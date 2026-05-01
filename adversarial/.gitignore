@@ -1,0 +1,32 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Images and data
+content/
+*.jpg
+*.png
+*.jpeg
+!results/*.jpg
+
+# Model weights
+*.pth
+*.pt
+*.h5
+*.ckpt
+
+# Jupyter
+.ipynb_checkpoints/
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db

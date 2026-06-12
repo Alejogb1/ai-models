@@ -1,0 +1,65 @@
+{
+  "n_queries": 10000,
+  "embedding_model": "all-MiniLM-L6-v2",
+  "hdbscan_results": {
+    "5": {
+      "n_clusters": 2,
+      "n_noise": 5258,
+      "noise_pct": 52.58,
+      "median_cluster_size": 4737,
+      "max_cluster_size": 5258,
+      "time_s": 69.6
+    },
+    "10": {
+      "n_clusters": 3,
+      "n_noise": 8828,
+      "noise_pct": 88.28,
+      "median_cluster_size": 578,
+      "max_cluster_size": 8828,
+      "time_s": 70.1
+    },
+    "15": {
+      "n_clusters": 6,
+      "n_noise": 9763,
+      "noise_pct": 97.63,
+      "median_cluster_size": 41,
+      "max_cluster_size": 9763,
+      "time_s": 73.5
+    },
+    "25": {
+      "n_clusters": 2,
+      "n_noise": 9799,
+      "noise_pct": 97.99,
+      "median_cluster_size": 175,
+      "max_cluster_size": 9799,
+      "time_s": 75.4
+    },
+    "50": {
+      "n_clusters": 0,
+      "n_noise": 10000,
+      "noise_pct": 100.0,
+      "median_cluster_size": 0,
+      "max_cluster_size": 0,
+      "time_s": 73.1
+    },
+    "100": {
+      "n_clusters": 0,
+      "n_noise": 10000,
+      "noise_pct": 100.0,
+      "median_cluster_size": 0,
+      "max_cluster_size": 0,
+      "time_s": 71.6
+    }
+  },
+  "interpretation": {
+    "n_clusters_at_mcs_5": 2,
+    "predicted_l3_count": 512,
+    "closest_to_l3": {
+      "mcs": 15,
+      "n_clusters": 6,
+      "ratio_to_512": 0.01
+    },
+    "predicted_l4_count": 3843,
+    "noise_at_mcs_5_pct": 52.58
+  }
+}

@@ -6,6 +6,9 @@ __pycache__/
 # Large binary files — PDFs are too heavy for git
 *.pdf
 
+# Embedded git repos (cloned subprojects)
+deepl-search/Awesome-Machine-Learning-Papers/
+
 # IDE files
 .vscode/
 .idea/

@@ -1,0 +1,15 @@
+{
+  "source": "Joint Deep Modeling of Users and Items Using Reviews for Recommendation",
+  "source_group": "Awesome-ML-Papers/MF",
+  "processed_at": "2026-06-08T12:00:00Z",
+  "agent": "agent_batch_generation",
+  "concepts": [
+    {
+      "finding": "Joint deep model: users and items both represented via stacked denoising autoencoders on their review texts. User review text encodes preferences; item review text encodes features. PMF connects user and item deep representations for rating prediction. Outperforms PMF and CDL on rating prediction.",
+      "category": "ModelCandidate",
+      "implication": "Keyword embedding from document context: the documents/pages where a keyword appears encode its semantics. Stacked autoencoder on keyword-document matrix captures document-level context for keyword intent.",
+      "open_question": "Should keyword embedding use the text of the keyword itself, the documents containing it, or both?",
+      "testable_hypothesis": "Joint deep model combining keyword text (autoencoder) with document context (co-occurrence matrix) produces more accurate intent clusters than either signal alone."
+    }
+  ]
+}

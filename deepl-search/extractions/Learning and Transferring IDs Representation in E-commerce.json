@@ -1,0 +1,15 @@
+{
+  "source": "Learning and Transferring IDs Representation in E-commerce",
+  "source_group": "Awesome-ML-Papers/Embeddings",
+  "processed_at": "2026-06-08T12:00:00Z",
+  "agent": "agent_batch_generation",
+  "concepts": [
+    {
+      "finding": "Learning transferable ID embeddings in e-commerce. Pre-trains embeddings on source task (click prediction w/ 10B+ samples) and transfers to target tasks with limited data. Key findings: (1) ID embeddings from large-scale tasks transfer to small tasks, (2) embedding dimension matters (128-512 works well), (3) joint training with auxiliary tasks improves transfer quality.",
+      "category": "Experiment",
+      "implication": "Keyword embeddings can be pre-trained on a large source task (e.g., search result prediction from logs) and transferred to keyword-intent clustering. Transfer learning reduces cold-start and improves embedding quality for rare keywords.",
+      "open_question": "What source task provides the most transferable keyword embeddings for intent clustering?",
+      "testable_hypothesis": "Keyword embeddings pre-trained on search click prediction tasks transfer better to intent clustering than embeddings pre-trained on general web text (Wikipedia)."
+    }
+  ]
+}

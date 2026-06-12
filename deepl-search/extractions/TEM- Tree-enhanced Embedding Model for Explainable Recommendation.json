@@ -1,0 +1,15 @@
+{
+  "source": "TEM- Tree-enhanced Embedding Model for Explainable Recommendation",
+  "source_group": "Awesome-ML-Papers/MF",
+  "processed_at": "2026-06-08T12:00:00Z",
+  "agent": "agent_batch_generation",
+  "concepts": [
+    {
+      "finding": "TEM: combines embedding-based recommendation with decision trees for explainability. Embedding captures user-item similarity; tree provides interpretable rules for why recommendation was made. Tree-learned feature interactions augment embedding predictions. Rules like \"user likes action movies AND movies from 1990s\" provide explanation.",
+      "category": "ModelCandidate",
+      "implication": "Explainable keyword-intent: embedding assigns keyword to intent; decision tree provides explanation rules. Rule: \"keyword contains 'best' AND 'budget' implies price-comparison intent.\" Tree rules interpretable, embedding handles complex patterns. Hybrid: embedding + tree ensemble.",
+      "open_question": "What combination of embedding-driven (accurate but opaque) and tree-driven (interpretable but limited) provides the best explainable keyword-intent system?",
+      "testable_hypothesis": "A TEM-style hybrid (embedding + decision tree) for keyword-intent achieves explainability (tree rules) while maintaining 95%+ of pure embedding accuracy."
+    }
+  ]
+}

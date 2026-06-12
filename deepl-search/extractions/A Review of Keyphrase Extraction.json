@@ -1,0 +1,15 @@
+{
+  "source": "A Review of Keyphrase Extraction.pdf",
+  "source_group": "Awesome-ML-Papers/Surveys",
+  "processed_at": "2026-06-08",
+  "agent": "agent6_remaining",
+  "concepts": [
+    {
+      "finding": "Keyphrase extraction methods fall into supervised (classification-based, sequence labeling) and unsupervised (graph-based like TextRank, topic-based like LDA, embedding-based like EmbedRank).",
+      "category": "Data",
+      "implication": "Keyphrase extraction techniques are directly applicable to query understanding: extracting key concepts from queries can improve query expansion, intent classification, and document retrieval.",
+      "open_question": "Can keyphrase extraction from queries improve retrieval accuracy compared to using full query text?",
+      "testable_hypothesis": "Queries expanded with automatically extracted keyphrases will improve retrieval recall@100 by 10%+ compared to raw query text for verbose or ambiguous queries."
+    }
+  ]
+}

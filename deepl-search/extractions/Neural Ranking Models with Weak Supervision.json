@@ -1,0 +1,15 @@
+{
+  "source": "Neural Ranking Models with Weak Supervision",
+  "source_group": "Awesome-ML-Papers/Ranking",
+  "processed_at": "2026-06-08T12:00:00Z",
+  "agent": "agent03_embeddings_mf_ranking_search_compiled",
+  "concepts": [
+    {
+      "finding": "Train neural ranking models using BM25 scores as weak supervision. Pre-training on billions of weakly labeled instances + fine-tuning on small labeled data. Achieves 13% and 35% MAP improvement over BM25 on Robust and ClueWeb. Key: pairwise ranking objectives outperform pointwise; letting network learn representations generalizes better.",
+      "category": "Label/Validation",
+      "implication": "Weak supervision can bootstrap keyword-intent clustering: use heuristic/rule-based keyword-intent assignments as weak labels. Pairwise training objectives ('intent A > intent B for keyword K') generalize better than pointwise classification of weak labels.",
+      "open_question": "What weak supervision signals (search logs, taxonomy rules, LLM-based labeling) are most effective for bootstrapping keyword-intent models?",
+      "testable_hypothesis": "A neural ranker pre-trained on weak keyword-intent labels and fine-tuned on curated data outperforms a model trained on curated data only, especially for tail keywords."
+    }
+  ]
+}

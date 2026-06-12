@@ -1,0 +1,22 @@
+{
+  "source": "0. Neural Machine Translation of Rare Words with Subword Units.pdf",
+  "source_group": "Awesome-ML-Papers/Neural Machine Translation",
+  "processed_at": "2026-06-08",
+  "agent": "agent6_remaining",
+  "concepts": [
+    {
+      "finding": "Byte Pair Encoding (BPE) segments words into subword units based on frequency, enabling NMT to handle rare and unseen words as sequences of subword units.",
+      "category": "Data",
+      "implication": "Subword tokenization solves the open-vocabulary problem and is directly applicable to query understanding: rare queries and misspellings can be handled via subword units without OOV issues.",
+      "open_question": "What is the optimal subword vocabulary size for search queries given their short length and high variability?",
+      "testable_hypothesis": "BPE-based tokenization with a 16K subword vocabulary will reduce OOV rate in search queries to <0.1% while maintaining semantic fidelity for intent classification."
+    },
+    {
+      "finding": "BPE-based NMT achieves BLEU scores comparable to or exceeding word-based models, demonstrating subword units preserve translation quality while eliminating unknown words.",
+      "category": "Evaluation",
+      "implication": "Subword representations are not just practical but maintain full task quality, making them suitable for high-stakes search applications.",
+      "open_question": "Does subword vs. word-level tokenization affect query intent classification differently for short vs. long queries?",
+      "testable_hypothesis": "Subword tokenization improves intent classification F1 for short queries (<3 words) by 5%+ compared to word-level tokenization."
+    }
+  ]
+}

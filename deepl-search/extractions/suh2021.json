@@ -1,0 +1,148 @@
+{
+  "source": "suh2021.pdf",
+  "source_group": "Web-Sources",
+  "processed_at": "2026-06-08",
+  "agent": "agent5_final",
+  "concepts": [
+    {
+      "finding": "CCS CONCEPTS\n• Information systems →Web log analysis; • Human-\ncentered computing;\nKEYWORDS\nWeb search; Search logs; Human needs; Population-scale; Pandemic;\nCOVID-19; Public policy; Difference-in-differences\nPermission to make digital or hard copies of all or part of this work for personal or\nclass",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Our contributions include the following:\n• We propose a novel computational framework for characterizing a\nholistic view of human behaviors, intents, and unmet needs based\non web search logs and human motivational theories (Sec.",
+      "category": "TargetConstruct",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "We demonstrate that\npotential barriers to addressing critical needs, such as support for\nunemployment and domestic violence, can be identified through\nweb search interactions.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "• We present the first population-scale analysis across a holistic set\nof human needs during the COVID-19 pandemic in the United\nStates through the use of web search logs (35+ billion search\ninteractions for 14 months on 86% of US ZIP codes; Sections 5-8).",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "• We demonstrate that potential barriers to accessing critical\nresources, in support of people facing unemployment or domestic\nviolence, can be identified through search interactions combined\nwith external data sources (Sec.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "(b) These needs are expressed through search interactions, which\ncan be categorized through keyword matches and/or subsequent clicks into relevant search result pages.",
+      "category": "ModelCandidate",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "For example, a search query\nfor ‘bandages’ with a subsequent click on ‘amazon.com’ could\nindicate a purchase intent that satisfies a Physiological need.",
+      "category": "TargetConstruct",
+      "implication": "Can inform intent modeling for recommendation systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "We\nrequire the additional click into one of many e-commerce domains\nto solidify that this interaction is a purchase intent.",
+      "category": "TargetConstruct",
+      "implication": "Can inform intent modeling for recommendation systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "When analyzing changes in such search\ninteractions, careful consideration is required to differentiate actual\nshifts in the underlying human needs (e.g., health-related needs\nhave increased due to COVID-19) from the equally meaningful\nchanges observed in logs based upon shifts from offline to online",
+      "category": "BehavioralTests",
+      "implication": "Can inform intent modeling for recommendation systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Although our\nanalysis excludes those who use traditional methods for filing\nunemployment claims (e.g., mail, phone), our results indicate that\nweb search is a critical resource that facilitates unemployment\nneeds and highlight a potential gap in satisfying unemployment\nneeds which requires further i",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Although expressions of needs may not reflect the\nactual underlying human needs, the methodology serves as a\nuseful detector for needs, as we have demonstrated through its\ncorroboration with several external findings, and combining our\nmethodology with additional data sources and interdisciplinary\nc",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "In contrast to traditional methods of\nmeasuring needs, our approach can operate at population scales\nrelying solely on data that is already routinely collected by web\nsearch engines, and thus allows for effective, retrospective, and\nfine-grained studies with observation periods of over one year.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "In\nexploring the timing and variations in statewide policies, we find\nthat the durations of shelter-in-place mandates have influenced\nsocial and emotional needs significantly.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Session 1: Society\nWSDM ’21, March 8–12, 2021, Virtual Event, Israel\n4\n\nWe address these limitations in obtaining signals about human\nneeds by observing the behaviors of people through their everyday\ninteractions with a web search engine.",
+      "category": "FailureRisk",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "How to address the limitation described: Session 1: Society\nWSDM ’21, March 8–12, 2021, Virtual Event, Israel\n4\n\nWe address these limitations in obtaining signals about human\nneeds by observing the behaviors of people through their everyday\n",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "We apply this framework to a dataset of 35+ billion\nsearch interactions across 36,000+ ZIP codes in the United States and\nover 14 months (7 months in 2019 and 7 months in 2020) to map\nsearch query strings and click interactions to human needs, resulting\nin over three billion expressions of human nee",
+      "category": "Experiment",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "We demonstrate\nhow this approach enables the examination of shifts in fundamental\nhuman needs based on disruptions induced by the pandemic.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "• We find that search interactions in pursuit of basic human needs\n(i.e., Physiological, Safety) have increased exponentially during\nthe pandemic while several higher-level aspirations (i.e., Self\nActualization, Cognitive) have declined (Sections 5, 6).",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Our findings also emphasize the importance of\ntracking broad sets of human needs in combination with other\nreported measures to identify gaps in our current understanding of\nchallenges and support, to measure the impact of policy changes,\nand to design policies and programs that can meet the needs.",
+      "category": "FailureRisk",
+      "implication": "Can optimize long-term user engagement metrics",
+      "open_question": "How to address the limitation described: Our findings also emphasize the importance of\ntracking broad sets of human needs in combination with other\nreported measures to identify gaps in our current understanding of\nchallenges and support, to",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "In particular,\nMaslow’s hierarchy of needs [37, 38] has been applied in numerous\ndomains [12, 42, 57, 63], despite criticisms of the validity of the\ntheory [58].",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "In contrast, we\nintroduce a computational methodology to extract a full spectrum\nof human needs at population scales, which is critical for aligning\npolicies with societal needs that they are intended to support.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    }
+  ]
+}

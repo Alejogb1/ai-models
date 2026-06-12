@@ -1,0 +1,148 @@
+{
+  "source": "A Sub-linear, Massive-scale Look-alike Audience Extension System.pdf",
+  "source_group": "Awesome-ML-Papers/Lookalike",
+  "processed_at": "2026-06-08",
+  "agent": "agent5_final",
+  "concepts": [
+    {
+      "finding": "The exper-\niment results show that our developed graph-based method with nearest-neighbor ﬁltering\noutperforms other methods by more than 50% regarding conversion rate in app-install ad\ncampaigns.",
+      "category": "Baseline",
+      "implication": "Relevant for similarity-based retrieval and lookalike targeting",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "The main\ncontributions of our work are summarized as follows:\n• We present a large-scale look-alike audience extension system from Yahoo!, where the\nsimilar user query time is sub-linear to the number of query users.",
+      "category": "ModelCandidate",
+      "implication": "Relevant for similarity-based retrieval and lookalike targeting",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "• Through extensive experiments using real-world app installation campaigns data, we\nshow that the recommended look-alike audience by our method can achieve more than\n50% lift in app installation rate over other existing audience extension models.",
+      "category": "Experiment",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Graph-Constraint Look-Alike System\nIn this section, we present the details of our developed graph-constraint look-alike system,\nwhich takes advantages of both simple similarity and regression-based methods.",
+      "category": "ModelCandidate",
+      "implication": "Relevant for similarity-based retrieval and lookalike targeting",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Through extensive evaluations on app installation campaigns, we show that the\nrecommended look-alike audience by our method can achieve more than 50% lift in app\ninstallation rate over other audience extension models.",
+      "category": "Experiment",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "We demonstrate that by using\nweighted user-2-user similarity graph, the app installation rate can be further im-\nproved by 11%.",
+      "category": "ModelCandidate",
+      "implication": "Relevant for similarity-based retrieval and lookalike targeting",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "In the rest of paper, we start with discussions on three existing approaches in Section 2,\nwhich are used in experiments for performance comparisons; then in Section 3 we introduce\nour nearest neighbor ﬁltering based look-alike audience extension method.",
+      "category": "Experiment",
+      "implication": "Relevant for similarity-based retrieval and lookalike targeting",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "A simple similarity-based look-alike system can use direct user-2-user similarity to\nsearch for users that look like (or in other words, be similar to) seeds.",
+      "category": "ModelCandidate",
+      "implication": "Relevant for similarity-based retrieval and lookalike targeting",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "However, this method has a couple of the main concerns.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "How to address the limitation described: However, this method has a couple of the main concerns.",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "For example, the predicting power for ad clicks or conversions is not considered.",
+      "category": "ModelCandidate",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Therefore, some less relevant candidate users may be regarded as look-alike users due to\nsimilarity from less important features.",
+      "category": "ModelCandidate",
+      "implication": "Relevant for similarity-based retrieval and lookalike targeting",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "However, it suﬀers from the cold-\nstart problem.",
+      "category": "FailureRisk",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "How to address the limitation described: However, it suﬀers from the cold-\nstart problem.",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "First, a\nglobal user-2-user similarity graph is built, which enables us to limit candidate look-alike\nusers to the nearest neighbors of seeds.",
+      "category": "FailureRisk",
+      "implication": "Relevant for similarity-based retrieval and lookalike targeting",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "The core\nformulation of our approach is a pairwise weighted user-2-user similarity, deﬁned as:\nsim(fi, fj) =\nfi′Afj\n||fi|| × ||fj||\n(9)\nwhere fi, fj are feature vectors of users ui and uj.",
+      "category": "Data",
+      "implication": "Relevant for similarity-based retrieval and lookalike targeting",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "The challenges of building the global user-2-user similarity graph live in both the high\ncomplexity of user pairwise similarity computation (O(N2)) and similar user query (O(N)).",
+      "category": "FailureRisk",
+      "implication": "Relevant for similarity-based retrieval and lookalike targeting",
+      "open_question": "How to address the limitation described: The challenges of building the global user-2-user similarity graph live in both the high\ncomplexity of user pairwise similarity computation (O(N2)) and similar user query (O(N)).",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Although in our ﬁnal audience\nrecommendation, we only need to use this score to rank candidate audience and recommend\na speciﬁc amount of audience, it will be useful to rank the audience and let advertisers\ncontrol and leverage the size of the recommended audience and the “quality” of the audience.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Figure 2 shows the weighted average of installation rates for all four methods.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "In empirical on-line\ncampaigns, these generated look-alike audiences are driving up to 40% improvements in\nconversion rates and up to 50% reduction in cost-per-conversion compared to other tar-\ngeting options like demographic or interests4.",
+      "category": "Baseline",
+      "implication": "Can inform intent modeling for recommendation systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "https://advertising.yahoo.com/Blog/GEMINI-CUSTOM-AUDIENCE-2.html\n12\n\nA Sub-linear, Massive-scaleLook-alike Audience Extension System\nFigure 4: Installation\nrate\nimprovement\nachieved\nby\nweighted\nglobal-\ngraph.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "To extend LSH to encode weighted Jaccard similarity, several prior works\nproposed diﬀerent methods Chum et al.",
+      "category": "ModelCandidate",
+      "implication": "Relevant for similarity-based retrieval and lookalike targeting",
+      "open_question": "",
+      "testable_hypothesis": ""
+    }
+  ]
+}

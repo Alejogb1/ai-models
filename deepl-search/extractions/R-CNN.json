@@ -1,0 +1,15 @@
+{
+  "source": "R-CNN.pdf",
+  "source_group": "Awesome-ML-Papers/CV",
+  "processed_at": "2026-06-08",
+  "agent": "agent6_remaining",
+  "concepts": [
+    {
+      "finding": "R-CNN combines bottom-up region proposals with CNNs for object detection, achieving 53.7% mAP on PASCAL VOC 2010 by warping each region proposal to a fixed-size image and classifying with a CNN.",
+      "category": "ModelCandidate",
+      "implication": "Region-proposal-based approaches can be adapted to search: first identify candidate regions of interest in query space, then classify each candidate - analogous to candidate generation + reranking.",
+      "open_question": "What is the text-domain equivalent of region proposals for query understanding?",
+      "testable_hypothesis": "A two-stage model that first proposes candidate query intents then classifies each will outperform flat classification on multi-intent queries by 20%+ F1."
+    }
+  ]
+}

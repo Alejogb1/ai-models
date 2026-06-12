@@ -1,0 +1,15 @@
+{
+  "source": "Incremental Learning for Matrix Factorization in Recommender Systems",
+  "source_group": "Awesome-ML-Papers/MF",
+  "processed_at": "2026-06-08T12:00:00Z",
+  "agent": "agent_batch_generation",
+  "concepts": [
+    {
+      "finding": "Incremental MF for streaming recommendation data. New user/item ratings processed incrementally without full retraining. Techniques: (1) alternating least squares on new data only, (2) warm-start with existing factors, (3) forgetting factor for temporal dynamics. 100-1000x faster than full retraining with <1% accuracy loss.",
+      "category": "Experiment",
+      "implication": "Incremental keyword embedding updates as new co-occurrence data arrives. New keyword-intent relationships processed without full retraining. Forgetting factor handles temporal keyword shifts (seasonal intents).",
+      "open_question": "How often should keyword embeddings be incrementally updated vs. fully retrained? What forgetting factor captures keyword intent evolution?",
+      "testable_hypothesis": "Incremental keyword embedding updates (100x faster than full retraining) maintain >95% of intent cluster quality for up to 30 days between full retraining cycles."
+    }
+  ]
+}

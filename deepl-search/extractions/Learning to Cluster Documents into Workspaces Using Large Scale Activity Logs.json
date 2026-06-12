@@ -1,0 +1,148 @@
+{
+  "source": "Learning to Cluster Documents into Workspaces Using Large Scale Activity Logs .pdf",
+  "source_group": "Awesome-ML-Papers/Other",
+  "processed_at": "2026-06-08",
+  "agent": "agent5_final",
+  "concepts": [
+    {
+      "finding": "For example, Beeferman and Berge [7] proposed an\nagglomerative clustering algorithm for clustering similar webpages\nusing a click-through bipartite graph extracted from search logs.",
+      "category": "ModelCandidate",
+      "implication": "Applicable to user/item clustering for personalization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "It is important to point out that while we\nevaluate our methods in the context of Google Drive, the problem\nof suggesting coherent and useful workspaces is a general one.",
+      "category": "Experiment",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "This shows the\nbenefit of learning from large-scale activity logs, and testifies to\nthe effectiveness of the proposed weak supervision method.",
+      "category": "BehavioralTests",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Our contributions can be summarized as follows:\n• We present the workspace suggestion task – an interesting\ndocument clustering problem that requires intra-cluster documents\nto be coherent as well as useful to users in their ongoing tasks.",
+      "category": "FailureRisk",
+      "implication": "Can inform intent modeling for recommendation systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "The co-access signals are analogous to\nthe clickthrough signals used for search ranking [5, 17], and can\nbe utilized in two ways.",
+      "category": "ModelCandidate",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "The\nidea of using signals from user logs as implicit feedback [20] has\nbeen extensively explored for many information retrieval problems,\nsuch as search ranking and query suggestion.",
+      "category": "FailureRisk",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Our research problem is to improve the document clustering\nusing the activity logs.",
+      "category": "FailureRisk",
+      "implication": "Applicable to user/item clustering for personalization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "First, models based on lexical text features, such as\nthe TF-IDF representation [25], could face the vocabulary mismatch\nproblem when estimating document similarity.",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Many techniques\nhave been proposed to address this problem including latent seman-\ntic analysis [12], topic modeling [9, 14] and more recently word2vec\nembeddings [21].",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "To address these weaknesses and improve document clustering,\nwe propose to extract signals from users’ activity logs (Section 3.2)\nfor measuring document similarity.",
+      "category": "ModelCandidate",
+      "implication": "Applicable to user/item clustering for personalization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "In this earlier work, click-\nthrough signals are introduced, and combined with text features for\nranking.",
+      "category": "ModelCandidate",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Feature\nAUC\nrecent_co_accesses(𝑑,𝑑′)\n0.6360\nhistoric_co_accesses(𝑑,𝑑′)\n0.6838\n4.5\nActivity-Based Labels and Weak\nSupervision\nWith the proposed activity-based features and the text/metadata\nfeatures, one could train an effective document similarity model to\nenable supervised clustering when the co-cl",
+      "category": "LabelValidation",
+      "implication": "Applicable to user/item clustering for personalization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "The notion of recent co-access features and future co-access labels\nis analogous to notion of clickthrough features [5] and clickthrough\nlabels [17] used for search ranking – clickthrough information from\nthe past search logs can be extracted as features, while the future\nclickthrough information ca",
+      "category": "LabelValidation",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "For example, for search ranking, user\nclicks are often collected as labels for training ranking models [17],\neven though clicks are known to be biased [18, 29].",
+      "category": "LabelValidation",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "6\nEXPERIMENTAL RESULTS\n6.1\nActivity-Based Features\nTo study the effectiveness of activity-based features, we train the\ndocument similarity model with different feature sets using co-\ncluster labels on Dtrain\nℎ\n.",
+      "category": "LabelValidation",
+      "implication": "Applicable to user/item clustering for personalization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Second, incorporating activity-based features with base-\nline feature sets effectively improves the performance.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "6.2\nWeak Supervision\nTo study the effectiveness of the proposed weak supervision method,\nwe train a document similarity model with future co-access labels\non Dtrain\n𝑎\n(weak supervision method) and another model with co-\ncluster human labels on Dtrain\nℎ\n(supervision method).",
+      "category": "LabelValidation",
+      "implication": "Applicable to user/item clustering for personalization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "6.3\nLive Experiment\nTo conclude the empirical study, we verify the effectiveness of our\nproposed weak supervision method by comparing it with several\nbaseline clustering methods that do not require supervised labels,\nand were included in the original suggested workspaces launch:\nWeak Supervision Our",
+      "category": "LabelValidation",
+      "implication": "Applicable to user/item clustering for personalization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Our offline and online experiments based\non Google Drive show that (a) co-access features are very effec-\ntive for document clustering; (b) our weakly supervised clustering\nachieves comparable or even better performance compared to the\nmodels trained with human labels; and (c) the weakly supervised\n",
+      "category": "LabelValidation",
+      "implication": "Applicable to user/item clustering for personalization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "For instance, a user may create a workspace for\n1https://gsuiteupdates.googleblog.com/2019/03/priority-page-drive.html\nPermission to make digital or hard copies of part or all of this work for personal or\nclassroom use is granted without fee provided that copies are not made or distributed\nfor profi",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    }
+  ]
+}

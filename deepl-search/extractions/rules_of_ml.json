@@ -1,0 +1,148 @@
+{
+  "source": "rules_of_ml.pdf",
+  "source_group": "Awesome-ML-Papers/Other",
+  "processed_at": "2026-06-08",
+  "agent": "agent5_final",
+  "concepts": [
+    {
+      "finding": "Note  that  this  is  not  about  personalization:  figure  out  if  someone \nlikes  the  content  in  this  context  first,  then  figure  out  who  likes  it  more  or  less.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "When  you  switch  your  ranking  algorithm  radically  enough  that  different  results  show  up,  you \nhave  effectively  changed  the  data  that  your  algorithm  is  going  to  see  in  the  future.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "However,  even  then,  not  all  metrics  are  easily  framed  as \nmachine  learning  objectives:  if  a  document  is  clicked  on  or  an  app  is  installed,  it  is  because  that \nthe  content  was  shown.",
+      "category": "Experiment",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "How to address the limitation described: However,  even  then,  not  all  metrics  are  easily  framed  as \nmachine  learning  objectives:  if  a  document  is  clicked  on  or  an  app  is  installed,  it  is  because  that \nthe  content  w",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Rule  #35:  Beware  of  the  inherent  skew  in  ranking  problems.",
+      "category": "FailureRisk",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Rule  #42:  Don’t  expect  diversity,  personalization,  or  relevance  to  be  as  correlated \nwith  popularity  as  you  think  they  are.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "The  second  part  is  about  deploying  your  first  pipeline.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "As  in  most  software  engineering  tasks,  you  will  want  to  be  constantly  updating  your \napproach,  whether  it  is  a  heuristic  or  a  machine­learned  model,  and  you  will  find  that  the \nmachine­learned  model  is  easier  to  update  and  maintain  (see  Rule  #16 ).",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "There  is \nan  existing  system  for  ranking,  or  classifying,  or  whatever  problem  you  are  trying  to  solve.",
+      "category": "FailureRisk",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "ML  Phase  II:  Feature  Engineering \nIn  the  first  phase  of  the  lifecycle  of  a  machine  learning  system,  the  important  issue  is  to  get  the \ntraining  data  into  the  learning  system,  get  any  metrics  of  interest  instrumented,  and  create  a \nserving  infrastructure.",
+      "category": "Experiment",
+      "implication": "Can inform intent modeling for recommendation systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Finally,  if  you  have  a  user  action  that  you  are  using  as  a  label,  seeing  that  action  on  the \ndocument  in  a  different  context  can  be  a  great  feature.",
+      "category": "LabelValidation",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "If  you  are  working  on  a  search  ranking  system,  and  there  are  millions  of  different  words \nin  the  documents  and  the  query  and  you  have  1000  labeled  examples,  then  you  should \nuse  a  dot  product  between  document  and  query  features,  TF­IDF ,  and  a  half­dozen \noth",
+      "category": "LabelValidation",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "For  example,  if  you  have  some  personalization  features,  but  only \n8%  of  your  users  have  any  personalization  features,  it  is  not  going  to  be  very  effective.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Human  Analysis  of  the  System \nBefore  going  on  to  the  third  phase  of  machine  learning,  it  is  important  to  focus  on  something  that \nis  not  taught  in  any  machine  learning  class:  how  to  look  at  an  existing  model,  and  improve  it.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "For  instance,  if  you  have  a  ranking  problem,  run  both  models  on  a  sample  of  queries \nthrough  the  entire  system,  and  look  at  the  size  of  the  symmetric  difference  of  the  results \n(weighted  by  ranking  position).",
+      "category": "Experiment",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "However,  in  the  end,  the  key  question  is  what \nyou  do  with  that  prediction.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "How to address the limitation described: However,  in  the  end,  the  key  question  is  what \nyou  do  with  that  prediction.",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "However,  if  you  are  maximizing  number  of  installs,  and \npeople  install  a  gag  app  when  they  search  for  free  games,  the  “gag  apps”  feature  won’t  have  the \neffect  you  want.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "How to address the limitation described: However,  if  you  are  maximizing  number  of  installs,  and \npeople  install  a  gag  app  when  they  search  for  free  games,  the  “gag  apps”  feature  won’t  have  the \neffect  you  want.",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "For  example,  if  they  think  that  too  many  “gag  apps” \nare  being  shown  in  Play  Search,  they  could  have  human  raters  identify  gag  apps.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "The  general  rule  is  “measure  first,  optimize  second”.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "However,  you  notice  that  no  new  apps  are  being  shown.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "How to address the limitation described: However,  you  notice  that  no  new  apps  are  being  shown.",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Although  data  that  was  never  shown  to  the  user  can  be  dropped,  importance \nweighting  is  best  for  the  rest.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    }
+  ]
+}

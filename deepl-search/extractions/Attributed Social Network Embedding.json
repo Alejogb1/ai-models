@@ -1,0 +1,15 @@
+{
+  "source": "Attributed Social Network Embedding",
+  "source_group": "Awesome-ML-Papers/Embeddings",
+  "processed_at": "2026-06-08T12:00:00Z",
+  "agent": "agent_batch_generation",
+  "concepts": [
+    {
+      "finding": "Learns embeddings from both network structure and node attributes. Deep neural network fuses topological proximity (from random walks) with attribute similarity. Experiments on citation and social networks show attributes significantly improve embedding quality for classification, especially for low-degree nodes.",
+      "category": "ModelCandidate",
+      "implication": "Keyword embedding can combine graph structure (co-occurrence patterns) with node attributes (keyword text, frequency, language, domain). This helps low-frequency keywords where co-occurrence signal is sparse.",
+      "open_question": "What keyword attributes (text features, frequency statistics, language, entity type) provide the strongest signal for intent clustering?",
+      "testable_hypothesis": "Attributed keyword embeddings (combining co-occurrence with lexical features) reduce the cold-start problem for low-frequency keywords by 30%+ in intent classification accuracy."
+    }
+  ]
+}

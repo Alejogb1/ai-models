@@ -1,0 +1,85 @@
+{
+  "source": "search-datasets.md",
+  "source_group": "Deepl-Search/Datasets",
+  "processed_at": "2026-06-08",
+  "agent": "agent5_final",
+  "concepts": [
+    {
+      "finding": "No single dataset covers full search intelligence pipeline. Must compose: MS MARCO (retrieval), AOL/ORCAS (clicks), TREC (relevance), ClueWeb (content).",
+      "category": "Data",
+      "implication": "Intent clustering needs assembled pipeline combining ORCAS (click signals) with MS MARCO and web crawl.",
+      "open_question": "What is minimal dataset composition for reliable intent discovery?",
+      "testable_hypothesis": "ORCAS + MS MARCO produces more coherent clusters than either alone."
+    },
+    {
+      "finding": "MS MARCO has ~1M queries but weak labels from Bing click logs, not human judgments.",
+      "category": "LabelValidation",
+      "implication": "Click-derived labels biased by SERP position effects. Intent signals inherit this bias.",
+      "open_question": "How much bias do click-derived labels introduce into downstream intent models?",
+      "testable_hypothesis": "MS MARCO clusters show systematic bias toward popular high-rank pages."
+    },
+    {
+      "finding": "Click datasets essential for intent inference but suffer position bias, trust bias, privacy filtering, missing negatives.",
+      "category": "Data",
+      "implication": "Raw CTR is misleading intent proxy. Position bias correction (IPW) required.",
+      "open_question": "What debiasing method is most effective for intent inference from click logs?",
+      "testable_hypothesis": "DBN/UBM click models produce intent labels with higher external validity than raw aggregation."
+    },
+    {
+      "finding": "No large multi-class intent dataset exists. Intent is binary or weakly inferred. No standardized taxonomy.",
+      "category": "LabelValidation",
+      "implication": "Multi-class intent (informational, transactional, navigational, commercial) needs better datasets.",
+      "open_question": "Can multi-class intent labels be inferred without manual annotation?",
+      "testable_hypothesis": "5+ intent categories can be induced from query-click patterns via unsupervised clustering."
+    },
+    {
+      "finding": "No open dataset includes full SERP layout. Commercial APIs not reproducible.",
+      "category": "Data",
+      "implication": "SERP features contain rich intent signals inaccessible in current datasets.",
+      "open_question": "How much does SERP context improve intent classification vs query-only?",
+      "testable_hypothesis": "SERP snippet text input improves intent F1 by >5% over query-only models."
+    },
+    {
+      "finding": "ORCAS: 10M query-click mappings lacks session context. AOL: session structure but outdated (2006).",
+      "category": "Data",
+      "implication": "Session context (sequences, reformulations) critical. Single-query models miss sequential behavior.",
+      "open_question": "How many prior session queries provide useful context?",
+      "testable_hypothesis": "3-5 prior queries in session-aware models outperform single-query by >10% F1."
+    },
+    {
+      "finding": "Critical gaps: content gap detection, cannibalization detection, query-to-page mapping must be inferred.",
+      "category": "FailureRisk",
+      "implication": "Current datasets don't support direct learning of these tasks. Heuristic inference required.",
+      "open_question": "Can content gaps be detected from query clustering without page content?",
+      "testable_hypothesis": "Low page-coverage-diversity intent groups reliably indicate content gaps."
+    },
+    {
+      "finding": "Embedding generation (BERT, E5, OpenAI) required preprocessing for clustering and retrieval.",
+      "category": "ModelCandidate",
+      "implication": "Embedding quality is foundation of downstream clustering. Choice significantly impacts coherence.",
+      "open_question": "Which embedding model produces most intent-aware representations for short queries?",
+      "testable_hypothesis": "E5 retrieval embeddings produce more intent-coherent clusters than general MiniLM."
+    },
+    {
+      "finding": "Temporal dynamics ignored: query trends, seasonality, ranking changes not captured.",
+      "category": "Data",
+      "implication": "Static snapshot models miss temporal evolution. Time-aware embeddings and updating needed.",
+      "open_question": "How much does temporal context improve intent prediction?",
+      "testable_hypothesis": "Time-aware embeddings (week/season features) improve classification for time-sensitive queries."
+    },
+    {
+      "finding": "Starter stack: MS MARCO, BEIR, ORCAS, AOL logs, Common Crawl, Quora Pairs.",
+      "category": "Baseline",
+      "implication": "Pipeline: embeddings on MS MARCO, BM25+dense retrieval, ORCAS weak supervision, clustering, gap detection.",
+      "open_question": "What is optimal production intent discovery pipeline?",
+      "testable_hypothesis": "6-step pipeline identifies actionable content gaps with >70% precision."
+    },
+    {
+      "finding": "No unified dataset combining queries, SERPs, clicks, content exists. Forces heavy preprocessing.",
+      "category": "Data",
+      "implication": "Deepest need is unified multimodal dataset. Until then, assemble from heterogeneous sources.",
+      "open_question": "What entity could create a unified search intelligence dataset?",
+      "testable_hypothesis": "Unified dataset would accelerate intent modeling 2-3x vs fragmented approach."
+    }
+  ]
+}

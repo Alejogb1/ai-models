@@ -1,0 +1,15 @@
+{
+  "source": "A Comprehensive Survey on Graph Neural Networks",
+  "source_group": "Awesome-ML-Papers/Embeddings",
+  "processed_at": "2026-06-08T12:00:00Z",
+  "agent": "agent_batch_generation",
+  "concepts": [
+    {
+      "finding": "Comprehensive survey covering GNN architectures: GCN, GAT, GraphSAGE, GIN, and variants. Identifies key design dimensions: aggregator type (mean, max, attention), depth (oversmoothing beyond 2-3 layers), and training approaches (supervised, unsupervised, self-supervised). Recurrent vs. convolutional vs. attention-based GNNs compared.",
+      "category": "TargetConstruct",
+      "implication": "GNN design space provides multiple approaches for embedding keyword co-occurrence graphs. Key decisions: neighbor aggregation method (attention-based may capture intent relevance), number of layers (2-3 sufficient for keyword neighborhoods), and whether to use inductive (GraphSAGE) or transductive (GCN) approaches.",
+      "open_question": "Which GNN architecture is most appropriate for keyword-intent graphs with millions of nodes? Can attention-based aggregation identify intent-relevant neighbors?",
+      "testable_hypothesis": "A 2-layer Graph Attention Network on keyword co-occurrence graphs produces better intent clusters than GCN or GraphSAGE due to learned neighbor importance weighting."
+    }
+  ]
+}

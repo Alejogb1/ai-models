@@ -1,0 +1,148 @@
+{
+  "source": "Timoshenko_Hauser Customer Needs from UGC June 2018.pdf",
+  "source_group": "Web-Sources",
+  "processed_at": "2026-06-08",
+  "agent": "agent5_final",
+  "concepts": [
+    {
+      "finding": "Finally, we \nthank the anonymous reviewers and Associate Editor for constructive comments that enabled us to \nimprove our research.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "However, established methods are neither efficient nor effective for large \nUGC corpora because much content is non-informative or repetitive.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "How to address the limitation described: However, established methods are neither efficient nor effective for large \nUGC corpora because much content is non-informative or repetitive.",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Although such information might be useful, we \nseek methods to efficiently search more broadly in order to obtain a reasonably complete set of \ncustomer needs (within cost and feasibility constraints), including rarely mentioned customer needs.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "CNNs demonstrate state-of-the-art \nperformance with minimum tuning in such problems as relation extraction (Nguyen and Grishman \n\n9 \n \n2015), named entity recognition (Chiu and Nichols 2016), and sentiment analysis (dos Santos and Gatti \n2014).",
+      "category": "Baseline",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "(“Features” in the CNN should not be \nconfused with product features.) In contrast, traditional machine-learning classification techniques, such \nas a support-vector machine or decision trees, depend critically on handcrafted features, which are the \ntransformations of the raw data designed by resea",
+      "category": "Data",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Figure 6 \n\n31 \n \nsuggests that, while not perfect, the clusters of sentence embeddings achieved separation among \nprimary customer needs and, hence, are likely to reduce redundancy and enable analysts to identify a \ndiverse set of customer needs when they analyze Y sentences, each chosen from one of",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "We expect the performance of the proposed architecture to improve significantly \nwith new developments in machine learning.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "A full list of tertiary customer needs is available from the authors.)  \nPrimary Group \nSecondary Group \n#Needs \nExamples of Tertiary Customer Needs (22 of 86 shown)  \nFeel Clean And Fresh \n(Sensory) \nClean Feeling in My Mouth \n4 \nMy mouth feels clean \nFresh Breath All Day Long \n4 \nI wake up without",
+      "category": "ModelCandidate",
+      "implication": "Applicable to user/item clustering for personalization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "We propose a machine-learning \napproach to facilitate qualitative analysis by selecting content for efficient review.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "We show that \n(1) UGC is at least as valuable as a source of customer needs for product development, likely more-\nvaluable, than conventional methods, and (2) machine-learning methods improve efficiency of \nidentifying customer needs from UGC (unique customer needs per unit of professional services ",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Keywords: Voice of the Customer; Machine Learning, User-generated Content; Customer Needs; Online \nReviews; Market Research; Text Mining; Deep Learning; Natural Language Processing \n\n2 \n \n1.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "American firms soon introduced their own concentrated detergents, but by being the first \nto identify an unfulfilled and previously unrecognized customer need, Kao gained a competitive edge.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "A customer \nneed is an abstract context-dependent statement describing the benefits, in the customer’s own words, \nthat the customer seeks to obtain from a product or service (Brown and Eisenhardt 1995; Griffin, et al., \n2009).",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "To effectively capture rich information, customer needs are typically described with sentences or \nphrases that describe in detail the benefits the customers wish to obtain from products.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "However, for new product development, product-\ndevelopment teams want to know how the customers use these words in context.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "How to address the limitation described: However, for new product development, product-\ndevelopment teams want to know how the customers use these words in context.",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "To identify abstract context-dependent \ncustomer needs, researchers need to understand rich meanings behind the words.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Manual review by professional analysts \nremains necessary in the last step because of the context-dependent nature of customer needs.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "We then evaluate the efficiency improvements achieved by the \nmachine learning methods in terms of the expected number of unique customer needs identified per \nunit of professional services costs.",
+      "category": "Experiment",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "We further demonstrate that machine learning \nhelps to eliminate irrelevant and redundant content and, hence, makes professional services \ninvestments more efficient.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "(2017) propose a benefit-based conjoint-\nanalysis model which maps product attributes to latent customer needs before estimation.",
+      "category": "Data",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    }
+  ]
+}

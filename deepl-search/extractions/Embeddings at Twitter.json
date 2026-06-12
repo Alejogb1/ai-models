@@ -1,0 +1,15 @@
+{
+  "source": "Embeddings at Twitter",
+  "source_group": "Awesome-ML-Papers/Embeddings",
+  "processed_at": "2026-06-08T12:00:00Z",
+  "agent": "agent_batch_generation",
+  "concepts": [
+    {
+      "finding": "Slide deck overview of embedding applications at Twitter: user embeddings (engagement, interests), tweet embeddings (content, topic), hashtag embeddings (semantic similarity), and advertiser targeting. Emphasizes scalability, real-time updates, and cold-start solutions.",
+      "category": "TargetConstruct",
+      "implication": "Real-world embedding systems must handle: (1) massive scale (millions of entities), (2) cold-start (new entities with no history), (3) real-time updates, (4) multi-modal entity types in shared spaces.",
+      "open_question": "What infrastructure is needed to maintain keyword embeddings at production scale (millions of keywords, daily updates)?",
+      "testable_hypothesis": "A production keyword embedding system can maintain <100ms inference latency for 10M+ keywords with daily embedding updates using approximate nearest neighbor search."
+    }
+  ]
+}

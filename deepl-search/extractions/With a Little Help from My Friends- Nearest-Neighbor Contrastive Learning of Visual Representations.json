@@ -1,0 +1,148 @@
+{
+  "source": "With a Little Help from My Friends- Nearest-Neighbor Contrastive Learning of Visual Representations.pdf",
+  "source_group": "Awesome-ML-Papers/Other",
+  "processed_at": "2026-06-08",
+  "agent": "agent5_final",
+  "concepts": [
+    {
+      "finding": "Next we introduce our approach, Nearest-Neighbor\nContrastive Learning of visual Representations (NNCLR),\nwhich proposes using nearest-neighbours (NN) as positives\nto improve contrastive instance discrimination methods.",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "We make the following contributions: (i) We introduce\nNNCLR to learn self-supervised representations that go be-\nyond single instance positives, without resorting to cluster-\ning; (ii) We demonstrate that NNCLR increases the perfor-\nmance of contrastive learning methods (e.g.",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "SimCLR [11])\nby ∼3.8% and achieves state of the art performance\non ImageNet classiﬁcation for linear evaluation and semi-\nsupervised setup with limited labels; (iii) Our method out-\nperforms state of the art methods on self-supervised, and\neven supervised features (learned via supervised ImageNet\npr",
+      "category": "LabelValidation",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "On transfer learning benchmarks\nour method outperforms state-of-the-art methods (including\nsupervised learning with ImageNet) on 8 out of 12 down-\nstream datasets.",
+      "category": "LabelValidation",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "[2] concurrently propose leveraging nearest-neighbors\nin embedding space to improve self-supervised representa-\ntion learning using BYOL [26].",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "First we show using the NNs in con-\ntrastive learning (row 2) is 3% better in Top-1 accuracy than\nusing view 1 embeddings (similar to SimCLR) shown in\nrow 1.",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Our method is robust to choice of the\nembedding size as shown in Table 7d.",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Linear evaluation on ImageNet classiﬁcation\nshows that it takes about 120 epochs for NNCLR to start\noutperforming SimCLR, and remains higher until the end\nof pre-traininig at 1000 epochs.",
+      "category": "Baseline",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "We ﬁnd that using the nearest-neighbor as positive\nin contrastive losses improves performance signiﬁcantly\non ImageNet classiﬁcation, from 71.7% to 75.6%, out-\nperforming previous state-of-the-art methods.",
+      "category": "Baseline",
+      "implication": "Relevant for similarity-based retrieval and lookalike targeting",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Furthermore, we demonstrate empirically\nthat our method is less reliant on complex data augmenta-\ntions.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "In this work, we show how an abil-\nity to ﬁnd similarities across items within previously seen\nexamples improves the performance of self-supervised rep-\nresentation learning.",
+      "category": "LabelValidation",
+      "implication": "Relevant for similarity-based retrieval and lookalike targeting",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "However, instead of clustering or\nlearning prototypes, we maintain a support set of image em-\nbeddings and using nearest neighbors from that set to deﬁne\npositive samples.",
+      "category": "ModelCandidate",
+      "implication": "Applicable to user/item clustering for personalization",
+      "open_question": "How to address the limitation described: However, instead of clustering or\nlearning prototypes, we maintain a support set of image em-\nbeddings and using nearest neighbors from that set to deﬁne\npositive samples.",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Unlike [8, 57, 63], our support set\nis continually refreshed with new embeddings and we do\nnot maintain running averages of the embeddings.",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Nearest neigh-\nbor search has been an important tool across a wide range of\ncomputer vision applications [14, 17, 30, 31, 50, 56], from\nimage retrieval to unsupervised feature learning.",
+      "category": "LabelValidation",
+      "implication": "Relevant for similarity-based retrieval and lookalike targeting",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "[52] propose a method to learn landmarks on ob-\njects in an unsupervised manner by using nearest-neighbors\nfrom other images of the same object while [19] show un-\nsupervised learning of action phases by using soft nearest-\nneighbors across videos of the same action.",
+      "category": "LabelValidation",
+      "implication": "Relevant for similarity-based retrieval and lookalike targeting",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "In contrast, in this work\nwe use nearest neighbor retrieval within a single modality\n(RGB images), and we maintain an explicit support set of\nprior embeddings to increase diversity.",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "the InfoNCE\nloss) in the context of instance discrimination, and discuss\nSimCLR [10] as one of the leading methods in this do-\nmain.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Finally we present results on transferring self-\nsupervised features to other downstream datasets and tasks.",
+      "category": "LabelValidation",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "First, NNCLR achieves the best performance com-\npared to all the other methods using a ResNet-50 encoder\ntrained with two views.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "[54], which explicitly studies\n“good view” transformations to apply in contrastive learn-\ning, NNCLR achieves more than 2% improvement on top-\n1 classiﬁcation performance.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    }
+  ]
+}

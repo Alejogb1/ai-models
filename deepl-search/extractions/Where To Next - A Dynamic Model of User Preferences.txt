@@ -1,0 +1,1459 @@
+Where To Next? A Dynamic Model of User Preferences
+Francesco Sanna Passino∗
+Imperial College London
+fs4515@ic.ac.uk
+Lucas Maystre
+Spotify
+lucasm@spotify.com
+Dmitrii Moor
+Spotify
+dmitriim@spotify.com
+Ashton Anderson†
+University of Toronto
+ashton@cs.toronto.edu
+Mounia Lalmas
+Spotify
+mounia@acm.org
+ABSTRACT
+We consider the problem of predicting users’ preferences on on-
+line platforms. We build on recent findings suggesting that users’
+preferences change over time, and that helping users expand their
+horizons is important in ensuring that they stay engaged. Most
+existing models of user preferences attempt to capture simulta-
+neous preferences: “Users who like 𝐴tend to like 𝐵as well”. In
+this paper, we argue that these models fail to anticipate changing
+preferences. To overcome this issue, we seek to understand the
+structure that underlies the evolution of user preferences. To this
+end, we propose the Preference Transition Model (PTM), a dynamic
+model for user preferences towards classes of items. The model
+enables the estimation of transition probabilities between classes of
+items over time, which can be used to estimate how users’ tastes are
+expected to evolve based on their past history. We test our model’s
+predictive performance on a number of different prediction tasks
+on data from three different domains: music streaming, restaurant
+recommendations and movie recommendations, and find that it
+outperforms competing approaches. We then focus on a music ap-
+plication, and inspect the structure learned by our model. We find
+that the PTM uncovers remarkable regularities in users’ preference
+trajectories over time. We believe that these findings could inform
+a new generation of dynamic, diversity-enhancing recommender
+systems.
+KEYWORDS
+Recommender systems, time series, diversity, user modelling.
+ACM Reference Format:
+Francesco Sanna Passino, Lucas Maystre, Dmitrii Moor, Ashton Anderson,
+and Mounia Lalmas. 2021. Where To Next? A Dynamic Model of User
+Preferences. In Proceedings of the Web Conference 2021 (WWW ’21), April
+19–23, 2021, Ljubljana, Slovenia. ACM, New York, NY, USA, 11 pages. https:
+//doi.org/10.1145/3442381.3450028
+∗This work was completed as part of an internship at Spotify.
+†This work was completed while the author was working at Spotify.
+This paper is published under the Creative Commons Attribution 4.0 International
+(CC-BY 4.0) license. Authors reserve their rights to disseminate the work on their
+personal and corporate Web sites with the appropriate attribution.
+WWW ’21, April 19–23, 2021, Ljubljana, Slovenia
+© 2021 IW3C2 (International World Wide Web Conference Committee), published
+under Creative Commons CC-BY 4.0 License.
+ACM ISBN 978-1-4503-8312-7/21/04.
+https://doi.org/10.1145/3442381.3450028
+1
+INTRODUCTION
+Online platforms have transformed the way users access informa-
+tion, audio and video content, knowledge repositories, and much
+more. Over three decades of research and practice have demon-
+strated that a) learning users’ preferences, and b) personalizing
+users’ experience to match these preferences is immensely valuable
+to increase engagement and satisfaction. To this end, recommender
+systems have emerged as essential building blocks [3]. They help
+users find their way through large collections of items and assist
+them in discovering new content. They typically build on user pref-
+erence models that exploit correlations across users’ preferences.
+As an example within the music domain, if a user likes The Beatles,
+that user might also like Simon & Garfunkel, because other users
+who listen to the former also listen to the latter.
+The vast majority of these preference models take a static view-
+point and try to capture simultaneous preferences. In other words,
+they seek to answer the following question: How well does prefer-
+ence for item 𝐴predict preference for item 𝐵? While these models
+are effective at finding similar items, they can confine users in so-
+called filter bubbles [30, 31]. In a sense, they successfully exploit
+narrow preferences but may not help users explore completely new
+regions in the space of items. From a user’s point of view, this can
+lead to the impression that recommender systems tend to show
+“more of the same” [27], and that they do not help expand their
+horizons.
+As online platforms mature, our understanding of users’ prefer-
+ences and behaviors is becoming richer and more nuanced. There is
+evidence suggesting that traditional approaches, based on matching
+users with items similar to those they have liked in the past, fail to
+capture important aspects of long-term engagement. In particular,
+the following two findings stand out.
+(1) Longitudinal traces reveal that the journey of users on online
+platform is inherently dynamic, and that their preferences
+are fluid [23]. Take a music streaming service, for example:
+new artists and tracks become available over time, trends
+evolve quickly and users’ preferences with them.
+(2) Consuming diverse content is linked to users’ engagement
+and long-term satisfaction [10, 15, 20, 35]. In the context of a
+music streaming service, for example, recent research shows
+that consumption diversity is highly correlated with user
+retention and conversion to a paid subscription [4].
+Previous research has attempted to address these aspects with-
+out fundamentally changing the underlying preference model. To
+account for preference drift over time, dynamic variants of well-
+known preference models have been proposed [9, 23]. These models
+WWW ’21, April 19–23, 2021, Ljubljana, Slovenia
+Francesco Sanna Passino, Lucas Maystre, Dmitrii Moor, Ashton Anderson, and Mounia Lalmas
+alleviate the staleness problem, but they do not capture regularities
+within the preference trajectories themselves. In other words, they
+recognize that users’ preferences today might be different from a
+year ago, but they cannot be used to predict how these preferences
+will look like one year from now. To address the lack of diversity in
+recommendations, some proposals suggest adding constraints such
+that sets of recommended items cover distinct regions of the item
+space [1], or framing recommendation as a multi-objective prob-
+lem [39]. These methods may succeed in exposing users to diverse
+items, but they again fail to capture how users discover new items.
+Arguably, the latter is crucial to ensure that novel recommended
+items remain relevant.
+In this work, we overcome these issues by modeling preference
+trajectories explicitly. We assume that we have access to times-
+tamped consumption traces for a set of users, and we ask the fol-
+lowing question.
+Question. How well does preference for item 𝐴at time 𝑡predict
+preference for item 𝐵at time 𝑡+ 1?
+In contrast to most existing preference models, this question ex-
+amines the structure of preferences’ temporal dynamics. It suggests
+that users’ changing preferences exhibit some regularities, and that
+we might be able to learn these regularities in a data-driven way.
+To this end, we propose the Preference Transition Model (PTM),
+a dynamic model of preferences that predicts how users move in
+the space of items. At its core is a transition matrix that captures
+the propensity of interacting with a given item at time 𝑡+ 1 given
+all interactions up to time 𝑡; this transition matrix provides a rich
+representation of the underlying preference dynamics and is highly
+interpretable. By design, our model anticipates changes in users’
+preferences, and accompanies them through their journey. Further-
+more, by taking advantage of the transition structure our model
+uncovers, we can gradually bring users towards unexplored regions
+of item space, thus increasing diversity in a meaningful way.
+We validate our model’s performance on several tasks using four
+datasets covering three different application domains. We show
+that it predicts users’ future preferences more accurately than com-
+peting approaches. Beyond accurate predictions, we find that our
+model can identify promising pathways between potentially distant
+regions in the space of items. We illustrate this point in Figure 1.
+We fit our model on a dataset of music streams and, based on the
+learned transition matrix, we compute the most likely trajectory
+between any two musical genres (details given in Section 5.2.1).
+These trajectories reveal valuable insights that could be turned into
+principled, diversity-enhancing recommendations.
+Organization of the Paper. After discussing the relevant literature
+in Section 2, we introduce the PTM in Section 3. We evaluate its
+performance on several datasets in Section 4 and compare it to alter-
+native approaches. In Section 5, we dive deeper into an application
+to music preferences, and we demonstrates that the model discovers
+meaningful structure in the music space. Finally, we conclude in
+Section 6.
+2
+RELATED WORK
+This work is related to several different areas, each of which we
+discuss here, emphasising connections and differences.
+rock-and-roll
+soul
+funk
+electronica
+nu jazz
+hard rock
+album rock
+art rock
+blues rock
+experimental
+dusseldorf electronic
+trip hop
+Figure 1: Given a dataset of music consumption traces, the
+PTM automatically finds the most likely trajectories from
+source genres (in green) to destination genres (in red).
+Dynamic Collaborative Filtering. Our contribution can be broadly
+classified within the work on dynamic collaborative filtering in the
+context of matrices of counts. Traditionally, models for collaborative
+filtering give users and items a low-dimensional latent feature rep-
+resentation. One popular approach for modelling large sparse ma-
+trices of counts is Poisson Matrix Factorisation (PMF, [16]), which
+assigns a non-negative latent feature representation to users and
+items. Matrix factorization based on the minimisation of the Frobe-
+nius norm has also been used successfully [36, 40]. Furthermore,
+many authors have recognised the importance of incorporating
+time-evolving features within models for collaborative filtering.
+Koren [23] proposed the popular timeSVD++ method, a dynamic
+matrix factorisation technique. Also, PMF has been extended to al-
+low for dynamically evolving latent features in [9]. Similarly, Schein
+et al. [33] use a Bayesian tensor approach to account for temporal
+variations in the latent representation. Tensor factorisation meth-
+ods are also successfully developed in [21, 38]. Acharya et al. [2]
+assume a Gamma Process structure for temporal changes in the
+latent features, but their inferential procedure is not easily scalable
+to large numbers of users or items. Similarly, Li et al. [25] propose
+Dirichlet-distributed latent representations with a Markov prior
+structure. Gaussian-based models with Kalman filter updates for
+the latent features have also been successfully developed by Gul-
+tekin and Paisley [17]. The main difference between our PTM and
+existing methodologies is that in this work the distribution of user
+activity across classes of items and the total number of interac-
+tions in each time period are modelled separately, using a two-stage
+Poisson-Multinomial hierarchical distribution. This approach has
+the advantage to suitably account for heterogeneity in user activity
+over time.
+Sequential Recommender Systems. Some authors have addressed
+variants of the dynamic recommendation problem by using sequen-
+tial models, in particular recurrent neural networks (RNNs). Wu
+et al. [37] introduce recurrent recommender networks, and Beutel
+et al. [7] discuss how to model context in RNN-based recommender
+systems. RNNs are also commonly used in the context of session-
+based recommender systems such as GRU4Rec [19]. In this work,
+we are mostly interested in long-term shifts in user preferences
+Where To Next? A Dynamic Model of User Preferences
+WWW ’21, April 19–23, 2021, Ljubljana, Slovenia
+as opposed to short-term sessions, and we focus on obtaining in-
+terpretable insights into how user preferences change over time.
+These differentiate our PTM framework from deep-learning based
+sequential models proposed in the literature.
+Diversity in Recommender Systems. One of the possible applica-
+tions of the model proposed in this paper is to provide more diverse
+recommendations to users, as well as promoting new classes of
+items for consumption. Traditionally, diversity is included in rec-
+ommender systems in a multi-objective framework. In this work,
+a different approach is taken, and the diversity stems from rec-
+ommendations of new classes of items to explore. An extensive
+review of the traditional approaches for promoting diversity within
+recommender systems can be found in [24] and references therein.
+Particularly relevant for our application to music streaming ser-
+vices is [20], which establishes a connection between engagement
+and diversity on a streaming platform.
+Estimation of Relationships Between Multivariate Processes. As
+described in Section 1, the PTM model proposed in this work is
+aimed at estimating relationships between classes of items within
+recommender systems. Our approach closely resembles techniques
+used in statistics and causal inference for estimating relationships
+between multivariate processes. In particular, vector autoregressive
+(VAR) processes are traditionally used to establish causal interac-
+tions between time series [5, 14]. In Section 4.3, we compare our
+PTM model to VARs. Similarly, Hawkes processes have also been
+used for the same purpose on point process data [26]. A more gen-
+eral class of models are self-exciting point processes (SEPPs, [28]),
+which could also be used for estimation of the interactions. Both
+VAR and Hawkes processes have good theoretical properties for
+estimation of a network structure between different processes, both
+in terms of Granger causality and directed information [13, 14].
+Qualitative Interpretation of Interaction Graphs. Finally, part of
+this work could be related to techniques for extracting qualitatively
+meaningful network relationships between entities. In particular,
+within a music streaming application, the PTM model is used to
+discover pathways between genres and how the users explored the
+music space. The work of Shahaf and Guestrin [34], which describes
+an algorithm for finding meaningful connections between news
+articles, is particularly relevant in this context, and provided ideas
+for the analysis in Section 5.
+Others. Our work could also be linked to that of Dunlavy et al.
+[12], where, in the context of a link prediction task, a weighted com-
+bination of previous observations is considered and subsequently
+fed into a matrix factorization framework. Finally, the model pro-
+posed in this article could be also related to the work of McAuley
+and Leskovec [29], where the dynamic evolution of user preferences
+is related to their expertise, such that user tastes are expected to
+change based on the number and type of items consumed in the
+past. In this work, the dynamics is induced by an exponentially
+weighted moving average distribution, which gives more weight to
+recent observations.
+3
+PREFERENCE TRANSITION MODEL
+In this section, we develop the Preference Transition Model (PTM).
+We first introduce some notation and formally define our prediction
+problem. Then, we proceed to give a detailed description of the
+model and related estimation and prediction methods.
+3.1
+Notation & Problem Statement
+We consider a set of 𝑀users interacting with items over time. We
+assume that each item belongs to one of 𝑁classes, and we divide
+the observation period into𝑇time windows. The exact definition of
+a class is domain-dependent. As a running example, we consider a
+music streaming application where users listen to tracks of different
+musical genres, and we let the item classes be the set of genres. We
+let 𝑛𝑡
+𝑖𝑗∈N ∪{0} be the number of times the user 𝑖interacted with
+an item in class 𝑗within the time window 𝑡. For example, in the
+music streaming domain, 𝑛𝑡
+𝑖𝑗represents the number of tracks of
+genre 𝑗streamed by user 𝑖in the time window 𝑡. We define the
+vector of streams for user 𝑖at time 𝑡as
+𝒏𝑡
+𝑖=
+𝑛𝑡
+𝑖1
+· · ·
+𝑛𝑡
+𝑖𝑁
+
+.
+Furthermore, the activity of user 𝑖in the 𝑡-th time window is the
+total number of interactions within the time period:
+𝜉𝑡
+𝑖=
+𝑁
+Õ
+𝑗=1
+𝑛𝑡
+𝑖𝑗.
+We assume that 𝜉𝑡
+𝑖> 0 for all users 𝑖= 1, . . . , 𝑀and all time win-
+dows 𝑡= 1, . . . ,𝑇. Combining 𝑛𝑡
+𝑖𝑗and 𝜉𝑡
+𝑖gives the class distribution
+at time 𝑡:
+𝝅𝑡
+𝑖=
+𝜋𝑡
+𝑖1
+· · ·
+𝜋𝑡
+𝑖𝑁
+
+= 𝒏𝑡
+𝑖/𝜉𝑡
+𝑖.
+The prediction problem we address can be formalized as follows.
+Given {𝒏𝑡
+𝑖: 𝑖,𝑡∈{1, . . . , 𝑀} × {1, . . . ,𝑇}}, predict 𝒏𝑇+1
+𝑖
+or 𝝅𝑇+1
+𝑖
+for every user 𝑖∈{1, . . . , 𝑀}.
+3.2
+Statistical Model
+We now present a dynamic statistical model to study the evolution
+of the counts 𝒏𝑡
+𝑖, and consequently the distributions 𝝅𝑡
+𝑖, over time,
+establishing relationships between different classes. We call it the
+Preference Transition Model (PTM). The PTM is aimed at jointly
+modelling sequences of user activities and class distributions over
+time.
+First, we postulate that the distribution of preferences of user 𝑖
+across classes at time window 𝑡depends on a combination of the
+distributions at the previous time windows. In particular, we let
+𝛾∈[0, 1] be an exploration parameter that measures how quickly
+the space of classes is explored on average. We assume that 𝛾is
+the same for all users. Conditional on 𝛾, an exponentially weighted
+moving average (EWMA, [32]) class distribution is obtained within
+each time window:
+˜𝝅𝑡
+𝑖= (1 −𝛾) ˜𝝅𝑡−1
+𝑖
++ 𝛾𝝅𝑡
+𝑖,
+(1)
+with initial value ˜𝝅1
+𝑖= 𝝅1
+𝑖. The EWMA distribution ˜𝝅𝑡
+𝑖in Equa-
+tion (1) contains information about the entire history of the user
+trajectory in the space of items, giving more weight to recent obser-
+vations, and exponentially down-weighting previous observations
+over time. Using ˜𝝅𝑡
+𝑖, we aim to approximate 𝝅𝑡+1
+𝑖
+as closely as
+possible, up to the effect of the interactions between classes.
+WWW ’21, April 19–23, 2021, Ljubljana, Slovenia
+Francesco Sanna Passino, Lucas Maystre, Dmitrii Moor, Ashton Anderson, and Mounia Lalmas
+1
+0
+0
+˜πt
+1
+blues
+new age
+soul
+User 1
+·
+0.5 0.4 0.1
+0.2 0.4 0.4
+0.2 0.3 0.5
+A
+= 0.5 0.4 0.1
+ˆπt+1
+1
+blues
+new age
+soul
+predicted
+distribution
+at next step
+“If you listen to soul, you will likely listen to new age next”
+0
+1
+0
+˜πt
+2
+User 2
+·
+0.5 0.4 0.1
+0.2 0.4 0.4
+0.2 0.3 0.5
+A
+= 0.2 0.4 0.4
+ˆπt+1
+2
+“If you listen to new age, you will likely listen to blues next”
+Relations between genres are not necessarily symmetric
+Figure 2: Visual representation of a PTM and corresponding prediction method within a music streaming application.
+Second, we assume that the activity 𝜉𝑡+1
+𝑖
+of the user 𝑖at time
+window𝑡+1 has a Poisson distribution with mean 𝜉𝑡
+𝑖, corresponding
+to the activity of the user in the previous time window. Furthermore,
+conditional on the activity at time 𝑡+1, the counts 𝒏𝑡+1
+𝑖
+are modelled
+using a multinomial distribution with probability given by ˜𝝅𝑡
+𝑖, re-
+weighted by a 𝑁×𝑁matrix of interactions between classes, encoded
+by a stochastic matrix 𝑨. In summary, the PTM model can be written
+as follows:
+𝜉𝑡+1
+𝑖
+∼Poisson  𝜉𝑡
+𝑖
+ ,
+𝒏𝑡+1
+𝑖
+| 𝜉𝑡+1
+𝑖
+, ˜𝝅𝑡
+𝑖∼Multinomial
+
+𝜉𝑡+1
+𝑖
+, ˜𝝅𝑡
+𝑖𝑨
+
+.
+(2)
+Here, 𝑨= {𝑎𝑗𝑘} ∈[0, 1]𝑁×𝑁is a stochastic matrix where:
+(1) all the entries are non-negative: 𝑎𝑗𝑘≥0 ∀𝑗,𝑘= 1, . . . , 𝑁,
+(2) all the rows sum up to 1: Í𝑁
+𝑘=1 𝑎𝑗𝑘= 1 ∀𝑗= 1, . . . , 𝑁.
+A key feature of the PTM model in Equation (2) is that the activity
+and the class distribution are modelled separately. The formulation
+of the PTM in Equation (2) also closely resembles a first-order
+Markov chain, where the states correspond to the classes. Under
+this framework, assuming 𝛾= 1, the entries of 𝑨take a simple
+interpretation: if users were allowed to interact only with one class
+at each time point, and that a given user liked class 𝑗at time 𝑡, then
+𝑎𝑗𝑘would represent the probability that the user makes a transition
+from class 𝑗to class 𝑘at time 𝑡+ 1:
+𝑎𝑗𝑘= P {class 𝑘at time 𝑡+ 1 | class 𝑗at time 𝑡} .
+(3)
+Using Equation (3), 𝑨assumes a convenient probabilistic interpre-
+tation, which could be useful to answer many practical questions
+about relationships between classes. In Section 5, this is demon-
+strated on a case study where interactions between musical genres
+are analysed.
+Importantly, 𝑎𝑗𝑘in Equation (3) is also not constrained to be
+equal to 𝑎𝑘𝑗. This introduces a notion of directionality between
+classes of items.
+3.3
+Parameter estimation
+Jointly estimating𝛾and 𝑨is a complex task. Any change in the esti-
+mate of𝛾in any optimisation procedure would require an update to
+the EWMA distributions { ˜𝝅𝑡
+𝑖}, which makes inference particularly
+cumbersome. One could, for example, use coordinate descent on
+an objective function of the pair (𝑨,𝛾), but inferring 𝑨for a fixed
+value of 𝛾is also computationally expensive, which makes such an
+approach computationally impractical. Therefore, a two-step pro-
+cedure is proposed. Instead of learning 𝑨and 𝛾jointly, we suggest
+to first estimate 𝛾, and subsequently estimate 𝑨conditional on the
+choice of the exploration parameter.
+3.3.1
+Selecting 𝛾. A strategy for estimation of 𝛾is proposed in this
+subsection. The EWMA distribution ˜𝝅𝑡
+𝑖should aim to approximate
+𝝅𝑡+1
+𝑖
+closely, up to the effects of the transitions between classes,
+handled by 𝑨instead. To do this, we could minimise the negative
+log-likelihood (NLL) under the assumption that 𝑨= 𝑰𝑁, where 𝑰𝑁
+is the 𝑁× 𝑁identity matrix:
+𝛾= 1
+𝑀
+𝑀
+Õ
+𝑖=1
+
+
+argmin
+𝛾𝑖∈[0,1]
+
+−
+𝑇−1
+Õ
+𝑡=1
+𝑁
+Õ
+𝑗=1
+𝑛𝑡+1
+𝑖𝑗
+log
+
+˜𝜋𝑡
+𝑖𝑗(𝛾𝑖)
+
+
+
+,
+(4)
+with initial value ˜𝜋1
+𝑖𝑗= (𝑛1
+𝑖𝑗+ 1/𝑁)/(𝜉1
+𝑖+ 1), which avoids the
+occurrence of the limit case log(0). In a Bayesian framework, such
+an initial value corresponds to the mean of the Dirichlet posterior
+distribution of the random variable corresponding to 𝝅1
+𝑖, assuming
+a Dirichlet conjugate prior with parameters set to 1/𝑁.
+3.3.2
+Estimating 𝑨conditional on 𝛾. Conditional on the selected
+value of 𝛾, the model parameters can be estimated by minimising
+the negative log-likelihood:
+ˆ𝑨= argmin
+𝑨
+
+
+−
+𝑇−1
+Õ
+𝑡=1
+𝑀
+Õ
+𝑖=1
+𝑁
+Õ
+𝑗=1
+𝑛𝑡+1
+𝑖𝑗
+log
+ 𝑁
+Õ
+𝑘=1
+˜𝜋𝑡
+𝑖𝑘𝑎𝑘𝑗
+!
+
+.
+Note that the computational complexity for evaluating the objective
+function is O(𝑁Í𝑇
+𝑡=1
+Í𝑀
+𝑖=1
+Í𝑁
+𝑗=1 I{𝑛𝑡
+𝑖𝑗> 0}), which is particularly
+convenient if the counts are sparse. To solve the optimisation pro-
+cedure, we use the Adam algorithm [22].
+3.4
+Prediction
+The performance of the PTM is assessed on its ability to predict
+future realisations of 𝒏𝑡
+𝑖and 𝝅𝑡
+𝑖. It is therefore required to pro-
+pose a prediction mechanism for those quantities. For an estimated
+transition matrix 𝑨, the predicted frequency distribution of the
+classes at time 𝑡+ 1 is obtained as the conditional expectation
+Where To Next? A Dynamic Model of User Preferences
+WWW ’21, April 19–23, 2021, Ljubljana, Slovenia
+E(𝝅𝑡+1
+𝑖
+| 𝜉𝑡+1
+𝑖
+, ˜𝝅𝑡
+𝑖):
+ˆ𝝅𝑡+1
+𝑖
+= ˜𝝅𝑡
+𝑖𝑨.
+To obtain a prediction for 𝒏𝑡+1
+𝑖
+, we use the fact that E(𝜉𝑡+1
+𝑖
+| 𝜉𝑡
+𝑖) = 𝜉𝑡
+𝑖
+from Equation (2), and the law of iterated expectation, which gives:
+ˆ𝒏𝑡+1
+𝑖
+= 𝜉𝑡
+𝑖˜𝝅𝑡
+𝑖𝑨.
+A visual representation of the model, and the corresponding pre-
+diction procedure, is given in Figure 2.
+4
+EXPERIMENTS
+In this section, we run experiments using different dynamic models
+for user preferences, demonstrating that the PTM achieves favorable
+performance on four different datasets.
+4.1
+Datasets
+To show the wide applicability of the proposed modelling frame-
+work, we consider datasets from three different domains: music
+streaming, movie ratings, and restaurant recommendations.
+Spotify. The streaming history of a sample of UK users of Spotify,
+a music streaming service. Each track is assigned to one of
+𝑁= 4430 musical genres.1
+Last.fm. The music streaming history of a sample of users on
+Last.fm2 [8]. Each stream is assigned one of 𝑁= 1500 tags
+matched from the Million Song Dataset3 [6].
+MovieLens 25M. User-movie rating pairs4 [18]. Each movie is as-
+signed to a tag from a genome of 𝑁= 1128 tags.
+Yelp. Restaurant reviews from the online review service Yelp.5
+Each restaurant is associated with one of 𝑁= 192 different
+cuisines.
+The raw datasets are preprocessed to ensure that only users
+active in each time window are included in the analysis. Summary
+statistics for all preprocessed datasets are given in Table 1. For all
+datasets, we train models using the first 𝑇−1 time periods, and we
+evaluate the predictive performance by using the last time period.
+4.2
+Evaluation Tasks and Metrics
+In this section, we introduce the four predictive tasks that we will
+use to evaluate the PTM and alternative methods. These tasks are
+depicted in Figure 3.
+Total variation. The total variation between the observed class
+distribution 𝝅𝑡
+𝑖and its predicted value ˆ𝝅𝑡
+𝑖is:
+𝜈𝑖(𝑡) = 1
+2
+𝑁
+Õ
+𝑗=1
+𝜋𝑡
+𝑖𝑗−ˆ𝜋𝑡
+𝑖𝑗
+ .
+The minimum value of the score is 0, corresponding to identical dis-
+tributions, whereas its maximum is 1. Therefore, the model should
+aim at minimising the total variation between the observed and
+predicted distributions. This task is evaluated using the average
+total variation (ATV) across all users, as represented in Figure 3a.
+1An interactive map of all the genres is publicly available at https://everynoise.com/.
+2Available at http://ocelma.net/MusicRecommendationDataset/lastfm-1K.html.
+3Available at: http://millionsongdataset.com/lastfm/.
+4Available at: https://grouplens.org/datasets/movielens/25m/.
+5Available at: https://www.yelp.com/dataset.
+Table 1: Summary statistics of the datasets
+Dataset
+𝑀
+𝑁
+𝑇
+Interval
+Start
+End
+Spotify
+10000
+4430
+18
+Quarter
+Q1 2016
+Q2 2020
+Last.fm
+450
+1500
+6
+Quarter
+Q3 2007
+Q4 2008
+MovieLens
+1320
+1128
+5
+Year
+2015
+2019
+Yelp
+1808
+192
+5
+Year
+2015
+2019
+The total variation task aims at evaluating the global performance
+of the model and its ability to predict the entire distribution of
+future allocations of user activity to classes.
+Plus-minus (+/-). This task evaluates the ability of the model
+to predict whether the relative consumption of classes increases
+or decreases respectively from 𝝅𝑡
+𝑖to 𝝅𝑡+1
+𝑖
+. The prediction problem
+can be framed as a simple binary classification problem, which is
+evaluated using the area under the receiver operating characteristic
+curve (ROC-AUC). This procedure is illustrated in Figure 3b. The
+task evaluates the performance of the model at estimating future
+consumption of items that the user has already interacted with.
+New classes (t) and new classes (all). These tasks measure the
+model’s ability to predict which new classes the user will interact
+with. Using a music streaming example, for the task new class (t), a
+genre streamed at time 𝑡+1 is considered new if it was not streamed
+at 𝑡. On the other hand, in new class (all), a genre is new only if it
+was never streamed by the user before time 𝑡+ 1. This task can be
+again formulated as binary classification, and is evaluated using
+both ROC-AUC and PR-AUC (area under the precision-recall curve).
+PR-AUC is expected to more appropriately account for class imbal-
+ance. An illustration is given in Figure 3c. The two tasks evaluate
+the performance of the model at estimating which completely new
+classes of items the user might like.
+4.3
+Alternative Models and Baselines
+We now describe alternative techniques for modelling user prefer-
+ences over time that will serve as comparisons for the PTM. These
+are a mixture of state-of-the art methods and simple baselines.
+Autoregressive Poisson model (Poisson AR). It is assumed that the
+counts 𝒏𝑡
+𝑖are distributed according to a Poisson distribution with
+rate depending on the observations at the previous time point, as
+follows: 𝒏𝑡+1
+𝑖
+∼Poisson(𝜆) with 𝜆= exp[log(𝒏𝑡
+𝑖+ 1)𝑨], where the
+exponential and logarithm are applied elementwise to the compo-
+nents of the vectors. The parameters are optimised via Adam using
+the negative log-likelihood loss function.
+Dynamic Poisson factorisation (DPF) [9]. Users and classes are
+assigned 𝐾-dimensional time-dependent latent features 𝒖𝑡
+𝑖, 𝒗𝑡
+𝑗∈
+R𝐾, evolving as Gaussian random-walks 𝒖𝑡+1
+𝑖
+∼N𝐾(𝒖𝑡
+𝑖, 𝜎2𝑢𝑰𝐾) and
+𝒗𝑡+1
+𝑗
+∼N𝐾(𝒗𝑡
+𝑗, 𝜎2𝑣𝑰𝐾). Assuming baseline rates ¯𝒖𝑖and ¯𝒗𝑗, counts
+are obtained as 𝑛𝑡
+𝑖𝑗∼Poisson(Í𝐾
+𝑘=1 exp{𝑢𝑡
+𝑖𝑘+ ¯𝑢𝑖𝑘} exp{𝑣𝑡
+𝑗𝑘+ ¯𝑣𝑗𝑘}).
+The model is fitted using code provided by the authors.6 The two
+modeling features that separate the PTM from DPF are as follows.
+6Available at: https://github.com/blei-lab/DynamicPoissonFactorization.
+WWW ’21, April 19–23, 2021, Ljubljana, Slovenia
+Francesco Sanna Passino, Lucas Maystre, Dmitrii Moor, Ashton Anderson, and Mounia Lalmas
+(a) total variation task
+observed
+−
+predicted
+=
+diﬀerence
+abs(·)
+total variation
+1
+2sum(·)
+(b) +/- prediction task
+observed @ t
+vs.
+observed @ t + 1
+⇓
+observed change
++
++
++
+−
+observed @ t
+vs.
+predicted @ t + 1
+⇓
+predicted change
++
+−
++
+−
+(c) new class prediction tasks
+observed @ t
+vs.
+observed @ t + 1
+⇓
+observed new class
+0
+1
+observed @ t
+vs.
+predicted @ t + 1
+⇓
+predicted new class
+Figure 3: Visual representation of the prediction tasks. The color intensity corresponds to the consumption level of each class.
+First, DPF assumes a low-rank representation of users and items,
+whereas the PTM does not. Second, DPF assumes that the evolution
+of users preferences are not predictable, and, therefore, they are
+modelled as a random walk. Consequently, in expectation, the latent
+features at time 𝑡+ 1 are identical to their values at the previous
+time window 𝑡, E(𝒖𝑡+1
+𝑖
+| 𝒖𝑡
+𝑖) = 𝒖𝑡
+𝑖. In contrast, the PTM assumes
+that the dynamics governing the stochastic process of class counts
+are not completely random, and instead exhibit some structure.
+Non-negative matrix factorization (NMF) (see, for example, [36,
+40]). The 𝑀× 𝑁matrix of counts averaged over time is factorized
+into the dot product 𝑾𝑯⊤of two non-negative matrices 𝑾∈
+R𝑀×𝐾
++
+and 𝑯∈R𝑁×𝐾
++
+of rank 𝐾, obtained by minimisation of
+the Frobenius norm. The predicted count at the next time point is
+predicted as ˆ𝑛𝑡+1
+𝑖𝑗
+= 𝒘⊤
+𝑖𝒉𝑗, where the two vectors correspond to the
+𝑖-th and 𝑗-th row of 𝑾and 𝑯respectively.
+Previous observation. The predicted distribution of classes at time
+𝑡+ 1 is simply the distribution at time 𝑡. Similarly, the predicted
+increase or decrease in the number of streams uses the difference
+observed between the two previous time periods. For prediction of
+new classes at time 𝑡+1 with respect to 𝑡, the number of interactions
+for each class at time 𝑡−1 is used. Observe that this is a special
+case of the PTM, with 𝑨= 𝑰𝑁and 𝛾= 1.
+4.4
+Predictive Performance
+We apply every model to each of the four tasks, and we present
+the results in Table 2. For the PTM, the value of the exploration
+parameter 𝛾is chosen using the NLL criterion in Equation (4), and
+is specified in parentheses in the table.
+We observe that the PTM outperforms alternative models on all
+tasks and datasets, with the exception of prediction of new genres
+on Last.fm, and for total variation on Yelp. In particular, on Last.fm,
+DPF slightly outperforms the PTM at predicting new genres with
+respect to the entire user history, and the previous observation
+baseline achieves the best PR-AUC for prediction of new genres
+with respect to the previous time window. On Yelp, non-negative
+matrix factorization has a better performance than the PTM for
+the task of minimising total variation. We note that both Last.fm
+and Yelp are relatively small datasets, and thus they might favor
+simpler approaches with fewer parameters. On the Spotify dataset,
+which contains a few orders of magnitude more data, the PTM
+outperforms competing approaches much more significantly.
+Inspecting the results, we find that modeling the changes in the
+distribution over items classes separately from the changes in overall
+activity—a distinctive feature of our model—is crucial in obtaining
+superior predictive performance. The PTM achieves this by the two-
+stage modelling approach given in Equation (2). The distribution of
+the classes 𝝅𝑡
+𝑖is modeled conditionally on the activity 𝜉𝑡
+𝑖, whereas
+all the alternative models attempt to infer the joint distribution,
+modelling 𝒏𝑡
+𝑖directly. The impact of this choice, independently of
+other modeling decisions, is best seen by comparing the Poisson AR
+and PTM models. Both models capture the evolution of preferences
+by using a transition matrix, but the former attempts to directly
+predict 𝒏𝑡
+𝑖whereas the latter predicts 𝝅𝑡
+𝑖. Empirically, the latter
+works better for the datasets studied in this work. Even though the
+time periods are relatively long, we find that user activity is highly
+heterogeneous across different periods. In direct models for 𝒏𝑡
+𝑖, the
+underlying effect of the relationships between classes appears to
+be confounded by the differences in activity levels across different
+time windows.
+In summary, these results show that the PTM achieves favorable
+performance on various prediction tasks across multiple different
+datasets. Explicitly modeling preference trajectories thus appears
+to be beneficial when attempting to predict how tastes change over
+time. We believe that these improvements could translate to better
+recommender systems that anticipate users’ changing needs.
+However, explicitly modeling preference trajectories has a sec-
+ond major benefit: it allows us to directly inspect the structure of
+the preference graph and develop a qualitative understanding of the
+domain under consideration. In the next section, we use the Spotify
+dataset as a case study, and demonstrate how the PTM enables us
+to interpret and understand the dynamics of changing preferences
+in a real-world domain.
+5
+SPOTIFY CASE STUDY
+In this section, we dive deeper into the Spotify dataset presented in
+Section 4.1. We begin by validating the two assumptions that drive
+Where To Next? A Dynamic Model of User Preferences
+WWW ’21, April 19–23, 2021, Ljubljana, Slovenia
+Table 2: Predictive performance of different models on four different datasets. The best result is highlighted in bold.
+Total variation
+Plus-minus (+/-)
+New classes (𝑡)
+New classes (all)
+Dataset
+Model
+TV
+ROC-AUC
+ROC-AUC
+PR-AUC
+ROC-AUC
+PR-AUC
+Spotify
+PTM (𝛾= 0.360)
+0.378
+0.698
+0.944
+0.267
+0.889
+0.039
+Poisson AR
+0.416
+0.663
+0.915
+0.190
+0.854
+0.033
+DPF, 𝐾= 5
+0.909
+0.512
+0.849
+0.051
+0.849
+0.016
+NMF, 𝐾= 50
+0.509
+0.646
+0.914
+0.189
+0.853
+0.025
+Previous obs.
+0.389
+0.581
+0.639
+0.221
+—
+—
+Last.fm
+PTM (𝛾= 0.803)
+0.277
+0.687
+0.677
+0.421
+0.655
+0.183
+Poisson AR
+0.320
+0.646
+0.648
+0.420
+0.600
+0.174
+DPF, 𝐾= 5
+0.616
+0.591
+0.659
+0.393
+0.676
+0.201
+NMF, 𝐾= 50
+0.294
+0.684
+0.669
+0.416
+0.607
+0.150
+Previous obs.
+0.301
+0.591
+0.634
+0.433
+—
+—
+MovieLens
+PTM (𝛾= 0.495)
+0.601
+0.685
+0.800
+0.269
+0.790
+0.134
+Poisson AR
+0.637
+0.661
+0.740
+0.207
+0.704
+0.090
+DPF, 𝐾= 5
+0.791
+0.548
+0.736
+0.155
+0.724
+0.072
+NMF, 𝐾= 50
+0.637
+0.650
+0.782
+0.226
+0.769
+0.108
+Previous obs.
+0.618
+0.558
+0.622
+0.179
+—
+—
+Yelp
+PTM (𝛾= 0.439)
+0.549
+0.716
+0.864
+0.326
+0.834
+0.145
+Poisson AR
+0.597
+0.683
+0.836
+0.267
+0.791
+0.110
+DPF, 𝐾= 5
+0.855
+0.584
+0.793
+0.151
+0.766
+0.066
+NMF, 𝐾= 50
+0.542
+0.714
+0.825
+0.307
+0.724
+0.077
+Previous obs.
+0.584
+0.575
+0.646
+0.241
+—
+—
+the development of our model. Then, we analyze the transition ma-
+trix 𝑨learned by the PTM, and we find that it contains meaningful
+and interpretable insights about the music space.
+5.1
+Dynamics and Diversity
+As discussed in Section 1, the development of our model is driven
+by two observations: a) users’ preferences change over time, and
+b) higher consumption diversity leads to stronger engagement. In
+this section, we validate these observations empirically.
+Preferences Change Over Time. To show that the genres users
+listen to change over time, we proceed as follows. For each user, we
+compute the total variation distance |𝝅1
+𝑖−𝝅𝑡
+𝑖|/2 between their genre
+distribution during the first quarter in the dataset and that of every
+subsequent quarter 𝑡= 2, . . . , 18. In Figure 4, we plot the histogram
+of distances (smoothed using a kernel density estimator) for each
+quarter. The figure shows that, on average, users progressively
+shifted away from the genres that they streamed in Q1 2016, and
+the difference appears to increase over time.
+Diversity is Linked to Engagement. Next, we show that discov-
+ering new musical genres correlates with a user’s propensity to
+convert to a paid subscription. To this end, we complement the
+dataset of Section 4 with another dataset containing 80,000 users
+that registered on Spotify before 2019. Every user in this dataset is
+continuously active on the platform between March 1st and Sep-
+tember 30th, 2019, and is using a free (ad-supported) service during
+that period. Half of the users in our sample convert to a premium
+(paid subscription) service between October 1st and October 31st,
+0.0
+0.2
+0.4
+0.6
+0.8
+1.0
+Total variation
+0.0
+0.5
+1.0
+1.5
+2.0
+2.5
+3.0
+Density
+Q1 2016 vs. Q2 2016
+Q1 2016 vs. Q2 2020
+Figure 4: Estimated densities of total variation scores with
+respect to Q1 2016.
+2019, whereas the other half of users do not convert. We partition
+each user’s streams into two sets, those that occur between March
+1st and August 31st, and those that occur between September 1st
+and September 30th. For each user, we look at the genres associated
+with every track that they stream, and we compute a) the fraction
+of distinct genres streamed for the first time during September, and
+b) the total number of distinct genres streamed during September.
+Figure 5 plots the average proportion of new genres against the total
+number of genres for the two aforementioned groups of users. For
+WWW ’21, April 19–23, 2021, Ljubljana, Slovenia
+Francesco Sanna Passino, Lucas Maystre, Dmitrii Moor, Ashton Anderson, and Mounia Lalmas
+0
+25
+50
+75
+100
+125
+150
+175
+200
+Number of genres
+0.20
+0.25
+0.30
+0.35
+0.40
+0.45
+0.50
+Share of new genres
+Subscribers
+Non-subscribers
+Figure 5: Proportion of new genres streamed in September
+2019 (with respect to the period March 1st – August 31st) ver-
+sus the total number of genres streamed in September 2019.
+(a) Scatterplot
+0
+2000
+4000
+Genre ID (sorted by popularity)
+0.0
+0.5
+1.0
+Transition aj j
+(b) Histogram
+0.0
+0.5
+1.0
+Transition probability aj j
+0
+250
+500
+750
+Frequency
+Figure 6: Scatterplot and histogram of the diagonal of 𝑨.
+every number of genres (i.e., activity level), users who converted
+to the paid subscription service (and thus, presumably, particularly
+enjoy the service) listened to a significantly larger fraction of new
+genres during September compared to users who did not convert.
+This suggests that helping users explore new regions of the music
+space can help increase users’ engagement and satisfaction.
+5.2
+Structure in Preference Trajectories
+Next, we inspect the transition matrix 𝑨learned by the PTM. One
+way to interpret this matrix is as the weighted adjacency matrix of
+a graph expressing a notion of distance between item classes. In the
+context of music streaming, we call this graph the Genre Interaction
+Graph (GIG).
+First, we expect that the resulting graph has high-weight self-
+loops, represented by the diagonal entries in 𝑨, since users are likely
+to continue listening, at time 𝑡+ 1, to the genres they were already
+listening to at time 𝑡. This is shown in Figure 6, which visualizes the
+distribution of the diagonal entries 𝑎𝑗𝑗of 𝑨, sorted by popularity.
+We find that users tend to stay in states corresponding to popular
+genres with high probability, but are more likely to leave states
+towards the low end of the popularity spectrum.
+Now we turn to the off-diagonal elements of the GIG, which
+represent transitions between musical genres. By examining the
+structure of these transitions, it becomes possible to answer ques-
+tions regarding the relationships between genres. For example:
+(1) Given two genres𝑖and 𝑗, what is the best connecting genre? In
+mathematical terms, we can answer this question by finding
+the genre ˆ𝑔that maximises the sequential product of the
+transition probabilities:
+ˆ𝑔=
+argmax
+𝑘∈{1,...,𝑁}\{𝑖,𝑗}
+𝑎𝑖𝑘𝑎𝑘𝑗.
+(2) Given that the user streamed genre 𝑖, what is the most likely
+genre that the user will stream in the next time window? In
+this case, the solution is given by:
+ˆ𝑔=
+argmax
+𝑘∈{1,...,𝑁}\{𝑖}
+𝑎𝑖𝑘.
+(3) What are the genres with the most asymmetric relationships?
+The directional nature of the PTM allows us to find genres 𝑖
+and 𝑗such that 𝑎𝑖𝑗and 𝑎𝑗𝑖are most different. We can rank
+pairs of genres by their absolute difference 𝑑𝑖𝑗:
+𝑑𝑖𝑗= |𝑎𝑖𝑗−𝑎𝑗𝑖|.
+In Table 3, we report some examples obtained from the estimated
+GIG that answer these questions. For a pair of genres (𝑖, 𝑗), we
+report the best connecting genre between 𝑖to 𝑗, and vice-versa.
+Also, we list the top genres that can be reached from 𝑖and 𝑗. The
+transitions in Table 3 are qualitatively meaningful and accord with
+intuitions. For example, the best way to connect the genre Spotify
+refers to as Canadian pop (e.g. Justin Bieber, Shawn Mendes and
+The Weeknd) to the trap sub-genre of rap (e.g. Migos, Ty Dolla $ign
+and Lil Uzi Vert) is estimated to be through Toronto rap (e.g. Drake,
+Tory Lanez and PARTYNEXTDOOR). As another example, garage
+rock (e.g. The Black Keys) might be linked to Madchester (e.g. Oasis
+or Joy Division) via Sheffield indie (e.g. the Arctic Monkeys). If a
+music streaming service or similar platform had a goal of helping
+users diversify their preferences, these connections would provide
+a useful guide.
+The model captures many geographical characteristics, despite
+geography not being explicitly encoded in the PTM. For example,
+for two Italian genres in the table, the estimated transitions are only
+towards Italian music. Also, some of the most representative artists
+for the genres indietronica and neo-psychedelic are Australian (for
+the former, Rüfüs du Sol and Empire of the Sun, and for the latter,
+Tame Impala), which explains the link given by Australian psych.
+Furthermore, for some of the estimated relationships the direc-
+tion of the connection is important. For example, the best connect-
+ing genre between pop and rap is pop rap in both directions, but this
+is not the case for indietronica and neo-psychedelic. As pictorially
+explained in Figure 2, the PTM incorporates a notion of direction-
+ality between genres. To reinforce this point, in Table 4 we show
+the most asymmetric pairs of genres. In all cases, listeners of genre
+2 were far more likely to subsequently listen to genre 1 than vice
+versa. In many cases, this is intuitive, and furthermore the most
+asymmetric relationships are often also hierarchical relationships.
+For example, chanson encapsulates vintage chanson, and instrumen-
+tal post-rock and polish post-rock have a similar relationship. This
+suggests it would be possible to extract a hierarchy over genres
+using the GIG.
+Where To Next? A Dynamic Model of User Preferences
+WWW ’21, April 19–23, 2021, Ljubljana, Slovenia
+Table 3: Examples of transitions in the estimated genre interaction graph.
+Genre 1
+Genre 2
+Path 1→2
+Path 1←2
+Top genres reachable from 1
+Top genres reachable from 2
+pop
+rap
+pop-rap
+pop-rap
+UK pop, dance pop, electropop
+UK hip-hop, melodic rap, trap, ATL hip-hop
+Canadian pop
+trap
+rap
+Toronto rap
+pop, rap, pop rap, R&B, Toronto rap
+Toronto rap, ATL hip-hop, southern hip-hop
+melodic rap
+underground hip-hop
+emo rap
+trap
+emo rap, vapor trap, DFW rap
+UK alternative hip hop, vapor trap
+garage rock
+Madchester
+Sheffield indie
+Sheffield indie
+modern alternative rock, Sheffield indie
+Britpop, modern rock, rock, dance rock
+moombahton
+reggaeton
+latin hip-hop
+latin hip-hop
+deep tropical house, electro house
+latin, latin hip hop, trap latino, reggaeton flow
+EDM
+chillwave
+progressive house
+progressive house
+tropical house, electro house, dance pop
+indietronica, electronica, indie soul
+indietronica
+neo-psychedelic
+alternative dance
+Australian psych
+electropop, vapor soul, indie pop
+Australian psych, Edmonton indie, indie soul
+Italian pop
+Italian folk rock
+classic Italian pop
+Italian alternative
+Italian arena pop, classic Italian pop
+Italian alternative, Italian indie folk
+Table 4: The most asymmetric relationships in the estimated
+genre interaction graph.
+Genre 1
+Genre 2
+𝑎12
+𝑎21
+jam band
+jamgrass
+0.0014
+0.87
+Galician rock
+Galician indie
+0.0030
+0.70
+British choir
+cathedral choir
+0.0035
+0.45
+focus
+jamgrass
+0.0002
+0.44
+instrumental post-rock
+Polish post-rock
+0.0019
+0.43
+chanson
+vintage chanson
+0.0019
+0.43
+5.2.1
+Most Likely Trajectories. Given two genres 𝑖and 𝑗, we can
+also use 𝑨to find a sequence of genres that connects 𝑖and 𝑗in
+such a way that every individual transition is likely. To this end, we
+adapt the criterion of Shahaf and Guestrin [34] and find a sequence
+𝑖,𝑔1, . . . ,𝑔𝐾, 𝑗such that min𝑘𝑎𝑔𝑘𝑔𝑘+1 is maximized. Additionally,
+we slightly penalize longer sequences by adding a regularization
+term to the objective.
+We illustrate some of these trajectories in Figure 7. Given a
+set of source genres (in green) and a set of destination genres (in
+red), we plot the subgraph induced by the trajectories between
+every source and destination pair. Again, the resulting structure is
+highly intuitive. For example, starting from classical music, the late
+romantic era acts as a gateway to reach more contemporary genres
+of music, bridging centuries of musical history. Similarly, tropical
+house, an uplifting and relaxing type of electronic music, connects
+edm (electronic dance music) to a large part of the music space.
+We envision that these trajectories could be turned into diversity-
+enhancing recommendations. Indeed, given a target genre that is
+far outside of a user’s current preferences, we can use the graph
+to lay out a pathway that progressively brings them there, one
+manageable step at a time.
+5.3
+Visualizing the Item Space
+Finally, the representation we learn can help us understand the
+macroscale structure of how genres relate to each other. We can
+interpret each row of log(𝑨) (where the log is taken elementwise)
+as a 𝑁-dimensional representation of a genre in an Euclidean space.
+We project all genres onto two axes of meaning in music: tempo
+and energy. We operationalize these axes by defining dimensions as
+differences between the vector representations of a pair of genres.
+The tempo dimension is defined as speedcore−slow core, and the
+energy dimension is defined as death metal−calming instrumental.
+The resulting projection is shown in Figure 8. We observe that tempo
+and energy are significantly related, with a correlation coefficient
+of 𝑟= 0.39. Furthermore, we can position genres in a semantically
+meaningful space just from data on how users transition between
+them.
+6
+CONCLUSION
+In this paper, we propose a dynamic model for user preferences
+towards items called Preference Transition Model (PTM). The model
+is well-suited to sequences of matrices of counts that express how
+many times users interacted with existing classes of items over time.
+A key feature of the model is that each user’s activity in each time
+period, and how their activity is distributed across classes of items,
+is modelled separately. Empirically, we found this to be crucial to
+learn meaningful relationships between classes of items.
+By comparing the PTM to alternative models and baselines on
+a number of different datasets, we showed that it outperforms all
+other methods. Furthermore, the model output—a matrix of tran-
+sition probabilities between item classes—is highly interpretable,
+as demonstrated in a case study on the music streaming platform
+Spotify.
+There are a number of promising directions for future work.
+The PTM in its current form does not scale well in the number of
+classes 𝑁, since the matrix 𝑨contains 𝑁2 parameters. Low-rank
+approximations of 𝑨could be considered when the number of
+classes is large. The learned exploration parameters could also be
+parametrized by user features, e.g., age, to understand how the
+dynamics of preference change vary with user demographics and
+other traits. Also, in this work, the transition matrix 𝑨is assumed to
+be common across all users. In the music domain, previous research
+has shown that users could be efficiently classified in meaningful
+clusters based on their streaming habits [11]. In principle, this clus-
+tering structure could be used to assign group-specific transition
+matrices 𝑨or exploration parameters 𝛾.
+In summary, we have demonstrated that by explicitly model-
+ing preference trajectories from raw user interaction data, we can
+achieve superior performance across a range of prediction tasks, as
+well as learn a useful, interpretable representation of how prefer-
+ences change over time. This approach to user preference modeling
+could be valuable in settings where tastes change over time, as well
+as in the design of recommendation systems that suggest diverse
+and novel items in a principled way.
+REFERENCES
+[1] Zeinab Abbassi, Vahab S. Mirrokni, and Mayur Thakur. 2013. Diversity Maxi-
+mization under Matroid Constraints. In Proceedings of the 19th ACM SIGKDD
+WWW ’21, April 19–23, 2021, Ljubljana, Slovenia
+Francesco Sanna Passino, Lucas Maystre, Dmitrii Moor, Ashton Anderson, and Mounia Lalmas
+classical
+late romantic era
+adult standards
+canadian pop
+hip hop
+swing
+nu jazz
+rock-and-roll
+vocal jazz
+contemporary vocal jazz
+modern blues
+quiet storm
+gospel
+classic rock
+reggae
+soul
+country
+permanent wave
+post-grunge
+alternative metal
+edm
+electro house
+pop rap
+tropical house
+new french touch
+scandipop
+british soul
+motown
+viral pop
+channel pop
+acoustic chill
+neo soul
+uk dance
+disco house
+diva house
+Figure 7: Graph induced by the most likely trajectories between every pair of source and destination nodes (in green and red,
+respectively). The trajectories are automatically learned from the PTM transition matrix 𝑨.
+hardcore punk
+brazilian thrash metal
+traditional folk
+melancholia
+neo-classical
+acoustic chill
+uptempo hardcore
+lo-fi
+speedcore
+slow core
+death metal
+calming instrumental
+afroswing
+experimental
+dark hardcore
+dutch trance
+Figure 8: Projection of each row of the log transition matrix
+onto two directions, intuitively corresponding to tempo (𝑥-
+axis) and energy (𝑦-axis).
+International Conference on Knowledge Discovery and Data Mining (KDD ’13).
+Association for Computing Machinery, New York, NY, USA, 32–40.
+[2] Ayan Acharya, Joydeep Ghosh, and Mingyuan Zhou. 2015. Nonparametric
+Bayesian Factor Analysis for Dynamic Count Matrices (Proc

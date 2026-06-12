@@ -1,0 +1,148 @@
+{
+  "source": "Deep Interest Network for Click-Through Rate Prediction.pdf",
+  "source_group": "Awesome-ML-Papers/CTR-CVR-Prediction",
+  "processed_at": "2026-06-08",
+  "agent": "agent5_final",
+  "concepts": [
+    {
+      "finding": "Experiments on two public datasets\nwith user behaviors as well as a dataset collected from the display\nadvertising system in Alibaba demonstrate the effectiveness of\nproposed approach which outperforms state-of-the-art methods on\nthe CTR prediction task.",
+      "category": "Baseline",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Experiments on\ntwo public datasets as well as an Alibaba real production dataset\nwith over 2 billion samples demonstrate the effectiveness of pro-\nposed approaches, which achieve superior performance compared\nwith state-of-the-art methods.",
+      "category": "Baseline",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "CCS CONCEPTS\n• Information systems →Display advertising; Recommender\nsystems;\nKEYWORDS\nClick-Through Rate Prediction, Display Advertising, E-commerce\n1\nINTRODUCTION\nIn cost-per-click (CPC) advertising system, advertisements are\nranked by the eCPM (effective cost per mille), which is the product\nof t",
+      "category": "ModelCandidate",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Second,\nablation study based on DIN demonstrates the effectiveness of\nour proposed training techniques.",
+      "category": "BehavioralTests",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "This is a significant\nimprovement and demonstrates the effectiveness of our proposed\napproaches.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Deep Interest Network for Click-Through Rate Prediction\nGuorui Zhou, Chengru Song, Xiaoqiang Zhu\nYing Fan, Han Zhu, Xiao Ma, Yanghui Yan, Junqi Jin, Han Li, Kun Gai\nAlibaba Group\n{guorui.xgr,chengru.scr,xiaoqiang.zxq,zhuhan.zh,fanying.fy,maxiao.ma,yanghui.yyh,junqi.jjq,lihan.hl,jingshi.gk}@\nalibaba-",
+      "category": "ModelCandidate",
+      "implication": "Can inform intent modeling for recommendation systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "In these methods large scale sparse input\nfeatures are first mapped into low dimensional embedding vectors,\nand then transformed into fixed-length vectors in a group-wise\nmanner, finally concatenated together to fed into a multilayer per-\nceptron (MLP) to learn the nonlinear relations among features",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "These methods follow a similar Embedding&MLP paradigm: large\nscale sparse input features are first mapped into low dimensional\nembedding vectors, and then transformed into fixed-length vectors\nin a group-wise manner, finally concatenated together to fed into\nfully connected layers (also known as mul",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Motivated by this, we propose a novel model: Deep Interest\nNetwork (DIN), which adaptively calculates the representation vec-\ntor of user interests by taking into consideration the relevance of\nhistorical behaviors given a candidate ad.",
+      "category": "Data",
+      "implication": "Can inform intent modeling for recommendation systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "The contributions of this paper are summarized as follows:\n• We point out the limit of using fixed-length vector to express\nuser’s diverse interests and design a novel deep interest\nnetwork (DIN) which introduces a local activation unit to\nadaptively learn the representation of user interests from\nh",
+      "category": "Data",
+      "implication": "Can inform intent modeling for recommendation systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "4.3\nThe structure of Deep Interest Network\nAmong all those features of Table 1, user behavior features are\ncritically important and play key roles in modeling user interests\nin the scenario of e-commerce applications.",
+      "category": "ModelCandidate",
+      "implication": "Can inform intent modeling for recommendation systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Com-\npared with base model, DIN introduces a novel designed local acti-\nvation unit and maintains the other structures the same.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "In this section, we introduce two important techniques\nwhich are proven to be helpful in practice.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "In this paper, we introduce an efficient mini-batch aware reg-\nularizer, which only calculates the L2-norm over the parameters\nof sparse features appearing in each mini-batch and makes the\ncomputation possible.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "All the regularizations show improvement,\namong which our proposed mini-batch aware regularization performs best.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Besides, DIN\nwith Dice brings further improvement over DIN, which verifies\nthe effectiveness of the proposed data adaptive activation function\nDice.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "In our practice,\nseveral important techniques are deployed for accelerating online\nserving of industrial deep networks under the CPU-GPU archi-\ntecture: i) request batching which merges adjacent requests from\nCPU to take advantage of GPU power, ii) GPU memory optimization\nwhich improves the access p",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Besides two novel\ntechniques are introduced to help training industrial deep networks\nand further improve the performance of DIN.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "The use\nof fixed-length vector will be a bottleneck, which brings difficulty\nfor Embedding&MLP methods to capture user’s diverse interests\neffectively from rich historical behaviors.",
+      "category": "Data",
+      "implication": "Can inform intent modeling for recommendation systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "In this paper, we propose\na novel model: Deep Interest Network (DIN) which tackles this chal-\nlenge by designing a local activation unit to adaptively learn the\nrepresentation of user interests from historical behaviors with re-\nspect to a certain ad.",
+      "category": "Data",
+      "implication": "Can inform intent modeling for recommendation systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    }
+  ]
+}

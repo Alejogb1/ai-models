@@ -1,0 +1,15 @@
+{
+  "source": "Bootstrapping Recommendations at Chrome Web Store",
+  "source_group": "Awesome-ML-Papers/Ranking",
+  "processed_at": "2026-06-08T12:00:00Z",
+  "agent": "agent_batch_generation",
+  "concepts": [
+    {
+      "finding": "Google Chrome Web Store uses bootstrapping for new extensions with no interaction history. Cold-start recommendations via content-based similarity (extension description, category, developer). As interactions accumulate, transitions to collaborative filtering. Key insight: threshold-based transition from content-based to CF as interaction count increases.",
+      "category": "ModelCandidate",
+      "implication": "Cold-start keyword clustering: bootstrap with content features (keyword text, entity type, language), then transition to co-occurrence-based embeddings as frequency increases. Threshold determines when keyword has enough context for reliable intent assignment.",
+      "open_question": "What interaction threshold marks the transition from content-based to context-based keyword intent prediction?",
+      "testable_hypothesis": "A hybrid keyword intent model (content-based for rare keywords, embedding-based for frequent ones) outperforms a single-model approach on total keyword coverage and accuracy."
+    }
+  ]
+}

@@ -1,0 +1,148 @@
+{
+  "source": "Simple Unsupervised Keyphrase Extraction using Sentence Embeddings.pdf",
+  "source_group": "Awesome-ML-Papers/Keywords-Extraction",
+  "processed_at": "2026-06-08",
+  "agent": "agent5_final",
+  "concepts": [
+    {
+      "finding": "This property is at the core of\nour method, as we show it outperforms competing\nembedding methods for keyphrase extraction.",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "3\nEmbedRank: From Embeddings to\nKeyphrases\nIn this and the next section, we introduce and\ndescribe our novel keyphrase extraction method,\nEmbedRank 1.",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "In addition,\nin the next section, we show how to improve the\nranking step, by providing a way to tune the diver-\nsity of the extracted keyphrases.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Simple Unsupervised Keyphrase Extraction using Sentence Embeddings\nKamil Bennani-Smires1, Claudiu Musat1, Andreaa Hossmann1,\nMichael Baeriswyl1, Martin Jaggi2\n1Data, Analytics & AI, Swisscom AG\nfirstname.lastname@swisscom.com\n2Machine Learning and Optimization Laboratory, EPFL\nmartin.jaggi@epfl.ch\nA",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Addressing these drawbacks,\nin this paper, we tackle keyphrase extrac-\ntion from single documents with EmbedRank:\na novel unsupervised method, that leverages\nsentence embeddings.",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "With EmbedRank, we also ex-\nplicitly increase coverage and diversity among\nthe selected keyphrases by introducing an\nembedding-based maximal marginal relevance\n(MMR) for new phrases.",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Finally, to the best of our knowledge, we\nare the ﬁrst to present an unsupervised method\nbased on phrase and document embeddings for\nkeyphrase extraction, as opposed to standard in-\ndividual word embeddings.",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Concretely, this second step of our keyphrase\nextraction method consists of:\n(a) Computing the document embedding.",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "3.2\nSelecting the Top Candidates\nBased on the above, we select the top keyphrases\nout of the initial set, by ranking the candidate\nphrases according to their cosine distance to the\ndocument embedding.",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "This problem can be elegantly\nsolved by once again using our phrase embeddings\nand their cosine similarity as a proxy for semantic\nrelatedness.",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Summarizing this section, we have proposed an\nunsupervised step-by-step method to extract infor-\nmative keyphrases from a single document by us-\ning sentence embeddings.",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "text summarization, tagging for search), this\nis problematic: redundant keyphrases adversely\nimpact the user’s experience.",
+      "category": "FailureRisk",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "We show\nhow to adapt MMR to keyphrase extraction, in\norder to combine keyphrase informativeness with\ndissimilarity among selected keyphrases.",
+      "category": "ModelCandidate",
+      "implication": "Relevant for similarity-based retrieval and lookalike targeting",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "In addition, we report on the\nresults of a sizable user study showing that, al-\nthough EmbedRank++ achieves slightly lower F-\nscores than EmbedRank, users prefer the seman-\ntically diverse keyphrases it returns to those com-\nputed by the other method.",
+      "category": "BehavioralTests",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "The results also show that the choice of doc-\nument embeddings has a high impact on the\nkeyphrase quality.",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "A possible explanation\nis that, given the small size of the original text, the\nextracted keyphrases have a high likelihood of be-\ning single words, thus removing the advantage of\nhaving better embeddings for word groups.",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "In all\nother cases, the results show a clear accuracy gain\nof Sent2Vec over Doc2Vec, adding to the practical\nadvantage of improved inference speed for very\nlarge datasets.",
+      "category": "Experiment",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "However, EmbedRank++ surprisingly results in a\ndecrease of the F-score, as shown in Table 2.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "How to address the limitation described: However, EmbedRank++ surprisingly results in a\ndecrease of the F-score, as shown in Table 2.",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "7\nConclusion\nIn this paper we presented EmbedRank and Em-\nbedRank++, two simple and scalable methods for\nkeyphrase extraction from a single document, that\nleverage sentence embeddings.",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Su-\npervised keyphrase extraction requires large\namounts of labeled training data and gener-\nalizes very poorly outside the domain of the\ntraining data.",
+      "category": "LabelValidation",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    }
+  ]
+}

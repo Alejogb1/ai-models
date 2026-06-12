@@ -1,0 +1,57 @@
+{
+  "source": "Axiomatic Attribution for Deep Networks.pdf",
+  "source_group": "Awesome-ML-Papers/Other",
+  "processed_at": "2026-06-08",
+  "agent": "agent5_final",
+  "concepts": [
+    {
+      "finding": "The attribution problem was previously studied by vari-\nous papers (Baehrens et al., 2010; Simonyan et al., 2013;\n*Equal\ncontribution\n1Google\nInc.,\nMountain\nView,\nUSA.",
+      "category": "FailureRisk",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "While for most objects, one would expect the pixels located\non the object to be most important for the prediction, in\nsome cases the context in which the object occurs may also\ncontribute to the prediction.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Question Classiﬁcation\nAutomatically answering natural language questions (over\nsemi-structured data) is an important problem in artiﬁcial\nintelligence (AI).",
+      "category": "FailureRisk",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "One approach to the attribution problem proposed ﬁrst\nby (Ribeiro et al., 2016a;b), is to locally approximate the\nbehavior of the network in the vicinity of the input being\nexplained with a simpler, more interpretable model.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Conclusion\nThe primary contribution of this paper is a method called\nintegrated gradients that attributes the prediction of a deep\nnetwork to its inputs.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "A secondary contribution of this paper is to clarify desir-\nable features of an attribution method using an axiomatic\nframework inspired by cost-sharing literature from eco-\nnomics.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "The ﬁgure shows attributions for two functionally equiva-\nlent networks f(x1, x2) and g(x1, x2) at the input x1 = 3, x2 =\n1 using integrated gradients, DeepLift (Shrikumar et al., 2016),\nand Layer-wise relevance propagation (LRP)\n(Binder et al.,\n2016).",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    }
+  ]
+}

@@ -1,0 +1,148 @@
+{
+  "source": "Deep Keyphrase Generation.pdf",
+  "source_group": "Awesome-ML-Papers/Keywords-Extraction",
+  "processed_at": "2026-06-08",
+  "agent": "agent5_final",
+  "concepts": [
+    {
+      "finding": "In\naddition, with the advantage of features from the\nsource text, the CopyRNN model also outperforms\nthe RNN model in this condition, though it does\nnot show as much improvement as the present\nkeyphrase extraction task.",
+      "category": "Baseline",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Empirical analy-\nsis on six datasets demonstrates that our\nproposed model not only achieves a sig-\nniﬁcant performance boost on extracting\nkeyphrases that appear in the source text,\nbut also can generate absent keyphrases\nbased on the semantic meaning of the\ntext.",
+      "category": "Experiment",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Third, we conducted a comprehen-\nsive comparison against six important baselines\non a broad range of datasets, and the results show\nthat our proposed model signiﬁcantly outperforms\nexisting supervised and unsupervised extraction\nmethods.",
+      "category": "LabelValidation",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Comprehensive empirical studies demonstrate the\neffectiveness of our proposed model for generat-\ning both present and absent keyphrases for differ-\nent types of text.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "We propose a\ngenerative model for keyphrase prediction\nwith\nan\nencoder-decoder\nframework,\nwhich can effectively overcome the above\ndrawbacks.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "First, we propose to apply an RNN-based gen-\nerative model to keyphrase prediction, as well\nas incorporate a copying mechanism in RNN,\nwhich enables the model to successfully pre-\ndict phrases that rarely occur.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Second, this is\nthe ﬁrst work that concerns the problem of ab-\nsent keyphrase prediction for scientiﬁc publica-\ntions, and our model recalls up to 20% of absent\nkeyphrases.",
+      "category": "FailureRisk",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "(2016) proposed a joint-layer recur-\nrent neural network model to extract keyphrases\nfrom tweets, which is another application of deep\nneural networks in the context of keyphrase ex-\ntraction.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "3\nMethodology\nThis section will introduce our proposed deep\nkeyphrase generation method in detail.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "The example in Figure 1(a) shows the result of\npredicted present keyphrases by RNN and Copy-\nRNN for an article about video search.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "5.2\nPredicting Absent Keyphrases\nAs stated, one important motivation for this work\nis that we are interested in the proposed model’s\ncapability for predicting absent keyphrases based\non the “understanding” of content.",
+      "category": "ModelCandidate",
+      "implication": "Can inform intent modeling for recommendation systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "6\nDiscussion\nOur experimental results demonstrate that the\nCopyRNN model not only performs well on pre-\ndicting present keyphrases, but also has the abil-\nity to generate topically relevant keyphrases that\nare absent in the text.",
+      "category": "Experiment",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Deep Keyphrase Generation\nRui Meng, Sanqiang Zhao, Shuguang Han, Daqing He∗, Peter Brusilovsky, Yu Chi\nSchool of Computing and Information\nUniversity of Pittsburgh\nPittsburgh, PA, 15213\n{rui.meng, saz31, shh69, daqing, peterb, yuc73}@pitt.edu\nAbstract\nKeyphrase\nprovides\nhighly-summative\ninformation ",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "1\nIntroduction\nA keyphrase or keyword is a piece of short, sum-\nmative content that expresses the main semantic\nmeaning of a longer text.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Most of\nthe existing keyphrase extraction algorithms have\naddressed this problem through two steps (Liu\net al., 2009; Tomokiyo and Hurst, 2003).",
+      "category": "FailureRisk",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "First, these\nmethods can only extract the keyphrases that ap-\narXiv:1704.06879v2  [cs.CL]  18 Sep 2018\n\npear in the source text; they fail at predicting\nmeaningful keyphrases with a slightly different se-\nquential order or those that use synonyms.",
+      "category": "FailureRisk",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Table 1 shows the proportion of\npresent and absent keyphrases from the docu-\nment abstract in four commonly-used datasets,\nfrom which we can observe large portions of ab-\nsent keyphrases in all the datasets.",
+      "category": "Experiment",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Second, when ranking phrase candidates, pre-\nvious approaches often adopted machine learning\nfeatures such as TF-IDF and PageRank.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Table 1: Proportion of the present keyphrases and\nabsent keyphrases in four public datasets\nDataset\n# Keyphrase\n% Present\n% Absent\nInspec\n19,275\n55.69\n44.31\nKrapivin\n2,461\n44.74\n52.26\nNUS\n2,834\n67.75\n32.25\nSemEval\n12,296\n42.01\n57.99\nTo overcome the limitations of previous stud-\nies, we re-examine th",
+      "category": "Experiment",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "How to address the limitation described: Table 1: Proportion of the present keyphrases and\nabsent keyphrases in four public datasets\nDataset\n# Keyphrase\n% Present\n% Absent\nInspec\n19,275\n55.69\n44.31\nKrapivin\n2,461\n44.74\n52.26\nNUS\n2,834\n67.75\n",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Given a document, hu-\nman annotators will ﬁrst read the text to get a ba-\nsic understanding of the content, then they try to\ndigest its essential content and summarize it into\nkeyphrases.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    }
+  ]
+}

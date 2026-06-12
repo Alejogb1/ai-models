@@ -1,0 +1,15 @@
+{
+  "source": "Recurrent Recommender Networks",
+  "source_group": "Awesome-ML-Papers/MF",
+  "processed_at": "2026-06-08T12:00:00Z",
+  "agent": "agent_batch_generation",
+  "concepts": [
+    {
+      "finding": "Recurrent recommender networks: user and item latent factors evolve over time via RNNs (LSTM/GRU). Each timestep, user and item factors from previous step updated based on new interactions. Temporal cross product: user_factor(t) * item_factor(t) predicts rating at time t. Outperforms static MF and time-biased MF by 10-20%.",
+      "category": "ModelCandidate",
+      "implication": "Temporal keyword embedding evolution: keyword embeddings updated over time as new co-occurrence patterns emerge. RNN captures smooth temporal drift (seasonal keywords, trending topics). Time-dependent embedding enables current-intent prediction.",
+      "open_question": "How much do keyword embeddings drift over weeks/months? Is RNN-based temporal evolution necessary or does periodic retraining suffice?",
+      "testable_hypothesis": "Recurrent keyword embeddings (RNN-driven temporal evolution) maintain higher intent classification accuracy during seasonal shifts than static embeddings retrained monthly."
+    }
+  ]
+}

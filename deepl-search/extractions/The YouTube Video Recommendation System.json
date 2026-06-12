@@ -1,0 +1,99 @@
+{
+  "source": "The YouTube Video Recommendation System.pdf",
+  "source_group": "Awesome-ML-Papers/Session-Based-Recommendations",
+  "processed_at": "2026-06-08",
+  "agent": "agent5_final",
+  "concepts": [
+    {
+      "finding": "In this paper, we present our video recommendation sys-\ntem, which delivers personalized sets of videos to signed\nin users based on their previous activity on the YouTube\nsite (while recommendations are also available in a limited\nform to signed out users, we focus on signed in users for\nthe remaind",
+      "category": "FailureRisk",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "An additional primary goal for YouTube\nrecommendations is to maintain user privacy and provide\nexplicit control over personalized user data that our back-\nend systems expose.",
+      "category": "TargetConstruct",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "SYSTEM DESIGN\nThe overall design of the recommendation system is guided\nby the goals and challenges outlined above: We want rec-\nommendations to be reasonably recent and fresh, as well as\ndiverse and relevant to the user’s recent actions.",
+      "category": "TargetConstruct",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "How to address the limitation described: SYSTEM DESIGN\nThe overall design of the recommendation system is guided\nby the goals and challenges outlined above: We want rec-\nommendations to be reasonably recent and fresh, as well as\ndiverse and ",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "2.5\nUser Interface\nPresentation of recommendations is an important part of\nthe overall user experience.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "The primary metrics we consider\ninclude click through rate (CTR), long CTR (only counting\nclicks that led to watches of a substantial fraction of the\nvideo), session length, time until ﬁrst long watch, and rec-\nommendation coverage (the fraction of logged in users with\nrecommendations).",
+      "category": "Experiment",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "INTRODUCTION\nPersonalized recommendations are a key method for infor-\nmation retrieval and content discovery in today’s information-\nrich environment.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Recommendations are fea-\ntured in two primary locations: The YouTube home page\n(http://www.youtube.com) and the “Browse” page at http:\n//www.youtube.com/videos.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "One simple way\nto achieve this goal is to impose constraints on the number\nof recommendations that are associated with a single seed\nvideo, or by limiting the number of recommendations from\nthe same channel (uploader).",
+      "category": "TargetConstruct",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "This has\nthe advantages of allowing the recommendation generation\nstage access to large amounts of data with ample amounts of\nCPU resources while at the same time allowing the serving\nof the pre-generated recommendations to be extremely low\nlatency.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "The actual implementation of YouTube’s recommendation\nsystem can be divided into three main parts: 1) data collec-\ntion, 2) recommendation generation and 3) recommendation\nserving.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "EVALUATION\nIn our production system we use live evaluation via A/B\ntesting [5] as the main method for evaluating the perfor-\nmance of the recommendation system.",
+      "category": "Experiment",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "The advantage of this approach is that\nevaluation takes place in the context of the actual website\nUI.",
+      "category": "Experiment",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "RESULTS\nThe recommendations feature has been part of the YouTube\nhomepage for more than a year and has been very successful\nin context of our stated goals.",
+      "category": "TargetConstruct",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    }
+  ]
+}

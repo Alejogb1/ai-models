@@ -1,0 +1,15 @@
+{
+  "source": "EXPLAINING AND HARNESSING ADVERSARIAL EXAMPLES .pdf",
+  "source_group": "Awesome-ML-Papers/GANs",
+  "processed_at": "2026-06-08",
+  "agent": "agent6_remaining",
+  "concepts": [
+    {
+      "finding": "Adversarial examples arise from linear behavior in high-dimensional spaces: small perturbations in the gradient direction can significantly change model predictions.",
+      "category": "FailureRisk",
+      "implication": "Neural models for query understanding are vulnerable to adversarial queries, requiring robust training to handle typos and adversarial rephrasing.",
+      "open_question": "How prevalent are adversarial queries in real search logs, and how vulnerable are production intent classifiers to them?",
+      "testable_hypothesis": "Standard query intent classifiers will misclassify >30% of adversarially perturbed queries, while adversarial training will reduce this to <10%."
+    }
+  ]
+}

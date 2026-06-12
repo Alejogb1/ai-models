@@ -1,0 +1,1903 @@
+metapath2vec: Scalable Representation Learning for
+Heterogeneous Networks
+Yuxiao Dong∗
+Microsof Research
+Redmond, WA 98052
+yuxdong@microsof.com
+Nitesh V. Chawla
+University of Notre Dame
+Notre Dame, IN 46556
+nchawla@nd.edu
+Ananthram Swami
+Army Research Laboratory
+Adelphi, MD 20783
+ananthram.swami.civ@mail.mil
+ABSTRACT
+We study the problem of representation learning in heterogeneous
+networks. Its unique challenges come from the existence of mul-
+tiple types of nodes and links, which limit the feasibility of the
+conventional network embedding techniques. We develop two
+scalable representation learning models, namely metapath2vec and
+metapath2vec++. Te metapath2vec model formalizes meta-path-
+based random walks to construct the heterogeneous neighborhood
+of a node and then leverages a heterogeneous skip-gram model
+to perform node embeddings. Te metapath2vec++ model further
+enables the simultaneous modeling of structural and semantic cor-
+relations in heterogeneous networks. Extensive experiments show
+that metapath2vec and metapath2vec++ are able to not only outper-
+form state-of-the-art embedding models in various heterogeneous
+network mining tasks, such as node classiﬁcation, clustering, and
+similarity search, but also discern the structural and semantic cor-
+relations between diverse network objects.
+CCS CONCEPTS
+•Information systems →Social networks; •Computing method-
+ologies →Unsupervised learning; Learning latent represen-
+tations; Knowledge representation and reasoning;
+KEYWORDS
+Network Embedding; Heterogeneous Representation Learning; La-
+tent Representations; Feature Learning; Heterogeneous Information
+Networks
+ACM Reference format:
+Yuxiao Dong, Nitesh V. Chawla, and Ananthram Swami. 2017. metap-
+ath2vec: Scalable Representation Learning for Heterogeneous Networks. In
+Proceedings of KDD ’17, August 13-17, 2017, Halifax, NS, Canada, , 10 pages.
+DOI: htp://dx.doi.org/10.1145/3097983.3098036
+1
+INTRODUCTION
+Neural network-based learning models can represent latent embed-
+dings that capture the internal relations of rich, complex data across
+various modalities, such as image, audio, and language [15]. Social
+∗Tis work was done when Yuxiao was a Ph.D. student at University of Notre Dame.
+Permission to make digital or hard copies of all or part of this work for personal or
+classroom use is granted without fee provided that copies are not made or distributed
+for proﬁt or commercial advantage and that copies bear this notice and the full citation
+on the ﬁrst page. Copyrights for components of this work owned by others than ACM
+must be honored. Abstracting with credit is permited. To copy otherwise, or republish,
+to post on servers or to redistribute to lists, requires prior speciﬁc permission and/or a
+fee. Request permissions from permissions@acm.org.
+KDD ’17, August 13-17, 2017, Halifax, NS, Canada
+© 2017 ACM. 978-1-4503-4887-4/17/08...$15.00
+DOI: htp://dx.doi.org/10.1145/3097983.3098036
+S. Shenker
+M. I.Jordan
+J. Han
+A. Tomkins
+R. E. Tarjan
+D. Song
+J. Dean
+T. Kanade
+R. N. Taylor
+C. D. Manning
+H. Ishii
+H. Jensen
+R. Agrawal
+J. Malik
+O. Mutlu
+KDD
+SIGGRAPH
+SIGIR
+FOCS
+S&P
+OSDI
+NIPS
+IJCAI
+ICSE
+SIGCOMM
+ACL
+SIGMOD
+CHI
+CVPR
+WWW
+ISCA
+W. B. Croft
+(a) DeepWalk / node2vec
+S. Shenker
+M. I.Jordan
+J. Han
+A. Tomkins
+R. E. Tarjan
+D. Song
+J. Dean
+T. Kanade
+R. N. Taylor
+C. D. Manning
+H. Ishii
+H. Jensen
+R. Agrawal
+J. Malik
+O. Mutlu
+KDD
+SIGGRAPH
+SIGIR
+FOCS
+S&P
+OSDI
+NIPS
+IJCAI
+ICSE
+SIGCOMM
+ACL
+SIGMOD
+CHI
+CVPR
+WWW
+ISCA
+W. B. Croft
+(b) PTE
+S. Shenker
+M. I.Jordan
+J. Han
+A. Tomkins
+R. E. Tarjan
+D. Song
+J. Dean
+T. Kanade
+R. N. Taylor
+C. D. Manning
+H. Ishii
+H. Jensen
+R. Agrawal
+J. Malik
+O. Mutlu
+KDD
+SIGGRAPH
+SIGIR
+FOCS
+S&P
+OSDI
+NIPS
+IJCAI
+ICSE
+SIGCOMM
+ACL
+SIGMOD
+CHI
+CVPR
+WWW
+ISCA
+W. B. Croft
+(c) metapath2vec
+S. Shenker
+M. I.Jordan
+J. Han
+A. Tomkins
+R. E. Tarjan
+D. Song
+J. Dean
+T. Kanade
+R. N. Taylor
+C. D. Manning
+H. Ishii
+H. Jensen
+R. Agrawal
+J. Malik
+O. Mutlu
+KDD
+SIGGRAPH
+SIGIR
+FOCS
+S&P
+OSDI
+NIPS
+IJCAI
+ICSE
+SIGCOMM
+ACL
+SIGMOD
+CHI
+CVPR
+WWW
+ISCA
+W. B. Croft
+(d) metapath2vec++
+Figure 1: 2D PCA projections of the 128D embeddings of 16
+top CS conferences and corresponding high-proﬁle authors.
+and information networks are similarly rich and complex data that
+encode the dynamics and types of human interactions, and are sim-
+ilarly amenable to representation learning using neural networks.
+In particular, by mapping the way that people choose friends and
+maintain connections as a “social language,” recent advances in
+natural language processing (NLP) [3] can be naturally applied to
+network representation learning, most notably the group of NLP
+models known as word2vec [17, 18]. A number of recent research
+publications have proposed word2vec-based network representa-
+tion learning frameworks, such as DeepWalk [22], LINE [30], and
+node2vec [8]. Instead of handcrafed network feature design, these
+representation learning methods enable the automatic discovery of
+useful and meaningful (latent) features from the “raw networks.”
+However, these work has thus far focused on representation
+learning for homogeneous networks—representative of singular
+type of nodes and relationships. Yet a large number of social and
+information networks are heterogeneous in nature, involving diver-
+sity of node types and/or relationships between nodes [25]. Tese
+heterogeneous networks present unique challenges that cannot
+be handled by representation learning models that are speciﬁcally
+designed for homogeneous networks. Take, for example, a het-
+erogeneous academic network: How do we eﬀectively preserve
+the concept of “word-context” among multiple types of nodes, e.g.,
+authors, papers, venues, organizations, etc.? Can random walks,
+such those used in DeepWalk and node2vec, be applied to networks
+KDD 2017 Research Paper
+KDD’17, August 13–17, 2017, Halifax, NS, Canada
+135
+Table 1: Case study of similarity search in the heterogeneous DBIS data used in [26].
+Method
+PathSim [26]
+DeepWalk / node2vec [8, 22]
+LINE (1st+2nd) [30]
+PTE [29]
+metapath2vec
+metapath2vec++
+Input
+meta-paths
+heterogeneous random walk paths
+heterogeneous edges
+heterogeneous edges
+probabilistic meta-paths
+probabilistic meta-paths
+Qery
+PKDD
+C. Faloutsos
+PKDD
+C. Faloutsos
+PKDD
+C. Faloutsos
+PKDD
+C. Faloutsos
+PKDD
+C. Faloutsos
+PKDD
+C. Faloutsos
+1
+ICDM
+J. Han
+R. S.
+J. Pan
+W. K.
+C. Aggarwal
+KDD
+C. Aggarwal
+A. S.
+C. Aggarwal
+KDD
+R. Agrawal
+2
+SDM
+R. Agrawal
+M. N.
+H. Tong
+S. A.
+P. Yu
+ICDM
+P. Yu
+M. B.
+J. Pei
+PAKDD
+J. Han
+3
+PAKDD
+J. Pei
+R. P.
+H. Yang
+A. B.
+D. Gunopulos
+SDM
+Y. Tao
+P. B.
+P. Yu
+ICDM
+J. Pei
+4
+KDD
+C. Aggarwal
+G. G.
+R. Filho
+M. S.
+N. Koudas
+DMKD
+N. Koudas
+M. S.
+H. Cheng
+DMKD
+C. Aggarwal
+5
+DMKD
+H. Jagadish
+F. J.
+R. Chan
+S. A.
+M. Vlachos
+PAKDD
+R. Rastogi
+M. K.
+V. Ganti
+SDM
+P. Yu
+of multiple types of nodes? Can we directly apply homogeneous
+network-oriented embedding architectures (e.g., skip-gram) to het-
+erogeneous networks?
+By solving these challenges, the latent heterogeneous network
+embeddings can be further applied to various network mining tasks,
+such as node classiﬁcation [13], clustering [27, 28], and similarity
+search [26, 35]. In contrast to conventional meta-path-based meth-
+ods [25], the advantage of latent-space representation learning lies
+in its ability to model similarities between nodes without connected
+meta-paths. For example, if authors have never published papers in
+the same venue—imagine one publishes 10 papers all in NIPS and
+the other has 10 publications all in ICML; their “APCPA”-based Path-
+Sim similarity [26] would be zero—this will be naturally overcome
+by network representation learning.
+Contributions. We formalize the heterogeneous network repre-
+sentation learning problem, where the objective is to simultane-
+ously learn the low-dimensional and latent embeddings for multiple
+types of nodes. We present the metapath2vec and its extension meta-
+path2vec++ frameworks. Te goal of metapath2vec is to maximize
+the likelihood of preserving both the structures and semantics of a
+given heterogeneous network. In metapath2vec, we ﬁrst propose
+meta-path [25] based random walks in heterogeneous networks
+to generate heterogeneous neighborhoods with network seman-
+tics for various types of nodes. Second, we extend the skip-gram
+model [18] to facilitate the modeling of geographically and seman-
+tically close nodes. Finally, we develop a heterogeneous negative
+sampling-based method, referred to as metapath2vec++, that en-
+ables the accurate and eﬃcient prediction of a node’s heterogeneous
+neighborhood.
+Te proposed metapath2vec and metapath2vec++ models are dif-
+ferent from conventional network embedding models, which focus
+on homogeneous networks [8, 22, 30]. Speciﬁcally, conventional
+models suﬀer from the identical treatment of diﬀerent types of
+nodes and relations, leading to the production of indistinguishable
+representations for heterogeneous nodes—as evident through our
+evaluation. Further, the metapath2vec and metapath2vec++ models
+also diﬀer from the Predictive Text Embedding (PTE) model [29]
+in several ways. First, PTE is a semi-supervised learning model
+that incorporates label information for text data. Second, the het-
+erogeneity in PTE comes from the text network wherein a link
+connects two words, a word and its document, and a word and its
+label. Essentially, the raw input of PTE is words and its output is
+the embedding of each word, rather than multiple types of objects.
+We summarize the diﬀerences of these methods in Table 1, which
+lists their input to learning algorithms, as well as the top-ﬁve simi-
+larity search results in the DBIS network for the same two queries
+used in [26] (see Section 4 for details). By modeling the hetero-
+geneous neighborhood and further leveraging the heterogeneous
+negative sampling technique, metapath2vec++ is able to achieve the
+best top-ﬁve similar results for both types of queries. Figure 1 shows
+the visualization of the 2D projections of the learned embeddings
+for 16 CS conferences and corresponding high-proﬁle researchers
+in each ﬁeld. Remarkably, we ﬁnd that metapath2vec++ is capable
+of automatically organizing these two types of nodes and implicitly
+learning the internal relationships between them, suggested by the
+similar directions and distances of the arrows connecting each pair.
+For example, it learns J. Dean →OSDI and C. D. Manning →ACL.
+metapath2vec is also able to group each author-conference pair
+closely, such as R. E. Tarjan and FOCS. All of these properties are
+not discoverable from conventional network embedding models.
+To summarize, our work makes the following contributions:
+(1) Formalizes the problem of heterogeneous network represen-
+tation learning and identiﬁes its unique challenges resulting
+from network heterogeneity.
+(2) Develops eﬀective and eﬃcient network embedding frame-
+works, metapath2vec & metapath2vec++, for preserving both
+structural and semantic correlations of heterogeneous networks.
+(3) Trough extensive experiments, demonstrates the eﬃcacy and
+scalability of the presented methods in various heterogeneous
+network mining tasks, such as node classiﬁcation (achieving
+relative improvements of 35–319% over benchmarks) and node
+clustering (achieving relative gains of 13–16% over baselines).
+(4) Demonstrates the automatic discovery of internal semantic
+relationships between diﬀerent types of nodes in heterogeneous
+networks by metapath2vec & metapath2vec++, not discoverable
+by existing work.
+2
+PROBLEM DEFINITION
+We formalize the representation learning problem in heterogeneous
+networks, which was ﬁrst brieﬂy introduced in [21]. In speciﬁc, we
+leverage the deﬁnition of heterogeneous networks in [25, 27] and
+present the learning problem with its inputs and outputs.
+Deﬁnition 2.1. A Heterogeneous Network is deﬁned as a graph
+G = (V, E,T ) in which each node v and each link e are associated
+with their mapping functions ϕ(v) : V →TV and φ(e) : E →TE,
+respectively. TV and TE denote the sets of object and relation types,
+where |TV | + |TE | > 2.
+For example, one can represent the academic network in Figure
+2(a) with authors (A), papers (P), venues (V), organizations (O) as
+nodes, wherein edges indicate the coauthor (A–A), publish (A–P,
+KDD 2017 Research Paper
+KDD’17, August 13–17, 2017, Halifax, NS, Canada
+136
+P–V), aﬃliation (O–A) relationships. By considering a heteroge-
+neous network as input, we formalize the problem of heterogeneous
+network representation learning as follows.
+Problem 1. Heterogeneous Network Representation Learn-
+ing: Given a heterogeneous network G, the task is to learn the d-
+dimensional latent representations X ∈R|V |×d, d ≪|V | that are
+able to capture the structural and semantic relations among them.
+Te output of the problem is the low-dimensional matrix X, with
+the vth row—a d-dimensional vector Xv—corresponding to the
+representation of node v. Notice that, although there are diﬀerent
+types of nodes in V , their representations are mapped into the
+same latent space. Te learned node representations can beneﬁt
+various heterogeneous network mining tasks. For example, the
+embedding vector of each node can be used as the feature input of
+node classiﬁcation, clustering, and similarity search tasks.
+Te main challenge of this problem comes from the network
+heterogeneity, wherein it is diﬃcult to directly apply homogeneous
+language and network embedding methods. Te premise of network
+embedding models is to preserve the proximity between a node
+and its neighborhood (context) [8, 22, 30]. In a heterogeneous envi-
+ronment, how do we deﬁne and model this ‘node–neighborhood’
+concept? Furthermore, how do we optimize the embedding models
+that eﬀectively maintain the structures and semantics of multiple
+types of nodes and relations?
+3
+THE METAPATH2VEC FRAMEWORK
+We present a general framework, metapath2vec, which is capable
+of learning desirable node representations in heterogeneous net-
+works. Te objective of metapath2vec is to maximize the network
+probability in consideration of multiple types of nodes and edges.
+3.1
+Homogeneous Network Embedding
+We, ﬁrst, brieﬂy introduce the word2vec model and its application
+to homogeneous network embedding tasks. Given a text corpus,
+Mikolov et al. proposed word2vec to learn the distributed represen-
+tations of words in a corpus [17, 18]. Inspired by it, DeepWalk [22]
+and node2vec [8] aim to map the word-context concept in a text
+corpus into a network. Both methods leverage random walks to
+achieve this and utilize the skip-gram model to learn the repre-
+sentation of a node that facilitates the prediction of its structural
+context—local neighborhoods—in a homogeneous network. Usu-
+ally, given a network G = (V, E), the objective is to maximize the
+network probability in terms of local structures [8, 18, 22], that is:
+arg max
+θ
+Y
+v ∈V
+Y
+c ∈N (v)
+p(c|v;θ)
+(1)
+where N (v) is the neighborhood of node v in the network G, which
+can be deﬁned in diﬀerent ways such as v’s one-hop neighbors,
+and p(c|v;θ) deﬁnes the conditional probability of having a context
+node c given a node v.
+3.2
+Heterogeneous Network Embedding:
+metapath2vec
+To model the heterogeneous neighborhood of a node, metapath2vec
+introduces the heterogeneous skip-gram model. To incorporate
+the heterogeneous network structures into skip-gram, we propose
+meta-path-based random walks in heterogeneous networks.
+Heterogeneous Skip-Gram.
+In metapath2vec, we enable skip-
+gram to learn eﬀective node representations for a heterogeneous
+network G = (V, E,T ) with |TV | > 1 by maximizing the probability
+of having the heterogeneous context Nt (v),t ∈TV given a node v:
+arg max
+θ
+X
+v ∈V
+X
+t ∈TV
+X
+ct ∈Nt (v)
+logp(ct |v;θ)
+(2)
+where Nt (v) denotes v’s neighborhood with the tth type of nodes
+and p(ct |v;θ) is commonly deﬁned as a sofmax function [3, 7, 18,
+24], that is: p(ct |v;θ) =
+eXct ·Xv
+P
+u∈V eXu ·Xv , where Xv is the vth row of
+X, representing the embedding vector for node v. For illustration,
+consider the academic network in Figure 2(a), the neighborhood
+of one author node a4 can be structurally close to other authors
+(e.g., a2, a3 & a5), venues (e.g., ACL & KDD), organizations (CMU
+& MIT), as well as papers (e.g., p2 & p3).
+To achieve eﬃcient optimization, Mikolov et al. introduced neg-
+ative sampling [18], in which a relatively small set of words (nodes)
+are sampled from the corpus (network) for the construction of sof-
+max. We leverage the same technique for metapath2vec. Given a
+negative sample size M, Eq. 2 is updated as follows: logσ (Xct ·Xv )+
+PM
+m=1 Eum∼P (u)[logσ (−Xum ·Xv )], where σ (x) =
+1
+1+e−x and P(u)
+is the pre-deﬁned distribution from which a negative node um is
+drew from for M times. metapath2vec builds the the node frequency
+distribution by viewing diﬀerent types of nodes homogeneously
+and draw (negative) nodes regardless of their types.
+Meta-Path-Based Random Walks.
+How to eﬀectively trans-
+form the structure of a network into skip-gram? In DeepWalk [22]
+and node2vec [8], this is achieved by incorporating the node paths
+traversed by random walkers over a network into the neighborhood
+function.
+Naturally, we can put random walkers in a heterogeneous network
+to generate paths of multiple types of nodes. At step i, the transition
+probability p(vi+1|vi ) is denoted as the normalized probability
+distributed over the neighbors of vi by ignoring their node types.
+Te generated paths can be then used as the input of node2vec
+and DeepWalk. However, Sun et al. demonstrated that heterogeneous
+random walks are biased to highly visible types of nodes—those with
+a dominant number of paths—and concentrated nodes—those with a
+governing percentage of paths pointing to a small set of nodes [26].
+In light of these issues, we design meta-path-based random walks
+to generate paths that are able to capture both the semantic and
+structural correlations between diﬀerent types of nodes, facilitat-
+ing the transformation of heterogeneous network structures into
+metapath2vec’s skip-gram.
+Formally, a meta-path scheme P is deﬁned as a path that is
+denoted in the form of V1
+R1
+−−→V2
+R2
+−−→· · ·Vt
+Rt
+−−→Vt+1 · · ·
+Rl−1
+−−−−→Vl,
+wherein R = R1 ◦R2 ◦· · · ◦Rl−1 deﬁnes the composite relations
+between node types V1 and Vl [25]. Take Figure 2(a) as an example,
+a meta-path “APA” represents the coauthor relationships on a paper
+(P) between two authors (A), and “APVPA” represents two authors
+(A) publish papers (P) in the same venue (V). Previous work has
+shown that many data mining tasks in heterogeneous information
+networks can beneﬁt from the modeling of meta-paths [6, 25, 27].
+KDD 2017 Research Paper
+KDD’17, August 13–17, 2017, Halifax, NS, Canada
+137
+Org
+Author Paper Venue
+a1
+a2
+a3
+a4
+a5
+MIT
+CMU
+ACL
+KDD
+p1
+p2
+p3
+APVPA
+OAPVPAO
+APA
+meta paths
+(a) An academic network
+KDD 0
+0
+0
+0
+0
+1
+0
+0
+0
+0
+0
+0
+ACL
+MIT
+CMU
+a1
+a2
+a3a4
+a5
+p1
+p2
+p3
+input layer
+hidden 
+layer
+output layer
+prob. that 
+p3 appears
+|V|-dim
+|V| x k
+prob. that 
+KDD apears
+... ...
+(b) Skip-gram in metapath2vec, node2vec, & DeepWalk
+0
+KDD
+0
+0
+0
+0
+1
+0
+0
+0
+0
+0
+0
+ACL
+MIT
+CMU
+a1
+a2
+a3a4
+a5
+p1
+p2
+p3
+input layer
+hidden 
+layer
+output layer
+prob. that 
+ACL appears
+prob. that 
+KDD appears
+prob. that 
+a3 appears
+prob. that 
+a5 appears
+prob. that 
+CMU appears
+prob. that 
+p3 appears
+|V|-dim
+|Vp| x kP
+prob. that 
+p2 appears
+|Vo| x ko
+|VA| x kA
+|VV| x kV
+(c) Skip-gram in metapath2vec++
+Figure 2: An illustrative example of a heterogeneous academic network and skip-gram architectures of metapath2vec and
+metapath2vec++ for embedding this network. (a). Yellow doted lines denote coauthor relationships and red doted lines denote citation
+relationships. (b) Te skip-gram architecture used in metapath2vec when predicting for a4, which is the same with the one in node2vec if
+node types are ignored. |V |=12 denotes the number of nodes in the heterogeneous academic network in (a) and a4’s neighborhood is set to
+include CMU, a2, a3, a5, p2, p3, ACL, & KDD, making k = 8. (c) Te heterogeneous skip-gram used in metapath2vec++. Instead of one set of
+multinomial distributions for all types of neighborhood nodes in the output layer, it speciﬁes one set of multinomial distributions for each
+type of nodes in a4’s neighborhood. Vt denotes one speciﬁc t-type nodes and V = VV ∪VA ∪VO ∪VP . kt speciﬁes the size of a particular
+type of one’s neighborhood and k = kV + kA + kO + kP .
+Here we show how to use meta-paths to guide heterogeneous
+random walkers. Given a heterogeneous network G = (V, E,T ) and
+a meta-path scheme P: V1
+R1
+−−→V2
+R2
+−−→· · ·Vt
+Rt
+−−→Vt+1 · · ·
+Rl−1
+−−−−→Vl,
+the transition probability at step i is deﬁned as follows:
+p(vi+1|vi
+t, P) =
+
+1
+|Nt+1(vi
+t )|
+(vi+1,vi
+t ) ∈E, ϕ(vi+1) = t+1
+0
+(vi+1,vi
+t ) ∈E, ϕ(vi+1) , t+1
+0
+(vi+1,vi
+t ) < E
+(3)
+where vi
+t ∈Vt and Nt+1(vi
+t ) denote the Vt+1 type of neighborhood
+of node vi
+t . In other words, vi+1 ∈Vt+1, that is, the ﬂow of the
+walker is conditioned on the pre-deﬁned meta-path P. In addition,
+meta-paths are commonly used in a symmetric way, that is, its ﬁrst
+node typeV1 is the same with the last oneVl [25, 26, 28], facilitating
+its recursive guidance for random walkers, i.e.,
+p(vi+1|vi
+t ) = p(vi+1|vi
+1), if t = l
+(4)
+Te meta-path-based random walk strategy ensures that the
+semantic relationships between diﬀerent types of nodes can be
+properly incorporated into skip-gram. For example, in a traditional
+random walk procedure, in Figure 2(a), the next step of a walker
+on node a4 transitioned from node CMU can be all types of nodes
+surrounding it—a2, a3, a5, p2, p3, and CMU. However, under the
+meta-path scheme ‘OAPVPAO’, for example, the walker is biased
+towards paper nodes (P) given its previous step on an organization
+node CMU (O), following the semantics of this path.
+3.3
+metapath2vec++
+metapath2vec distinguishes the context nodes of nodev conditioned
+on their types when constructing its neighborhood function Nt (v)
+in Eq. 2. However, it ignores the node type information in sofmax.
+In other words, in order to infer the speciﬁc type of context ct in
+Nt (v) given a node v, metapath2vec actually encourages all types
+of negative samples, including nodes of the same type t as well as
+the other types in the heterogeneous network.
+Heterogeneous negative sampling.
+We further propose the
+metapath2vec++ framework, in which the sofmax function is nor-
+malized with respect to the node type of the context ct . Speciﬁcally,
+p(ct |v;θ) is adjusted to the speciﬁc node type t, that is,
+p(ct |v;θ) =
+eXct ·Xv
+P
+ut ∈Vt eXut ·Xv
+(5)
+where Vt is the node set of type t in the network. In doing so,
+metapath2vec++ speciﬁes one set of multinomial distributions for
+each type of neighborhood in the output layer of the skip-gram
+model. Recall that in metapath2vec and node2vec / DeepWalk, the
+dimension of the output multinomial distributions is equal to the
+number of nodes in the network. However, in metapath2vec++’s
+skip-gram, the multinomial distribution dimension for type t nodes
+is determined by the number of t-type nodes. A clear illustration
+can be seen in Figure 2(c). For example, given the target node a4 in
+the input layer, metapath2vec++ outputs four sets of multinomial
+distributions, each corresponding to one type of neighbors—venues
+V , authors A, organizations O, and papers P.
+Inspired by PTE [29], the sampling distribution is also speciﬁed
+by the node type of the neighbor ct that is targeted to predict, i.e.,
+Pt (·). Terefore, we have the following objective:
+O(X) = logσ (Xct · Xv ) +
+M
+X
+m=1
+Eum
+t ∼Pt (ut )[logσ (−Xum
+t · Xv )]
+(6)
+KDD 2017 Research Paper
+KDD’17, August 13–17, 2017, Halifax, NS, Canada
+138
+Input: Te heterogeneous information network G = (V, E,T ),
+a meta-path scheme P, #walks per node w, walk
+length l, embedding dimension d, neighborhood size k
+Output: Te latent node embeddings X ∈R|V |×d
+initialize X ;
+for i = 1 →w do
+for v ∈V do
+MP = MetaPathRandomWalk(G, P, v, l) ;
+X = HeterogeneousSkipGram(X, k, MP) ;
+end
+end
+return X ;
+MetaPathRandomWalk(G, P, v, l)
+MP[1] = v ;
+for i = 1 →l−1 do
+draw u according to Eq. 3 ;
+MP[i+1] = u ;
+end
+return MP ;
+HeterogeneousSkipGram(X, k, MP)
+for i = 1 →l do
+v = MP[i] ;
+for j = max(0, i-k) →min(i+k, l) & j , i do
+ct = MP[j] ;
+Xnew = Xold −η · ∂O(X)
+∂X
+(Eq. 7) ;
+end
+end
+ALGORITHM 1: Te metapath2vec++ Algorithm.
+whose gradients are derived as follows:
+∂O(X)
+∂Xum
+t
+= (σ (Xum
+t · Xv −Ict [um
+t ]))Xv
+(7)
+∂O(X)
+∂Xv
+=
+M
+X
+m=0
+(σ (Xum
+t · Xv −Ict [um
+t ]))Xum
+t
+where Ict [um
+t ] is an indicator function to indicate whether um
+t is
+the neighborhood context node ct and when m = 0, u0
+t = ct . Te
+model is optimized by using stochastic gradient descent algorithm.
+Te pseudo code of metapath2vec++ is listed in Algorithm 1.
+4 EXPERIMENTS
+In this section, we demonstrate the eﬃcacy and eﬃciency of the 
+presented metapath2vec and metapath2vec++ frameworks for het-
+erogeneous network representation learning.
+Data. We use two heterogeneous networks, including the AMiner 
+Computer Science (CS) dataset [31] and the Database and Infor-
+mation Systems (DBIS) dataset [26]. Both datasets and code are 
+publicly available1. Tis AMiner CS dataset consists of 9,323,7392
+1Te network data, learned latent representations, labeled ground truth data, and
+source code can be found at htps://ericdongyx.github.io/metapath2vec/m2v.html
+computer scientists and 3,194,405 papers from 3,883 computer sci-
+ence venues—both conferences and journals—held until 2016. We
+construct a heterogeneous collaboration network, in which there
+are three types of nodes: authors, papers, and venues. Te links
+represent diﬀerent types of relationships among three sets of nodes—
+such as collaboration relationships on a paper.
+Te DBIS dataset was constructed and used by Sun et al. [26]. It
+covers 464 venues, their top-5000 authors, and corresponding 72,902
+publications. We also construct the heterogeneous collaboration
+networks from DBIS wherein a link may connect two authors, one
+author and one paper, as well as one paper and one venue.
+4.1
+Experimental Setup
+We compare metapath2vec and metapath2vec++ with several recent
+network representation learning methods:
+(1) DeepWalk [22] / node2vec [8]: With the same random walk
+path input (p=1 & q=1 in node2vec), we ﬁnd that the choice be-
+tween hierarchical sofmax (DeepWalk) and negative sampling
+(node2vec) techniques does not yield signiﬁcant diﬀerences.
+Terefore we use p=1 and q=1 [8] in node2vec for comparison.
+(2) LINE [30]: We use the advanced version of LINE by considering
+both the 1st- and 2nd-order of node proximity;
+(3) PTE [29]: We construct three bipartite heterogeneous networks
+(author–author, author–venue, venue–venue) and restrain it as
+an unsupervised embedding method;
+(4) Spectral Clustering [33] / Graph Factorization [2]: With the
+same treatment to these methods in node2vec [8], we exclude
+them from our comparison, as previous studies have demon-
+strated that they are outperformed by DeepWalk and LINE.
+For all embedding methods, we use the same parameters listed
+below. In addition, we also vary each of them and ﬁx the others for
+examining the parameter sensitivity of the proposed methods.
+(1) Te number of walks per node w: 1000;
+(2) Te walk length l: 100;
+(3) Te vector dimension d: 128 (LINE: 128 for each order);
+(4) Te neighborhood size k: 7;
+(5) Te size of negative samples: 5.
+For metapath2vec and metapath2vec++, we also need to specify
+the meta-path scheme to guide random walks. We surveyed most
+of the meta-path-based work and found that the most commonly
+and eﬀectively used meta-path schemes in heterogeneous academic
+networks are “APA” and “APVPA” [12, 25–27]. Notice that “APA”
+denotes the coauthor semantic, that is, the traditional (homoge-
+neous) collaboration links / relationships. “APVPA” represents the
+heterogeneous semantic of authors publishing papers at the same
+venues. Our empirical results also show that this simple meta-path
+scheme “APVPA” can lead to node embeddings that can be general-
+ized to diverse heterogeneous academic mining tasks, suggesting its
+applicability to potential applications for academic search services.
+We evaluate the quality of the latent representations learned
+by diﬀerent methods over three classical heterogeneous network
+mining tasks, including multi-class node classiﬁcation [13], node
+clustering [27], and similarity search [26]. In addition, we also use
+the embedding projector in TensorFlow [1] to visualize the node
+embeddings learned from the heterogeneous academic networks.
+KDD 2017 Research Paper
+KDD’17, August 13–17, 2017, Halifax, NS, Canada
+139
+2Correction Nov 05, 2017: The used AMiner dataset consists of 1,693,531 authors. The  
+count 9,323,739 is the paper-author link count.
+Table 2: Multi-class venue node classiﬁcation results in AMiner data.
+Metric
+Method
+5%
+10%
+20%
+30%
+40%
+50%
+60%
+70%
+80%
+90%
+Macro-F1
+DeepWalk/node2vec
+0.0723
+0.1396
+0.1905
+0.2795
+0.3427
+0.3911
+0.4424
+0.4774
+0.4955
+0.4457
+LINE (1st+2nd)
+0.2245
+0.4629
+0.7011
+0.8473
+0.8953
+0.9203
+0.9308
+0.9466
+0.9410
+0.9466
+PTE
+0.1702
+0.3388
+0.6535
+0.8304
+0.8936
+0.9210
+0.9352
+0.9505
+0.9525
+0.9489
+metapath2vec
+0.3033
+0.5247
+0.8033
+0.8971
+0.9406
+0.9532
+0.9529
+0.9701
+0.9683
+0.9670
+metapath2vec++
+0.3090
+0.5444
+0.8049
+0.8995
+0.9468
+0.9580
+0.9561
+0.9675
+0.9533
+0.9503
+Micro-F1
+DeepWalk/node2vec
+0.1701
+0.2142
+0.2486
+0.3266
+0.3788
+0.4090
+0.4630
+0.4975
+0.5259
+0.5286
+LINE (1st+2nd)
+0.3000
+0.5167
+0.7159
+0.8457
+0.8950
+0.9209
+0.9333
+0.9500
+0.9556
+0.9571
+PTE
+0.2512
+0.4267
+0.6879
+0.8372
+0.8950
+0.9239
+0.9352
+0.9550
+0.9667
+0.9571
+metapath2vec
+0.4173
+0.5975
+0.8327
+0.9011
+0.9400
+0.9522
+0.9537
+0.9725
+0.9815
+0.9857
+metapath2vec++
+0.4331
+0.6192
+0.8336
+0.9032
+0.9463
+0.9582
+0.9574
+0.9700
+0.9741
+0.9786
+Table 3: Multi-class author node classiﬁcation results in AMiner data.
+Metric
+Method
+5%
+10%
+20%
+30%
+40%
+50%
+60%
+70%
+80%
+90%
+Macro-F1
+DeepWalk/node2vec
+0.7153
+0.7222
+0.7256
+0.7270
+0.7273
+0.7274
+0.7273
+0.7271
+0.7275
+0.7275
+LINE (1st+2nd)
+0.8849
+0.8886
+0.8911
+0.8921
+0.8926
+0.8929
+0.8934
+0.8936
+0.8938
+0.8934
+PTE
+0.8898
+0.8940
+0.897
+0.8982
+0.8987
+0.8990
+0.8997
+0.8999
+0.9002
+0.9005
+metapath2vec
+0.9216
+0.9262
+0.9292
+0.9303
+0.9309
+0.9314
+0.9315
+0.9316
+0.9319
+0.9320
+metapath2vec++
+0.9107
+0.9156
+0.9186
+0.9199
+0.9204
+0.9207
+0.9207
+0.9208
+0.9211
+0.9212
+Micro-F1
+DeepWalk/node2vec
+0.7312
+0.7372
+0.7402
+0.7414
+0.7418
+0.7420
+0.7419
+0.7420
+0.7425
+0.7425
+LINE (1st+2nd)
+0.8936
+0.8969
+0.8993
+0.9002
+0.9007
+0.9010
+0.9015
+0.9016
+0.9018
+0.9017
+PTE
+0.8986
+0.9023
+0.9051
+0.9061
+0.9066
+0.9068
+0.9075
+0.9077
+0.9079
+0.9082
+metapath2vec
+0.9279
+0.9319
+0.9346
+0.9356
+0.9361
+0.9365
+0.9365
+0.9365
+0.9367
+0.9369
+metapath2vec++
+0.9173
+0.9217
+0.9243
+0.9254
+0.9259
+0.9261
+0.9261
+0.9262
+0.9264
+0.9266
+4.2
+Multi-Class Classiﬁcation
+For the classiﬁcation task, we use third-party labels to determine
+the class of each node. First, we match the eight categories2 of
+venues in Google Scholar3 with those in AMiner data. Among all of
+the 160 venues (20 per category × 8 categories), 133 of them are suc-
+cessfully matched and labeled correspondingly (Most of unmatched
+venues are pre-print venues, such as arXiv). Second, for each au-
+thor who published in these 133 venues, his / her label is assigned
+to the category with the majority of his / her publications, and a
+tie is resolved by random selection among the possible categories;
+246,678 authors are labeled with research category.
+Note that the node representations are learned from the full
+dataset. Te embeddings of above labeled nodes are then used as
+the input to a logistic regression classiﬁer. In the classiﬁcation
+experiments, we vary the size of the training set from 5% to 90%
+and the remaining nodes for testing. We repeat each prediction
+experiment ten times and report the average performance in terms
+of both Macro-F1 and Micro-F1 scores.
+21. Computational Linguistics, 2. Computer Graphics, 3. Computer Networks &
+Wireless Communication, 4. Computer Vision & Patern Recognition, 5. Computing
+Systems, 6. Databases & Information Systems, 7. Human Computer Interaction, and 8.
+Teoretical Computer Science.
+3htps://scholar.google.com/citations?view op=top venues&hl=en&vq=eng. Accessed
+on February, 2017.
+Results. Tables 2 and 3 list the eight-class classiﬁcation results.
+Overall, the proposed metapath2vec and metapath2vec++ models
+consistently and signiﬁcantly outperform all baselines in terms
+of both metrics. When predicting for the venue category, the ad-
+vantage of both metapath2vec and metapath2vec++ are particular
+strong given a small size of training data. Given 5% of nodes as train-
+ing data, for example, metapath2vec and metapath2vec++ achieve
+0.08–0.23 (relatively 35–319%) improvements in terms of Macro-
+F1 and 0.13–0.26 (relatively 39–145%) gains in terms of Micro-F1
+over DeepWalk / node2vec, LINE, and PTE. When predicting for
+authors’ categories, the performance of each method is relatively
+stable when varying the train-test split. Te constant gain achieved
+by the proposed methods is around 2-3% over LINE and PTE, and
+∼20% over DeepWalk / node2vec.
+In summary, metapath2vec and metapath2vec++ learn signiﬁ-
+cantly beter heterogeneous node embeddings than current state-
+of-the-art methods, as measured by multi-class classiﬁcation perfor-
+mance. Te advantage of the proposed methods lies in their proper
+consideration and accommodation of the network heterogeneity
+challenge—the existence of multiple types of nodes and relations.
+Parameter sensitivity. In skip-gram-based representation learn-
+ing models, there exist several common parameters (see Section
+4.1). We conduct a sensitivity analysis of metapath2vec++ to these
+parameters. Figure 3 shows the classiﬁcation results as a function
+KDD 2017 Research Paper
+KDD’17, August 13–17, 2017, Halifax, NS, Canada
+140
+#walks per node w
+100
+200
+400
+600
+800
+1000
+1500
+2000
+F1
+0.8
+0.85
+0.9
+0.95
+1
+venue Macro-F1
+venue Micro-F1
+author Macro-F1
+author Micro-F1
+(a) #walks per node w
+walk length l
+40 60 80 100
+150
+200
+F1
+0.8
+0.85
+0.9
+0.95
+1
+venue Macro-F1
+venue Micro-F1
+author Macro-F1
+author Micro-F1
+(b) walk length l
+#dimensions d
+64
+128
+256
+384
+512
+640
+896
+1024
+F1
+0.8
+0.85
+0.9
+0.95
+1
+venue Macro-F1
+venue Micro-F1
+author Macro-F1
+author Micro-F1
+(c) #dimensions d
+neighborhod size k
+3
+5
+7
+9
+11
+13
+15
+F1
+0.8
+0.85
+0.9
+0.95
+1
+venue Macro-F1
+venue Micro-F1
+author Macro-F1
+author Micro-F1
+(d) neighborhood size k
+Figure 3: Parameter sensitivity in multi-class node classiﬁcation. 50% as training data and the remaining as test data.
+Table 4: Node clustering results (NMI) in AMiner data.
+methods
+venue
+author
+DeepWalk/node2vec
+0.1952
+0.2941
+LINE (1st+2nd)
+0.8967
+0.6423
+PTE
+0.9060
+0.6483
+metapath2vec
+0.9274
+0.7470
+metapath2vec++
+0.9261
+0.7354
+of one chosen parameter when the others are controlled for. In
+general, we ﬁnd that in Figures 3(a) and 3(b) the number of walks w
+rooting from each node and the length l of each walk are positive to
+the author classiﬁcation performance, while they are surprisingly
+inconsequential for inferring venue nodes’ categories as measured
+by Macro-F1 and Micro-F1 scores. Te increase of author clas-
+siﬁcation performance converges as w and l reach around 1000
+and 100, respectively. Similarly, Figures 3(c) and 3(d) suggest that
+the number of embedding dimensions d and neighborhood size
+k are again of relatively litle relevance to the predictive task for
+venues, and k on the other hand is positively crucial to determine
+the class of a venue. However, the descending lines as the increase
+of k for author classiﬁcations imply that a smaller neighborhood
+size actually produces the best embeddings for separating authors.
+Tis ﬁnding diﬀers from those in a homogeneous environment [8],
+wherein the neighborhood size generally shows a positive eﬀect
+on node classiﬁcation.
+According to the analysis, metapath2vec++ is not strictly sen-
+sitive to these parameters and is able to reach high performance
+under a cost-eﬀective parameter choice (the smaller, the more ef-
+ﬁcient). In addition, our results also indicate that those common
+parameters show diﬀerent functions for heterogeneous network
+embedding with those in homogeneous network cases, demonstrat-
+ing the request of diﬀerent ideas and solutions for heterogeneous
+network representation learning.
+4.3
+Node Clustering
+We illustrate how the latent representations learned by embed-
+ding methods can help the node clustering task in heterogeneous
+networks. We employ the same eight-category author and venue
+nodes used in the classiﬁcation task above. Te learned embeddings
+by each method is input to a clustering model. Here we leverage
+the k-means algorithm to cluster the data and evaluate the cluster-
+ing results in terms of normalized mutual information (NMI) [26].
+In addition, we also report metapath2vec++’s sensitivity with re-
+spect to diﬀerent parameter choices. All clustering experiments are
+conducted 10 times and the average performance is reported.
+Results. Table 4 shows the node clustering results as measured
+by NMI in the AMiner CS data. Overall, the table demonstrates
+that metapath2vec and metapath2vec++ outperform all the compar-
+ative methods. When clustering for venues, the task is trivial as
+evident from the high NMI scores produced by most of the methods:
+metapath2vec, metapath2vec++, LINE, and PTE. Nevertheless, the
+proposed two methods outperform LINE and PTE by 2–3%. Te
+author clustering task is more challenging than the venue case, and
+the gain obtained by metapath2vec and metapath2vec++ over the
+best baselines (LINE and PTE) is more signiﬁcant—around 13–16%.
+In summary, metapath2vec and metapath2vec++ generate more
+appropriate embeddings for diﬀerent types of nodes in the network
+than comparative baselines, suggesting their ability to capture and
+incorporate the underlying structural and semantic relationships
+between various types of nodes in heterogeneous networks.
+Parameter sensitivity. Following the same experimental proce-
+dure in classiﬁcation, we study the parameter sensitivity of meta-
+path2vec++ as measured by the clustering performance. Figure 4
+shows the clustering performance as a function of each of the four
+parameters when ﬁxing the other three. From Figures 4(a) and 4(b),
+we can observe that the balance between computational cost (a
+small w and l in x-axis) and eﬃcacy (a high NMI in y-axis) can be
+achieved at around w = 800∼1000 and l = 100 for the clustering of
+both authors and venues. Further, diﬀerent from the positive eﬀect
+of increasing w and l on author clustering, d and k are negatively
+correlated with the author clustering performance, as observed from
+Figures 4(c) and 4(d). Similarly, the venue clustering performance
+also shows an descending trend with an increasing d, while on the
+other hand, we observe a ﬁrst-increasing and then-decreasing NMI
+line when k is increased. Both ﬁgures together imply that d = 128
+and k = 7 are capable of embedding heterogeneous nodes into latent
+space for promising clustering outcome.
+4.4
+Case Study: Similarity Search
+We conduct two case studies to demonstrate the eﬃcacy of our
+methods. We select 16 top CS conferences from the corresponding
+KDD 2017 Research Paper
+KDD’17, August 13–17, 2017, Halifax, NS, Canada
+141
+#walks per node w
+100
+200
+400
+600
+800
+1000
+1500
+2000
+NMI
+0.6
+0.7
+0.8
+0.9
+1
+venue clustering
+author clustering
+(a) #walks per node w
+walk length l
+40 60 80 100
+150
+200
+NMI
+0.6
+0.7
+0.8
+0.9
+1
+venue clustering
+author clustering
+(b) walk length l
+#dimensions d
+64
+128
+256
+384
+512
+640
+896
+1024
+NMI
+0.6
+0.7
+0.8
+0.9
+1
+venue clustering
+author clustering
+(c) #dimensions d
+neighborhod size k
+3
+5
+7
+9
+11
+13
+15
+NMI
+0.6
+0.7
+0.8
+0.9
+1
+venue clustering
+author clustering
+(d) neighborhood size k
+Figure 4: Parameter sensitivity in clustering.
+KDD
+ICDM
+SDM
+CIKM WSDM
+WWW
+ICDE
+SIGMOD
+VLDB
+SIGIR
+ECIR
+TREC
+ACL NAACL
+EMNLP
+ECAI
+AAAI
+IJCAI
+SODA
+FOCS
+STOC
+ICML
+AISTATS
+NIPS
+CVPR
+ICCV
+ECCV
+VIS
+SI3D SIGGRAPH
+UIST CHI
+CSCW
+ASE
+FSE
+ICSE
+CCS
+S&P
+SIGCOMM
+USEC
+HotNets
+NSDI
+OSDI
+SOSP
+HotOS
+HPCA
+MICRO
+ISCA
+Figure 5: 2D t-SNE projections of the 128D embeddings of
+48 CS venues, three each from 16 sub-ﬁelds.
+sub-ﬁelds in the AMiner CS data and another 5 from the DBIS data.
+Tis results in a total of 21 query nodes. We use cosine similarity
+to determine the distance (similarity) between the query node and
+the remaining others.
+Table 5 lists the top ten similar results for querying the 16 leading
+conferences in corresponding computer science sub-ﬁelds. One can
+observe that for the query “ACL”, for example, metapath2vec++
+returns venues with the same focus—natural language processing,
+such as EMNLP (1st ), NAACL (2nd), Computational Linguistics
+(3rd), CoNLL (4th), COLING (5th), and so on. Similar performance
+can be also achieved when querying the other conferences from
+various ﬁelds. More surprisingly, we ﬁnd that in most cases, the
+top three results cover venues with similar prestige to the query
+one, such as STOC to FOCS in theory, OSDI to SOSP in system,
+HPCA to ISCA in architecture, CCS to S&P in security, CSCW to
+CHI in human-computer interaction, EMNLP to ACL in NLP, ICML
+to NIPS in machine learning, WSDM to WWW in Web, AAAI to
+IJCAI in artiﬁcial intelligence, PVLDB to SIGMOD in database, etc.
+Similar results can also be observed in Tables 6 and 1, which show
+the similarity search results for the DBIS network.
+4.5
+Case Study: Visualization
+We employ the TensorFlow embedding projector to further visualize
+the low-dimensional node representations learned by embedding
+#threads
+12 4
+8
+16
+24
+32
+40
+speedup
+12
+4
+8
+16
+24
+32
+40
+metapath2vec
+metapath2vec++
+Figure 6: Scalability of metapath2vec and metapath2vec++.
+models. First, we project multiple types of nodes—16 top CS confer-
+ences and corresponding top-proﬁle authors—into the same space in
+Figure 1. From Figure 1(d), we can clearly see that metapath2vec++
+is able to automatically organize these two types of nodes and im-
+plicitly learn the internal relationships between them, indicated by
+the similar directions and distances of the arrows connecting each
+pair of them, such as J. Dean →OSDI, C. D. Manning →ACL, R. E.
+Tarjan →FOCS, M. I. Jordan →NIPS, and so on. In addition, these
+two types of nodes are clearly located in two separate and straight
+columns. Neither of these two results can be made by the recent
+network embedding models in Figures 1(a) and 1(b).
+As to metapath2vec, instead of separating the two types of nodes
+into two columns, it is capable of grouping each pair of one venue
+and its corresponding author closely, such as R. E. Tarjan and FOCS,
+H. Jensen and SIGGRAPH, H. Ishli and CHI, R. Agrawal and SIG-
+MOD, etc. Together, both models arrange nodes from similar ﬁelds
+close to each other and dissimilar ones distant from each other, such
+as the “Core CS” cluster of systems (OSDI), networking (SIGCOMM),
+security (S&P), and architecture (ISCA), as well as the “Big AI” clus-
+ter of data mining (KDD), information retrieval (SIGIR), artiﬁcial
+intelligence (AI), machine learning (NIPS), NLP (ACL), and vision
+(CVPR). Tese groupings are also reﬂected by their corresponding
+author nodes.
+Second, Figure 5 visualizes the latent vectors—learned by meta-
+path2vec++—of 48 venues used in similarity search of Section 4.4,
+KDD 2017 Research Paper
+KDD’17, August 13–17, 2017, Halifax, NS, Canada
+142
+Table 5: Case study of similarity search in AMiner Data
+Rank
+ACL
+NIPS
+IJCAI
+CVPR
+FOCS
+SOSP
+ISCA
+S&P
+ICSE
+SIGGRAPH
+SIGCOMM
+CHI
+KDD
+SIGMOD
+SIGIR
+WWW
+0
+ACL
+NIPS
+IJCAI
+CVPR
+FOCS
+SOSP
+ISCA
+S&P
+ICSE
+SIGGRAPH
+SIGCOMM
+CHI
+KDD
+SIGMOD
+SIGIR
+WWW
+1
+EMNLP
+ICML
+AAAI
+ECCV
+STOC
+TOCS
+HPCA
+CCS
+TOSEM
+TOG
+CCR
+CSCW
+SDM
+PVLDB
+ECIR
+WSDM
+2
+NAACL
+AISTATS
+AI
+ICCV
+SICOMP
+OSDI
+MICRO
+NDSS
+FSE
+SI3D
+HotNets
+TOCHI
+TKDD
+ICDE
+CIKM
+CIKM
+3
+CL
+JMLR
+JAIR
+IJCV
+SODA
+HotOS
+ASPLOS
+USENIX S
+ASE
+RT
+NSDI
+UIST
+ICDM
+DE Bull
+IR J
+TWEB
+4
+CoNLL
+NC
+ECAI
+ACCV
+A-R
+SIGOPS E
+PACT
+ACSAC
+ISSTA
+CGF
+CoNEXT
+DIS
+DMKD
+VLDBJ
+TREC
+ICWSM
+5
+COLING
+MLJ
+KR
+CVIU
+TALG
+ATC
+ICS
+JCS
+E SE
+NPAR
+IMC
+HCI
+KDD E
+EDBT
+SIGIR F
+HT
+6
+IJCNLP
+COLT
+AI Mag
+BMVC
+ICALP
+NSDI
+HiPEAC
+ESORICS
+MSR
+Vis
+TON
+MobileHCI
+WSDM
+TODS
+ICTIR
+SIGIR
+7
+NLE
+UAI
+ICAPS
+ICPR
+ECCC
+OSR
+PPOPP
+TISS
+ESEM
+JGT
+INFOCOM
+INTERACT
+CIKM
+CIDR
+WSDM
+KDD
+8
+ANLP
+KDD
+CI
+EMMCVPR
+TOC
+ASPLOS
+ICCD
+ASIACCS
+A SE
+VisComp
+PAM
+GROUP
+PKDD
+SIGMOD R
+TOIS
+TIT
+9
+LREC
+CVPR
+AIPS
+T on IP
+JAlG
+EuroSys
+CGO
+RAID
+ICPC
+GI
+MobiCom
+NordiCHI
+ICML
+WebDB
+IPM
+WISE
+10
+EACL
+ECML
+UAI
+WACV
+ITCS
+SIGCOMM
+ISLPED
+CSFW
+WICSA
+CG
+IPTPS
+UbiComp
+PAKDD
+PODS
+AIRS
+WebSci
+Table 6: Case study of similarity search in DBIS Data
+Rank
+KDD
+SIGMOD
+SIGIR
+WWW
+WSDM
+0
+KDD
+SIGMOD
+SIGIR
+WWW
+WSDM
+1
+SDM
+PVLDB
+TREC
+CIKM
+WWW
+2
+ICDM
+ICDE
+CIKM
+SIGIR
+SIGIR
+3
+DMKD
+TODS
+IPM
+KDD
+KDD
+4
+KDD E
+VLDBJ
+IRJ
+ICDE
+AIRWeb
+5
+PKDD
+PODS
+ECIR
+TKDE
+CIKM
+6
+PAKDD
+EDBT
+TOIS
+VLDB
+WebDB
+7
+TKDE
+CIDR
+WWW
+TOTT
+ICDM
+8
+CIKM
+TKDE
+JASIST
+SIGMOD
+VLDB
+9
+ICDE
+ICDT
+JASIS
+WebDB
+VLDBJ
+10
+TKDD
+DE Bull
+SIGIR F
+WISE
+SDM
+three each from 16 sub-ﬁelds. We can see that conferences from
+the same domain are geographically grouped to each other and
+each group is well separated from others, further demonstrating
+the embedding ability of metapath2vec++. In addition, similar to the
+observation in Figure 1, we can also notice that the heterogeneous
+embeddings are able to unveil the similarities across diﬀerent do-
+mains, including the “Core CS” sub-ﬁeld cluster at the botom right
+and the “Big AI” sub-ﬁeld cluster at the top right.
+Tus, Figures 1 and 5 intuitively demonstrate metapath2vec++’s
+novel capability to discover, model, and capture the underlying
+structural and semantic relationships between multiple types of
+nodes in heterogeneous networks.
+4.6
+Scalability
+In the era of big (network) data, it is necessary to demonstrate
+the scalability of the proposed network embedding models. Te
+metapath2vec and metapath2vec++ methods can be parallelized by
+using the same mechanism as word2vec and node2vec [8, 18]. All
+codes are implemented in C and C++ and our experiments are
+conducted in a computing server with Qad 12 (48) core 2.3 GHz
+Intel Xeon CPUs E7-4850. We run experiments on the AMiner CS
+data with the default parameters with diﬀerent number of threads,
+i.e., 1, 2, 4, 8, 16, 24, 32, 40, each of them utilizing one CPU core.
+Figure 6 shows the speedup of metapath2vec & metapath2vec++
+over the single-threaded case. Optimal speedup performance is
+denoted by the dashed y = x line, which represents perfect distribu-
+tion and execution of computation across all CPU cores. In general,
+we ﬁnd that both methods achieve acceptable sublinear speedups
+as both lines are close to the optimal line. In speciﬁc, they can reach
+11–12× speedup with 16 cores and 24–32× speedup with 40 cores
+used. By using 40 cores, metapath2vec++’s learning process costs
+only 9 minutes for embedding the full AMiner CS network, which is
+composed of over 9 million authors with 3 million papers published
+in more than 3800 venues. Overall, the proposed metapath2vec and
+metapath2vec++ models are eﬃcient and scalable for large-scale
+heterogeneous networks with millions of nodes.
+5
+RELATED WORK
+Network representation learning can be traced back to the usage of
+latent factor models for network analysis and graph mining tasks
+[10, 34], such as the application of factorization models for rec-
+ommendation systems [14, 16], node classiﬁcation [32], relational
+mining [19], and role discovery [9]. Tis rich line of research focuses
+on factorizing the matrix/tensor format (e.g., the adjacency matrix)
+of a network, generating latent-dimension features for nodes or
+edges in this network. However, the computational cost of decom-
+posing a large-scale matrix/tensor is usually very expensive, and
+also suﬀers from its statistical performance drawback [8], making it
+neither practical nor eﬀective for addressing tasks in big networks.
+With the advent of deep learning techniques, signiﬁcant eﬀort
+has been devoted to designing neural network-based representa-
+tion learning models. For example, Mikolov et al. proposed the
+word2vec framework—a two-layer neural network—to learn the
+distributed representations of words in natural language [17, 18].
+Building on word2vec, Perozzi et al. suggested that the “context”
+of a node can be denoted by their co-occurrence in a random walk
+path [22]. Formally, they put random walkers over networks to
+record their walking paths, each of which is composed of a chain
+of nodes that could be considered as a “sentence” of words in a text
+corpus. More recently, in order to diversify the neighborhood of
+a node, Grover & Leskovec presented biased random walkers—a
+mixture of breadth-ﬁrst and width-ﬁrst search procedures—over
+networks to produce paths of nodes [8]. With node paths gener-
+ated, both works leveraged the skip-gram architecture in word2vec
+to model the structural correlations between nodes in a path. In
+addition, several other methods have been proposed for learning
+representations in networks [4, 5, 11, 20, 23]. In particular, to learn
+network embeddings, Tang et al. decomposed a node’s context
+into ﬁrst-order (friends) and second-order (friends’ friends) prox-
+imity [30], which was further developed into a semi-supervised
+model PTE for embedding text data [29].
+KDD 2017 Research Paper
+KDD’17, August 13–17, 2017, Halifax, NS, Canada
+143
+Our work furthers this direction of investigation by designing
+the metapath2vec and metapath2vec++ models to capture hetero-
+geneous structural and semantic correlations exhibited from large-
+scale networks with multiple types of nodes, which can not be
+handled by previous models, and applying these models to a variety
+of network mining tasks.
+6
+CONCLUSION
+In this work, we formally deﬁne the representation learning prob-
+lem in heterogeneous networks in which there exist diverse types
+of nodes and links. To address the network heterogeneity chal-
+lenge, we propose the metapath2vec and metapath2vec++ meth-
+ods. We develop the meta-path-guided random walk strategy in
+a heterogeneous network, which is capable of capturing both the
+structural and semantic correlations of diﬀerently typed nodes and
+relations. To leverage this method, we formalize the heterogeneous
+neighborhood function of a node, enabling the skip-gram-based
+maximization of the network probability in the context of multiple
+types of nodes. Finally, we achieve eﬀective and eﬃcient optimiza-
+tion by presenting a heter

@@ -1,0 +1,148 @@
+{
+  "source": "Initializing Bayesian Hyperparameter Optimization via Meta-Learning .pdf",
+  "source_group": "Awesome-ML-Papers/Other",
+  "processed_at": "2026-06-08",
+  "agent": "agent5_final",
+  "concepts": [
+    {
+      "finding": "SMBO has been\nconclusively shown to yield better performance than both\ngrid and random search and matched or outperformed the\nstate-of-the-art performance for several challenging machine\nlearning problems (Snoek, Larochelle, and Adams 2012;\nBergstra et al.",
+      "category": "Baseline",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Second, to demonstrate the generality of our approach,\nwe applied MI-SMBO to the lower-dimensional problem\nof optimizing the 2 hyperparameters of a support vector\nmachine (SVM) on the same datasets.",
+      "category": "Data",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "For the more chal-\nlenging CASH problem our MI-SMAC variant of the SMBO\nmethod SMAC (Hutter, Hoos, and Leyton-Brown 2011) (a\nstate-of-the-art approach for CASH optimization) yielded\nsubstantial improvements, signiﬁcantly outperforming the\nprevious state of the art for this problem.",
+      "category": "Baseline",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "For a large conﬁguration space describing a CASH problem\nin scikit-learn, MI-SMAC substantially improved over the\ncurrent state of the art CASH algorithm SMAC (and all other\ntested optimizers), showing the potential of our approach\nespecially for large-scale hyperparameter optimization.",
+      "category": "FailureRisk",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "The key concept behind meta-learning\nfor hyperparameter search is to suggest good conﬁgurations\nfor a novel dataset based on conﬁgurations that are known\nto perform well on similar, previously evaluated, datasets.",
+      "category": "Experiment",
+      "implication": "Relevant for similarity-based retrieval and lookalike targeting",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "First, we applied our method to a combined al-\ngorithm selection and hyperparameter (CASH) optimization\nproblem on this benchmark: choosing between three classi-\nﬁers from the prominent scikit-learn package (Pedregosa et\nal.",
+      "category": "Baseline",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "We performed a second experiment to test the suitability\nof our method for a low-dimensional hyperparameter op-\ntimization problem: optimizing the complexity penalty C\nand the kernel width γ of an SVM using an RBF kernel.",
+      "category": "Experiment",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Overall, we\nfound SMAC to outperform both TPE and random search\nfor this large hyperparameter space, conﬁrming the results\nof Eggensperger et al.",
+      "category": "Baseline",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "We attribute this success to the\nlarge search space for this problem, which not even SMAC\ncan effectively search in as little as 50 function evaluations.",
+      "category": "Experiment",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "The ranking plot in Figure 5 shows the performance\nof Spearmint and two MI-Spearmint variants compared to\nSMAC, TPE and random search.",
+      "category": "Baseline",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Our\ninitialization procedure yields mild improvements for low-\ndimensional hyperparameter optimization and substantially\nimproves the state of the art for the more complex combined\nalgorithm selection and hyperparameter optimization problem.",
+      "category": "FailureRisk",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "However, as a generic function optimization framework,\nSMBO requires a substantial number of evaluations to de-\ntect high-performance regions when started on a new opti-\nmization problem.",
+      "category": "Experiment",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "How to address the limitation described: However, as a generic function optimization framework,\nSMBO requires a substantial number of evaluations to de-\ntect high-performance regions when started on a new opti-\nmization problem.",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "2008) to the hyperparam-\neter search problem.",
+      "category": "FailureRisk",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "We found that for\nthe lower-dimensional problem our MI-Spearmint variant of\nSpearmint (Snoek, Larochelle, and Adams 2012) (a state-\nof-the-art approach for low-dimensional hyperparameter op-\ntimization) yielded mild improvements.",
+      "category": "FailureRisk",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "While this can\ngreatly improve the quality of the model, the correspond-\ning function evaluations are also costly and for expensive\nhyperparameter optimization problems a cheaper solution\nis needed.",
+      "category": "Experiment",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "We focused on supervised classiﬁcation because it is the\nmost widely studied problem in metalearning, with a large\nbody of literature and readily available metafeatures and\ndatasets.2\nThe large conﬁguration space for our main experiment\nis spanned by a range of machine learning algorithms from\nsciki",
+      "category": "LabelValidation",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "(2013): we used\n2We note, however, that in principle, our procedure is applicable\nto every optimization problem that is concerned with minimizing a\nmeasurable objective and has a set of metafeatures describing the\nproblem.",
+      "category": "FailureRisk",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "How to address the limitation described: (2013): we used\n2We note, however, that in principle, our procedure is applicable\nto every optimization problem that is concerned with minimizing a\nmeasurable objective and has a set of metafeatures d",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "This CASH problem is of high practical relevance since\nit describes precisely the problem an end user faces when\ngiven a new dataset.3 To keep the computation bearable and\nthe results interpretable, we only included three classiﬁca-\ntion algorithms: an SVM with an RBF kernel, a linear SVM,\nand rando",
+      "category": "Experiment",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "First, we evaluated the base performance of\nthe hyperparameter optimization procedures random search,\nTPE, and SMAC (note that for TPE the prior distributions\nwere uniform) on all 57 datasets and then added meta-\nlearning-initialization to the best of these.",
+      "category": "Experiment",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "In the middle plot the\nsecond conﬁguration suggested by meta-learning was already\nthe best, leaving no room for improvement by SMAC.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    }
+  ]
+}

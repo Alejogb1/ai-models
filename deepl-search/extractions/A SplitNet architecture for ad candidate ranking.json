@@ -1,0 +1,134 @@
+{
+  "source": "A SplitNet architecture for ad candidate ranking.pdf",
+  "source_group": "Awesome-ML-Papers/Other",
+  "processed_at": "2026-06-08",
+  "agent": "agent5_final",
+  "concepts": [
+    {
+      "finding": "Relevance score: One immediate opportunity involves replacing our cosine\nsimilarity-based embedding aggregation with an additional linear layer that learns\nelementwise weights while computing the dot product.",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Conclusion\nRedesigning our early ﬁltering system from scratch improved our ad relevance\nmodels and system performance while simplifying our ranking stack.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "As our business has\nexpanded, we’ve faced new challenges of operating our ad server at growing scale\nwhile maintaining reliability and improving performance.",
+      "category": "FailureRisk",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "How to address the limitation described: As our business has\nexpanded, we’ve faced new challenges of operating our ad server at growing scale\nwhile maintaining reliability and improving performance.",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "We do this through two\nmain phases: candidate selection and candidate ranking.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "The second phase, candidate ranking, ranks these ads to ﬁnd the most relevant\nones for the user.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "With the patches we introduced,\nthe pipeline looked like this:\nWe introduced two additional ﬁltering stages, which optimized for system eﬃciency\nby eliminating low-value candidates earlier in the pipeline using simple heuristics.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "We refer to this entire stack, consisting of the two heuristic ﬁlters and the ML-based\nlight ranking model, as “early ﬁltering.”\nHowever, using less robust heuristics inevitably led to some high-value ad\ncandidates being incorrectly eliminated before the heavy ranking stage.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "How to address the limitation described: We refer to this entire stack, consisting of the two heuristic ﬁlters and the ML-based\nlight ranking model, as “early ﬁltering.”\nHowever, using less robust heuristics inevitably led to some high-value",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "The light ranking stage within the early ﬁltering stack itself also needed\nimprovement.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "While this approach was eﬃcient\nand scalable, we could not experiment with state-of-the-art model architectures or\nnovel loss functions.",
+      "category": "Baseline",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Last year, we shipped multiple improvements to these early ﬁltering stages which\nsigniﬁcantly improved ad relevance.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Modeling Improvements\nUsing Lolly, our in-house ML framework, for the light ranking stage, we were limited\nto a very small set of supported models (primarily linear and logistic regression).",
+      "category": "FailureRisk",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "We concluded that an embedding-based architecture was\nideal for our light ranking use case as well.",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "The user and ad embeddings are then learned jointly using a\nlogistic loss function, with labels obtained directly from the downstream heavy\nranking model.",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "System Improvements\nAt serving time, the SplitNet model requires us to compute a user embedding and\nan ad embedding, and generates a score for the user/ad pair calculated as the dot\nproduct of these embeddings.",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Therefore, we compute the user embedding in parallel with\ncandidate selection, creating no additional latency to the overall system.",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Whenever we ﬁnd an ad candidate without an embedding in the\ncache, we compute and store it so that the embedding is immediately available for\nthe next request that requires it\nAt ranking time, we just need to fetch ad embeddings from the cache and calculate\nthe dot product with the user embedding th",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "As a\nresult, computing the dot product is signiﬁcantly faster than the previous logistic\nregression computation, and so the SplitNet model decreased CPU utilization in our\nserving system by 20%:\nThe system performance gain allowed us to remove one of the heuristic ﬁlters in our\nearly ﬁltering stack,",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "The launch opens up a number of opportunities for additional\nimprovements to the ads ranking funnel.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    }
+  ]
+}

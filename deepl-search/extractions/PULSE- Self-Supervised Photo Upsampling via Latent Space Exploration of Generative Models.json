@@ -1,0 +1,15 @@
+{
+  "source": "PULSE- Self-Supervised Photo Upsampling via Latent Space Exploration of Generative Models.pdf",
+  "source_group": "Awesome-ML-Papers/GANs",
+  "processed_at": "2026-06-08",
+  "agent": "agent6_remaining",
+  "concepts": [
+    {
+      "finding": "PULSE performs super-resolution by searching the latent space of a pretrained GAN for a high-resolution image that downscales to the input low-resolution image.",
+      "category": "ModelCandidate",
+      "implication": "Latent space exploration in pretrained models can solve inverse problems, applicable to query expansion: search latent space of query embeddings to find related queries mapping to the same intent.",
+      "open_question": "Can latent space exploration of query embeddings improve query expansion and recall for rare queries?",
+      "testable_hypothesis": "A PULSE-inspired latent search over query embedding space will generate query expansions that improve recall@100 by 20%+ for tail queries."
+    }
+  ]
+}

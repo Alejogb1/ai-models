@@ -1,0 +1,148 @@
+{
+  "source": "li2020.pdf",
+  "source_group": "Web-Sources",
+  "processed_at": "2026-06-08",
+  "agent": "agent5_final",
+  "concepts": [
+    {
+      "finding": "In both Gong, Abhishek, and Li and Liu and Toubia,\nLDA is first applied on keywords to generate latent topics,\nand then in a two-stage manner the LDA output is used in\ninterpreting consumers’ click-throughs of search ads.",
+      "category": "Data",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "In summary, compared with the aforementioned research,\nour article contributes on two key aspects: (1) we connect\ntopic models to consumers’ visit and purchase choices using\nan integrated modeling framework and (2) we focus on\nconsumers’ latent purchase intentions and, consequently,\ntheir purchase d",
+      "category": "Data",
+      "implication": "Can inform intent modeling for recommendation systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "These new findings provide insights for the firm to\nevaluate its search campaign effectiveness and improve key-\nword selection for search engine marketing.",
+      "category": "Experiment",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Although recent efforts have been made to use\nlatent themes in search phrases to infer consumers’ content\npreference (Liu and Toubia 2018) and keyword ambiguity\n(Gong, Abhishek, and Li 2018), no research has connected the\nsemantics embedded in these search phrases to consumers’\npurchase decisions, a",
+      "category": "Data",
+      "implication": "Can inform intent modeling for recommendation systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Next, we demonstrate the predictive\nperformance of the proposed model and finally conclude with\nsummaries, managerial implications, and limitations.",
+      "category": "FailureRisk",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "How to address the limitation described: Next, we demonstrate the predictive\nperformance of the proposed model and finally conclude with\nsummaries, managerial implications, and limitations.",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Gong,\nAbhishek, and Li (2018) apply LDA to extract the latent\ntopics in keywords and construct an index of topic entropy,\nwhich is then used in the prediction of the click-through\nrates (CTR) and ad rankings.",
+      "category": "Data",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "The owned category contains\ndirect visits to the firm’s website and visits via email click-\nthroughs, while the earned category covers the click-throughs\nfrom the remaining channels: organic search, unpaid referral\nlinks and websites, and social media.",
+      "category": "ModelCandidate",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "We build two specifications\nof the proposed framework, one in discrete state space and the\nother in continuous state space, and show that the semantic\ninformation contained in consumers’ search keywords is infor-\nmative about consumers’ positions along the path to purchase.",
+      "category": "ModelCandidate",
+      "implication": "Can inform intent modeling for recommendation systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "More importantly, we show that once such\nsemantic information is connected to purchase decisions, firms\ncan significantly improve their inferences about consumers’\npositions on the purchase journey.",
+      "category": "ModelCandidate",
+      "implication": "Can inform intent modeling for recommendation systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Furthermore, we show that incorporating textual information\nusing the proposed modeling framework can significantly\nimprove the accuracy of assessing consumers’ latent stages and\npurchase likelihood.",
+      "category": "Data",
+      "implication": "Can inform intent modeling for recommendation systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Interpreting consumers’ search phrases renders a better understanding of their purchase intentions, which is critical\nfor marketing success.",
+      "category": "TargetConstruct",
+      "implication": "Can inform intent modeling for recommendation systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Compared with a model lacking any textual information from consumers’ search phrases, a model using textual data in a\nheuristic approach, and a model based on the latent Dirichlet allocation, the proposed model provides a better evaluation of a\nconsumer’s position on the path to purchase and achieve",
+      "category": "Data",
+      "implication": "Can inform intent modeling for recommendation systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "The research on consumers’\ndecisions and behaviors along their path to purchase dates back\nto the awareness-interest-desire-action (AIDA) model (Howard\nand Sheth 1969; Strong 1925), in which a prospective con-\nsumer first becomes aware of a product, then develops interest,\nresearches and narrows dow",
+      "category": "BehavioralTests",
+      "implication": "Can inform intent modeling for recommendation systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "In this\narticle, we develop a framework to extract structured and quan-\ntifiable information from consumers’ search queries and use\nthis information to improve the inference about consumers’\npurchase intentions along their path to purchase.",
+      "category": "TargetConstruct",
+      "implication": "Can inform intent modeling for recommendation systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "However,\nthe large volume of textual data created by consumers on their\npurchase journeys remains underresearched in this stream of\nliterature.",
+      "category": "ModelCandidate",
+      "implication": "Can inform intent modeling for recommendation systems",
+      "open_question": "How to address the limitation described: However,\nthe large volume of textual data created by consumers on their\npurchase journeys remains underresearched in this stream of\nliterature.",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Researchers have studied the characteristics\nof search keywords based on the presence of certain terms, such\nas brand names, retailer names, and geolocations (Ghose and\nYang 2009; Rutz and Bucklin 2011), the popularity of a keyword\nby its ranking (Jerath, Ma, and Park 2014), and the specificity of\na",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "2012), Tirunillai and Tellis\n(2014) were among the first to introduce LDA, an early\nstandard of topic models, to marketing research to analyze\nuser-generated content.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Our\nmodel differs from these approaches in two aspects: first,\nour model jointly estimates latent topics and consumers’\nvisit and purchase choices; second, our model utilizes the\nlatent topics to infer consumers’ purchase intentions and\npredict their purchase decisions.",
+      "category": "Data",
+      "implication": "Can inform intent modeling for recommendation systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Consumers’ search queries offer information about their\npurchase intentions—consumers in an early state of purchase\njourney are likely to have different focuses from consumers\nclose to purchase, leading to different keyword choices.",
+      "category": "TargetConstruct",
+      "implication": "Can inform intent modeling for recommendation systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Overall, we find that the HMM\nversion has better predictive performance than the continuous\nstate-space version, while the key empirical findings are con-\nsistent between the two.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    }
+  ]
+}

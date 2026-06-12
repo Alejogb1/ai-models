@@ -1,0 +1,15 @@
+{
+  "source": "Asynchronous Training of Word Embeddings for Large Text Corpora",
+  "source_group": "Awesome-ML-Papers/Embeddings",
+  "processed_at": "2026-06-08T12:00:00Z",
+  "agent": "agent_batch_generation",
+  "concepts": [
+    {
+      "finding": "Extends word2vec to distributed asynchronous training with parameter servers. Analyzes gradient staleness, learning rate decay, and negative sampling distribution in async setting. Achieves near-linear speedup with up to 64 workers while maintaining embedding quality. Key insight: stale gradients are less problematic than expected for embedding training.",
+      "category": "Experiment",
+      "implication": "Large-scale keyword embedding training (millions of keywords, billions of co-occurrences) can be distributed across many workers with asynchronous SGD. Keyword co-occurrence matrices at scale require distributed training infrastructure.",
+      "open_question": "At what scale of keywords does distributed async training become necessary? What negative sampling distribution works best for keyword co-occurrence data?",
+      "testable_hypothesis": "Asynchronous training of keyword embeddings achieves 50x speedup with 64 workers while maintaining >95% of the cluster quality of single-worker training."
+    }
+  ]
+}

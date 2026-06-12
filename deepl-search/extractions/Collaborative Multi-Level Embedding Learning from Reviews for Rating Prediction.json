@@ -1,0 +1,15 @@
+{
+  "source": "Collaborative Multi-Level Embedding Learning from Reviews for Rating Prediction",
+  "source_group": "Awesome-ML-Papers/MF",
+  "processed_at": "2026-06-08T12:00:00Z",
+  "agent": "agent_batch_generation",
+  "concepts": [
+    {
+      "finding": "Multi-level embedding from review text: word-level (topic modeling), sentence-level (sentiment analysis), document-level (review summary). Multi-task learning jointly trains all levels with rating prediction. Attention mechanism weighs different review levels for prediction. Outperforms single-level review models.",
+      "category": "ModelCandidate",
+      "implication": "Multi-level keyword representation: character-level (subword patterns, language), word-level (semantics), phrase-level (compound keywords), document-level (pages where keyword appears). Each level captures different intent signals.",
+      "open_question": "What granularity of keyword representation (char, word, phrase, document) is most informative for intent clustering?",
+      "testable_hypothesis": "Multi-level keyword embeddings (character + word + document-level) produce more robust intent clusters than single-level embeddings, especially for short (1-2 word) keywords."
+    }
+  ]
+}

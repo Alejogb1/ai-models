@@ -1,0 +1,148 @@
+{
+  "source": "Model Ensemble for Click Prediction in Bing Search Ads.pdf",
+  "source_group": "Awesome-ML-Papers/CTR-CVR-Prediction",
+  "processed_at": "2026-06-08",
+  "agent": "agent5_final",
+  "concepts": [
+    {
+      "finding": "5 Dan Ling Street\nBeijing, China\nfengsun@microsoft.com\nABSTRACT\nAccurate estimation of the click-through rate (CTR) in sponsored\nads signiﬁcantly impacts the user search experience and businesses’\nrevenue, even 0.1% of accuracy improvement would yield greater\nearnings in the hundreds of millions of ",
+      "category": "Experiment",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Accurately esti-\nmating the click-through rate (CTR) of ads [10, 16, 12] has a vital\nimpact on the revenue of search businesses; even a 0.1% accuracy\nimprovement in our production would yield hundreds of millions\nof dollars in additional earnings.",
+      "category": "Experiment",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Click predic-\n0\n200\n400\n600\n800\n1000\nNumber of Trees\n0.0%\n0.1%\n0.2%\n0.3%\n0.4%\n0.5%\nAUC Gain\nSecond Order\nFirst Order\nFigure 7: Effectiveness of second-order gradient.",
+      "category": "ModelCandidate",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "With larger training data, it\nshows near 0.9% AUC improvement in ofﬂine testing and signiﬁ-\ncant click yield gains in online trafﬁc.",
+      "category": "BehavioralTests",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "When a user\nsearches with a query, the search engine matches the user query\nwith bidding keywords, and then selects and shows proper ads to\nthe user.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "The remain-\ning ads are estimated by the click model to predict the click prob-\nability (pClick) given the query and context information (click\nprediction).",
+      "category": "ModelCandidate",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "They behaved poorly was proba-\nbly because Facebook mainly works for feed ads and the position\nfeature may be not as important as with search ads.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "RELATED WORK\nSponsored search advertising relies heavily on the accurate, scal-\nable and quick prediction of ad click-through rates.",
+      "category": "ModelCandidate",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Another trend of models for predicting click-through rate fo-\ncuses on neural networks in order to improve the accuracy.",
+      "category": "ModelCandidate",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Web-scale bayesian click-through rate prediction for\nsponsored search advertising in Microsoft’s Bing search\nengine.",
+      "category": "ModelCandidate",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Web-scale bayesian click-through rate prediction for\nsponsored search advertising in Microsoft’s bing search\nengine.",
+      "category": "ModelCandidate",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Using boosted\ntrees for click-through rate prediction for sponsored search.",
+      "category": "ModelCandidate",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Model Ensemble for Click Prediction in Bing Search Ads\nXiaoliang Ling\nMicrosoft Bing\nNo.",
+      "category": "ModelCandidate",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "With larger training data, there is a nearly 0.9% AUC improvement\nin ofﬂine testing and signiﬁcant click yield gains in online trafﬁc.",
+      "category": "BehavioralTests",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Keywords\nclick prediction; DNN; GBDT; model ensemble\n1.",
+      "category": "ModelCandidate",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "The challenge lies in the large design space: which models are\nensembled together; which ensemble techniques are used; and which\nensemble design would achieve the best accuracy?",
+      "category": "Experiment",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "How to address the limitation described: The challenge lies in the large design space: which models are\nensembled together; which ensemble techniques are used; and which\nensemble design would achieve the best accuracy?",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "2.1\nAds System Overview\nSponsored search typically uses keyword based auction.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "When a user clicks any of the ads, the advertiser will\nbe charged with a fee based on the generalized second price [2,\n1].",
+      "category": "ModelCandidate",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "A typical system involves several steps including selection,\nrelevance ﬁltration, CTR prediction, ranking and allocation.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "In addition, a ranking score is calculated for each\nad candidate by bid ∗pClick where bid is the corresponding bid-\nding price.",
+      "category": "ModelCandidate",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    }
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "source": "Annoy.pdf",
+  "source_group": "Awesome-ML-Papers/Nearest Neighbor Search",
+  "processed_at": "2026-06-08",
+  "agent": "agent6_remaining",
+  "concepts": [
+    {
+      "finding": "Annoy uses random projection trees to partition high-dimensional space, building a forest of trees where each node splits with a random hyperplane, enabling fast ANN with memory-mapped indexes.",
+      "category": "ModelCandidate",
+      "implication": "Tree-based ANN with random projections provides memory-efficient, easily indexable approach for static datasets, widely used in production for item recommendation and similarity search.",
+      "open_question": "How does Annoy compare with HNSW for dynamic datasets where items are frequently added or removed?",
+      "testable_hypothesis": "Annoy will have comparable recall to HNSW on static datasets but 3x+ faster index rebuild times, making it preferable for periodically refreshed search indexes."
+    }
+  ]
+}

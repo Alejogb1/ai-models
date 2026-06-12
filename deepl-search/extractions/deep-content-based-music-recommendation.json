@@ -1,0 +1,15 @@
+{
+  "source": "deep-content-based-music-recommendation",
+  "source_group": "Awesome-ML-Papers/Embeddings",
+  "processed_at": "2026-06-08T12:00:00Z",
+  "agent": "agent_batch_generation",
+  "concepts": [
+    {
+      "finding": "Content-based music recommendation using deep neural networks on audio features, metadata, and user listening history. Joint embedding of audio content (spectrograms via CNN) and collaborative signals. Key challenge: bridging the semantic gap between low-level audio features and high-level user preferences.",
+      "category": "ModelCandidate",
+      "implication": "Content-based embedding approaches are critical for cold-start items/keywords without interaction history. Multi-modal embedding (audio features + metadata) parallels multi-modal keyword features (text + frequency + entity type).",
+      "open_question": "For keywords, what constitutes the \"content\" signal? Text embeddings of the keyword itself, or document embeddings of pages where the keyword appears?",
+      "testable_hypothesis": "Hybrid content+context keyword embeddings outperform either pure content (keyword text) or pure context (co-occurrence) embeddings for intent clustering."
+    }
+  ]
+}

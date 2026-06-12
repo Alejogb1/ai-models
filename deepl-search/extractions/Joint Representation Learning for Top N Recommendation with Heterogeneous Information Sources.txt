@@ -1,0 +1,1410 @@
+Joint Representation Learning for Top-N Recommendation with
+Heterogeneous Information Sources
+Yongfeng Zhang1∗, Qingyao Ai1∗, Xu Chen2, W. Bruce Crof1
+1College of Information and Computer Sciences, University of Massachusets Amherst, MA 01003
+2School of Sofware, Tsinghua University, Beijing, 10084, China
+{yongfeng,aiqy,crof}@cs.umass.edu,xu-ch14@mails.tsinghua.edu.cn
+ABSTRACT
+Te Web has accumulated a rich source of information, such as text,
+image, rating, etc, which represent diﬀerent aspects of user pref-
+erences. However, the heterogeneous nature of this information
+makes it diﬃcult for recommender systems to leverage in a uniﬁed
+framework to boost the performance. Recently, the rapid develop-
+ment of representation learning techniques provides an approach
+to this problem. By translating the various information sources
+into a uniﬁed representation space, it becomes possible to integrate
+heterogeneous information for informed recommendation.
+In this work, we propose a Joint Representation Learning (JRL)
+framework for top-N recommendation. In this framework, each
+type of information source (review text, product image, numerical
+rating, etc) is adopted to learn the corresponding user and item
+representations based on available (deep) representation learning
+architectures. Representations from diﬀerent sources are integrated
+with an extra layer to obtain the joint representations for users and
+items. In the end, both the per-source and the joint representations
+are trained as a whole using pair-wise learning to rank for top-N
+recommendation. We analyze how information propagates among
+diﬀerent information sources in a gradient-descent learning para-
+digm, based on which we further propose an extendable version of
+the JRL framework (eJRL), which is rigorously extendable to new
+information sources to avoid model re-training in practice.
+By representing users and items into embeddings oﬄine, and us-
+ing a simple vector multiplication for ranking score calculation on-
+line, our framework also has the advantage of fast online prediction
+compared with other deep learning approaches to recommendation
+that learn a complex prediction network for online calculation.
+KEYWORDS
+Recommender Systems; Representation Learning; Heterogeneous
+Information Processing; Top-N Recommendation
+1
+INTRODUCTION
+For many years, user to item numerical ratings have been the most
+frequently used user-item interactions for personalized recommen-
+dation, and they have served as the underpinning of most Matrix
+Permission to make digital or hard copies of all or part of this work for personal or
+classroom use is granted without fee provided that copies are not made or distributed
+for proﬁt or commercial advantage and that copies bear this notice and the full citation
+on the ﬁrst page. Copyrights for components of this work owned by others than ACM
+must be honored. Abstracting with credit is permited. To copy otherwise, or republish,
+to post on servers or to redistribute to lists, requires prior speciﬁc permission and/or a
+fee. Request permissions from permissions@acm.org.
+CIKM’17, November 6–10, 2017, Singapore.
+© 2017 ACM. ISBN 978-1-4503-4918-5/17/11...$15.00 [*equal contribution]
+DOI: htps://doi.org/10.1145/3132847.3132892
+Factorization (MF)-based [22] Collaborative Filtering (CF) [32] algo-
+rithms. Recently, researchers have found or argued that information
+sources beyond ratings are extremely helpful in user/item proﬁling
+and personalized recommendation, but these information sources
+come in very diﬀerent and heterogeneous forms, e.g., textual re-
+views, visual images, or even sound tracks.
+Diﬀerent types of feedbacks describe diﬀerent aspects of user
+preferences – numerical ratings indicate users’ overall atitude to-
+wards a product; textual reviews are able to express user opinions
+towards various product features [9, 27, 42]; and product images
+reveal users’ preferences on diﬀerent visual fashions [18, 28]. Intu-
+itively, heterogeneous information sources can be complementary
+with each other for user proﬁling, which can help to promote per-
+sonalized recommendation when integrated properly. However, the
+nature of heterogeneity makes it diﬃcult to fuse ratings, reviews,
+images, and other information sources in a uniﬁed way.
+Previous work on this topic falls into the category of hybrid rec-
+ommendation [6, 7], which generally includes two research lines
+– the hybridization of algorithms, and the hybridization of het-
+erogeneous information sources. Te ﬁrst research line atempts
+to integrate diﬀerent recommendation techniques for improved
+performance, e.g., integrating content- [30] and CF-based [14] algo-
+rithms. Diﬀerent algorithms can be assembled by various strategies
+such as weighting, switching, mixing, cascading, or meta-level hy-
+bridization [7, 16]. However, these approaches put less atention on
+leveraging heterogeneous information sources. Tey also require
+signiﬁcant eﬀorts on model design and selection because diﬀer-
+ent strategies are needed for diﬀerent algorithms, especially when
+content-based methods are involved.
+More recently, the second research line has atracted much at-
+tention from the research community, and algorithms are pro-
+posed to leverage the power of diﬀerent information sources. One
+trend is to augment numerical ratings with textual reviews for rec-
+ommendation [8], which includes topic modeling [3, 26, 27, 34],
+sentiment analysis [9, 13, 39, 42–44], and (deep) neural network
+[2, 36, 41, 45] approaches for review modeling. Researchers have
+also jointly considered ratings and images for product recommen-
+dation [17, 18, 28], video signals for key frame recommendation
+[10], audio signals for music recommendation [35, 37], and knowl-
+edge bases for movie/book recommendation [40]. Yet existing ap-
+proaches are usually restricted to limited information sources (e.g.,
+rating plus another information source), or require the pre-existence
+of domain knowledge for recommendation.
+Fortunately, recent advances on representation learning [5] has
+shed light on this problem, which makes it possible to learn the
+representations of very diﬀerent information sources in a shared
+representation space. Tis further makes it possible to design a
+Session 8A: Recommendation 3
+CIKM’17, November 6-10, 2017, Singapore
+1449
+uniﬁed recommendation framework that is capable of providing
+recommendation lists based on a variety of user feedbacks.
+In this work, we focus on ranking-based recommendation to con-
+struct top-N recommendation lists. Referring to principles of multi-
+view machine learning [33], we propose a Joint Representation
+Learning (JRL) approach as a general framework for recommen-
+dation, which builds representation learning on top of pair-wise
+learning to rank for top-N recommendation (Figure 1). In this
+framework, each kind of information source is considered as a view,
+and each piece of information therein (e.g., a piece of review) is
+considered as an entity. In each view, entities are represented as
+embeddings based on available (deep) representation learning ar-
+chitectures. Tese entity embeddings (shown as gray intermediate
+embeddings in Figure 1) are connected to users and items based
+on the observed user-item interactions, which give us the user and
+item representations in the corresponding view. Representations
+from each view are further mapped to a shared semantic space
+with a full connection to obtain the integrated user/item represen-
+tations, which are multiplied to produce the ranking scores for
+pair-wise learning to rank. For model learning, we randomly select
+an item that has no interaction with the target user to construct
+positive-negative item pairs, and parameters and representations in
+the whole framework are learned simultaneously in an end-to-end
+manner on the ranking loss.
+To avoid model re-training when adding new information sources
+(i.e., views), we analyze the information propagation among views
+in the JRL framework. With this, we further propose an extendable
+version of the JRL framework (called eJRL), which theoretically al-
+lows integrating new views without re-training the existing views
+– an extremely favorable property in real-world systems where fre-
+quent model retraining on large-scale data is not always practical.
+In the following, we ﬁrst review related work in Section 2. In Sec-
+tion 3 we propose the JRL approach for recommendation, including
+the modeling of each view, the uniﬁed framework, and the top-N
+recommendation strategy. We examine the framework extendabil-
+ity and propose eJRL in Section 4, and provide the experimental
+results and analyses in Section 5. Section 6 concludes the work and
+points out some of the future research directions.
+2
+RELATED WORK
+Researchers and practitioners have known for years that incor-
+porating richer information source beyond numerical ratings can
+promote recommendation performance. Tis leads to research on
+hybrid recommendation techniques [6, 7]. At the very beginning,
+hybrid recommendation mostly referred to the integration of both
+content-based [30] and CF-based [14] techniques for recommen-
+dation, where the integration can come in various forms such as
+weighting, switching, mixing, etc, depending on the available con-
+tent proﬁles and meta-recommendation algorithms.
+More recently, many Web applications have accumulated a large
+amount of heterogeneous information sources about users, items,
+and their interactions, which helped to extend the concept of hybrid
+recommendation to the integration of diﬀerent information sources.
+A popular research line is the joint modeling of numerical ratings
+and textual reviews for recommendation. Te earliest approach
+constructs manually deﬁned ontologies from free-text reviews to
+…
+…
+…
+Entity1
+Entity2
+Entity3
+Entity4
+… EntityN-1
+…
+…
+…
+…
+…
+…
+User 𝑢"
++Item 𝑣$%
+-Item 𝑣$&
+…
+…
+…
+…
+…
+…
+…
+…
+…
+V2
+V1
+V3
+EntityN
+…
+(Deep) Representation Learning
+S1
+S2
+>
++Item 𝑣$%
++Item 𝑣$%
++Item 𝑣$%
+User 𝑢"
+User 𝑢"
+User 𝑢"
+-Item 𝑣$&
+-Item 𝑣$&
+-Item 𝑣$&
+Figure 1: Overview of the Joint Representation Learning
+(JRL) framework for top-N recommendation. Each type of
+information source is denoted as a viewVi, and user-item in-
+teractions in each view are adopted to learn the correspond-
+ing user/item representations. In this ﬁgure, a positive item
+is one that the user previously purchased, so the user and
+item are linked to the common entity of this interaction (i.e.,
+rating, review, or image of the product); instead, a negative
+item is one that the user did not purchase before, thus they
+are not linked to any common entity.
+help rating prediction [1], but it requires extensive human labor
+on domain-related ontology construction. To address the prob-
+lem, researchers have been relying on automatic review analysis
+techniques for recommendation. Speciﬁcally, [3, 26, 27, 34] conduct
+topic discovery from the reviews and integrate it with the latent fac-
+tors from ratings to estimate user preferences for recommendation,
+which achieved beter performance in rating prediction. Further-
+more, [13, 39] proposed leveraging probabilistic graphical models
+to include more ﬂexible prior knowledge for review modeling. To
+capture the local semantic information in reviews, [41] proposed
+to integrate traditional matrix factorization with word2vec [29] for
+user proﬁling and rating prediction.
+Users may express explicit sentiments toward products or as-
+pects in reviews. To capture this important signal of user preference,
+researchers have also applied sentiment analysis on textual reviews
+for recommendation. In particular, [42] uses multi-matrix factor-
+ization to generate explainable recommendations based on phrase-
+level sentiment analysis, and [9] further captures user interests on
+multi-category product features with a learning to rank manner.
+Furthermore, [4] proposed a Sentiment Utility Logistic Model to
+recommend not only items but also item aspects to provide beter
+experience for the users, and [43] jointly considered sentiment,
+aspect, and regional features based on geographical topic modeling
+for location-aware recommendation.
+Beyond numerical ratings and textual reviews, visual images re-
+veal users’ visual preference towards diﬀerent items. For example,
+[28] proposed image-based recommendation to provide co-purchase
+recommendations, and [18] proposed a Visual-based Bayesian Per-
+sonalized Ranking (VBPR) approach for top-N recommendation.
+Session 8A: Recommendation 3
+CIKM’17, November 6-10, 2017, Singapore
+1450
+In [10], the authors jointly modeled time-synchronized comments
+and key frame images for personalized key frame recommendation
+in video websites.
+A related research trend in recent years is leveraging deep learn-
+ing for recommendation. For example, [25, 38] adopted denoising
+auto-encoders for recommendation, [46] developed a neural au-
+toregressive approach for collaborative ﬁltering, and [19, 20] gen-
+eralized matrix factorization and factorization machines for neural
+collaborative ﬁltering. On considering information sources beyond
+ratings, [2, 36, 41, 45] adopted deep textual modeling on reviews for
+recommendation, [35, 37] leveraged deep audio embeddings for mu-
+sic recommendation, [40] incorporated knowledge base embedding
+for recommendation, and [15] studied cross-domain recommenda-
+tion with deep user modeling based on web search queries.
+Tough achieving beter performance against modeling ratings
+alone, previous models (including deep approaches) are usually lim-
+ited to pre-selected information sources or domain knowledge, thus
+researchers have to develop diﬀerent models for diﬀerent types of
+user-item interactions. Recent promising advances on representa-
+tion learning [5] shed light on this problem. With well established
+representation learning theories on texts [24, 29], images [23], au-
+dios [21], and many others, we can conduct joint representation
+learning on heterogeneous information sources in a shared space
+for more informed recommendation. Furthermore, by building rep-
+resentation learning on top of pair-wise learning to rank techniques
+[31], we are able to achieve highly promoted top-N recommenda-
+tion performance, which is closely related to the business values in
+real-world recommender systems.
+3
+JOINT REPRESENTATION LEARNING
+In this section, we describe the Joint Representation Learning (JRL)
+framework for recommendation. We ﬁrst provide a simple overview
+of the framework, and then adopt three heterogeneous information
+sources (textual review, visual image, and numerical rating) to
+describe how the framework can be developed in practice. Afer
+that, we discuss and prove how diﬀerent selections of ranking loss
+functions and multi-view representation merge functions aﬀect the
+extendability of the framework.
+3.1
+Framework Overview
+LetVi be the i-th view in the framework. Speciﬁcally, we takeV1 for
+reviews,V2 for images, andV3 for ratings in this work. Letu refer to
+a speciﬁc user, andv to a speciﬁc item. In each viewVi, we have eiuv
+denoting the entity corresponding to useru and itemv. For example,
+we have duv and ruv referring to the review and rating given by
+user u towards item v, and in the image view, puv refers to the
+image that user u examined on item v. Te entity representations
+ekuv (grey vectors in Figure 1 and 2) are linked to users and items
+in diﬀerent views to obtain the user/item representations, which
+will be described in detail in the following subsections.
+Te JRL framework for recommendation consists of the following
+four components:
+• Learn the representation ekuv of each entity ekuv in view
+Vk. When back-propagation is incorporated, this step will
+introduce an objective function Lk (Θk ).
+Table 1: A summary of key notations in this work. Note that
+all vectors are denoted with bold lowercases.
+Vk
+Te k-th view of the framework, speciﬁcally V1, V2, V3
+refer to review, image, and rating views in this work
+u, v
+An arbitrary user or item in the system
+ekuv, ekuv
+An entity (and its representation) corresponding to user
+u and item v in view Vk. Tis is a general notation, and
+an entity can be a review, image, rating, or others
+duv, duv
+Te review user u writen to item v in view V1, and its
+representation learned by PV-DBOW
+puv, puv
+Te image that user u examined on item v in view V2,
+and its representation learned by CNN
+ruv, ru, rv
+Te rating user u rated on item v in view V3, and its
+corresponding user and item representations learned by
+multi-layer perceptron
+m, n, Nk
+Number of users and items in the system, as well as the
+total number of entities in view Vk
+R
+Te set of all observed user-item interactions
+uk, vk
+Representations of user u and item v in Vk
+u, v
+Integrated representations of user u and item v
+Lk (Θk )
+Regularization function for learning entity representa-
+tions ekuv in view Vk, and Θk is the parameter set
+λk
+Regularization coeﬃcient for Lk (Θk )
+Wk
+Te set of connection weight parameters from entity
+representations to user/item representations in view Vk
+f (·)
+Te merge function to get the integrated user/item rep-
+resentations from per-view user/item representations,
+i.e., u = f (u1u2u3 · · · ), v = f (v1v2v3 · · · )
+д(·)
+Te ranking objective function for pair-wise learning to
+rank, e.g., д(u, v+, v−) = σ (u⊺v+ −u⊺v−)
+• In each view Vk, obtain user/item representations uk, vk
+by linear combinations of entity representations ekuv, and
+the learned connection weight parameters are denoted as
+Wk, which is a set of connection weight parameters.
+• Obtain the ﬁnal user/item representations based on the
+merge function: u = f (u1u2u3 · · · ), v = f (v1v2v3 · · · ).
+• Optimize the pair-wise ranking objective functionд(u,v+,v−)
+with objectives of each view Lk (Θk ) as regularizer.
+Finally, the JRL framework optimizes the following abstract ob-
+jective function for top-N recommendation:
+maximize
+∀k:{Wk,Θk }L =
+X
+(u,v+)∈R
+д(u,v+,v−) +
+X
+k
+λk Lk (Θk )
+(1)
+where (u,v+) is a positive user-item pair indicating that user u
+purchased item v+, while (u,v−) is a negative pair where user u
+did not purchase v−. In this framework, all observed user-item
+interaction pairs in R are treated as positive pairs, while negative
+pairs are randomly sampled from those items that a user did not
+purchase before.
+We will show that diﬀerent choices of merge function f (·) and
+ranking loss functionд(·) will aﬀect how information from diﬀerent
+views are shared. Speciﬁcally, we will show that when f (·) and
+д(·) obtain certain separation properties, the JRL framework is
+extendable to new views without retraining of the existing views.
+Key notations adopted in this section are summarized in Table 1.
+Session 8A: Recommendation 3
+CIKM’17, November 6-10, 2017, Singapore
+1451
+…
+…
+User 𝑢
+Item 𝑣
+Review 𝑑$%
+Projection
+…
+𝑤$%
+'
+𝑤$%
+(
+𝑤$%
+)
+𝑤$%
+*+,-'
+𝑤$%
+*+,
+…
+(a) Representation Learning of Reviews
+Image 𝑝"#
+Multi-Layer Convolutional Neural Network
+Multiple Fully Connected Layers
+User 𝑢
+Item 𝑣
+…
+Fully Connected Layer
+…
+…
+…
+(b) Representation Learning of Images
+…
+…
+…
+Fully Connected Layer 1
+Fully Connected Layer 2
+User 𝑢
+Item 𝑣
+…
+Rating 𝑟$%
+(c) Representation Learning of Ratings
+Figure 2: Te representation learning architectures for diﬀerent views. We consider the textual review, visual image, and
+numerical rating views in this work, but the framework is extendable to more heterogeneous information sources as additional
+views. Each subﬁgure examples the learning of a single entity therein, and diﬀerent entities in the same view are learned using
+the same architecture. In each view, entity representations are connected to users and items according to the corresponding
+user-item interactions in that view.
+3.2
+Modeling of Textual Reviews
+We adopt the PV-DBOW model [24] to learn the review represen-
+tations in V1, which is shown in Figure 2(a). PV-DBOW assumes
+the independence between words in a document and uses the doc-
+ument to predict each observed word in it. Let duv be the review
+of user u on item v, with words {w1uv,w2uv · · ·wnuv
+uv } in it. Te
+representations of user u, item v, word w, review duv in this view
+V1 are deﬁned as u1, v1, w, duv ∈RK, respectively, where K is the
+dimension (i.e., embedding size) of representations.
+Speciﬁcally, each review duv is ﬁrst projected into a semantic
+space and then trained to predict its words. With the bag-of-words
+assumption, the generative probability of word w in review duv is
+calculated by a sofmax function over the whole vocabulary V:
+P(w|duv ) =
+exp(w⊺duv )
+P
+w′∈V exp(w′⊺duv )
+(2)
+To reduce the cost of gradient computation of Eq.(2) given a large
+vocabulary, we take the negative sampling strategy [29], which
+randomly samples several words according to a predeﬁned noise
+distribution and uses these words to approximate the denominator
+of Eq.(2). With negative sampling, the global objective of PV-DBOW
+that sums over all possible word-review pairs is:
+L1(w, duv ) =
+X
+w ∈V
+X
+(u,v)∈R
+fw,duv logσ (w⊺duv )
++
+X
+w ∈V
+X
+(u,v)∈R
+fw,duv
+
+t · EwN ∼PV logσ (−w⊺
+N duv )
+
+(3)
+where fw,duv is the frequency of word-review pair, which is 0 when
+duv does not mentionw. t is the number of negative samples, which
+is set as 5 in this work according to the guidance of [29]. σ (x) =
+1
+1+e−x is the sigmoid function, and EwN ∼PV [logσ (−w⊺
+N duv )] is
+the expected value of logσ (−w⊺
+N duv ) given the noise distribution
+PV, for which we take the 3/4rd unigram distribution as in [29].
+Afer the review representations duv are obtained, each duv is
+connected to its corresponding user u and item v, thus the user and
+item representations u1, v1 in V1 are generated from their corre-
+sponding reviews. Weights of these connections consist a set W1,
+which is learned as parameter in the ﬁnal objective function.
+3.3
+Modeling of Visual Images
+We adopt frequently used DNN architectures to learn the repre-
+sentations in the image view V2, as shown in Figure 2(b). Let puv
+denote the image that user u examined on item v. Same as [28],
+the image features ⃗puv (black intermediate vectors in Figure 2(b))
+are calculated using the Caﬀe deep learning framework with 5 con-
+volutional layers followed by 3 fully-connected layers, which was
+pre-trained on 1.2 million ImageNet (ILSVRC2010) images. Output
+of the second fully-connected layer are used as the intermediate
+image vectors ⃗puv, whose dimension is 40961.
+To learn our compressed image representations puv, we adopt a
+fully connected layer to predict the image features ⃗puv. Let A and b
+be the weight matrix and bias vector to be learned, this introduces
+the following objective function,
+L2(A, b, puv ) =
+X
+(u,v)∈R
+
+ϕ(A · puv + b) −⃗puv
+2
+(4)
+where ϕ(·) is the activation function that can be sigmoid, hyperbolic
+tangent (tanh), exponential linear units (ELU), or others. It is known
+that the sigmoid function restricts each neuron to be in (0,1), which
+may limit the performance and may also suﬀer from saturation,
+where neurons stop learning when their output is near either 0 or
+1. Te tanh function only partly alleviates the problem because
+tanh(x/2) = 2σ (x) −1. As a result, we take the state-of-the-art ELU
+function in this work to avoid this problem [11].
+Similar to reviews, afer the image representations puv are ob-
+tained, each puv is also connected to its corresponding user u and
+item v, so that the user and item representations u2, v2 in view V2
+are generated from their corresponding images. Weights of these
+connections consist a parameter set W2 to be learned.
+3.4
+Modeling of Numerical Ratings
+In this subsection, we present the modeling of the rating view in
+our framework, as shown in Figure 2(c). Let ruv be the rating that
+user u scores on item v. In contrast to the modeling of reviews
+and images, we do not apply a single representation to each rating
+1In experiments, the Amazon review dataset has pre-trained the image features and
+each image is already represented as a 4096-dimensional vector ⃗puv , so we used these
+vectors directly to learn our image representations puv .
+Session 8A: Recommendation 3
+CIKM’17, November 6-10, 2017, Singapore
+1452
+Exactly Neural CF!
+number, but use a pair of representations ru, rv corresponding to
+the rating user and the rated item to predict the ratings, with the
+following two-layer fully connected neural network to model the
+underlying non-linear correlations:
+ˆruv = ϕ
+
+U2 · ϕ
+
+U1(ru ⊙rv ) + c1
+
++ c2
+
+(5)
+where ⊙is element-wise multiplication, ϕ(·) is also the ELU activa-
+tion function, and U1, U2, c1, c2 are the weight and bias parameters
+to be learned. Tis gives us the following objective function,
+L3(U1,U2, c1, c2, ru, rv ) =
+X
+(u,v)∈R
+(ˆruv −ruv )2
+(6)
+Because the entity representations of ratings have already been
+mapped to each user and item, we take the entity representations
+directly as the user/item representations in view V3, i.e., u3 = ru,
+v3 = rv, and connection weight set W3 is predeﬁned as all 1’s.
+3.5
+Integrated Recommendation Strategy
+In this subsection, we integrate the above three views in a uniﬁed
+pair-wise learning to rank framework. We already have the user
+and item representations from each of the three views above, which
+are u1, u2, u3 and v1, v2, v3, respectively. With merge function f (·),
+we obtain the integrated user and item representations u and v,
+u = f (u1, u2, u3), v = f (v1, v2, v3)
+(7)
+Common selections of merge functions can be used in this step,
+such as concatenation (i.e., u = [u⊺
+1 u⊺
+2 u⊺
+3 ]⊺) or average (i.e., u =
+1
+3 (u1 + u2 + u3)). In this work, we adopt the simple concatenation
+function to guarantee the extendability of the framework, which
+will be analyzed in the next section.
+To conduct pair-wise learning to rank, we consider all the ob-
+served user-item purchases (u,v) ∈R as positive pairs, which
+are identically denoted as (u,v+). For each positive pair (u,v+),
+we randomly select a negative item v−that the user did not pur-
+chase before to construct a triplet (u,v+,v−) for training, where
+д(u,v+,v−) = д(u, v+, v−) denotes the ranking loss function based
+on the integrated user and item representations. Generally,д(u, v+, v−)
+can be any function as long as its maximization or minimization
+leads to higher rankings of v+ against v−for user u, but its func-
+tional form directly aﬀects whether the framework is easily ex-
+tendable to new views. For here, we primarily adopt the sigmoid
+function д(u, v+, v−) = σ (u⊺v+ −u⊺v−) for model learning. In the
+next section, we will discuss how diﬀerent selections of д(·) result
+in diﬀerent extendable properties of this framework.
+By integrating the objective functions in Eq.(3)(4)(6) as well as
+the objective function for pair-wise learning to rank into Eq.(1), we
+have the objective function for 3-view JRL as,
+maximize
+W,Θ
+L =
+X
+(u,v)∈R
+д(u, v+, v−) + λ1L1 −λ2L2 −λ3L3
+=
+X
+(u,v)∈R
+
+σ (u⊺v+ −u⊺v−) −λ2
+
+ϕ(A · puv + b) −⃗puv
+2
++ λ1
+X
+w ∈V
+fw,duv
+
+logσ (w⊺duv ) + t · EwN ∼PV logσ
+
+−w⊺
+N duv
+
+−λ3
+
+ϕ
+
+U2 · ϕ
+
+U1(ru ⊙rv ) + c1
+
++ c2
+
+−ruv
+2
+(8)
+where the optimization parameters W = {W1, W2, W3} and Θ =
+{Θ1, Θ2, Θ3} = {{w, duv }, {A, b, puv }, {U1,U2, c1, c2, ru, rv }}. Be-
+sides, λ1, λ2, λ3 > 0 are regularization coeﬃcients. Note that the
+image and rating regularizer have negative coeﬃcients because
+their objectives need to be minimized instead of being maximized.
+Besides, the parameters of each viewVk are restricted to its own part
+of objective function Lk, and the only interaction of diﬀerent views
+lies in the ranking objective д(u, v+, v−), where u = f (u1, u2, u3)
+and v = f (v1, v2, v3) integrate representations learned from dif-
+ferent views. Tis aﬀects the gradient on diﬀerent parameters and
+further aﬀects the extendability of the framework, which will be
+analyzed in the next section.
+Eq.(8) can be easily optimized based on Stochastic Gradient De-
+scent (SGD) in well-developed deep learning infrastructures. Once
+we obtain the integrated user/item representations u and v, the
+personalized recommendation list for each user is constructed by
+ranking all the candidate items in descending order of s = u⊺v.
+4
+FRAMEWORK EXTENDABILITY
+Intuitively, our JRL framework is already extendable to new views
+in practice, in the sense that when a new view is added to the frame-
+work, there is no need to redesign the architecture of existing views
+– we only need to design a model to learn the user/item represen-
+tations from the new information source, add it to the integrated
+user/item representations with the merge function f (·), and ﬁnally
+retrain the whole framework for personalized recommendation.
+But in this section, we discuss the extendability of the framework
+in a more rigorous sense – we expect that there should not only
+be no need to redesign the architecture of existing views, but also
+no need to retrain the parameters of existing views, so that the
+already trained model parameters can still be used even a new view
+is added into the framework – which is a very favorable property
+for real-world systems.
+To this end, we analyze the learning process of the framework
+by examining the updating gradients of diﬀerent parameters, based
+on which we take a closer look at how information from diﬀerent
+views is shared during model learning. Further more, by selecting
+a proper merge function f (·) and ranking objective function д(·),
+we propose a rigorously extendable version of the JRL framework
+(denoted as eJRL) for recommendation.
+4.1
+Information Propagation among Views
+Careful readers may have realized that our JRL framework does
+not involve common parameters across views – each view has
+its own optimization parameter set Θk for objective function Lk,
+as well as its own connection weight parameter set Wk to map
+entity representations to user/item representations within the view.
+Tis raises the question of how information is transferred amongst
+diﬀerent views, so as to take advantage of the power of multi-
+view machine learning. We examine this problem by looking into
+the model learning process based on (stochastic) gradient descent
+methods.
+For the optimization of Θk of the k-th view, we have,
+∂L
+∂Θk
+= λk
+∂Lk
+Θk
+(9)
+Session 8A: Recommendation 3
+CIKM’17, November 6-10, 2017, Singapore
+1453
+which only involves variables and parameters of the k-th view itself.
+While for the optimization of Wk, we have,
+∂L
+∂Wk
+=
+X
+(u,v)∈R
+ ∂д
+∂u
+∂u
+∂Wk
++ ∂д
+∂v+
+∂v+
+∂Wk
++ ∂д
+∂v−
+∂v−
+∂Wk
+!
+=
+X
+(u,v)∈R
+*
+,
+∂д
+∂u
+∂f
+∂uk
+∂uk
+∂Wk
++ ∂д
+∂v+
+∂f
+∂v+
+k
+∂v+
+k
+∂Wk
++ ∂д
+∂v−
+∂f
+∂v−
+k
+∂v−
+k
+∂Wk
++
+-
+≜
+X
+(u,v)∈R
+*
+,
+h(u) ∂uk
+∂Wk
++ h(v+)
+∂v+
+k
+∂Wk
++ h(v−)
+∂v−
+k
+∂Wk
++
+-
+(10)
+where the second equality holds for u = f (u1, u2, · · · ) because that,
+∂д
+∂u
+∂u
+∂Wk
+= ∂д
+∂u
+*.
+,
+∂f
+∂uk
+∂uk
+∂Wk
++
+X
+j,k
+∂f
+∂uj
+∂uj
+∂Wk
++/
+-
+= ∂д
+∂u
+∂f
+∂uk
+∂uk
+∂Wk
+(11)
+and that similar results can be obtained for v+ = f (v+
+1 , v+
+2 , · · · ) and
+v−= f (v−
+1 , v−
+2 , · · · ). Te last equality is for notational purpose by
+deﬁning the following discriminant,
+h(x) = ∂д
+∂x
+∂f
+∂xk
+, ∀x ∈{u, v+, v−}
+(12)
+where x represents any integrated user/item representation, and
+xk is the corresponding representation from view Vk.
+We see that for each additive component in Eq.(10), the last mul-
+tiplier (i.e.,
+∂uk
+∂Wk ,
+∂v+
+k
+∂Wk , and
+∂v−
+k
+∂Wk ) is only related to view Vk itself,
+while discriminant part h(·) may involve variables and parameters
+from other views, which makes it possible for diﬀerent views to
+share information during the model learning process. For example,
+when we adopt sigmoid function д(u, v+, v−) = σ (u⊺v+ −u⊺v−)
+as in Eq.(8), and adopt the concatenation function f (u1, u2, · · · ) =
+[u⊺
+1 u⊺
+2 · · · ]⊺as examined before, then we have,
+h(u) = ∂д
+∂u
+∂f
+∂uk
+= σ ′(u⊺v+ −u⊺v−)(v+
+k −v−
+k )⊺
+(13)
+which is related not only to view Vk, but also variables from other
+views because u = [u⊺
+1 u⊺
+2 · · · ]⊺, v+ = [v+
+1
+⊺v+
+2
+⊺· · · ]⊺, and v−=
+[v−
+1
+⊺v−
+2
+⊺· · · ]⊺. Tis is also true for h(v+) = σ ′(u⊺v+ −u⊺v−)u⊺
+k
+and h(v−) = σ ′(u⊺v+ −u⊺v−)(−u⊺
+k ).
+As a result, the learning of user/item representations in view Vk
+based on Eq.(10) would rely on information (i.e., user/item represen-
+tations) from other views, which eventually propagates information
+among diﬀerent views.
+4.2
+Extendable JRL (eJRL)
+Although information propagation among views helps to boost the
+performance of joint representation learning, it also prevents the
+framework from being extendable, that is, whenever a new view
+is added, we need to retrain the whole model because information
+from the new view will aﬀect the parameters of the existing views,
+which is not favorable in real-world systems that usually need
+to train models based on massive data. However, we show that
+by selecting certain combinations of the merge function f (·) and
+ranking objective functionд(·), we can obtain an extendable version
+of the JRL framework.
+Te key is to examine the discriminant h(x) = ∂д
+∂x
+∂f
+∂xk in Eq.(12).
+If for any x, h(x) contains no variable from other views beyond Vk,
+then the gradient
+∂L
+∂Wk in Eq.(10) will also be independent from
+other views. For example, when f (u1, u2, · · · ) = [u⊺
+1 , u⊺
+2 , · · · ]⊺
+and д(u, v+, v−) = P
+k σ (u⊺
+k v+
+k −u⊺
+k v−
+k ), we have,
+h(u) = σ ′(u⊺
+k v+
+k −u⊺
+k v−
+k )(v+
+k −v−
+k )⊺
+h(v+) = σ ′(u⊺
+k v+
+k −u⊺
+k v−
+k )u⊺
+k , h(v−) = σ ′(u⊺
+k v+
+k −u⊺
+k v−
+k )(−u⊺
+k )
+(14)
+By substituting Eq.(14) into Eq.(10), we obtain the gradient on
+parameter set Wk as,
+∂L
+∂Wk
+=
+X
+(u,v)∈R
+σ ′(u⊺
+kv+
+k−u⊺
+kv−
+k ) *
+,
+(v+
+k −v−
+k )⊺∂uk
+∂Wk
++ u⊺
+k
+∂v+
+k
+∂Wk
+−u⊺
+k
+∂v−
+k
+∂Wk
++
+-
+(15)
+which only contains variables from viewVk itself. Combining Eq.(9)
+and Eq.(15), the parameters {Θk, Wk } of view Vk will converge
+to the same solution even if we retrain the whole model with a
+new view added into the framework, as long as we adopt gradient
+descent algorithms (e.g., SGD, BFGS, Adam, etc) for optimization.
+In this case, we can actually ﬁx the parameters of existing views and
+only gradient on the parameters of the newly added view, which
+makes the framework easily extendable in practice.
+We denote this model under д(u, v+, v−) = P
+k σ (u⊺
+k v+
+k −u⊺
+k v−
+k )
+and f (u1, u2, · · · ) = [u⊺
+1 , u⊺
+2 , · · · ]⊺as the Extendable Joint Rep-
+resentation Learning (eJRL) framework. Although it prevents in-
+formation propagation among diﬀerent views, it still signiﬁcantly
+outperforms baseline methods because of the integration of multi-
+ple information sources for recommendation. We will report the
+performance of both JRL and eJRL in the experiments.
+5
+EXPERIMENTS
+In this section, we provide and analyze the experimental results to
+study the performance of our (e)JRL framework. We ﬁrst provide
+the dataset descriptions and experimental setup, and then present
+the evaluations and interpretations of our observations.
+5.1
+Dataset Description
+We adopt the Amazon review dataset2 for experiments. It covers
+user interactions (review, rating, helpfulness votes, etc) on items
+as well as the item metadata (descriptions, price, brand, image
+features, etc) on 24 product categories spanning May 1996 - July
+2014, and each product category consists a sub-dataset. We adopt
+ﬁve product categories of diﬀerent sizes and sparsity, and take the
+standard ﬁve-core dataset for experiment. Some statistics of the
+datasets are shown in Table 2.
+Te number of interactions in Table 2 refers to the total number of
+reviews or ratings in each dataset. Each item is accompanied with an
+image, which has already been processed into a 4096-dimensional
+vector in the dataset, and we take these vectors to ﬁt the user/item
+representations, as explained in Section 3.3.
+For each dataset, we randomly select 70% of the interactions from
+each user to construct the training set, and adopt the remaining
+30% for testing. Because we take the 5-core dataset where each user
+2htp://jmcauley.ucsd.edu/data/amazon/
+Session 8A: Recommendation 3
+CIKM’17, November 6-10, 2017, Singapore
+1454
+Table 2: Basic statistics of the experimental datasets.
+Dataset
+#users
+#items
+#interactions
+sparsity
+Movies
+123,960
+50,052
+1,697,533
+0.0274%
+CDs
+75,258
+64,421
+1,097,592
+0.0226%
+Clothing
+39,387
+23,033
+278,677
+0.0307%
+Cell Phones
+27,879
+10,429
+194,439
+0.0669%
+Beauty
+22,363
+12,101
+198,502
+0.0734%
+has at least 5 interactions, thus we have at least 3 interactions per
+user for training, and at least 2 interactions per user for testing.
+5.2
+Experimental Setup
+We compare and analyze our JRL and eJRL framework, as well as
+our framework using each single view (review, image, or rating),
+with the following baselines3.
+• BPR: Te Bayesian Personalized Ranking approach for rec-
+ommendation, which is one of the state-of-the art ranking-based
+method for top-N recommendation with numerical ratings. Speciﬁ-
+cally, we use BPR-MF for model learning [31].
+• BPR-HFT: Te Hidden Factors and Topics model is one of the
+state-of-the-art methods for rating prediction with textual reviews
+[27], but it is not speciﬁcally designed for top-N recommendation.
+We apply Bayesian personalized ranking on top of HFT for beter
+top-N recommendation while using textual reviews.
+• VBPR: Te Visual Bayesian Personalized Ranking method for
+recommendation, which is the state-of-the-art method for recom-
+mendation based on visual images of the products [18].
+• DeepCoNN: Te Deep Cooperative Neural Networks model
+for recommendation, which models users and items jointly using
+review text for rating prediction [45].
+• CKE: Te Collaborative Knowledge-base Embedding model
+for recommendation. We adopt the textual product description and
+product image knowledge for model implementation [40].
+In general, we have considered both shallow (BPR, BPR-HFT,
+VBPR) and deep (DeepCoNN, CKE) models. Besides, they cover dif-
+ferent information sources, including ratings (BPR), reviews (BPR-
+HFT, DeepCoNN), and images (VBPR, CKE), respectively.
+To simulate a practical application, we train the diﬀerent views
+independently and then merge the views for the eJRL framework;
+while for JRL, diﬀerent views are trained as a whole. We adopt
+stochastic gradient descent with batch size 64 and train each model
+for 20 epochs. Te learning rate is 0.5 multiplied with the num-
+ber of trained instances divided by the total number of training
+instances, which dynamically shrinks during the learning proce-
+dure. We set the number of negative samples t = 5 in Eq.(3), and
+clip the global norm of gradients from each batch with 5. Unless
+otherwise speciﬁed, we primarily set the embedding size (length
+of vectors duv, puv, ru, rv, and uk, vk) as 300, and set the regular-
+ization coeﬃcients as λ1 = λ3 = 1, λ2 = 0.0001 (λ2 = 0.001 for
+clothing dataset). Performance on diﬀerent parameter setings will
+be analyzed in Section 5.6 and 5.7.
+We conduct ﬁve-fold cross-validation on training set to tune the
+best hyper-parameters of each baseline. Speciﬁcally, the number
+of topics is 10 for BPR-HFT, and the dimension of latent factor (or
+embedding size) is 100 for baselines. Te regularization coeﬃcient
+3Source code of our models are available at htps://github.com/evison/JRL
+λ = 10 works the best for BPR and VBPR. Optimization for baselines
+terminate until convergence or 150 learning epochs.
+5.3
+Evaluation Measures
+For evaluation, we adopt the following four representative top-N
+recommendation measures:
+• Precision: Percentage of correctly recommended items in a
+user’s recommendation list, averaged across all testing users.
+• Recall: Percentage of purchased items that are really recom-
+mended in the list, and it is also averaged across all testing users.
+• NDCG: Te most frequently used list evaluation measure that
+takes into account the position of correctly recommended items.
+NDCG is averaged across all the testing users.
+• HT: Hit Ratio, which is the percentage of users that have at
+least one correctly recommended item in their list.
+We provide top-N recommendation list for each user in the test-
+ing set, where N=10 is taken to report the numbers and compare
+diﬀerent algorithms.
+5.4
+Single-view Performance
+We ﬁrst look into the performance of our framework when using
+each single view, i.e., when only one of the regularization coeﬃ-
+cients λi in Eq.(8) is non-zero. Results are shown in Table 3.
+We see that both of the deep baselines (DeepCoNN and CKE)
+are beter than any of the shallow baselines, which is in accordance
+with the observations in [40, 45]. Besides, we see that CKE per-
+forms beter than DeepCoNN on most datasets. Te reason can be
+that CKE incorporates more multimodal information (both product
+description and image) for product embedding, while DeepCoNN
+only takes advantage of textual reviews. Another reason is that
+DeepCoNN adopts point-wise learning for recommendation, while
+CKE is based on pair-wise learning to rank, and the later has been
+frequently observed to be beter than point-wise methods on top-N
+recommendation tasks [12].
+We ﬁrst compare our model with the shallow baselines to analyze
+the advantage of deep representation learning methods. Speciﬁ-
+cally, we compare our review-based model with BPR-HFT – the
+baseline that also models textual reviews for recommendation. Te
+improvement mainly comes from two aspects: 1) embedding-based
+representation learning gives higher degree of freedom to ﬁnd the
+word/document representations, instead of pre-assuming a ﬁxed
+number of topics as in topic modeling (used by BPR-HFT); and 2),
+by word embedding, our model can beter capture the semantic
+similarity between words and phrases, which helps to aggregate
+user preferences from multiple reviews that use diﬀerent but se-
+mantically similar expressions.
+Using images alone in our framework also outperforms VBPR –
+the baseline that models images for recommendation. Considering
+the diﬀerence of image modeling in our framework from that of
+VBPR, this implies that by connecting both users and items to the
+image representations directly (see Figure 2(b)), our model proﬁles
+the users and items in the same semantic space spanned by images,
+which can beter capture the user-item similarity than the latent
+aﬃne space used in VBPR.
+However, when using the rating view alone, our framework did
+not outperform the best baseline – it was only comparable to BPR
+Session 8A: Recommendation 3
+CIKM’17, November 6-10, 2017, Singapore
+1455
+Table 3: Summary of performance for baselines and our framework with single- and multi-view settings (note: all numbers in
+the table are percentage numbers with ‘%’ omitted). Te ﬁrst block shows the shallow baseline performance, where the starred
+numbers are the best shallow baseline performance among the four; the second block shows deep baseline performance; the
+third block shows the results of our framework with each single view (Review, Image, Rating) and multi-views (JRL, eJRL).
+Te last block shows the percentage increment (or decrement for negative numbers) of our results against the best baseline
+(i.e., CKE). All increments/decrements are signiﬁcant at p=0.001. Underlined numbers show the best single view among all
+three views, while bolded numbers are the best performance of each column.
+Dataset
+Movies
+CDs
+Clothing
+Cell Phones
+Beauty
+Measures(%) NDCG Recall
+HT
+Prec NDCG Recall
+HT
+Prec NDCG Recall
+HT
+Prec NDCG Recall
+HT
+Prec NDCG Recall
+HT
+Prec
+BPR
+1.267 1.988
+4.421 0.528
+2.009 2.679
+8.554 1.085
+0.601 1.046 1.767 0.185
+1.998 3.258
+5.273 0.595
+2.753 4.241
+8.241 ∗1.143
+BPR-HFT
+∗2.092 ∗3.255 ∗6.378 ∗0.776 ∗2.661 ∗3.570 ∗9.926 ∗1.268 ∗1.067 ∗1.819 ∗2.872 ∗0.297 ∗3.151 ∗5.307 ∗8.125 ∗0.860 ∗2.934 ∗4.459 ∗8.268 1.132
+VBPR
+0.849 1.534
+2.976 0.324
+0.631 0.845
+2.930 0.328
+0.560 0.968 1.557 0.166
+1.797 3.489
+5.002 0.507
+1.901 2.786
+5.961 0.902
+DeepCoNN
+3.800 4.671 10.522 0.886
+4.218 6.001 13.857 1.681
+1.310 2.332 3.286 0.229
+3.636 6.353
+9.913 0.999
+3.359 5.429
+9.807 1.200
+CKE
+4.091 5.466 11.053 1.319
+4.620 6.483 14.541 1.779
+1.502 2.509 4.275 0.388
+3.995 7.005 10.809 1.070
+3.717 5.938 11.043 1.371
+Review
+4.222 6.145 12.958 1.465
+5.286 7.454 16.592 2.079
+1.270 2.211 3.527 0.336
+4.184 7.275 10.632 1.062
+4.216 6.766 12.422 1.467
+Image
+2.648 4.035
+9.489 1.048
+3.191 4.564 11.547 1.379
+1.393 2.481 3.773 0.354
+3.777 6.439
+9.444 0.932
+3.310 5.288 10.280 1.211
+Rating
+0.432 0.700
+2.242 0.234
+0.528 0.747
+2.394 0.248
+0.377 0.732 1.219 0.112
+1.506 2.706
+3.845 0.369
+0.876 1.442
+3.322 0.313
+eJRL
+4.405 6.28913.292 1.521
+5.023 6.973 16.081 2.002
+1.523 2.679 4.182 0.396
+4.185 7.130 10.531 1.054
+3.896 6.010 11.090 1.355
+JRL
+4.334 6.334 13.245 1.492 5.378 7.54516.774 2.085 1.735 2.989 4.634 0.442 4.364 7.51010.940 1.096 4.396 6.94912.776 1.546
+Review-Impr
+3.20 12.43
+17.24 11.09
+14.43 14.99
+14.11 16.86 -15.46 -11.90 -17.51 -13.36
+4.72
+3.86
+-1.64 -0.73
+13.42 13.94
+12.49
+6.98
+Image-Impr
+-35.28 -26.19 -14.15 -20.58 -30.92 -29.59 -20.59 -22.50
+-7.24 -1.12 -11.75 -8.84
+-5.47 -8.08 -12.63 -12.89 -10.96 -10.95
+-6.91 -11.67
+eJRL-Impr
+7.67 15.07
+20.26 15.33
+8.72
+7.57
+10.59 12.54
+1.41
+6.75 -2.19
+1.92
+4.74
+1.79
+-2.57 -1.52
+4.81
+1.21
+0.42 -1.14
+JRL-Impr
+5.92 15.89
+19.84 13.08
+16.40 16.39
+15.36 17.21
+15.52 19.12
+8.38 13.87
+9.23
+7.21
+1.21
+2.41
+18.27 17.03
+15.69 12.76
+on some datasets. Because of the sparsity of rating interactions and
+the huge parameter complexity in the training stage of our model,
+this observation is not surprising, and it also implies that the power
+of (deep) representation learning structures can be beter leveraged
+with the availability of large-scale unstructured data of rich (textual
+or visual) semantics, such as text or image.
+We also see that Review performs beter than Image on most
+datasets except clothing, which is expected because users’ prefer-
+ences to clothes are largely aﬀected by their visual fashions, which
+is also observed in VBPR [18]. But for other domains such as movie
+or CD, it is relatively diﬃcult to make judgements only based on
+the appearance of a movie poster or a CD cover, while the textual
+comments from users may reveal more details about these products.
+Similar observations can be found when comparing our single-
+view model with the best baseline (CKE), shown in the last block of
+Table 3. We see that Review achieves beter performance than CKE
+on all datasets except Clothing and (partly) Cell Phones, because the
+review information not only contains users’ description of products,
+but also their personalized preferences and sentiments on these
+products, while the product text description information used by
+CKE is non-personalized. On Clothing dataset, however, image is
+the most informative source for consumer decisions, as a result,
+CKE is beter for its adoption of both text and image information.
+However, by incorporating image, review, and rating information
+sources together, our uniﬁed JRL or eJRL models are beter than the
+best CKE baseline, which will be analyzed in the next subsection.
+5.5
+Multi-view Performance
+We further look into our framework when integrating all three
+views. Generally, we see that on most datasets, eJRL is beter than
+CKE, and JRL is even beter than eJRL for nearly all the cases.
+Intuitively, our ranking-based uniﬁcation of diﬀerent views, plus
+the adoption of concatenation function f (u1, u2, · · · ) = [u⊺
+1 , u⊺
+2 , · · · ]⊺
+as the merge function, together help to gain beter performance
+when integrating diﬀerent views. Mathematically, this is equiva-
+lent to adding up the ranking scores sk = u⊺
+k vk from each view
+to rerank the top-N recommendation lists produced by diﬀerent
+views. As a result, an item tends to gain a higher score in the ﬁnal
+recommendation list as long as it achieves a high score from one
+view, i.e., as long as the user preference on this item is appropriately
+proﬁled by one information source.
+Furthermore, by allowing information propagation among views
+during model learning, each view borrows representations from
+other views to ﬁt the ranking objective д(·), which helps the JRL
+framework to achieve even beter performance than eJRL. However,
+the performance of eJRL is generally comparable to JRL on most
+cases, and they are both signiﬁcantly beter than the best CKE
+baseline. As a result, eJRL has advantages in practice given its
+extendability property.
+We also ﬁnd that selecting proper regularization coeﬃcients in
+Eq.(8) is important to gain beter integrated performance on JRL
+and eJRL than the single-view versions – especially the image view
+regularizer λ2. We analyze the parameter sensitivity and explain
+the reasons in the following subsections.
+5.6
+Impact of Regularization Coeﬃcients
+During the experiments, we ﬁnd that the performance of the (e)JRL
+framework is relatively stable in terms of review and rating regu-
+larization coeﬃcients λ1 and λ3, but the image regularization coef-
+ﬁcient λ2 largely aﬀects the results. As a result, we ﬁx λ1 = λ3 = 1
+as the default value, and vary the values of λ2 to study the eﬀect.
+Figure 3 shows the performance of Review, Image, eJRL, and
+JRL on the ﬁve datasets in terms of NDCG. Observations on other
+evaluation measures were similar. Note that only the performance
+of Image, eJRL and JRL change with diﬀerent values of λ2, because
+other model variations do not involve this parameter.
+Session 8A: Recommendation 3
+CIKM’17, November 6-10, 2017, Singapore
+1456
+0.00001
+0.0001
+0.0005
+0.001
+Image Regularizer
+2.0
+2.5
+3.0
+3.5
+4.0
+4.5
+NDCG@10(%)
+Movies
+Review
+Image
+eJRL
+JRL
+0.00001
+0.0001
+0.0005
+0.001
+Image Regularizer
+2.5
+3.0
+3.5
+4.0
+4.5
+5.0
+5.5
+CDs
+Review
+Image
+eJRL
+JRL
+0.00001
+0.0001
+0.0005
+0.001
+Image Regularizer
+0.2
+0.4
+0.6
+0.8
+1.0
+1.2
+1.4
+1.6
+1.8
+Clothing
+Review
+Image
+eJRL
+JRL
+0.00001
+0.0001
+0.0005
+0.001
+Image Regularizer
+2.5
+3.0
+3.5
+4.0
+4.5
+Cell Phones
+Review
+Image
+eJRL
+JRL
+0.00001
+0.0001
+0.0005
+0.001
+Image Regularizer
+2.0
+2.5
+3.0
+3.5
+4.0
+4.5
+5.0
+Beauty
+Review
+Image
+eJRL
+JRL
+Figure 3: Relationship of NDCG vs the Image Regularization Coeﬃcient λ2 under the default embedding size 300 and other
+regularizers λ1 = λ3 = 1. Note that only the performance of Image, eJRL, and JRL approaches change with diﬀerent selections
+with λ2, because other model variations do not involve this parameter. We also plot Review performance for reference.
+We see that on most datasets (Movies, CDs, Cell Phones, Beauty),
+the performance of our model increases with the increase of λ2 at
+the beginning, and then drops when λ2 further increases, whi

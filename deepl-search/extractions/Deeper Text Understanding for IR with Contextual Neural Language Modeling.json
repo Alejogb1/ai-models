@@ -1,0 +1,15 @@
+{
+  "source": "Deeper Text Understanding for IR with Contextual Neural Language Modeling",
+  "source_group": "Awesome-ML-Papers/Ranking",
+  "processed_at": "2026-06-08T12:00:00Z",
+  "agent": "agent_batch_generation",
+  "concepts": [
+    {
+      "finding": "Applies deep contextual language models to IR tasks. Pre-trained on large text corpora (Wikipedia + news), fine-tuned on query-document relevance. Key insight: neural language modeling captures semantic matching beyond lexical overlap. Contextual embeddings outperform static embeddings (word2vec, GloVe) on ad-hoc retrieval by 5-8% MAP.",
+      "category": "ModelCandidate",
+      "implication": "Deep contextual language models can understand keyword semantics beyond surface form. Important for intent clustering: \"car\" and \"automobile\" should map to same intent despite no lexical overlap. Contextual models capture paraphrase relationships.",
+      "open_question": "How much do contextual language models improve keyword-intent clustering over static embeddings? Is the improvement worth the inference cost?",
+      "testable_hypothesis": "BERT-encoded keyword embeddings produce 10%+ improvement in intent cluster purity over GloVe embeddings, measured on manually labeled keyword-intent datasets."
+    }
+  ]
+}

@@ -1,0 +1,43 @@
+{
+  "source": "Fine-tune BERT for Extractive Summarization.pdf",
+  "source_group": "Awesome-ML-Papers/Keywords-Extraction",
+  "processed_at": "2026-06-08",
+  "agent": "agent5_final",
+  "concepts": [
+    {
+      "finding": "Recurrent\nNeural\nNetwork\nAlthough\nthe\nTransformer model achieved great results on\nseveral tasks, there are evidence that Recurrent\nNeural Networks still have their advantages,\nespecially when combining with techniques in\nTransformer (Chen et al., 2018).",
+      "category": "ModelCandidate",
+      "implication": "Architecture pattern applicable to sequence modeling for user behavior",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Although many neural models have been\nproposed\nfor\nextractive\nsummarization\nre-\ncently (Cheng and Lapata, 2016; Nallapati et al.,\n2017; Narayan et al., 2018; Dong et al., 2018;\nZhang et al., 2018; Zhou et al., 2018), the im-\nprovement on automatic metrics like ROUGE\n†Please see https://arxiv.org/abs",
+      "category": "Experiment",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "4\nExperimental Results\nThe\nexperimental\nresults\non\nCNN/Dailymail\ndatasets are shown in Table 1.",
+      "category": "Experiment",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "As illustrated in the table, all BERT-based mod-\nels outperformed previous state-of-the-art models\nby a large margin.",
+      "category": "Baseline",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "The experimental results on NYT datasets are\nshown in Table 3.",
+      "category": "Experiment",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    }
+  ]
+}

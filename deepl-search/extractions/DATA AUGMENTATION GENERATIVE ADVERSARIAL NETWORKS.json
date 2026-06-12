@@ -1,0 +1,15 @@
+{
+  "source": "DATA AUGMENTATION GENERATIVE ADVERSARIAL NETWORKS.pdf",
+  "source_group": "Awesome-ML-Papers/GANs",
+  "processed_at": "2026-06-08",
+  "agent": "agent6_remaining",
+  "concepts": [
+    {
+      "finding": "DAGAN generates synthetic training examples via GANs for data augmentation, improving classification accuracy by 5-30% on few-shot tasks across multiple datasets.",
+      "category": "Data",
+      "implication": "GAN-based augmentation can dramatically improve performance when labeled data is scarce, directly applicable to low-resource query intent classification.",
+      "open_question": "Can GAN-generated synthetic queries improve intent classification for languages or domains with minimal labeled data?",
+      "testable_hypothesis": "A GAN-based query augmentation pipeline will improve intent classification F1 by 10%+ for low-resource query types with fewer than 100 labeled examples."
+    }
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "source": "Mask R-CNN.pdf",
+  "source_group": "Awesome-ML-Papers/CV",
+  "processed_at": "2026-06-08",
+  "agent": "agent6_remaining",
+  "concepts": [
+    {
+      "finding": "Mask R-CNN extends Faster R-CNN by adding a branch for predicting segmentation masks in parallel with bounding box regression, achieving 39.8 AP on COCO and enabling pixel-level instance segmentation.",
+      "category": "ModelCandidate",
+      "implication": "Multi-task learning with parallel prediction heads (detection + segmentation) improves both tasks. For search, parallel prediction of intent + entities + reformulation could similarly improve all tasks.",
+      "open_question": "Which search tasks benefit most from joint multi-task learning vs. separate models?",
+      "testable_hypothesis": "A multi-task model jointly predicting query intent, named entities, and reformulation type will outperform separate single-task models on each task by at least 5% F1."
+    }
+  ]
+}

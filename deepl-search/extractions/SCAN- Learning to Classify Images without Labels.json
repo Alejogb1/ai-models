@@ -1,0 +1,148 @@
+{
+  "source": "SCAN- Learning to Classify Images without Labels.pdf",
+  "source_group": "Awesome-ML-Papers/Other",
+  "processed_at": "2026-06-08",
+  "agent": "agent5_final",
+  "concepts": [
+    {
+      "finding": "Experimental evaluation shows that we outperform\nstate-of-the-art methods by large margins, in particular +26.6% on CI-\nFAR10, +25.0% on CIFAR100-20 and +21.3% on STL10 in terms of clas-\nsiﬁcation accuracy.",
+      "category": "Baseline",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Experimental evaluation shows that our method outperforms prior work by\nlarge margins across multiple datasets.",
+      "category": "Baseline",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Interestingly, applying K-means to the pretext features\noutperforms prior state-of-the-art methods for unsupervised classiﬁcation based\non end-to-end learning schemes (see Sec.",
+      "category": "LabelValidation",
+      "implication": "Can inform intent modeling for recommendation systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "As shown in Section 3.2, our method\noutperforms the application of K-means on the pretext features.",
+      "category": "Baseline",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Importantly, the initial conclusions remain\nvalid, while results on the full ImageNet dataset improved.",
+      "category": "Experiment",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "The task of\nunsupervised image classiﬁcation remains an important, and open chal-\nlenge in computer vision.",
+      "category": "LabelValidation",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Despite these eﬀorts, representation learning approaches are mainly used as the\nﬁrst pretraining stage of a two-stage pipeline.",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "The proposed\nmethod, named SCAN (Semantic Clustering by Adopting Nearest neighbors),\nleverages the advantages of both representation and end-to-end learning ap-\nproaches, but at the same time it addresses their shortcomings:\n\nSCAN: Learning to Classify Images without Labels\n3\n– In a ﬁrst step, we le",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "In\ncontrast to representation learning approaches that require K-means clus-\ntering after learning the feature representations, which is known to lead to\ncluster degeneracy [4], we propose to mine the nearest neighbors of each\nimage based on feature similarity.",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "First, we show\nhow mining nearest neighbors from a pretext task can be used as a prior for\nsemantic clustering.",
+      "category": "ModelCandidate",
+      "implication": "Applicable to user/item clustering for personalization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Also, we introduce additional constraints for selecting an\nappropriate pretext task, capable of producing semantically meaningful feature\nrepresentations.",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Second, we integrate the obtained prior into a novel loss function\nto classify each image and its nearest neighbors together.",
+      "category": "ModelCandidate",
+      "implication": "Relevant for similarity-based retrieval and lookalike targeting",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Additionally, we show\nhow to mitigate the problem of noise inherent in the nearest neighbor selection\nwith a self-labeling approach.",
+      "category": "LabelValidation",
+      "implication": "Relevant for similarity-based retrieval and lookalike targeting",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Section 3.2 experimentally shows that choosing\nK ≥1 signiﬁcantly improves the results compared to only enforcing consistency\nbetween samples and their augmentations, as in [24,21].",
+      "category": "Baseline",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Finally, Figure 6\nshows that self-labeling procedure is not sensitive to the threshold’s value.",
+      "category": "LabelValidation",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "First, we observe that the proposed method is not tied to a speciﬁc pretext\ntask.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Table 3 compares our method to the state-of-the-art on three dif-\nferent benchmarks.",
+      "category": "Baseline",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Finally, we also\ninclude results when tackling the problem in a fully-supervised manner.",
+      "category": "LabelValidation",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "The classiﬁcation accuracy remains stable for CIFAR10\n(87.6% to 86.2%) and STL10 (76.7% to 76.8%), and improves for CIFAR100-20\n(45.9% to 55.1%)3.",
+      "category": "Experiment",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Finally, Table 5 compares our method against recent semi-supervised learning\napproaches when using 1% of the images as labelled data.",
+      "category": "LabelValidation",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    }
+  ]
+}

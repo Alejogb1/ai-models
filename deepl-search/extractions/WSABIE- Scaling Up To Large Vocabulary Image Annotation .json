@@ -1,0 +1,15 @@
+{
+  "source": "WSABIE- Scaling Up To Large Vocabulary Image Annotation ",
+  "source_group": "Awesome-ML-Papers/Ranking",
+  "processed_at": "2026-06-08T12:00:00Z",
+  "agent": "agent_batch_generation",
+  "concepts": [
+    {
+      "finding": "WSABIE: large-scale image annotation via joint embedding of visual features and text labels. Weighted approximate ranking loss with O(1) negative sampling. Learns embedding space where image and label vectors are similar via dot product. Scales to millions of labels. Key: ranking loss optimized via SGD with weighted sampling.",
+      "category": "ModelCandidate",
+      "implication": "WSABIE-style embedding for keyword-intent: keywords and intents as learnable embeddings in shared space. Weighted approximate ranking loss (WARP) optimizes precision@K directly. Scales to thousands of intents efficiently.",
+      "open_question": "Is WARP loss (optimizing rank-based metrics) better for keyword-intent matching than pointwise or pairwise loss?",
+      "testable_hypothesis": "WSABIE-style embedding with WARP loss achieves higher precision@K for keyword-intent matching than pointwise logistic regression or pairwise ranking loss."
+    }
+  ]
+}

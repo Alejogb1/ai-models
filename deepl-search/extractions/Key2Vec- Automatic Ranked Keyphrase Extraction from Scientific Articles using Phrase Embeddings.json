@@ -1,0 +1,148 @@
+{
+  "source": "Key2Vec- Automatic Ranked Keyphrase Extraction from Scientific Articles using Phrase Embeddings.pdf",
+  "source_group": "Awesome-ML-Papers/Keywords-Extraction",
+  "processed_at": "2026-06-08",
+  "agent": "agent5_final",
+  "concepts": [
+    {
+      "finding": "In this paper, we present an un-\nsupervised technique (Key2Vec) that leverages\nphrase embeddings for ranking keyphrases\nextracted from scientiﬁc articles.",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Speciﬁ-\ncally, we propose an effective way of pro-\ncessing text documents for training multi-word\nphrase embeddings that are used for thematic\nrepresentation of scientiﬁc articles and rank-\ning of keyphrases extracted from them using\ntheme-weighted PageRank.",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Due to extensive use\nof phrase embeddings for representing the can-\ndidate keyphrases and ranking them, we name\nour method as Key2Vec.",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Word embeddings have already shown promis-\n634\n\ning results in the process of keyphrase extraction\nfrom scientiﬁc articles (Wang et al., 2015, 2014).",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "did not use domain-speciﬁc\nword embeddings and had suggested that train-\ning them might lead to improvements.",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "In this work, we represent candidate keyphrases\nextracted from a scientiﬁc article by domain-\nspeciﬁc phrase embeddings and rank them using\na theme-weighted PageRank algorithm (Langville\nand Meyer, 2004), such that the thematic weight\nof a candidate keyphrase indicate how similar\nit is to the themat",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "shows ranked keyphrases extracted using\nKey2Vec from a sample research abstract.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "2\nMethodology\nOur methodology primarily uses three steps: can-\ndidate selection, candidate scoring, and candidate\nranking, similar to other popular frameworks of\nranked keyphrase extraction (Kim et al., 2013).",
+      "category": "ModelCandidate",
+      "implication": "Relevant for similarity-based retrieval and lookalike targeting",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Tables 3 and 4\nshows a comparison of Key2Vec with some of the\nstate-of-the-art systems giving best performances\non the Inspec and SemEval 2010 datasets, respec-\ntively.",
+      "category": "Baseline",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "4\nConclusion and Future Work\nIn this paper, we proposed a framework for auto-\nmatic extraction and ranking of keyphrases from\nscientiﬁc articles.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "We showed an efﬁcient way of\ntraining phrase embeddings, and showed its effec-\ntiveness in constructing thematic representation of\nscientiﬁc articles and assigning thematic weights\nto candidate keyphrases.",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Experimental evaluations conﬁrm\nthat our proposed technique of Key2Vec produces\nstate-of-the-art results on benchmark datasets.",
+      "category": "Baseline",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "The task of ranked keyphrase extraction\nfrom scientiﬁc articles is of great interest to sci-\nentiﬁc publishers as it helps to recommend arti-\ncles to readers, highlight missing citations to au-\nthors, identify potential reviewers for submissions,\nand analyze research trends over time (Augenstein\net ",
+      "category": "ModelCandidate",
+      "implication": "Can inform intent modeling for recommendation systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Due to its widespread use, keyphrase\nextraction has received signiﬁcant attention from\nresearchers (Kim et al., 2010; Augenstein et al.,\n2017).",
+      "category": "ModelCandidate",
+      "implication": "Architecture pattern applicable to sequence modeling for user behavior",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Some of the major challenges are the var-\nied length of the documents to be processed, their\nstructural inconsistency and developing strategies\nthat can perform well in different domains (Hasan\nand Ng, 2014).",
+      "category": "FailureRisk",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "How to address the limitation described: Some of the major challenges are the var-\nied length of the documents to be processed, their\nstructural inconsistency and developing strategies\nthat can perform well in different domains (Hasan\nand Ng",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Methods for automatic keyphrase extraction are\nmainly divided into two categories: supervised\nand unsupervised.",
+      "category": "LabelValidation",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Supervised methods approach\nthe problem as a binary classiﬁcation problem\n(Hasan and Ng, 2014), whereas the unsupervised\nmethods are mostly based on TF-IDF, cluster-\ning, and graph-based ranking (Hasan and Ng,\n2010; Mihalcea and Tarau, 2004).",
+      "category": "LabelValidation",
+      "implication": "Applicable to user/item clustering for personalization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "On the pres-\nence of domain-speciﬁc data, supervised methods\nhave shown better performance.",
+      "category": "LabelValidation",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "The unsupervised\nmethods have the advantage of not requiring any\ntraining data and can produce results in any do-\nmain.",
+      "category": "LabelValidation",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "These representations of words have\nbeen shown to equal or outperform other methods\n(e.g.",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    }
+  ]
+}

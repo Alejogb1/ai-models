@@ -1,0 +1,15 @@
+{
+  "source": "Image-to-Image Translation with Conditional Adversarial Networks.pdf",
+  "source_group": "Awesome-ML-Papers/GANs",
+  "processed_at": "2026-06-08",
+  "agent": "agent6_remaining",
+  "concepts": [
+    {
+      "finding": "pix2pix uses a U-Net generator with PatchGAN discriminator for general-purpose image-to-image translation, achieving high-quality results on labels-to-scene and edges-to-photo tasks.",
+      "category": "ModelCandidate",
+      "implication": "U-Net architecture with skip connections preserves fine-grained detail while transforming input, analogous to query reformulation where original query details must be preserved while transforming intent.",
+      "open_question": "What architecture best preserves query structure while transforming intent in query reformulation tasks?",
+      "testable_hypothesis": "A U-Net-like encoder-decoder with skip connections for query reformulation will better preserve original query keywords than a standard seq2seq model."
+    }
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "source": "Neural Feature Embedding for User Response Prediction in Real-Time Bidding",
+  "source_group": "Awesome-ML-Papers/Embeddings",
+  "processed_at": "2026-06-08T12:00:00Z",
+  "agent": "agent_batch_generation",
+  "concepts": [
+    {
+      "finding": "Neural embedding for user response prediction in RTB. Maps high-cardinality categorical features (user ID, ad ID, publisher ID, keyword) to dense embeddings via neural network. Feature embeddings learned end-to-end for CTR prediction. Handles millions of unique feature values.",
+      "category": "ModelCandidate",
+      "implication": "Keyword embeddings can be learned from user response prediction tasks (CTR, conversion). Embeddings optimized for prediction naturally capture intent-relevant semantics. Multi-field feature embedding is proven at scale.",
+      "open_question": "Do keyword embeddings from CTR prediction capture different semantics than embeddings from co-occurrence? Which is better for intent clustering?",
+      "testable_hypothesis": "Keyword embeddings learned from CTR prediction tasks produce more intent-discriminative clusters than embeddings from pure co-occurrence (word2vec-style)."
+    }
+  ]
+}

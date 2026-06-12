@@ -1,0 +1,148 @@
+{
+  "source": "ssrn-1340267.pdf",
+  "source_group": "Web-Sources",
+  "processed_at": "2026-06-08",
+  "agent": "agent5_final",
+  "concepts": [
+    {
+      "finding": "Finally, our results show that almost everyone bene\u001cts from the product references that selectively\nlower search costs at Amazon.com\nThe remaining of the paper is organized as follows.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "We introduce product and individual speci\u001cc search\ncost, cij, which we interpret mainly as time spent on discovering and evaluating the product.6 We model\nsearch cost as a log normally distributed random e\u001bect\ncij ∝exp (Ljγi) ,\n(2)\nwith\nγi ∼N(γ, Γ),\nwhere the matrix Γ is diagonal.",
+      "category": "Experiment",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Second, although we mainly model\nconsumers engaged in optimal search behavior, the Amazon.com data may contain traces of consumers\nin other modes such as hedonic browsing.",
+      "category": "BehavioralTests",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "First, we show how well our proposed search model\npredicts the actual sales ranks for the same month (May 2007).",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "To estimate the demand and search primitives,\nwe introduce an optimal sequential search process into a model of choice and treat the observed market-\nlevel product search data as aggregations of individual-level optimal search sequences.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Methodologically, we introduce an optimal sequential search process into a\nmodel of choice and identify the demand parameters of interest from the search data.",
+      "category": "ModelCandidate",
+      "implication": "Can inform intent modeling for recommendation systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "In this paper, we advocate that such responses can be measured\nin the context of how they a\u001bect the consumer's search strategies, and that if one has access to outcomes\nof search behavior, as we do here, those become informative of important demand primitives when viewed\n4\nElectronic copy available ",
+      "category": "BehavioralTests",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Seminal contributions to sequential search theory have been made\nby Weitzman (1979), in the case of single agent problems and by Reinganum (1982, 1983) in the case of\nmultiple agent problems.",
+      "category": "FailureRisk",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Now we discuss some important modeling assumptions in our proposed search model.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Third, we do not include any context or reference e\u001bect in the proposed model of optimal\nconsumer search.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "However, an important computational windfall of the sequential search\nprocess is that it is not subject to the curse of dimensionality.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "How to address the limitation described: However, an important computational windfall of the sequential search\nprocess is that it is not subject to the curse of dimensionality.",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Since one of the appealing aspects of\nour proposed model is to study consumer demand using consumer search data, the proposed validation\nusing the actual sales information is of a critical interest.",
+      "category": "ModelCandidate",
+      "implication": "Can inform intent modeling for recommendation systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "First, we present\na summary of brand level search set membership.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Finally, the random coe\u001ecient discrete choice model is a special case of the proposed\nmodel with zero search cost.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Lastly,\nour empirical model is applicable to other search contexts than shopping for durable goods, such as the\nanalysis of click-stream data.",
+      "category": "ModelCandidate",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "A second but related avenue for further development is to assume only partial consumer knowledge of\nattribute information and study how this a\u001bects choice and search outcomes.31 That is, in our model, the\ngoal of search would remain to resolve the unknown component of utility eij, but we could allow",
+      "category": "TargetConstruct",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "In a\npolicy simulation, we also \u001cnd that the vast majority of the households bene\u001ct from the Amazon.com's\nproduct recommendations via lower search costs.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "In addition, these choice options need not all be equally accessible\nand may be o\u001bered to consumers at di\u001berent search costs (for instance through the use of seller sponsored\nrecommendation engines).",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "At the individual level,\nour approach yields a probabilistic model of optimal search set formation, is not subject to the curse of\ndimensionality, and is purposely suited to be estimable using the view-rank data.",
+      "category": "TargetConstruct",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "37\nSONY\nDVD\n10\n· · ·\n$752.75\n38\nCANON\nDVD\n35\n· · ·\n$354.78\n39\nCANON\nDVD\n35\n· · ·\n$376.57\n40\nPANASONIC\nMINIDV\n32\n· · ·\n$289.39\n41\nSONY\nHD\n25\n· · ·\n$554.14\n42\nJVC\nMINIDV\n32\n· · ·\n$488.88\n43\nPANASONIC\nDVD\n32\n· · ·\n$361.81\nTable 1: Product alternatives searched at Amazon.com, in May 2007, given search o",
+      "category": "Experiment",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    }
+  ]
+}

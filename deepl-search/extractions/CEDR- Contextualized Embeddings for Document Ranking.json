@@ -1,0 +1,15 @@
+{
+  "source": "CEDR- Contextualized Embeddings for Document Ranking",
+  "source_group": "Awesome-ML-Papers/Ranking",
+  "processed_at": "2026-06-08T12:00:00Z",
+  "agent": "agent_batch_generation",
+  "concepts": [
+    {
+      "finding": "CEDR integrates BERT with existing neural ranking models (KNRM, Conv-KNRM, PACRR). Instead of using BERT alone, uses BERT to generate contextualized embeddings for query and document terms, then passes to the ranking model. BERT + KNRM achieves best results: 5-10% NDCG improvement over non-contextualized baselines. Ablation shows both BERT representations and ranking model architecture matter.",
+      "category": "ModelCandidate",
+      "implication": "For keyword-intent matching, contextualized embeddings from a language model can enrich keyword representations before passing to a matching/ranking model. BERT provides disambiguation (e.g., apple as fruit vs brand).",
+      "open_question": "Can keyword embeddings from BERT (or similar PLMs) capture intent as well as embeddings from co-occurrence graphs? Which PLM layer provides the best keyword representations for intent?",
+      "testable_hypothesis": "CEDR-style integration of contextualized PLM embeddings with intent matching functions outperforms either PLM-only or co-occurrence-only keyword embeddings for intent assignment."
+    }
+  ]
+}

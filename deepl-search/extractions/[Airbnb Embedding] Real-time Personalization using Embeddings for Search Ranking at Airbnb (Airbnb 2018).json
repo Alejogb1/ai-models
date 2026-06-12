@@ -1,0 +1,15 @@
+{
+  "source": "[Airbnb Embedding] Real-time Personalization using Embeddings for Search Ranking at Airbnb (Airbnb 2018)",
+  "source_group": "Awesome-ML-Papers/Embeddings",
+  "processed_at": "2026-06-08T12:00:00Z",
+  "agent": "agent03_embeddings_mf_ranking_search_compiled",
+  "concepts": [
+    {
+      "finding": "Two embedding types: (1) Listing embeddings from click sessions (800M sessions) for short-term personalization - skip-gram with booked listing as global context. (2) User-type & listing-type embeddings from booking sequences for long-term personalization. Key innovations: congregated search negative sampling (same-market negatives), rejections as explicit negatives, cold-start via metadata.",
+      "category": "Data",
+      "implication": "For keyword clustering: (1) Use booked/converted sessions as global context to anchor intent clusters. (2) Market-specific negative sampling prevents trivial separation by domain. (3) User-type embeddings address data sparsity via bucketing of attributes.",
+      "open_question": "Should keyword clustering incorporate 'global context' keywords (like 'booked' items) that anchor the intent?",
+      "testable_hypothesis": "Adding converted/clicked-through keywords as 'global context' during embedding training improves intent cluster coherence measured by conversion prediction."
+    }
+  ]
+}

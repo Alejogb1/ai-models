@@ -1,0 +1,15 @@
+{
+  "source": "Translation-based Recommendation",
+  "source_group": "Awesome-ML-Papers/Embeddings",
+  "processed_at": "2026-06-08T12:00:00Z",
+  "agent": "agent_batch_generation",
+  "concepts": [
+    {
+      "finding": "Translation-based recommendation model: user preferences as translations between item pairs. If user likes item i and item j is similar but from different category, then i + preference_vector = j. Outperforms MF on recommendation tasks. Captures user preference transitions.",
+      "category": "ModelCandidate",
+      "implication": "Keyword intent transitions via translation: \"best budget shoes\" + price_check_intent = \"shoes under 50.\" Translation vectors capture intent shift directions. Can generate intent-specific keyword variations.",
+      "open_question": "Can translation vectors capture intent shifts (e.g., from informational to transactional) in keyword sequences?",
+      "testable_hypothesis": "Translation-based keyword embeddings capture systematic intent shift patterns (e.g., research -> purchase) better than static embeddings or MF."
+    }
+  ]
+}

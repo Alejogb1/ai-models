@@ -1,0 +1,1334 @@
+Personalized Entity Recommendation: A Heterogeneous
+Information Network Approach
+Xiao Yu†, Xiang Ren†, Yizhou Sun‡, Quanquan Gu†,
+Bradley Sturt†, Urvashi Khandelwal†, Brandon Norick†, Jiawei Han†
+†University of Illinois at Urbana-Champaign, Urbana, IL, USA
+†{xiaoyu1, xren7, qgu3, sturt1, khndlwl2, bnorick, hanj}@illinois.edu
+‡Northeastern Univeristy, Boston, MA, USA
+‡yzsun@ccs.neu.edu
+ABSTRACT
+Among diﬀerent hybrid recommendation techniques, network-
+based entity recommendation methods, which utilize user or
+item relationship information, are beginning to attract in-
+creasing attention recently. Most of the previous studies in
+this category only consider a single relationship type, such
+as friendships in a social network. In many scenarios, the
+entity recommendation problem exists in a heterogeneous
+information network environment. Diﬀerent types of rela-
+tionships can be potentially used to improve the recommen-
+dation quality. In this paper, we study the entity recom-
+mendation problem in heterogeneous information networks.
+Speciﬁcally, we propose to combine heterogeneous relation-
+ship information for each user diﬀerently and aim to pro-
+vide high-quality personalized recommendation results using
+user implicit feedback data and personalized recommenda-
+tion models.
+In order to take full advantage of the relationship hetero-
+geneity in information networks, we ﬁrst introduce meta-
+path-based latent features to represent the connectivity be-
+tween users and items along diﬀerent types of paths. We
+then deﬁne recommendation models at both global and per-
+sonalized levels and use Bayesian ranking optimization tech-
+niques to estimate the proposed models. Empirical studies
+show that our approaches outperform several widely em-
+ployed or the state-of-the-art entity recommendation tech-
+niques.
+Categories and Subject Descriptors
+H.3.3 [Information Search and Retrieval]: Information
+Filtering
+Keywords
+Hybrid Recommender System; Information Network
+1.
+INTRODUCTION
+Entity recommendation, as one of the most eﬀective and
+widely used information ﬁltering and discovery methods, has
+been actively studied in the past decade in both industry and
+Permission to make digital or hard copies of all or part of this work for personal or
+classroom use is granted without fee provided that copies are not made or distributed
+for proﬁt or commercial advantage and that copies bear this notice and the full cita-
+tion on the ﬁrst page. Copyrights for components of this work owned by others than
+ACM must be honored. Abstracting with credit is permitted. To copy otherwise, or re-
+publish, to post on servers or to redistribute to lists, requires prior speciﬁc permission
+and/or a fee. Request permissions from permissions@acm.org.
+WSDM’14, February 24–28, 2014, New York, New York, USA.
+Copyright 2014 ACM 978-1-4503-2351-2/14/02 ...$15.00.
+http://dx.doi.org/10.1145/2556195.2556259.
+academia. Among diﬀerent recommendation techniques, hy-
+brid recommender systems, which combine user feedback
+data (explicit ratings or implicit user log) and additional
+information of users or items, can achieve better recommen-
+dation results in certain scenarios, based on recent studies
+[6] [20].
+In many recommendation applications, additional infor-
+mation regarding users and items can be obtained, e.g., user
+demographic attributes, product speciﬁcations, or user so-
+cial network information. Moreover, the entity recommen-
+dation problem often exists in a heterogeneous information
+network environment with diﬀerent types of attributes and
+relationships of users, items, and other entities available. An
+illustration of a movie recommendation problem in a hetero-
+geneous information network can be found in Figure 1. In
+this example, besides users and movies and the user-movie
+interaction relationships, other types of entities can be found
+and linked to the movie recommendation problem, such as
+actors, directors, and genres.
+Diﬀerent types of relation-
+ships between users (e.g., friendship) and entities (e.g., di-
+rector directed a movie) can be potentially utilized in hybrid
+recommender systems.
+users
+movies
+Schindler's 
+List
+Good Will 
+Hunting
+The 
+Terminal
+Saving 
+Private Ryan
+Steven 
+Spielberg 
+(director)
+Matt 
+Damon 
+(actor)
+Tom 
+Hanks 
+(actor)
+Liam 
+Neeson
+(actor)
+War (tag)
+other entities
+S h
+S h
+Te
+Te
+Te
+Go
+H
+Priv
+Priv
+S
+Priv
+drama 
+(genre)
+implicit
+feedback
+relationships
+Figure 1:
+A heterogeneous information network
+snippet with users, movies, actors, directors and
+tags as entities and the corresponding relationships
+between these entities
+Previous studies suggest that by utilizing additional user
+or item relationship information, the quality of the recom-
+mender systems can be improved.
+Our study falls in the
+category of such hybrid recommender systems. The diﬀer-
+ence between our work and other link-based hybrid methods
+is that most previous studies only utilize a single type of rela-
+tionship, e.g., trust relationship [10], friend relationship [19],
+or user membership [31]. We propose to study entity rec-
+ommendation problem in the aforementioned heterogeneous
+network environment, aiming to take advantage of diﬀerent
+types of relationship information at the same time.
+Previous studies [29] [30] on link-based hybrid recommender
+systems apply the same recommendation models to all the
+users when recommending items. They rely on the personal
+ratings or user feedback data to achieve recommendation
+personalization. However, such approaches cannot fully dis-
+tinguish user interests and preferences, and thus may lead
+to unsatisfying results. For example, Alice and Bob watched
+the movie “Paciﬁc Rim”. Alice watched this movie because
+she likes robot / monster stories (genre and story of the
+movie) while Bob watched this movie because his friends
+watched the same movie. If we apply the same recommen-
+dation model (e.g., social network-based collaborative ﬁlter-
+ing) to both users without understanding or diﬀerentiating
+their motives and interests, the recommendation results may
+not satisfy the information discovery needs of diﬀerent users.
+In this paper, we introduce a novel entity recommenda-
+tion framework in heterogeneous information networks using
+implicit feedback data. We combine user feedback with dif-
+ferent types of entity relationships in a collaborative ﬁltering
+way. We personalize recommendation results by both con-
+sidering personal user implicit feedback data and building
+personalized recommendation models for diﬀerent users.
+To take advantage of the relationship heterogeneity of the
+information network, we ﬁrst diﬀuse the observed user im-
+plicit feedback along diﬀerent meta-paths to generate pos-
+sible recommendation candidates, under the corresponding
+user interest semantic assumptions. We apply matrix factor-
+ization techniques on the diﬀused user preferences to calcu-
+late latent representations for users and items accordingly.
+We then combine these latent features and deﬁne a global
+recommendation model. To further distinguish user inter-
+ests, we propose to build recommendation models at per-
+sonalized level, i.e., we build diﬀerent entity recommenda-
+tion models for diﬀerent users. We adopt a Bayesian rank-
+ing optimization technique for model estimation. Empirical
+studies in two real world datasets, IMDb-MovieLens-100K
+and Yelp, have shown that the proposed recommendation
+models outperform several state-of-the-art implicit feedback
+recommendation systems.
+The contributions of this paper are summarized as follows:
+1. We study personalized entity recommendation with
+implicit user feedback in heterogeneous information
+networks.
+2. To take advantage of the relationship heterogeneity,
+we propose to diﬀuse user preferences along diﬀerent
+meta-paths in information networks to generate latent
+features for users and items.
+3. The proposed framework generates personalized rec-
+ommendation models for diﬀerent users eﬀectively and
+eﬃciently.
+4. Empirical studies in two real-world datasets, IMDb-
+MovieLens-100K and Yelp, demonstrate the power of
+our methodology.
+The remainder of this paper is organized as follows. The
+preliminaries for this study are introduced in Section 2. The
+meta-path-based latent features and the global recommen-
+dation model are presented in Section 3. We propose the
+personalized recommendation framework in Section 4 and
+parameter estimation techniques in 5.
+Experiments and
+analysis are in Section 6. Finally, we discuss related work in
+Section 7 and conclude the study in Section 8.
+actor
+director
+tag
+genre
+country
+keyword
+studio
+movie
+(a) IMDb Network Schema
+customer
+review
+location
+avg. 
+rating
+check-in
+dist.
+business
+category
+check-in
+(b) Yelp Network Schema
+Figure 2: Information network schemas (solid rect-
+angles represent entity types and dashed rectangles
+represent attribute types)
+Table 1: Notations
+Notation
+Description
+u, e
+user, item (or entity)
+R
+implicit feedback matrix
+G, GT
+heterogeneous information network and schema
+A, R
+entity type and relationship type
+P, p
+meta-path and path
+˜R(q)
+diﬀused user preferences along the q-th meta-path
+U, V
+low rank representations of users and items
+C
+user clusters
+θ, θ{·}
+global and hidden local model parameters
+2.
+BACKGROUND AND PRELIMINARIES
+In this section, we present the background and prelimi-
+naries of this study. Detailed problem deﬁnition is included
+at the end of this section.
+2.1
+Binary User Feedback
+With m users U = {u1, ..., um} and n items I = {e1, ..., en},
+we deﬁne the user implicit feedback matrix R ∈Rm×n as
+follows:
+Rij =
+
+1,
+if (ui, ej) interaction is observed;
+0,
+otherwise.
+Notice that the value 1 in R represents interactions be-
+tween users and items, e.g., users watched a movie or users
+browsed a restaurant website. The value 1 in the implicit
+feedback data does not mean that users like the items. A
+user buys a movie ticket because she or he is interested in the
+movie but this user might dislike the movie after watching
+it. Similarly the value 0 in R does not mean that the users
+dislike the items, but are a mixture of negative feedback
+(the users are not interested in the items) and unobserved
+interactions (the users are not aware of these items for now).
+Several previous studies have additional assumptions about
+the implicit feedback data, e.g., user-item interaction fre-
+quency, or the dwelling time of each interaction.
+Not to
+digress from the purpose of this study, we use binary user
+feedback in its original form as deﬁned above.
+However,
+additional information as mentioned can be added into the
+factorization process of the proposed models accordingly.
+2.2
+Heterogeneous Information Network
+Similar to [24], we deﬁne information networks as follows:
+Definition 1
+(Information Network). An informa-
+tion network is deﬁned as a directed graph G = (V, E) with
+an entity type mapping function φ : V →A and a link type
+mapping function ψ : E →R. Each entity v ∈V belongs to
+an entity type φ(v) ∈A, and each link l ∈E belongs to a
+relation type ψ(l) ∈R.
+We call an information network a heterogeneous informa-
+tion network when |A| > 1 or |R| > 1. To be consistent with
+recommender system terminology, we refer to the entities in
+the information network which are being recommended as
+items.
+Similar to an entity-relation diagram in a relational database,
+we use an abstract graph (i.e., network schema) to represent
+the entity and relation type restrictions in heterogeneous in-
+formation networks, denoted by GT = (A, R).
+Examples
+of heterogeneous information networks and partial network
+schemas can be found in Figure 2.
+2.3
+Matrix Factorization for Implicit Feedback
+Matrix factorization techniques have been used to inter-
+pret implicit user feedback in previous studies [5] [9], by
+learning the low-rank matrix representations for users and
+items. More speciﬁcally, factorization methods seek to ap-
+proximate the implicit feedback matrix R with the product
+of the low-rank matrices as follows:
+R ≈UV T
+(1)
+where U ∈Rm×d are the latent features representing users
+and V ∈Rn×d are the latent features representing items,
+with d < min(n, m).
+The recommendation score between ui and ej can be com-
+puted with the estimated low-rank matrices as r(ui, ej) =
+UiV T
+j , where Ui denotes the i-th row of the matrix U and Vj
+denotes the j-th row of V . By sorting items with their rec-
+ommendation scores, we can return the top-k items which
+ui has not interacted with before as the recommendation
+results.
+To solve Equation (1), the non-negative factorization tech-
+niques (NMF) discussed in [5] can be directly employed.
+More advanced methods [9] [6] [19] have been studied re-
+cently to incorporate additional information in order to fur-
+ther improve the performance.
+In our proposed recommendation models, when deﬁning
+user item features, we rely on matrix factorization methods
+to derive low-rank representations of users and items under
+diﬀerent semantics. One should notice that our proposed
+models are orthogonal to factorization techniques, i.e., one
+can extend the proposed models easily with advanced fac-
+torization techniques.
+In this study, aiming to propose a
+generic recommendation framework, we use the basic NMF
+method in [5] when deﬁning features and models. By uti-
+lizing advanced factorization methods, the performance of
+the our methods can be improved accordingly due to the
+aforementioned orthogonality.
+2.4
+Problem Deﬁnition
+We deﬁne the recommendation problem which we study
+in this paper as follows:
+Definition 2
+(Problem Definition). Given a hetero-
+geneous information network G with user implicit feedback
+R, for a user ui, we aim to build personalized recommenda-
+tion model for ui, and recommend a ranked list of items that
+are of interest to ui accordingly.
+Notations which are used in the rest of the paper can be
+found in Table 1.
+3.
+META-PATH-BASED LATENT FEATURES
+In this section, aiming to utilize the rich yet under-discovered
+information network, we present a user preference diﬀusion-
+based feature generation approach, which combines user im-
+plicit feedback and heterogeneous entity relationships. We
+u1 
+u2 
+a2 
+a3 
+a1 
+e1 
+e4 
+e5 
+e2 
+genre: drama 
+u3 
+director 
+a3
+tag: AcademyAward 
+Figure 3: User preference discussion along diﬀerent
+meta-paths (Example 1)
+then deﬁne a recommendation function with the latent fea-
+tures at a global level at the end of this section. Notice that
+we use the term “global” to represent the process of applying
+the same recommendation model to all users. We still utilize
+personal user implicit feedback data during recommendation
+with the global recommendation model. We introduce per-
+sonalized recommendation models in Section 4. We discuss
+the learning algorithms for the recommendation models in
+Section 5.
+3.1
+Meta-Path
+From the information network point of view, the entity
+recommendation problem is to seek certain connectivity be-
+tween users and items. In heterogeneous information net-
+works, two entities can be connected via diﬀerent paths (see
+Figure 3 for examples).
+Due to the multiplicity of entity
+and relationship types in the information networks, these
+paths may contain diﬀerent entity types, relationship types
+in diﬀerent orders and they can have various lengths.
+In
+order to describe path types in heterogeneous information
+network, we introduce the deﬁnition of meta-path proposed
+in [24]. Meta-paths are deﬁned in the scope of information
+network schemas, and describe how two entity types could
+be connected via diﬀerent types of paths.
+Definition 3
+(Meta-Path). A meta path P = A0
+R1
+−−→
+A1
+R2
+−−→...
+Rk
+−−→Ak is a path in a network schema GT =
+(A, R), which deﬁnes a new composite relation R1R2...Rk
+between type A0 and Ak, where Ai ∈A and Ri ∈R for
+i = 0, . . . , k, A0 = dom(R1) = dom(P), Ak = range(Rk) =
+range(P) and Ai = range(Ri) = dom(Ri+1) for i = 1, . . . , k−
+1.
+where dom(·) deﬁnes the domain of certain relationship and
+range(·) deﬁnes the range.
+We use p to denote the paths in information networks and
+P to denote meta-paths. Based on the above deﬁnition, one
+can notice that meta-paths are the types for paths in infor-
+mation networks. Previous studies suggest that meta-paths
+can be used to facilitate entity similarity or proximity mea-
+surement and similarity semantic disambiguation [24] [28].
+We use the following example to demonstrate the intuition
+of utilizing meta-paths in entity recommendation problem.
+Example 1
+(Different Meta-Paths in IMDb). With
+the graph schema of IMDb deﬁned in Figure 2(a), we can
+derive a number of meta-paths which connect users with
+movies. We show two possible meta-paths as follows:
+u2 
+u1 
+e1 
+e2 
+e3 
+a1 
+a4 
+a2 
+a5 
+a3 
+0.5 
+0.4 
+0.9 
+Figure 4: User preference diﬀusion score calculation
+(Example 2). The solid red links represent observed
+user implicit feedback while the purple doted links
+represent diﬀused user preferences.
+• P1: user
+V iewed
+−−−−−→movie
+V iewed−1
+−−−−−−−→user
+F ollows
+−−−−−→actor
+StarredIn
+−−−−−−−→movie
+• P2: user
+V iewed
+−−−−−→movie
+StarredIn−1
+−−−−−−−−→actor
+StarredIn
+−−−−−−−→
+movie
+StarredIn−1
+−−−−−−−−→actor
+StarredIn
+−−−−−−−→movie
+We give two path examples of the two meta-paths in Fig-
+ure 3 (the solid blue line represents meta-path P1 and the
+solid red line represents meta-path P2).
+These two meta-
+paths connect users and movies under diﬀerent semantic
+assumptions.
+P1 explores the social relationships of other
+users who watched movies in common with the target user,
+while P2 utilizes movie-actor links to build relationships be-
+tween users and movies. By measuring proximity between
+users and movies along diﬀerent meta-paths, we may be able
+to make movie recommendations to users from diﬀerent se-
+mantic perspectives in information networks.
+When representing longer meta-paths, relationship types
+can be ignored when doing so does not cause ambiguity.
+The recursive parts of the meta-paths can be compressed
+with exponentiation notation. For example, we use user −(
+movie −actor −movie)2 to represent meta-path P2 in
+the above example.
+3.2
+User Preference Diffusion
+With the implicit user feedback data deﬁned in Section 2
+and meta-path deﬁned above, we introduce the the user pref-
+erence diﬀusion process along meta-paths. As mentioned be-
+fore, implicit feedback represents user item interactions. the
+value 1 in implicit feedback indicates that users are more
+interested in the corresponding items than the rest of the
+items.
+We use the term user preference to represent the
+user interests in implicit feedback data. Intuitively, if we
+can understand the semantic meanings of user preferences
+and ﬁnd similar items to the ones that the users were inter-
+ested in, following the discovered semantics, we can make
+entity recommendations to these users accordingly.
+Based on this observation and the problem deﬁnition pre-
+sented in Section 2, in this paper, we focus on meta-paths
+in the format of user −item −∗−item when building
+recommendation models. The intuition is we want to dif-
+fuse the observed users preferences in implicit feedback data
+along diﬀerent meta-paths so that users can be connected
+with other items.
+By deﬁning a user preference diﬀusion
+score between the target user and all possible items along
+diﬀerent meta-paths, we can now measure the possibility of
+an unobserved user-item interaction in the information net-
+work under diﬀerent semantic assumptions.
+Given a meta-path P = R1R2...Rk with dom(P) = user
+and range(P) = item, let P′ = R2...Rk with dom(P′) =
+item and range(P′) = range(P) = item. We deﬁne the
+user preference diﬀusion score between user i and item j
+along P by extending PathSim measurement proposed in
+[24] as follows:
+s(ui, ej|P)
+(2)
+=
+X
+e∈I
+2 × Rui,e × |{pe❀ej : pe❀ej ∈P′}|
+|{pe❀e : pe❀e ∈P′}| + |{pej❀ej : pej❀ej ∈P′}|
+where pe❀ej is a path between e and ej, pe❀e is a path
+between e and e, and pej❀ej is a path between ej and ej.
+The user preference diﬀusion score between user ui and
+item ej contains two parts: (1) the observed user-item inter-
+actions associated with ui, and (2) the connectivity between
+the items that ui is interested in and potential items of in-
+terest, which are represented by ej in Equation (2). Notice
+the connectivity between items is deﬁned as the number of
+paths between these items following meta-path P and nor-
+malized by the visibility of the items so the diﬀusion score
+does not overly favor popular items. We demonstrate the
+user preference diﬀusion process with a toy example as in
+Figure 4.
+Example 2
+(User Preference Diffusion Score).
+In this toy example, we use a small information network
+which contains two users (u1 and u2), three movies (e1, e2
+and e3), and 5 actors (a1, ..., a5). These entities are inter-
+connected as shown in Figure 4 (The solid red links represent
+observed user implicit feedback while the purple doted links
+represent the diﬀused user preferences).
+We use user −
+movie −actor −movie as meta-path P when calculating
+the diﬀusion score. Based on implicit feedback data R, we
+know that u1 watched movie e2. Based on the information
+network structure, there is 1 path between e1 and e2 follow-
+ing the aforementioned meta-path, 2 paths between e1 and
+e1 and 2 paths between e2 and e2. By plugging the implicit
+feedback data and the numbers of paths described above into
+Equation (2), we can get that the user preference diﬀusion
+score under meta-path P from u1 to e1 is 0.5. Other diﬀu-
+sion scores in this example can be calculated accordingly.
+By measuring the diﬀusion scores between all users and
+all items along meta-path P, we can generate a diﬀused user
+preference matrix ˜R ∈Rm×n.
+˜Ri represents the possible
+preferences of user ui if he or she explores the network for
+new content following meta-path P (ui watches movies with
+certain genres or ui watches movies from certain directors).
+By repeating this process, with L diﬀerent meta-paths, we
+can calculate L diﬀerent diﬀused user preference matrices
+accordingly.
+We denote these user preference matrices as
+˜R(1), ˜R(2), ..., ˜R(L).
+This process propagates user preferences along diﬀerent
+meta-paths in the heterogeneous information networks, and
+it mimics users’ information discovery process. The diﬀusion
+score indicates the possibility of certain user-item interaction
+under certain meta-path semantic. The diﬀusion scores can
+be used to deﬁne recommendation models.
+3.3
+Global Recommendation Model
+We denote ˜R(q) as the diﬀused user preference matrix
+along the q-th meta-path. Following the intuition and princi-
+ple of matrix factorization-based recommendation methods,
+we can derive low-rank user and item matrices from each
+diﬀused preference matrix accordingly. These low-rank ma-
+trices are the latent representations of users and items, un-
+der the semantic meaning of the corresponding meta-path.
+With low-rank matrix factorization technique, we can fac-
+torize the diﬀused matrix ˜R(q) as follows:
+( ˆU (q), ˆV (q))
+=
+argminU,V ∥˜R(q) −UV T ∥2
+F
+(3)
+s.t.
+U ≥0,
+V ≥0,
+where ˆU (q) ∈Rm×d represents users and ˆV (q) ∈Rn×d rep-
+resents items, with d < min(n, m). ˆU (q)
+i
+is the latent feature
+for user ui along the q-th meta-path and ˆV (q)
+j
+is the latent
+feature for ej along the q-th meta-path respectively.
+As discussed in Section 2, we apply the generic NMF
+method to solve Equation (3), although more advanced fac-
+torization techniques can be used instead. By repeating the
+above process for all L diﬀused user preference matrices, we
+can now generate L pairs of representations of users and
+items ( ˆU (1), ˆV (1)), ..., ( ˆU (L), ˆV (L)). Each low-rank feature
+pair represents users and items under a speciﬁc relationship
+semantic due to the user preference diﬀusion process. When
+deﬁning recommendation models with these latent-features,
+diﬀerent feature pairs may have diﬀerent importance. For
+example, users are more likely to follow certain actors when
+choosing movies rather than consider which movie studios
+these movies are made. With this observation, following [30],
+we deﬁne a global recommendation model as follows:
+r(ui, ej) =
+L
+X
+q=1
+θq · ˆU (q)
+i
+ˆV (q)T
+j
+(4)
+where θq is the weight for the q-th user and item low-rank
+representation pair. Based on the non-negative property of
+the features, we add θq ≥0 as an optimization constraint.
+With the recommendation model in Equation (4), given a
+user, we can now assign recommendation scores to all items,
+and then rank these items accordingly. We return the top-K
+results as the recommendation results. We will discuss how
+to estimate the parameters in the recommendation model in
+Section 5.
+4.
+PERSONALIZED RECOMMENDATION
+MODEL
+We proposed to diﬀuse user preferences along diﬀerent
+meta-paths in heterogeneous information networks, and cal-
+culate latent features for users and items under various se-
+mantic assumptions with matrix factorization techniques.
+We then deﬁned the global recommendation model with
+these latent features, which essentially combines the ob-
+served implicit feedback from users and diﬀerent types of
+relationships in the information network together. During
+recommendation, we apply the global model to all users and
+utilize users’ personal feedback to generate recommendation
+results. However, such a solution does not distinguish user
+interests or behavior patterns at the model level. For ex-
+ample, the learned global model may suggest that majority
+users watch popular movies featuring famous actors, but this
+rule might not be true for all individuals.
+In this section, we extend the proposed global recommen-
+dation model to a ﬁner level of granularity.
+Rather than
+learn one recommendation model for all the users, we aim
+to calculate diﬀerent recommendation models for diﬀerent
+users to better capture user preferences and interests. The
+straightforward way of learning personalized models is to es-
+timate the recommendation model deﬁned in Equation (4)
+with each user’s own implicit feedback data. However, the
+number of feedback per user follows power law distribution
+(we demonstrate this claim in Section 6), which means we do
+not have enough feedback data to learn personalized models
+for most of the users.
+Although users may have diﬀerent behaviors from each
+other, a subgroup of users can share similar interests and
+preferences from certain perspectives. For example, comic
+fans are interested in super-hero, fantasy and adventure movies
+while fans of Steven Spielberg follow movies directed by him.
+Motivated by this observation, we propose to ﬁrst cluster
+users based on their interests, and then learn a recommen-
+dation models within each cluster. Notice that one user can
+belong to diﬀerent user clusters (one can be comic fan and
+Spielberg fan at the same time). When recommending, we
+ﬁrst calculate the personalized recommendation model for
+the target user by combining the recommendation models
+of the related user clusters, and then calculate the recom-
+mendation results with the personalized model of the target
+user. We deﬁne the personalized recommendation function
+for user ui as follows:
+r∗(ui, ej) =
+c
+X
+k=1
+sim(Ck, ui)
+L
+X
+q=1
+θ{k}
+q
+· ˆU (q)
+i
+ˆV (q)T
+j
+(5)
+where C represents user clusters related to target user ui
+and function sim(·, ·) deﬁnes the cosine similarity between
+the center of cluster Ck and ui. θ{k}
+q
+represents the recom-
+mendation model deﬁned in cluster Ck. We deﬁne θ{·} =
+θ{1}, ..., θ{c} as the recommendation model parameters for
+this approach.
+Compared with L parameters in the global recommen-
+dation model (Equation (4)), the personalized recommen-
+dation approach has a total c × L parameters, where c is
+the number of clusters. With a relatively larger parameter
+space, now we can generate personalized recommendation
+models eﬃciently and represent diﬀerent user interests or
+behavior patterns eﬀectively. We discuss the user clustering
+and the model learning algorithm in details in Section 5.
+After estimating recommendation models for all the user
+clusters θ{·}, when recommending items for ui, we ﬁrst ﬁnd
+the clusters that ui is related to (has a high similarity to the
+cluster center), and then combine the related user cluster-
+ing parameters following Equation (5). With the calculated
+personalized recommendation model, we can assign recom-
+mendation score to each item for ui. Recommendation can
+be made by sorting all items with their recommendation
+scores and returning the top-k items.
+The number of clusters could be essential to this method.
+If the cluster number c is too small, we may not be able
+to distinguish user interests well. If the cluster number is
+too big, the number of users in each cluster becomes very
+small. In this case, we may not have enough training data
+to learn the recommendation models. A good estimation of
+the optimal number of clusters can be achieved by cross-
+validation using training data. We discuss the performance
+change with diﬀerent parameter c in Section 6.5.
+5.
+MODEL LEARNING WITH IMPLICIT
+FEEDBACK
+In this section, we introduce learning algorithms for both
+global and personalized recommendation models. We ﬁrst
+discuss parameter estimation method for global recommen-
+dation model (Equation (4)) and then extend the learning
+algorithm to personalized recommendation models.
+Recommendation models proposed in this paper take ad-
+vantage of the heterogeneous entity relationships in infor-
+mation networks.
+More speciﬁcally, we combine network
+diﬀusion-based latent features with parameters indicating
+the importance of the corresponding meta-path in the rec-
+ommendation process. To learn the importance of the latent
+features, we use user implicit feedback as training data. As
+discussed in Section 2, the value 1 in implicit feedback data
+represents positive feedback (users are interested in such
+items) while the value 0 represents a mixture of negative
+feedback (users are not interested in such items) and un-
+observed potential interactions (users are not aware of such
+items). Traditional learning methods adopt classiﬁcation or
+learning-to-rank objective functions and usually treat 1s in
+training dataset as positives and 0s as negatives.
+As we
+discussed, such methods do not ﬁt in the deﬁnition of im-
+plicit feedback data and they cannot generate high quality
+recommendation models.
+Motivated by [21], we employ a diﬀerent learning approach
+by considering the correct item pair orders. We deﬁne an
+objective function to order 1 values before 0 values for each
+user. The assumption behind this objective function is that
+users are more interested in the items with value 1 in R than
+the rest of the items, which is a weaker and more plausible
+assumption compared with the traditional approaches.
+5.1
+Bayesian Ranking-Based Optimization
+We use p(ea > eb; ui|θ) to denote the probability that user
+ui prefers ea over eb. The Bayesian formulation of the op-
+timization criterion is to maximize the posterior probability
+as follows:
+p(θ|R) ∝p(R|θ)p(θ),
+(6)
+where θ = {θ1, ..., θL} represents the global model parame-
+ters, and p(R|θ) represent the probability that all item pairs
+can be ranked correctly for all users according to R, i.e., for
+each user, items with feedback 1 can be ranked before items
+with feedback 0.
+With the assumption that both user preferences and or-
+dering of the item pairs are independent, we can expand the
+likelihood function p(R|θ) as follows:
+p(R|θ)
+=
+Y
+ui∈U
+p(Ri|θ)
+(7)
+=
+Y
+ui∈U
+Y
+(ea>eb)∈Ri
+p(ea > eb; ui|θ)
+where (ea > eb) ∈Ri represent all item pairs with the cor-
+rect orders in the observed implicit feedback of ui.
+We deﬁne p(ea > eb; ui|θ) as:
+p(ea > eb; ui|θ) = σ(r(ui, ea) −r(ui, eb)),
+(8)
+where σ is the logistic sigmoid function σ(x) =
+1
+1+e−x .
+We assume that p(θ) is a Gaussian distribution with zero
+mean and variance-covariance matrix Σθ = λI. With the
+probability and the likelihood deﬁned above, we can derive
+the objective function as follows:
+O
+=
+−ln p(θ|R) = −ln p(R|θ)p(θ)
+(9)
+=
+−
+X
+ui∈U
+X
+(ea>eb)∈Ri
+ln p(ea > eb; ui|θ) + λ∥θ∥2
+2
+=
+−
+X
+ui∈U
+X
+(ea>eb)∈Ri
+ln σ(r(ui, ea) −r(ui, eb)) + λ∥θ∥2
+2
+where λ∥θ∥2
+2 is a data dependent L2 regularization term.
+By minimizing O in Equation (9), we can estimate the rec-
+ommendation parameter θ from the implicit feedback data.
+5.2
+The Optimization Algorithm
+Notice that Equation (9) is diﬀerentiable, many optimiza-
+tion techniques (e.g., SGD [2], BFGS-B method [3]) can be
+utilized to estimate parameter θ.
+The gradient of Equa-
+tion (9) with respect to θ can be calculated as follows:
+∂O
+∂θ
+=
+−
+X
+ui∈U
+X
+(ea>eb)∈Ri
+∂
+∂θ σ(ri,ab) + λ
+2
+∂
+∂θ ∥θ∥2
+2
+=
+−
+X
+ui∈U
+X
+(ea>eb)∈Ri
+e−ri,ab
+1 + e−ri,ab
+∂
+∂θ ri,ab + λθ,
+where ri,ab = r(ui, ea) −r(ui, eb).
+Considering the data size of the real-world recommender
+systems, with the above gradient, we employed the stochas-
+tic gradient descent (SGD) method [2] to estimate the pa-
+rameters in our empirical studies. Notice that the time com-
+plexity of this proposed learning process is O(mn2) where
+m is the number of users and n is the number of items. In
+large datasets this can be overwhelming.
+With SGD, we
+only need to estimate the gradient with a very small subset
+(10−5 sample rate) of training pairs sampled from R at each
+iteration.
+We discuss sample rate selection for parameter
+estimation in Section 6.
+5.3
+Learning Personalized Recommendation
+Models
+As discussed in Section 4, the proposed global recommen-
+dation model failed to distinguish individual interests and
+behavior diﬀerences, and thus the quality of the results may
+not be satisfying.
+We observed that although users may
+have diﬀerent interests from each other, a subgroup of users
+can share similar interests or behavior patterns. Instead of
+learning one global model, which cannot represent user in-
+dividuality, or learning personalized models directly, which
+can be time consuming and may cause model over-ﬁtting,
+we propose to learn recommendation models for user sub-
+groups. With recommendation models for user subgroups,
+when making recommendations, we can calculate the per-
+sonalized recommendation model for a target user by com-
+bining the recommendation models he or she is most related
+to, and generate recommendation results accordingly.
+In order to learn recommendation models for user sub-
+groups, we ﬁrst need to cluster users based on their inter-
+ests and preferences, by examining the user implicit feed-
+back data.
+Considering the sparsity of R, we ﬁrst learn
+low-rank representation for users by applying non-negative
+matrix factorization on R directly. With the low dimension
+user matrix U, we apply the well-studied k-means algorithm
+with a cosine function as similarity measurement between
+users, to ﬁnally cluster users into subgroups. For each clus-
+ter, we apply the techniques we discussed above to learn a
+recommendation model. The learning algorithm of person-
+alized recommendation models can be found in Algorithm 1.
+After estimating parameters of the recommendation mod-
+els, given a target user, we can calculate the corresponding
+personalized recommendation model with Equation (5), and
+make personalized entity recommendation by using both the
+personalized recommendation model and his or her personal
+feedback data accordingly.
+6.
+EMPIRICAL STUDY
+We present the empirical studies of the proposed rec-
+ommendation framework in this section. We implemented
+both global and personalized recommendation models pro-
+posed in Section 3 and 4 along with several popularly de-
+ployed or the state-of-the-art implicit feedback recommen-
+dation techniques. We applied these methods on two real-
+world datasets and performed a series of experiments to
+demonstrate the eﬀectiveness of the proposed approach. We
+present both experimental results and discussion with anal-
+ysis.
+Algorithm 1: Learning Personalized Recommendation
+Models
+// input:
+implicit feedback and information
+network
+// output:
+recommendation models for user
+clusters
+Input: R, G
+Output: θ{·}
+Prepare L meta-paths in the format of user −item
+−∗−item
+// User preference diffusion along meta-paths
+for q ←1 to L do
+foreach ui and ej do
+˜R(q)
+ui,ej = s(ui, ej|P(q)) (Equation (2))
+end
+Calculate latent features ˆU (q), ˆV (q) with ˜R(q)
+(Equation (3))
+end
+// Clustering users into subgroups
+Factorize R and derive U, V
+C = k-means(U)
+// Learn recommendation models
+foreach Ck in C do
+Optimize θ{k} with implicit feedback in user
+subgroup Ck (Equation (9))
+end
+Name
+#Items
+#Users
+#Ratings
+#Entities
+#Links
+IM100K
+943
+1360
+89,626
+60,905
+146,013
+Yelp
+11,537
+43,873
+229,907
+285,317
+570,634
+(a) Datasets Description
+(b) IMDb Feedback Distribu-
+tion
+(c) Yelp Feedback Distribu-
+tion
+Figure 5: IM100K and Yelp Datasets
+6.1
+Data
+To demonstrate the eﬀectiveness of the proposed recom-
+mendation framework, we choose two datasets from diﬀer-
+ent domains (movie and local business) for empirical stud-
+ies.
+The ﬁrst dataset is built by combining the popular
+MovieLens-100K dataset and the corresponding IMDb dataset
+together. We name this dataset IMDb-MovieLens-100K
+(IM100K). We use MovieLens user ratings as user feedback
+and we build a corresponding heterogeneous information
+network from the IMDb dataset.
+If users watched a cer-
+tain movie and wrote a review about this movie, no matter
+whether they liked the movie or not, we say we observed the
+user-item interaction and we set this feedback as 1, other-
+wise, we set as 0. When building this dataset, we mapped
+two datasets using titles and release date of the movies,
+which could be erroneous on certain movies so the results
+we presented below are lower-bound of the actual perfor-
+mances.
+Table 2: Meta-path examples (we set n = 1 and 2.
+“biz” is short for “local business”)
+Network
+Meta-Path
+IM100K
+user−(movie−tag−movie)n
+user−(movie−director−movie)n
+user−(movie−genre−movie)n
+user−movie−plot−movie
+Yelp
+user−(biz−category−movie)n
+user−(biz−customer−biz)n
+user−biz−checkin−biz
+user−biz−location−biz
+The second dataset is the Yelp challenge dataseta. This
+dataset contains both user reviews and local business in-
+formation (an information network). When a user wrote a
+review for a restaurant, we set the feedback as 1, otherwise
+it would be set to 0. We summarize these two datasets in
+Figure 5(a) and the schema of which can be found in Fig-
+ure 2. Notice that the Yelp dataset is much sparser than the
+IM100K dataset, so the performances of all methods decline
+accordingly. The distributions of the user feedback can be
+found in Figure 5.
+Both datasets have timestamps with each user item inter-
+action. We split the feedback matrix R of both datasets for
+each user into training and test based on timestamps, i.e.,
+we use 80% of the “past” feedback to predict 20% of “future”
+feedback. In Yelp dataset, we have to ﬁlter out all the users
+who only have 1 review since we can not create training and
+test data for such users.
+6.2
+Competitors and Evaluation Metrics
+We implement several widely deployed or the state-of-the-
+art recommendation approaches as comparison methods as
+follows:
+• Popularity: Recommend the popular items to users.
+• Co-Click: Estimate conditional probabilities between
+items and recommend items with an aggregated con-
+ditional probability calculated using the training data
+of the target user.
+• NMF: Non-negative matrix factorization on R, details
+of which is discussed in Section 2.3
+• Hybrid-SVM: Use SVM-based ranking function [13]
+to learn a global recommendation model with user im-
+plicit feedback and meta-paths based similarity mea-
+sures [24].
+We use HeteRec-g to denote the proposed global recommen-
+dation model and HeteRec-p to represent the personalized
+recommendation models derived from user subgroup recom-
+mendation models.
+We utilize 10 diﬀerent meta-paths in
+each information network, including the most simple meta-
+path user −item, which means user preferences can only be
+propagated to items with observed positive feedback. We list
+some other meta-paths and / or attribute similarity mea-
+sures in Table 6.1. For explicit feedback recommendation
+evaluation, measures like root mean square error (RMSE)
+are the standard evaluation metric.
+However, these met-
+rics do not suit the deﬁnition of implicit feedback problem.
+In this study, we test all methods as ranking models and
+use the well-studied information retrieval metrics includ-
+ing precision-at-position and top-10 mean reciprocal rank
+(MRR, Equation (10)) to evaluate and compare the perfor-
+mance of these methods.
+MRRK = 1
+m
+m
+X
+i=1
+
+
+X
+e∈test(ui)
+1
+rank(ui, e)
+
+
+(10)
+ahttp://www.yelp.com/dataset_challenge/
+Table 3: Performance Comparison
+Method
+IM100K
+Yelp
+Prec1
+Prec5
+Prec10
+MRR
+Prec1
+Prec5
+Prec10
+MRR
+Popularity
+0.0731
+0.0513
+0.0489
+0.1923
+0.00747
+0.00825
+0.00780
+0.0228
+Co-Click
+0.0668
+0.0558
+0.0538
+0.2041
+0.0147
+0.0126
+0.01132
+0.0371
+NMF
+0.2064
+0.1661
+0.1491
+0.4938
+0.0162
+0.0131
+0.0110
+0.0382
+Hybrid-SVM
+0.2087
+0.1441
+0.1241
+0.4493
+0.0122
+0.0121
+0.0110
+0.0337
+HeteRec-g
+0.2094
+0.1791
+0.1614
+0.5249
+0.0165
+0.0144
+0.0129
+0.0422
+HeteRec-p
+0.2121
+0.1932
+0.1681
+0.5530
+0.0213
+0.0171
+0.0150
+0.0513
+6.3
+Performance Comparison
+The performance of all 6 methods in the two datasets can
+be found in Table 3.
+Based on Figure 5, user feedback data follow power law
+distribution, i.e., a very small number of items have inter-
+action with a large number of users. Due to this property,
+recommending the popular items to users has a decent per-
+formance (MRR=0.1923 in IM100K). Co-click method, as
+one of the most widely deployed technique, achieves MRR
+= 0.2041 in IM100K and has a similar performance as the
+NMF method in Yelp (MRR=0.0371).
+We implemented the NMF as the CF baseline (details
+of this method can be found in Section 2.3).
+We set the
+dimensionality of the low-rank representations d = 20 in
+IMD100K and d = 60 in Yelp with cross validation in train-
+ing dataset. We use the same method and settings in the
+diﬀusion-based latent feature generation method for the pro-
+posed approaches. With parameter tuning and additional
+information (e.g., [9]), NMF may perform better than the
+results in Table 3. However, the same performance improve-
+ment can be achieved in our methods accordingly by replac-
+ing the NMF solver in Equation (3) with a more advanced
+technique. As presented in Table 3, NMF achieved MRR =
+0.4938 and Prec1 = 0.2061 in IM100K dataset and MRR =
+0.0382 and Prec1 = 0.0162 in Yelp dataset. This method
+outperforms other baselines methods in both datasets.
+Hybrid-SVM method is a hybrid recommendation approach
+which uses the same amount of information as our proposed
+methods.
+This method combines both implicit feedback
+and heterogeneous relationship information following the in-
+tuitions of our study.
+However, it adopts an SVM based
+ranking framework [13] and uses PathSim [24] measures as
+features when deﬁning the recommendation model. With-
+out the proposed diﬀusion-based feature generation method,
+the learning algorithm and the recommendation model per-
+sonalization, Hybrid-SVM can not fully take advantage of
+the feedback data and the heterogeneity of the information
+network.
+This method can only achieve MRR = 0.4493
+in IM100K (compared to 0.4938 with NMF) and MRR =
+0.0337 (compared to 0.0371 with Co-Click method).
+The
+low-performance of the Hybrid-SVM method proves the ef-
+fectiveness of the proposed framework.
+Our proposed global recommendation model (HeteRec-g),
+which takes advantage of both user feedback and the related
+information network, and users the same amount of infor-
+mation as Hybrid-SVM, beats all baseline methods in both
+datasets. It improves MRR by 6.1% compared to NMF in
+IM100K and 10.4% in Yelp dataset. This proves our assump-
+tion that adding information network as external knowledge
+with the proposed approach can alleviate the data spar-
+sity issue and improve the recommendation quality. Mor-
+ever, HeteRec-g produces much more accurate recommen-
+dation results compared to Hybrid-SVM (in IM100K, MRR
+of HeteRec-g is 0.5249 while MRR of Hybrid-SVM is only
+0.4493). Both methods utilize the same set of meta-paths,
+and use the same sample rate during training. Both meth-
+ods deﬁne“global” recommendation models since they apply
+the same model to all the users. The performance increase
+of HeteRec-g proves the eﬀectiveness of our diﬀusion-based
+latent feature generation method. Another interesting ob-
+servation is that the MRR gain of HeteRec-g compared with
+NMF in the relatively dense IM100K dataset is less than it is
+in the sparer Yelp dataset (6.1% v.s. 10.4%), which ﬁts our
+intuition that when feedback dataset is sparser, the informa-
+tive network-based recommendation approach can improve
+the performance even more. When training, we employ a
+uniform sample rate 10−5 in SGD and we apply the same
+rate to all supervised approaches in this experiment. Param-
+eter tuning of the sample rate is discussed later this section.
+HeteRec-p as the personalized recommendation approach
+can further improve the performance in both datasets. HeteRec-
+p method clusters users based on their interests and utilizes
+personalized model parameters when recommending. This
+approach can distinguish user behaviors while HeteRec-g
+treats all users as the same.
+We use c = 10 in IM100K
+dataset and c = 100 in Yelp dataset. We discuss the strategy
+of choosing the correct granularity later this section. Com-
+pared with the global recommendation model (HeteRec-g),
+personalized models can provide higher quality recommen-
+dation results in both datasets. It improves Prec5 by 7.9%
+and MRR by 5.4% in IM100K, and improves Prec1 by 29%
+and MRR by 21.5% in Yelp. This veriﬁes that diﬀerent users
+indeed have diﬀerent interests and behavior patterns. Ap-
+plying global recommendation model to all users can not dis-
+tinguish user diﬀerences properly. Recommendation mod-
+els which are learned within user subgroups can represent
+user interests and behaviors at a ﬁner granularity level, and
+thus HeteRec-p can generates better results.
+Compared
+with baseline methods which only utilize user feedback data,
+HeteRec-p surpasses NMF by 12.0% in terms of MRR in
+IM100K and beats the MRR score of Co-Click by 38.3% in
+Yelp dataset.
+Overall, the proposed recommendation models outperform
+all comparison methods in both IM100K and Yelp datasets.
+The experiments verify that using heterogeneous informa-
+tion networks in recommender systems can improve recom-
+mendation quality.
+Personalized recommendation models
+can better distinguish user interests and behaviors, and thus
+can lead to personalized and more accurate recommendation
+results.
+6.4
+Performance Analysis
+We analyze the performance of Co-Click, NMF, HeteRec-g
+and HeteRec-p in diﬀerent recommendation scenarios. We
+ran the following analytical experiments on both datasets
+and observed similar performance change in both datasets.
+Due to the page limitation, we only present these ﬁndings
+with IM100K dataset.
+We ﬁrst study the correlation between the performance
+of diﬀerent recommendation methods and the training feed-
+back data size of each user. We split all users into 6 groups
+based on their individual training data size. Users in group
+1 provided very limited number of feedback (average size
+is 13) while users in group 6 provided the most amount of
+(a) Performance
+Change
+with
+User
+Feedback Number
+(b) Performance
+Change
+with
+User
+Feedback Popularity
+(c) Local Model Cluster Number Tuning
+Figure 6: Performance Analysis and Parameter Tuning
+feedback (average size is 224). We apply all 4 methods in
+each group. The results of this study can be found in Fig-
+ure 6(a). One can notice that overall HeteRec-p outperforms
+all the other methods for users with diﬀerent feedback sizes.
+When the user feedback size is small, i.e., the data spar-
+sity issue is severe, the performances of all methods are bad.
+When the feedback size of each user increases, the perfor-
+mances increase accordingly. The performance of Co-Click
+however does not change as much among diﬀerent groups.
+This proves that all CF based methods could be aﬀected
+when data are sparse. When feedback data are insuﬃcient,
+it is critical to utilize information network as external knowl-
+edge to alleviate this issue.
+We then study the correlation between performances of
+the 4 methods and the popularity of the items that users
+interacted in the feedback dataset.
+We split users into 6
+groups based on the average popularity of the movies they
+interacted with in the training dataset. Users in group 1
+prefer less popular movies (average popularity of items is
+71) whle users in group 6 prefer the most popular movies
+(average popularity is 281). The results of this study can be
+found in Figure 6(b). Similar to the previous study, overall
+HeteRec-p outperforms all the other methods for diﬀerent
+user groups. Interestingly, all CF based methods perform
+better for users who prefer unpopular movies.
+This ﬁnd-
+ing may be counter-intuitive. It would seem like popular
+movies are easier to handle since the related data are suf-
+ﬁcient. However, users who prefer popular movies usually
+do not have speciﬁc interests (they watch anything popular
+without considering genres, stories or any other types of in-
+formation). Recommending movies to such users is always
+challenging. One possible way of handling this problem is
+to identify such users and use popularity based methods for
+the recommendation.
+6.5
+Parameter Tuning
+The proposed methods have several additional parameters
+compared with other methods.
+In Equation (9), λ controls L2 regularization of the func-
+tion.
+We cross-validated this parameter and set it to 0.1
+when optimizing objective function. Another parameter is
+the sampling rate in SGD when estimating parameters. As
+mentioned in Section 5, with the proposed objective func-
+tion, the scale of the training dataset is O(mn2) which can be
+overwhelming in large datasets (this number in Yelp dataset
+is approximately 1012). Instead of using the entire dataset,
+we only sample a subset during training. We study the re-
+lationship between the sample rate and the performance of
+HeteRec-g in IM100K (Figure 7).
+Notice the x-axis in Figure 7 is at log scale. When sam-
+ple rate is more than 10−5, the performance of the global
+Figure 7: Sample Rate Tuning
+model is re

@@ -1,0 +1,15 @@
+{
+  "source": "Large-Scale Matrix Factorization with Distributed Stochastic Gradient Descent",
+  "source_group": "Awesome-ML-Papers/MF",
+  "processed_at": "2026-06-08T12:00:00Z",
+  "agent": "agent_batch_generation",
+  "concepts": [
+    {
+      "finding": "Distributed SGD for large-scale MF. Strategies: (1) data parallelism (partition users/items across workers), (2) model parallelism (partition factors across workers), (3) asynchronous updates with staleness tolerance. Hybrid approach: data-parallel for dense factors, model-parallel for sparse. Handles billions of ratings.",
+      "category": "Experiment",
+      "implication": "Distributed keyword embedding training at scale. For millions of keywords with billions of co-occurrences, distributed SGD with hybrid parallelism is necessary. Asynchronous updates with staleness tolerance work well.",
+      "open_question": "At what keyword count does distributed training become necessary for keyword embedding? What parallelism strategy is optimal?",
+      "testable_hypothesis": "Distributed SGD for keyword embedding achieves near-linear speedup up to 32 workers for graphs with 10M+ keyword nodes."
+    }
+  ]
+}

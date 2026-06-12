@@ -1,0 +1,15 @@
+{
+  "source": "[Alibaba Embedding] Billion-scale Commodity Embedding for E-commerce Recommendation in Alibaba (Alibaba 2018)",
+  "source_group": "Awesome-ML-Papers/Embeddings",
+  "processed_at": "2026-06-08T12:00:00Z",
+  "agent": "agent03_embeddings_mf_ranking_search_compiled",
+  "concepts": [
+    {
+      "finding": "Three graph embedding methods for 2 billion items: BGE (Base Graph Embedding via DeepWalk on item graph from user behavior), GES (with side information - category, brand, price), EGES (Enhanced with weighted aggregation of side information). Weighted item graph from session sequences outperforms CF co-occurrence.",
+      "category": "Data",
+      "implication": "Side information (category, brand, price range) can bootstrap cold-start keyword embeddings. When a keyword has few co-occurrences, its side information (language, domain, topic labels) can provide signal via weighted aggregation.",
+      "open_question": "What side information (synonyms, categories, language, domain) should weight into keyword embeddings for cold keywords?",
+      "testable_hypothesis": "EGES-weighted side information embeddings improve cluster assignment accuracy for low-frequency ('tail') keywords by 10%+ over unweighted aggregation."
+    }
+  ]
+}

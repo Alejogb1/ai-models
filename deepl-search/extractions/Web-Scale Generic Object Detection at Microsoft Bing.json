@@ -1,0 +1,15 @@
+{
+  "source": "Web-Scale Generic Object Detection at Microsoft Bing.pdf",
+  "source_group": "Awesome-ML-Papers/CV",
+  "processed_at": "2026-06-08",
+  "agent": "agent6_remaining",
+  "concepts": [
+    {
+      "finding": "Bing deployed object detection at web scale using a two-stage system: lightweight models for candidate generation followed by heavier models for re-ranking, enabling detection across billions of images with 95%+ precision.",
+      "category": "ModelCandidate",
+      "implication": "Two-stage cascades (cheap recall + expensive precision) are proven at web scale for vision and directly apply to search: coarse retrieval + fine reranking for query-document matching.",
+      "open_question": "What is the optimal latency-accuracy tradeoff curve for cascading retrieval models in search systems?",
+      "testable_hypothesis": "A cascaded retrieval system (lightweight embedding model + heavyweight cross-encoder) will achieve 10x latency reduction with <2% accuracy loss."
+    }
+  ]
+}

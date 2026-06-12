@@ -1,0 +1,15 @@
+{
+  "source": "Probabilistic Matrix Factorization",
+  "source_group": "Awesome-ML-Papers/MF",
+  "processed_at": "2026-06-08T12:00:00Z",
+  "agent": "agent_batch_generation",
+  "concepts": [
+    {
+      "finding": "PMF: probabilistic interpretation of matrix factorization. Assumes Gaussian observation noise, Gaussian priors on user and item latent factors. MAP estimation equivalent to MF with L2 regularization. Extensions: constrained PMF (side information), Bayesian PMF (full posterior via MCMC). Foundation paper for all modern MF-based recommendation.",
+      "category": "ModelCandidate",
+      "implication": "Probabilistic formulation of keyword-intent MF: keyword and intent embeddings with Gaussian priors, maximizing likelihood of observed keyword-intent pairs. L2 regularization prevents overfitting. Bayesian extension provides uncertainty estimates for keyword-intent assignments.",
+      "open_question": "What prior distribution best suits keyword embeddings? Should we use Gaussian priors or more structured priors reflecting keyword taxonomy?",
+      "testable_hypothesis": "PMF for keyword-intent matrix factorization provides well-calibrated confidence scores that improve threshold-based keyword-intent assignment over non-probabilistic MF."
+    }
+  ]
+}

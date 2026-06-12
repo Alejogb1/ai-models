@@ -1,0 +1,15 @@
+{
+  "source": "PTE Predictive Text Embedding through Large-scale Heterogeneous Text Networks",
+  "source_group": "Awesome-ML-Papers/Embeddings",
+  "processed_at": "2026-06-08T12:00:00Z",
+  "agent": "agent03_embeddings_mf_ranking_search_compiled",
+  "concepts": [
+    {
+      "finding": "Heterogeneous text network embedding: constructs bipartite networks of word-word, word-document, and word-label. Learns embeddings via LINE (first-order + second-order proximity) over this heterogeneous graph. Preserves both local and global structure.",
+      "category": "Model Candidate",
+      "implication": "Keyword clustering can benefit from heterogeneous network construction: keyword-keyword co-occurrence, keyword-document, keyword-intent label relations. This captures richer semantic signal than just keyword co-occurrence.",
+      "open_question": "What node types (keywords, documents, intents, categories) should form the heterogeneous network for keyword clustering?",
+      "testable_hypothesis": "A heterogeneous embedding approach (PTE-style) for keywords, documents, and intent labels will outperform homogeneous keyword-only embeddings for intent clustering."
+    }
+  ]
+}

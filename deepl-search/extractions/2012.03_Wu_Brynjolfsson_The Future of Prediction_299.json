@@ -1,0 +1,148 @@
+{
+  "source": "2012.03_Wu_Brynjolfsson_The Future of Prediction_299.pdf",
+  "source_group": "Web-Sources",
+  "processed_at": "2026-06-08",
+  "agent": "agent5_final",
+  "concepts": [
+    {
+      "finding": "Applying our methodology to predict housing market trends, we find that a housing search index \nis strongly predictive of the future housing market sales and prices.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Page 3 of 24 \n \n \n \n \n \nas revealed by online search, we can significantly improve the accuracy of predictions about future economic \nactivities.",
+      "category": "Experiment",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Similarly, a report, \nwritten by California Association of Realtors in 2008, shows that 63% of home buyers find their real estate agent \nusing a search engine (Appleton-Young, 2008).",
+      "category": "ModelCandidate",
+      "implication": "Relevant for similarity-based retrieval and lookalike targeting",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "With the ability to gather billions of search queries over time, Google Insight is essentially aggregating all the honest \nsignals of decision-makers intentions to capture the overall level of “sentiment”.",
+      "category": "TargetConstruct",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Figure 1 shows the overall interest in real estate agencies using online searches.",
+      "category": "ModelCandidate",
+      "implication": "Can inform intent modeling for recommendation systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "In Model 5, we only use the search indices to predict housing sales and \nwe find similar results as what is shown in Model 4, where past sales and HPI are included.",
+      "category": "ModelCandidate",
+      "implication": "Relevant for similarity-based retrieval and lookalike targeting",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "However the past search index on “Real Estate Agencies” from the previous quarter \nis no longer statistically significant as shown in Model 2.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "How to address the limitation described: However the past search index on “Real Estate Agencies” from the previous quarter \nis no longer statistically significant as shown in Model 2.",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Then, we introduced the present and the past search index for both “Real Estate” \nand “Real Estate Agencies” in Model 4.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "To gauge the overall interests in home appliances, we use \nthe search index for the “Home Appliance” category from Google Trends and show its relationship with home sales \n(Table 3).",
+      "category": "ModelCandidate",
+      "implication": "Can inform intent modeling for recommendation systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Other applications of this research \nWhile we show promising predictions about the housing market using Google Trends, it can be also used in many \nother contexts to predict future economic activities, for example, the technology sectors.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "However, despite missing these consumers, we can still predict the housing sales and housing price using only \nonline search captured by Google, demonstrating the power of online queries in forecasting economic trends.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "How to address the limitation described: However, despite missing these consumers, we can still predict the housing sales and housing price using only \nonline search captured by Google, demonstrating the power of online queries in forecastin",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "We demonstrate how data \nfrom search engines like Google provide a highly accurate but simple way to predict future business \nactivities.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "The use of search data produces out-of-sample predictions with a mean absolute error of just 0.102, a \nsubstantial improvement over the 0.441 mean absolute error of the baseline model which uses conventional \ndata but does not include any search data.",
+      "category": "Baseline",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Keywords: Online Search, Prediction, Housing Trends \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n\nElectronic copy available at: http://ssrn.com/abstract=2022293\nPage 2 of 24 \n \n \n \n \n \n“It’s difficult to make predictions, especially about the future” \n \n \n \n \n \n \n-- Attributed to Neils Bohr \nIntroduction \nTradi",
+      "category": "FailureRisk",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "However, due to the widespread adoption of search engines and related information technologies, it is \nincreasingly possible to obtain highly disaggregated data on literally hundreds of billions1 of economic decisions \nalmost the instant that they are made.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "How to address the limitation described: However, due to the widespread adoption of search engines and related information technologies, it is \nincreasingly possible to obtain highly disaggregated data on literally hundreds of billions1 of e",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Assisting with predictions has always been a central contribution of social science research.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "In the past several \ndecades, much of social science research has focused on ever more complex mathematical models, for many types \nof important business and economic predictions.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "However, the latest recession has shown that none of the theoretical \nmodels was intelligent enough to foresee the biggest economic downturn in our recent history (Krugman, 2009).",
+      "category": "BehavioralTests",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "How to address the limitation described: However, the latest recession has shown that none of the theoretical \nmodels was intelligent enough to foresee the biggest economic downturn in our recent history (Krugman, 2009).",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "By effectively aggregating consumers’ digital traces and \nimproving data quality by several orders of magnitude, information technology has created a transformation on how \nwe solve the problem of predicting the future.",
+      "category": "FailureRisk",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "The Real Estate Market \nWe use the real estate market to demonstrate how online search can be used to reveal the present economic activities \nand predict future economic trends.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    }
+  ]
+}

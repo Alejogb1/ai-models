@@ -1,0 +1,15 @@
+{
+  "source": "Deep Neural Networks for YouTube Recommendations",
+  "source_group": "Awesome-ML-Papers/MF",
+  "processed_at": "2026-06-08T12:00:00Z",
+  "agent": "agent03_embeddings_mf_ranking_search_compiled",
+  "concepts": [
+    {
+      "finding": "Two-stage retrieval + ranking funnel. Candidate generation: extreme multiclass classification (millions of video classes) with sampled softmax (importance-weighted negative sampling). Learned user embeddings as function of watch history, search tokens, demographics. At serving: nearest neighbor search in embedding space. Ranking: separate DNN predicting expected watch time (not CTR) via weighted logistic regression. 'Example Age' feature captures freshness (time since upload).",
+      "category": "Model Candidate",
+      "implication": "Two-stage architecture can apply: (1) Stage 1: keyword -> intent candidate generation via softmax over intent classes. (2) Stage 2: rank intents by relevance to keyword. Freshness feature ('Example Age') is critical if keywords have temporal trends.",
+      "open_question": "Should keyword-intent matching be a single-stage scoring or two-stage (candidate generation + ranking) as in YouTube?",
+      "testable_hypothesis": "A two-stage keyword-intent model (generation with sampled softmax + ranking with DNN) scales better to 1000+ intents than a single flat classifier."
+    }
+  ]
+}

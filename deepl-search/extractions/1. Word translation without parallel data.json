@@ -1,0 +1,15 @@
+{
+  "source": "1. Word translation without parallel data.pdf",
+  "source_group": "Awesome-ML-Papers/Neural Machine Translation",
+  "processed_at": "2026-06-08",
+  "agent": "agent6_remaining",
+  "concepts": [
+    {
+      "finding": "Cross-lingual word embeddings can be aligned without parallel data by exploiting structural similarity of embedding spaces: adversarial training aligns spaces, Procrustes refinement improves mapping.",
+      "category": "ModelCandidate",
+      "implication": "Unsupervised alignment of embedding spaces can create cross-lingual query representations without bilingual dictionaries, enabling multilingual search without parallel query data.",
+      "open_question": "How well does unsupervised embedding alignment work for query spaces vs. general word spaces?",
+      "testable_hypothesis": "An adversarially aligned cross-lingual query embedding space will achieve bilingual lexicon induction accuracy of 40%+ without any parallel data."
+    }
+  ]
+}

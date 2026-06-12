@@ -1,0 +1,15 @@
+{
+  "source": "Faster R-CNN.pdf",
+  "source_group": "Awesome-ML-Papers/CV",
+  "processed_at": "2026-06-08",
+  "agent": "agent6_remaining",
+  "concepts": [
+    {
+      "finding": "Faster R-CNN introduces Region Proposal Network (RPN) that shares full-image convolutional features with the detection network, making region proposals nearly cost-free and enabling real-time detection.",
+      "category": "ModelCandidate",
+      "implication": "Attention-like mechanism (RPN) that shares computation with the main network is highly efficient. For search, this suggests shared encoders for both retrieval and ranking stages.",
+      "open_question": "Can a shared-encoder architecture for retrieval and ranking in search approach the efficiency gains seen in Faster R-CNN?",
+      "testable_hypothesis": "A shared-encoder two-tower model for search retrieval and ranking will reduce total computation by 40%+ compared to separate models."
+    }
+  ]
+}

@@ -1,0 +1,148 @@
+{
+  "source": "Hubble- An Industrial System for Audience Expansion in Mobile Marketing .pdf",
+  "source_group": "Awesome-ML-Papers/Lookalike",
+  "processed_at": "2026-06-08",
+  "agent": "agent5_final",
+  "concepts": [
+    {
+      "finding": "Given the seed users Sc, to find out\nthe past campaigns similar to c, a straightforward method is to\nfirst calculates the similarity scores between all seed embeddings\n{h(L)\nu }u ∈Sc and all past campaign embeddings {h(L)\nc }c ∈C, with the\nprediction model in Equation 6.",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "In summary, our experiments aim to answer\nthe following three questions:\n• Q1: Does our proposed Hubble System outperform other\nstate-of-the-art approaches in the audience expansion task?",
+      "category": "Baseline",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "From Table 3, we can observe that the proposed Hubble System\nmaintains a great improvement on the number of conversion and\nCVR, as well as slightly improvement in the number of exposure,\nagainst the MLP classifier.",
+      "category": "ModelCandidate",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "In summary, the proposed Hubble System performs\nmore effectively and efficiently in the real-world online A/B testing,\nthus is more suitable for the industry.",
+      "category": "BehavioralTests",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Second, conventional two-stage audience expansion\nsystems neglect the high-order user-campaign interactions and\nusually generate entangled user embeddings, thus fail to achieve\nhigh-quality user representation.",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Specifically, in the offline stage, we propose a novel\nadaptive and disentangled graph neural network (called AD-GNN),\nto adaptively explore the user-campaign graph and generate com-\nprehensive user embedding in a disentangled manner.",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "ACM ISBN 978-1-4503-7998-4/20/08...$15.00\nhttps://doi.org/10.1145/3394486.3403295\nA/B testing demonstrate the superior performance of the proposed\nHubble System, compared with other state-of-the-art methods.",
+      "category": "Baseline",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "To our best knowledge, this is the first work to tackle\nthis challenge in the audience expansion problem.",
+      "category": "FailureRisk",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "How to address the limitation described: To our best knowledge, this is the first work to tackle\nthis challenge in the audience expansion problem.",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "The experimental results\ndemonstrate the superiority of the proposed Hubble System, which\nwill be detailedly discussed in section 4.",
+      "category": "Experiment",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "In\nour mobile marketing scenario, the interaction between user and\ncampaign falls into two types: exposure which means the campaign\nhas been shown to the user in our APP and conversion which means\nthe user attended the campaign and has finished its business goal\n(e.g., purchase the fund or insurance",
+      "category": "TargetConstruct",
+      "implication": "Can inform intent modeling for recommendation systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "However, the above disentangled mechanism neglects that there\nare some noisy edges caused by the casual conversion between\nusers and campaigns, which are common in the mobile marketing\nApplied Data Science Track Paper\nKDD '20, August 23–27, 2020, Virtual Event, USA\n2458\n\nscenario (e.g., click some c",
+      "category": "ModelCandidate",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "How to address the limitation described: However, the above disentangled mechanism neglects that there\nare some noisy edges caused by the casual conversion between\nusers and campaigns, which are common in the mobile marketing\nApplied Data Sc",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Considering the fact that some users may have similar prefer-\nences toward campaigns, we propose to divide the seeds into sev-\neral groups according to their preference, which is encoded in user\nembedding, and calculate the similarity between user groups and\npast campaigns.",
+      "category": "Data",
+      "implication": "Can inform intent modeling for recommendation systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "For each cluster, we find the most similar past cam-\npaign based on the similarity between its cluster embedding and all\npast campaign embeddings.",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "4\nEXPERIMENTS\n3 In this section, we conduct extensive offline and online experi-\nments on the proposed Hubble System, to demonstrate its effective-\nness and efficiency.",
+      "category": "Experiment",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Before diving into the experimental results, we first introduce the\nexperiment settings, including datasets, comparison methods and\nevaluation metrics.",
+      "category": "Experiment",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "However, this simple baseline still performs worse against\nMLP, thus we propose Hubble System for further improvement.",
+      "category": "Baseline",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "How to address the limitation described: However, this simple baseline still performs worse against\nMLP, thus we propose Hubble System for further improvement.",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Meth-\nods in the latter category propose to expand audiences based on\nuser embeddings generated by a machine learning model, and have\nachieved success in some companies (e.g., Linkedin [7], Pinterest [1]\nand Tencent [11]).",
+      "category": "Data",
+      "implication": "Can inform intent modeling for recommendation systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "For the offline stage, we propose a novel GNN model, called\nAD-GNN, to adaptively explore the user-campaign graph and gener-\nate high-quality user embedding in a disentangled manner.",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "For the\nonline stage, we propose a novel KD-AE model, which employs a\nwell-designed knowledge distillation mechanism, to absorb knowl-\nedge from AD-GNN and eliminate the coverage bias introduced\nby the given seed users.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "By combining these two stages, Hubble\nSystem demonstrates its superior effectiveness and efficiency in\nboth offline experiments and online A/B testing, compared to other\nstate-of-the-art approaches.",
+      "category": "Baseline",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    }
+  ]
+}

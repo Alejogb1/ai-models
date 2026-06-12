@@ -1,0 +1,15 @@
+{
+  "source": "AutoRec- Autoencoders Meet Collaborative Filtering",
+  "source_group": "Awesome-ML-Papers/MF",
+  "processed_at": "2026-06-08T12:00:00Z",
+  "agent": "agent_batch_generation",
+  "concepts": [
+    {
+      "finding": "AutoRec: autoencoder framework for collaborative filtering. Input: partially observed user rating vector (u-AutoRec) or item rating vector (i-AutoRec). Encoder projects to low-dimensional bottleneck, decoder reconstructs all ratings. i-AutoRec outperforms u-AutoRec. Simple but effective: beats SVD and RBM-CF on MovieLens and Netflix.",
+      "category": "ModelCandidate",
+      "implication": "Keyword embedding via autoencoder: input keyword co-occurrence vector -> encoder compresses to embedding -> decoder reconstructs co-occurrence. Denoising version (corrupt input) improves robustness. Simple, scalable baseline.",
+      "open_question": "How does autoencoder-based keyword embedding compare to word2vec (CBOW/Skip-gram) for intent clustering? Are denoising autoencoders more robust?",
+      "testable_hypothesis": "Autoencoder-based keyword embeddings (i-AutoRec style) produce comparable intent clusters to word2vec embeddings while being simpler to train and tune."
+    }
+  ]
+}

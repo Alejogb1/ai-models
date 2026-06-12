@@ -1,0 +1,148 @@
+{
+  "source": "yang16.pdf",
+  "source_group": "Awesome-ML-Papers/CTR-CVR-Prediction",
+  "processed_at": "2026-06-08",
+  "agent": "agent5_final",
+  "concepts": [
+    {
+      "finding": "Contributions\nIn view of these challenges, we propose a novel approach for conversion prediction that relies\non two distinct sources of information: (a) The global features associated with the adver-\ntising campaign, such as campaign speciﬁc conversion and retargeting pixels.",
+      "category": "TargetConstruct",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "How to address the limitation described: Contributions\nIn view of these challenges, we propose a novel approach for conversion prediction that relies\non two distinct sources of information: (a) The global features associated with the adver-\n",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Criterion to characterize the\nperformances of CPC and CPA models are click-through-rate (CTR) and conversion-rate\n(CVR) respectively.",
+      "category": "ModelCandidate",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "First,\nusually only a very small portion of the users that click or have been shown ads eventually\nconvert.",
+      "category": "ModelCandidate",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "However, we can only get partial information of the pixel ﬁring,\ne.g., we only get access to the complete information of converters that are attributed to us\n(e.g., conversions are lead by the ads that we showed before).",
+      "category": "ModelCandidate",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "How to address the limitation described: However, we can only get partial information of the pixel ﬁring,\ne.g., we only get access to the complete information of converters that are attributed to us\n(e.g., conversions are lead by the ads tha",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "We use local features to model the users’ purchase behaviors\nand the key is that certain search queries or browsing content from certain user segments\nare relatively higher related to speciﬁc brand conversions.",
+      "category": "BehavioralTests",
+      "implication": "Can inform intent modeling for recommendation systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "We combine these two complimentary sources of information in a principled way and\npropose Trans-RWM, a novel probabilistic generative model that tightly integrates com-\nponents of natural language processing, dynamic transfer learning and scalable prediction\nto support learning from the extremely sp",
+      "category": "ModelCandidate",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "(2014)\nintroduced transfer learning to model post-view conversions through combining data from\ngeneral conversions to improve targeting performances across a large number of campaigns.",
+      "category": "TargetConstruct",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "(7)\nFor the contextual information that are collected in our scenario, there is a unique tuple\nmapping {User, Publisher, Advertiser} (e.g., the speciﬁc user browsed a publisher web\npage and purchased a product form the ads shown on the page) and the current set up of\nW2V cannot easily include this i",
+      "category": "ModelCandidate",
+      "implication": "Can inform intent modeling for recommendation systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Experimental Results\nIn this section we demonstrate empirically the improvements induced by Trans-RWM.",
+      "category": "Experiment",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Second, neither Max Ent nor Transfer Learning considers modeling users’\nonline activities and proposes a probabilistic generative model by tightly integrating users’\npurchase preferences from online activities to conversion prediction.",
+      "category": "ModelCandidate",
+      "implication": "Can inform intent modeling for recommendation systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "However, as time goes on,\nTrans-RWM achieves more and more improvements compared to Max Ent and Transfer\nLearning.",
+      "category": "Baseline",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "How to address the limitation described: However, as time goes on,\nTrans-RWM achieves more and more improvements compared to Max Ent and Transfer\nLearning.",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "First, the newly proposed natural\nlanguage modeling results in a good improvement in the quality of the learnt word and\nphrase representations.",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "We propose a\nnovel probabilistic generative model by tightly integrating components of natural language\nprocessing, dynamic transfer learning and scalable prediction, named Dynamic Transfer\nLearning with Reinforced W ord M odeling (a.k.a.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "We demonstrate that on Brightroll our framework can eﬀectively discriminate\nextremely rare events in terms of their conversion propensity.",
+      "category": "ModelCandidate",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Second, user proﬁles are high dimensional and sparse, ranging from user demographics to\nsearch queries and page browsing.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "We propose a novel model for Bayesian transfer learning where the knowledge is\ndynamically transferred from source to the future target campaigns.",
+      "category": "TargetConstruct",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Some of these\nfeatures are contextual, e.g., campaign descriptions, user online search and browsing history,\netc.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "In our problem, Ys represents conversion labels observing related\ntraﬃc from other campaigns and the campaign itself (if exists) in the past.",
+      "category": "LabelValidation",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "The Proposed Framework\nIn this section, we describe the proposed Trans-RWM model for CVR prediction, which is a\nprobabilistic generative framework that jointly models global campaign competitiveness and\ntheir relationship, purchase preferences discovery from users’ search and browsing history,\nand d",
+      "category": "ModelCandidate",
+      "implication": "Can inform intent modeling for recommendation systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Existing CVR prediction models are usually trained\nbased on attributed conversions, as well as the impressions from the same campaign shown\nby the DSP.",
+      "category": "ModelCandidate",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    }
+  ]
+}

@@ -1,0 +1,239 @@
+[
+  {
+    "source": "Timoshenko_Hauser_Customer_Needs_from_UGC.pdf",
+    "concepts": [
+      {
+        "finding": "Customer needs are abstract context-dependent statements describing benefits customers seek, distinct from product attributes.",
+        "category": "TargetConstruct",
+        "implication": "Search-intelligence must distinguish between surface-level query patterns and underlying user intents/JTBD.",
+        "open_question": "How do we map search queries to abstract JTBD statements vs. product attributes?",
+        "testable_hypothesis": "Sentence-level intent labels outperform keyword-cluster labels for downstream product development decisions."
+      },
+      {
+        "finding": "Traditional VOC uses 20-30 qualitative experiential interviews producing ~100 abstract customer-need statements structured hierarchically.",
+        "category": "TargetConstruct",
+        "implication": "Ground-truth target: ~100 intent clusters per domain, structured hierarchically (3 levels).",
+        "open_question": "What is the optimal granularity (number of clusters) for search intent taxonomies?",
+        "testable_hypothesis": "A 3-level hierarchy provides the best balance of interpretability and coverage."
+      },
+      {
+        "finding": "52% of UGC sentences contained at least one customer need; 9.2% contained two or more needs. 10% of most frequent needs appear in 54% of informative sentences.",
+        "category": "Data",
+        "implication": "Search queries follow power-law distribution: few dominant intents, many rare ones.",
+        "open_question": "How many rare intents must a search-intelligence product capture to provide value?",
+        "testable_hypothesis": "Capturing the top 10% of intent clusters covers >50% of search volume."
+      },
+      {
+        "finding": "Inter-coder accuracy was 70% (new analyst vs. three original analysts). Individual analysts identified 45-68% of universe needs.",
+        "category": "LabelValidation",
+        "implication": "Human agreement on intent labeling is inherently ~70-80%. Use multiple coders.",
+        "open_question": "What is acceptable inter-annotator agreement for search-intent taxonomies?",
+        "testable_hypothesis": "Majority-vote from 3 annotators achieves 80%+ precision on search intent labels."
+      },
+      {
+        "finding": "CNN achieves F1=74.0% for identifying informative sentences. LSTM-RNN: 73.4%. SVM: 65.7%. CNN with asymmetric costs: recall 85.3%, precision 65.2%.",
+        "category": "ModelCandidate",
+        "implication": "Deep learning classifiers outperform SVM by ~8-10 F1 points for informativeness detection.",
+        "open_question": "What is the best architecture for identifying intent-bearing search queries?",
+        "testable_hypothesis": "A BERT-based classifier achieves >80% F1 for informative query detection."
+      },
+      {
+        "finding": "CNN performance stabilizes after ~500 training sentences, with improvement up to 2,000+. Training under 1 minute on MacBook Pro for 1,000-4,000 samples.",
+        "category": "Experiment",
+        "implication": "Labeling budgets can be modest: ~500-2,000 labeled examples.",
+        "open_question": "What is the minimum labeled sample size for robust query informativeness classification?",
+        "testable_hypothesis": "500 labeled queries achieve >90% of the F1 achievable with 5,000 labels."
+      },
+      {
+        "finding": "CNN identified sentences containing 100% of frequent needs, 91% of rare needs, and 84% of new-to-holdout needs.",
+        "category": "Evaluation",
+        "implication": "Informativeness filters have different recall by frequency class. Frequency-stratified evaluation required.",
+        "open_question": "Do intent classifiers show systematic bias against rare intents?",
+        "testable_hypothesis": "Intent classifiers achieve 90%+ recall on high-frequency intents but <70% on long-tail intents."
+      },
+      {
+        "finding": "Sentence embeddings (20-dim from word embedding averages) clustered with Ward's method separate primary needs in PCA.",
+        "category": "ModelCandidate",
+        "implication": "Simple averaged word embeddings + hierarchical clustering can separate high-level intent categories.",
+        "open_question": "What embedding granularity best separates fine-grained search intents?",
+        "testable_hypothesis": "BERT sentence embeddings achieve higher cluster purity than averaged Word2Vec by >15%."
+      },
+      {
+        "finding": "ML reduces manual review effort by 15-22%. At 200 sentences: 78% efficiency; at 400: 79%.",
+        "category": "Evaluation",
+        "implication": "ML pre-filtering reduces human labeling effort by 15-22%.",
+        "open_question": "What is the cost savings of ML-assisted vs. fully manual taxonomy building?",
+        "testable_hypothesis": "ML-filtered sampling identifies 20%+ more unique intents per dollar spent on annotation."
+      },
+      {
+        "finding": "Frequency of mention is marginally correlated with importance (ρ=0.21, p=0.06). Using only above-median frequency would miss 29% of high-importance needs.",
+        "category": "Baseline",
+        "implication": "Frequency-based or popularity-based query clustering misses rare but strategically valuable intents.",
+        "open_question": "How to distinguish rare-but-important intents from noise?",
+        "testable_hypothesis": "Embedding-based similarity to known high-value intents identifies rare important queries."
+      },
+      {
+        "finding": "Oral-care VOC hierarchy: 6 primary groups, 22 secondary groups, 86 tertiary needs.",
+        "category": "TargetConstruct",
+        "implication": "Search-intent taxonomy prototype can target 5-7 primary, 15-25 secondary categories.",
+        "open_question": "What is a universal intent taxonomy schema that generalizes across categories?",
+        "testable_hypothesis": "A 6-primary/22-secondary taxonomy fits most physical product categories."
+      },
+      {
+        "finding": "Word embeddings trained with skip-gram, k=5 window, d=20 dimensions. Sentence embeddings: average of word embeddings.",
+        "category": "ModelCandidate",
+        "implication": "Simple averaging of word embeddings is a strong, scalable baseline for intent clustering.",
+        "open_question": "Does mean-pooling of BERT token embeddings outperform learned sentence embeddings for intent clustering?",
+        "testable_hypothesis": "Sentence-BERT embeddings improve NMI for intent clusters by 10+ points over averaged word embeddings."
+      }
+    ]
+  },
+  {
+    "source": "jansen_patterns_query_reformulation.pdf",
+    "concepts": [
+      {
+        "finding": "6 query-reformulation states: New, Assistance, Content Change, Generalization, Reformulation, Specialization. Classified 964,780 sessions.",
+        "category": "TargetConstruct",
+        "implication": "Search behavior has 6 distinct reformulation types. Intent tracking should capture reformulation patterns.",
+        "open_question": "Do query-reformulation states correspond to distinct user intents/JTBD?",
+        "testable_hypothesis": "Reformulation states correlate with shifts in JTBD categories."
+      },
+      {
+        "finding": "71.64% of sessions contain only 1 query; 15.85% have 2 queries; 12.51% have 3+. Mean query length: 2.79 terms.",
+        "category": "Data",
+        "implication": "Most sessions are single-query. Short queries dominate. Intent extraction must work with very short text.",
+        "open_question": "How to extract reliable intents from single short queries (2-3 words)?",
+        "testable_hypothesis": "Query expansion via retrieved documents improves single-query intent classification by 20%+."
+      },
+      {
+        "finding": "Transition probability: from New state, 21% go to Reformulation, 22% to Specialization, 21% to Assistance. After Assistance, 58% go to Content Change.",
+        "category": "Data",
+        "implication": "Users often reformulate or specialize immediately after initial query.",
+        "open_question": "Can query-reformulation patterns predict intent shifts within a session?",
+        "testable_hypothesis": "A sequence model over reformulation states predicts intent shifts with >70% accuracy."
+      },
+      {
+        "finding": "Misclassification analysis: 95.6% accuracy on 2,000 verified queries. Errors: misspelling (58.5%), cookie issues (25.8%), special characters (5.6%).",
+        "category": "LabelValidation",
+        "implication": "Automated query classification feasible at >95% accuracy. Main errors: spelling normalization.",
+        "open_question": "How robust are intent classifiers to query spelling variations?",
+        "testable_hypothesis": "Spell-normalization preprocessor improves intent classification accuracy by 3-5%."
+      },
+      {
+        "finding": "Second-order Markov model: precision 40%, coverage 13%. Best overall tradeoff.",
+        "category": "ModelCandidate",
+        "implication": "2nd-order Markov best for reformulation prediction. Only last 2 states needed.",
+        "open_question": "What is the optimal session context window for intent prediction?",
+        "testable_hypothesis": "A transformer with context window of 3-5 queries outperforms 2nd-order Markov."
+      }
+    ]
+  },
+  {
+    "source": "IR_Survey_BeiWang_2026.pdf",
+    "concepts": [
+      {
+        "finding": "Two core IR tasks: extracting features, developing relevance estimators. Evolution: BM25 → dense retrieval (BERT) → LLM-based retrieval.",
+        "category": "TargetConstruct",
+        "implication": "Intent clustering needs representation backbone + relevance/clustering estimator. Separable decisions.",
+        "open_question": "Should representation and clustering share a model or be separate?",
+        "testable_hypothesis": "Separate representation and clustering models outperform end-to-end models."
+      },
+      {
+        "finding": "Modern IR follows 'retrieve-then-rerank' two-stage: bi-encoder selects top-k, cross-encoder refines.",
+        "category": "ModelCandidate",
+        "implication": "Two-stage clustering: fast bi-encoder clustering + cross-encoder refinement.",
+        "open_question": "Is two-stage clustering more effective than single-stage?",
+        "testable_hypothesis": "Two-stage pipeline improves cluster quality by 15% over single-stage."
+      },
+      {
+        "finding": "Hard Negative Mining critical: In-Batch Negatives, Lexical Negatives (BM25), Iterative HNM (ANCE).",
+        "category": "Experiment",
+        "implication": "Careful negative sampling improves embedding quality for distinguishing similar intents.",
+        "open_question": "What negative sampling strategy best learns separable intent embeddings?",
+        "testable_hypothesis": "Combined IBN + lexical negatives produces 10% better intent separation than random negatives."
+      },
+      {
+        "finding": "Knowledge Distillation: student bi-encoder trained to mimic cross-encoder via KL divergence. Bridges effectiveness gap.",
+        "category": "ModelCandidate",
+        "implication": "Distilled bi-encoder can approach cross-encoder quality at fraction of cost.",
+        "open_question": "Can distilled bi-encoder match cross-encoder quality for intent assignment?",
+        "testable_hypothesis": "Distilled bi-encoder achieves <5% quality gap with cross-encoder while 100x faster."
+      },
+      {
+        "finding": "Sparse retrieval (SPLADE): learned sparse vectors aligned to vocabulary, inverted-index compatible, CPU inference.",
+        "category": "ModelCandidate",
+        "implication": "Sparse intent representations offer interpretability and CPU-efficient deployment.",
+        "open_question": "Are sparse or dense representations better for intent interpretability?",
+        "testable_hypothesis": "Sparse representations achieve higher human-interpretability scores for cluster labeling."
+      },
+      {
+        "finding": "Multi-vector models (ColBERT): token-level late interaction via MaxSim. Strong performance with efficient index.",
+        "category": "ModelCandidate",
+        "implication": "Multi-vector representations may capture multi-faceted intents better than single-vector.",
+        "open_question": "Do multi-vector representations improve handling of multi-faceted queries?",
+        "testable_hypothesis": "ColBERT-style multi-vector improves recall for multi-intent queries by 15%."
+      },
+      {
+        "finding": "LLM as retriever: scaling law - larger backbone LMs (7B+) improve bi-encoder retrieval. LLM2Vec enables bidirectional attention on decoder-only models.",
+        "category": "ModelCandidate",
+        "implication": "Larger embedding models outperform BERT-size. Decoder adaptation needed for Llama-family.",
+        "open_question": "What is cost-benefit sweet spot for embedding model size?",
+        "testable_hypothesis": "A 7B embedding model improves NMI by 10+ points over 350M BERT."
+      },
+      {
+        "finding": "LLM as reranker: pointwise (T5), pairwise, listwise (RankGPT). Zero-shot RankGPT-4 competitive without fine-tuning.",
+        "category": "ModelCandidate",
+        "implication": "LLMs can assign queries to intent clusters zero-shot. Useful for seed taxonomy creation.",
+        "open_question": "Can prompted LLMs replace human annotation for intent taxonomy creation?",
+        "testable_hypothesis": "GPT-4 zero-shot labeling achieves 80%+ agreement with expert annotators."
+      },
+      {
+        "finding": "Contrastive learning (InfoNCE) for bi-encoder training: maximizes similarity between query-positive document vs. negatives.",
+        "category": "LabelValidation",
+        "implication": "Contrastive training is the standard for learning search-intent representations.",
+        "open_question": "What constitutes a positive pair for intent representation learning?",
+        "testable_hypothesis": "Co-clicked documents as positive pairs produce better intent representations than same-session queries."
+      }
+    ]
+  },
+  {
+    "source": "EECS-2022-178.pdf",
+    "concepts": [
+      {
+        "finding": "Four fundamental problems: Measurement (experimentation often infeasible), Feedback (recommendations affect future behavior), Scale, Incentives.",
+        "category": "FailureRisk",
+        "implication": "Search-intent system must account for feedback loops, measurement bias, and strategic manipulation.",
+        "open_question": "How do feedback loops bias intent clusters?",
+        "testable_hypothesis": "Intent clusters from pre-recommendation logs differ systematically from post-recommendation logs."
+      },
+      {
+        "finding": "Offline metrics predict online performance across 6 simulated environments. Spearman rank correlations positive. But diminishing returns after a point.",
+        "category": "Evaluation",
+        "implication": "Offline metrics valid for screening methods, but chasing small improvements may not yield online gains.",
+        "open_question": "What is the good enough threshold for offline cluster quality?",
+        "testable_hypothesis": "Beyond NMI=0.75, further improvements yield diminishing online gains."
+      },
+      {
+        "finding": "Feedback loops affect algorithms differently. TopPop improves over time. CF-NADE improves slower. AutoRec initially bad but quickly matches best.",
+        "category": "FailureRisk",
+        "implication": "Some clustering algorithms more susceptible to feedback bias than others.",
+        "open_question": "Which intent clustering methods are most/least susceptible to feedback-loop bias?",
+        "testable_hypothesis": "Frequency-based grouping exhibits stronger feedback amplification than embedding-based clustering."
+      },
+      {
+        "finding": "Higher embedding dimension (d=50 vs d=10) induces more bias in content targeting. More expressive algorithms incentivize more targeted content.",
+        "category": "Experiment",
+        "implication": "Higher-dimensional embeddings may enable more biased or manipulative targeting.",
+        "open_question": "What is the safe dimensionality that balances expressiveness and bias?",
+        "testable_hypothesis": "Intent embeddings with d<30 show 50% less demographic bias amplification than d>100."
+      },
+      {
+        "finding": "Pre-deployment audit of strategic creator incentives can identify misalignment before deployment.",
+        "category": "BehavioralTests",
+        "implication": "Simulate strategic responses before deploying an intent-clustering system.",
+        "open_question": "What is a pre-deployment audit framework for search-intent systems?",
+        "testable_hypothesis": "Pre-deployment simulation predicts 70%+ of real-world content manipulation patterns."
+      }
+    ]
+  }
+]

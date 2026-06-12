@@ -1,0 +1,148 @@
+{
+  "source": "sustainability-13-00391-v2.pdf",
+  "source_group": "Web-Sources",
+  "processed_at": "2026-06-08",
+  "agent": "agent5_final",
+  "concepts": [
+    {
+      "finding": "Considering that “billing mistake” caused the hotel’s internal process problems and online\npayment problems, keyword-frequency-based analysis has limitations in identifying such\ncontext.",
+      "category": "FailureRisk",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "How to address the limitation described: Considering that “billing mistake” caused the hotel’s internal process problems and online\npayment problems, keyword-frequency-based analysis has limitations in identifying such\ncontext.",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Job-to-be-done is generally deﬁned as the fundamental purposes or problems that customers\nwant to solve by products or services [9,10] and outcomes as a measure of how well the\njob-to-be-done are achieved [9].",
+      "category": "TargetConstruct",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "This research extracts keywords and functional information from\nwebpages and classifying them into Universal job map steps using semantic similarity anal-\nysis.",
+      "category": "ModelCandidate",
+      "implication": "Relevant for similarity-based retrieval and lookalike targeting",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Even though these studies tried to develop a data-driven ODI approach,\nthe research purpose, method structure and data are fundamentally different from the\nproposed method and insufﬁcient to apply to identify service opportunities.",
+      "category": "TargetConstruct",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "However, our\nresult shows customers feel this issue is very important, but most hotel services do\nnot fulﬁll it.",
+      "category": "FailureRisk",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "How to address the limitation described: However, our\nresult shows customers feel this issue is very important, but most hotel services do\nnot fulﬁll it.",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "The major contribution of the proposed method is\nas follows: First, this paper is the ﬁrst attempt to develop a data-driven ODI approach for\nservice sectors.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "1\nSamsung Research, Seoul 04763, Korea; shyun.nam@samsung.com\n2\nDepartment of Information Systems, Hanyang University, Seoul 04763, Korea; yoonsejun@hanyang.ac.kr\n3\nEngineering Product Development Pillar, Singapore University of Technology and Design (SUTD),\nSingapore 487372, Singapore; nagarajan@su",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Therefore, the proposed method can be used as an intelligent tool for the\neffective development of a business strategy.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "ODI is basically an expert knowledge-based\napproach, but it is fundamentally difﬁcult to deﬁne the complete set of job-to-be-done and\noutcomes by domain experts’ subjective knowledge in the recent complex and converging\nSustainability 2021, 13, 391.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "To overcome the limitations, this paper proposes an ODI-based quantitative method to\nidentify customer needs in a speciﬁc service sector using deep learning techniques.",
+      "category": "FailureRisk",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "How to address the limitation described: To overcome the limitations, this paper proposes an ODI-based quantitative method to\nidentify customer needs in a speciﬁc service sector using deep learning techniques.",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "As the ﬁrst attempt to develop a data-driven\nODI approach for service sectors, the proposed method has clear contributions.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "First, this\nresearch adopted Service job map, instead of Universal job map, to cover more complex service\nprocesses.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Second, the performance of classifying job-to-be-done into one of Service job map\nsteps is improved by using a BERT-based attention network.",
+      "category": "ModelCandidate",
+      "implication": "Architecture pattern applicable to sequence modeling for user behavior",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "The results show that the proposed\nmethod can discover customer needs, which are difﬁcult to be identiﬁed by conventional\napproaches, and evaluate the service opportunity of customer needs in an objective manner.",
+      "category": "Experiment",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Although most job-to-be-done-based approaches only focus on a job’s\nexecution, there exist many cases that critical service opportunities were identiﬁed prior to\nor after the execution step.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Service job map can effectively visualize and overall operational process of a speciﬁc job, and\nso it is a basic framework that enables ODI to discover desired outcomes from unexpected\nsteps.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "However, since this research focuses on product opportu-\nnities using patent data, the analytic process structure and data are basically different\nfrom service-related research.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "How to address the limitation described: However, since this research focuses on product opportu-\nnities using patent data, the analytic process structure and data are basically different\nfrom service-related research.",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "The powerful improvement neural networks made is\nincorporating context information.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "However, RNN inherently suffers from exploding or vanishing gradient\nproblem [22].",
+      "category": "FailureRisk",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "How to address the limitation described: However, RNN inherently suffers from exploding or vanishing gradient\nproblem [22].",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Method\nThe overall procedure for the proposed method consists of six steps:\n1.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    }
+  ]
+}

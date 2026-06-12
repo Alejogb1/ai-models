@@ -1,0 +1,15 @@
+{
+  "source": "SimCLR - A Simple Framework for Contrastive Learning of Visual Representations",
+  "source_group": "Awesome-ML-Papers/Embeddings",
+  "processed_at": "2026-06-08T12:00:00Z",
+  "agent": "agent_batch_generation",
+  "concepts": [
+    {
+      "finding": "SimCLR: simple contrastive learning framework. Key components: (1) composition of data augmentations critical, (2) learnable nonlinear projection head improves representation quality, (3) contrastive loss (NT-Xent) with large batch size and many negatives, (4) normalized embeddings + temperature scaling. Outperforms supervised methods on ImageNet with linear probe.",
+      "category": "ModelCandidate",
+      "implication": "Contrastive keyword embedding: two augmented views of same keyword (e.g., co-occurrence neighborhood dropout, synonym substitution) should have similar embeddings. Projection head (MLP) followed by contrastive loss. Large batch size important for many negatives.",
+      "open_question": "What keyword data augmentations produce effective positive pairs? Can SimCLR-style contrastive learning produce keyword embeddings without any labeled intents?",
+      "testable_hypothesis": "SimCLR-trained keyword embeddings (with neighborhood sampling and synonym substitution as augmentations) outperform word2vec embeddings for downstream intent clustering tasks."
+    }
+  ]
+}

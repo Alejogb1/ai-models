@@ -1,0 +1,148 @@
+{
+  "source": "12jun13_aromi_advances_behavioral_economics.pdf",
+  "source_group": "Web-Sources",
+  "processed_at": "2026-06-08",
+  "agent": "agent5_final",
+  "concepts": [
+    {
+      "finding": "Under some conditions it has even been shown that subjects\nachieve nearly full cooperation although the self-interest model predicts complete\ndefection (Isaac and Walker 1988, 1991; Ostrom and Walker 1991; Fehr and\nGächter 2000).2 However, as we will see in more detail in section 4, there are also\nt",
+      "category": "ModelCandidate",
+      "implication": "Can inform intent modeling for recommendation systems",
+      "open_question": "How to address the limitation described: Under some conditions it has even been shown that subjects\nachieve nearly full cooperation although the self-interest model predicts complete\ndefection (Isaac and Walker 1988, 1991; Ostrom and Walker ",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Con-\nsistent with this orientation, experimental economists have made a major invest-\nment in developing novel experimental methods that are suitable for addressing\neconomic issues and have achieved a virtual consensus among themselves on a\nnumber of important methodological issues.",
+      "category": "Experiment",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Psychological\nresearch shows that the effect of context on decision making can be powerful (see\nGoldstein and Weber 1995; Loewenstein 2001) and some recent experimental\neconomics studies have explored context effects too (Cooper et al.",
+      "category": "Experiment",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Studies of\nworker quit rates, suicide, and other behavioral measures show similar effects of\nrelative income and tie the happiness research to important economic phenomena\n(Clark and Oswald 1994, 1996; Frey and Stutzer 2002; Oswald 1997).",
+      "category": "BehavioralTests",
+      "implication": "Relevant for similarity-based retrieval and lookalike targeting",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Where It Began\nAlthough the primary purpose of this chapter is to review alternatives to EU, that\ntheory provides the natural point of departure since most of the theories I will be\ndiscussing can be understood as generalizations of this base theory.1 EU was ﬁrst\nproposed by Daniel Bernoulli (1738) ",
+      "category": "TargetConstruct",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Although they achieve it in different ways, there is one struc-\ntural similarity between these theories: each operates by assigning subjective\nweights—or utilities—to consequences; the value assigned to any given prospect\nis then determined by some function that combines these utilities with objecti",
+      "category": "ModelCandidate",
+      "implication": "Relevant for similarity-based retrieval and lookalike targeting",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "In\nsuch theories, it is common for problem context to be an important determinant of\nchoice-rule selection.",
+      "category": "FailureRisk",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "While some economists might be tempted to think that\nquestions about how reference points are determined sound more like psycholog-\nical than economic issues, recent research is showing that understanding the role\nof references points may be an important step in explaining real economic behav-\nior i",
+      "category": "FailureRisk",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "The development of these\nso called sign- and rank-dependent models demonstrates that important aspects of\nprospect theory can be captured within a formal model that is essentially conven-\ntional, without the need to invoke an editing phase.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Collectively, these studies show that models with s-shaped probability\ntransformations offer signiﬁcant predictive improvement over EU and outperform\nother rivals.",
+      "category": "Baseline",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "The movement toward longshots, and away from favorites, is so\npronounced that some studies show that conservatively betting on the favorite to\nshow (to ﬁnish ﬁrst, second, or third) in the last race is a proﬁtable bet despite the\ntrack’s take.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Essentially\nall economic models of changing tastes assume (as economists typically do) that\nsuch predictions are correct—that people have “rational expectations.” Loewenstein,\nO’Donoghue, and Rabin (2000), however, propose that, while people may antici-\npate the qualitative nature of their changing ",
+      "category": "LabelValidation",
+      "implication": "Can inform intent modeling for recommendation systems",
+      "open_question": "How to address the limitation described: Essentially\nall economic models of changing tastes assume (as economists typically do) that\nsuch predictions are correct—that people have “rational expectations.” Loewenstein,\nO’Donoghue, and Rabin (2",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Nor did he ﬁnd much correlation among any of these reported behav-\niors (see also Nyhus 1995).45 Chapman and Coups (1999) found that corporate\nemployees who chose to receive an inﬂuenza vaccination did have signiﬁcantly\nlower discount rates (as inferred from a matching task with monetary losses), bu",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "How to address the limitation described: Nor did he ﬁnd much correlation among any of these reported behav-\niors (see also Nyhus 1995).45 Chapman and Coups (1999) found that corporate\nemployees who chose to receive an inﬂuenza vaccination di",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Their research shows that behavioral inhibi-\ntion in one domain (for example, refraining from eating desirable food) reduces the ability to exert\nwillpower in another domain (for example, completing a taxing mental or physical task).",
+      "category": "BehavioralTests",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "For each\n211\nT I M E  D I S C O U N T I N G\n\ndomain, economists choose the utility function that is best able to incorporate the\nessential considerations for that domain, and then evaluate whether the inclusion\nof speciﬁc considerations improves the predictive or explanatory power of a\nmodel.",
+      "category": "Experiment",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Further, and somewhat surprisingly, judgments of fairness did not reliably\ndiscriminate between primary producers and middlemen, or between savings due\nto lower input prices and to improved efﬁciency.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "His research investigates participant\nbehavior in deﬁned contribution plans.",
+      "category": "BehavioralTests",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "His main research interests and publications\nare on behavioral issues of voluntary cooperation and punishment, wage formation,\nand incentive contracting.",
+      "category": "FailureRisk",
+      "implication": "Can inform intent modeling for recommendation systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "His main\ntopic of research is decision under uncertainty in situations where there is too little\ninformation for the generation of a Bayesian prior.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "His research includes developing formal theoretical models of fairness and\nrisk preferences, biases in predicting preferences, cognitive biases and inferential\nerrors, and procrastination and other forms of self-control problems.",
+      "category": "FailureRisk",
+      "implication": "Can inform intent modeling for recommendation systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    }
+  ]
+}

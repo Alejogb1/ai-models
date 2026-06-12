@@ -1,0 +1,148 @@
+{
+  "source": "Distributed Representations of Sentences and Documents.pdf",
+  "source_group": "Awesome-ML-Papers/Other",
+  "processed_at": "2026-06-08",
+  "agent": "agent5_final",
+  "concepts": [
+    {
+      "finding": "Finally, we achieve new state-of-the-art re-\nsults on several text classiﬁcation and sentiment\nanalysis tasks.",
+      "category": "Baseline",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "In\nthis space, “powerful” is closer to “strong” than to “Paris.”\nThe second advantage of the paragraph vectors is that they\ntake into consideration the word order, at least in a small\ncontext, in the same way that an n-gram model with a large\nn would do.",
+      "category": "Data",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Empirical results show that Para-\ngraph Vectors outperform bag-of-words models\nas well as other techniques for text representa-\ntions.",
+      "category": "Data",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Introduction\nText classiﬁcation and clustering play an important role\nin many applications, e.g, document retrieval, web search,\nspam ﬁltering.",
+      "category": "ModelCandidate",
+      "implication": "Applicable to user/item clustering for personalization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "This means that words “powerful,” “strong” and “Paris” are\nequally distant despite the fact that semantically, “power-\nful” should be closer to “strong” than “Paris.”\nIn this paper, we propose Paragraph Vector, an unsuper-\nvised framework that learns continuous distributed vector\nrepresentations for",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Following these successful techniques, researchers have\ntried to extend the models to go beyond word level\nto achieve phrase-level or sentence-level representa-\ntions (Mitchell & Lapata, 2010; Zanzotto et al., 2010;\nYessenalina & Cardie, 2011; Grefenstette et al., 2013;\nMikolov et al., 2013c).",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "The second\napproach, using a parse tree to combine word vectors, has\nbeen shown to work for only sentences because it relies on\nparsing.",
+      "category": "Data",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Further in the paper,\nwe will present experiments on several benchmark datasets\nthat demonstrate the advantages of Paragraph Vector.",
+      "category": "Data",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "For\nexample, on sentiment analysis task, we achieve new state-\nof-the-art results, better than complex methods, yielding a\nrelative improvement of more than 16% in terms of error\nrate.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "On a text classiﬁcation task, our method convincingly\nbeats bag-of-words models, giving a relative improvement\nof about 30%.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "In summary, the algorithm itself has two key stages: 1)\ntraining to get word vectors W, softmax weights U, b and\nparagraph vectors D on already seen paragraphs; and 2)\n“the inference stage” to get paragraph vectors D for new\nparagraphs (never seen before) by adding more columns\nin D and gradient des",
+      "category": "Data",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Distributed Representations of Sentences and Documents\nAdvantages of paragraph vectors:\nAn important ad-\nvantage of paragraph vectors is that they are learned from\nunlabeled data and thus can work well for tasks that do not\nhave enough labeled data.",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "First, they inherit an important\nproperty of the word vectors: the semantics of the words.",
+      "category": "Data",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "To achieve this, we benchmark\nParagraph Vector on two text understanding problems that\nrequire ﬁxed-length vector representations of paragraphs:\nsentiment analysis and information retrieval.",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "It\ncan be argued that this is because movie reviews are often\nshort and compositionality plays an important role in de-\nciding whether the review is positive or negative, as well as\nsimilarity between words does given the rather tiny size of\nthe training set.",
+      "category": "ModelCandidate",
+      "implication": "Relevant for similarity-based retrieval and lookalike targeting",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Our method performs better than all these baselines, e.g.,\nrecursive networks, despite the fact that it does not re-\nquire parsing.",
+      "category": "Baseline",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "This advantage makes our method more general\nthan some of the other approaches.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "The following experi-\nment on IMDB dataset demonstrates this advantage.",
+      "category": "Experiment",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "It achieves 7.42% which is another 1.3% absolute improve-\nment (or 15% relative improvement) over the best previous\nresult of (Wang & Manning, 2012).",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "The results show that Paragraph Vector works well and\ngives a 32% relative improvement in terms of error rate.",
+      "category": "Data",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    }
+  ]
+}

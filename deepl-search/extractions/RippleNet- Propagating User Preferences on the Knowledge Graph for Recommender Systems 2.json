@@ -1,0 +1,148 @@
+{
+  "source": "RippleNet- Propagating User Preferences on the Knowledge Graph for Recommender Systems 2.pdf",
+  "source_group": "Awesome-ML-Papers/CTR-CVR-Prediction",
+  "processed_at": "2026-06-08",
+  "agent": "agent5_final",
+  "concepts": [
+    {
+      "finding": "In summary, our contributions in this paper are as follows:\n• To the best of our knowledge, this is the first work to com-\nbine embedding-based and path-based methods in KG-aware\nrecommendation.",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Through extensive experiments\non real-world datasets, we demonstrate that RippleNet achieves\nsubstantial gains in a variety of scenarios, including movie, book\nand news recommendation, over several state-of-the-art baselines.",
+      "category": "Baseline",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "To address these\nlimitations, researchers have proposed incorporating side informa-\ntion into CF, such as social networks [9], user/item attributes [32],\nimages [43] and contexts [25].",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "How to address the limitation described: To address these\nlimitations, researchers have proposed incorporating side informa-\ntion into CF, such as social networks [9], user/item attributes [32],\nimages [43] and contexts [25].",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Embedding-based methods show high flexibility in utilizing KG\nto assist recommender systems, but the adopted KGE algorithms\nin these methods are usually more suitable for in-graph applica-\ntions such as link prediction than for recommendation [35], thus\nthe learned entity embeddings are less intuiti",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "The experiment results\nshow that RippleNet achieves AUC gains of 2.0% to 40.6%, 2.5%\nto 17.4%, and 2.6% to 22.4% in movie, book, and news recommen-\ndations, respectively, compared with state-of-the-art baselines for\nrecommendation.",
+      "category": "Baseline",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "To address the limitations of existing embedding-\nbased and path-based methods for knowledge-graph-aware recom-\nmendation, we propose RippleNet, an end-to-end framework that\nnaturally incorporates the knowledge graph into recommender\nsystems.",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "How to address the limitation described: To address the limitations of existing embedding-\nbased and path-based methods for knowledge-graph-aware recom-\nmendation, we propose RippleNet, an end-to-end framework that\nnaturally incorporates the",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "In general, existing KG-aware recommendation\ncan be classified into two categories:\nThe first category is embedding-based methods [32, 33, 43], which\npre-process a KG with knowledge graph embedding (KGE) [35] al-\ngorithms and incorporates the learned entity embeddings into a\nrecommendation framework",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "(2) In specific recommendation\nscenarios such as movie or book recommendations, relations can\nbe limited to scenario-related categories to reduce the size of ripple\nsets and improve relevance among entities.",
+      "category": "FailureRisk",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Vector o1u can be seen as\nthe 1-order response of useru’s click history Vu with respect to item\n\nitem 𝒗\nuser 𝒖\n𝑣\nuser click \nhistory 𝓥𝒖\n𝑣\n(𝒉, 𝒓) →𝒕\n……\n𝑣\n(𝒉, 𝒓) →𝒕\n……\npropagation\n∙∙∙\n∙∙∙\nKnowledge \ngraph\npropagation\n∙∙∙\nSeeds\nHop 1\nHop 2\nHop 𝐻\n𝑣\n(𝒉, 𝒓) →𝒕\n……\nuser \nembedding\nitem\nembedding\n𝐑𝐡\n𝐭\nsoftma",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Finally, the user embedding and\nitem embedding are combined to output the predicted clicking\nprobability:\nˆyuv = σ(uTv),\n(7)\nwhere σ(x) =\n1\n1+exp(−x) is the sigmoid function.",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Recently, researchers have proposed\na great many knowledge graph embedding methods, including\ntranslational distance models [3, 14] and semantic matching models\n[15, 19] (We will continue the discussion on KGE methods in Section\n3.6.3).",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "For\nexample, DADM [4] considers factors of specialty and date when\nassigning attention values to articles for recommendation; D-Attn\n[22] proposes an interpretable and dual attention-based CNN model\nthat combines review text and ratings for product rating predic-\ntion; DKN [33] uses an attention net",
+      "category": "ModelCandidate",
+      "implication": "Can inform intent modeling for recommendation systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Researchers have also\nproposed using memory networks in other tasks such as sentiment\nclassification [13, 26] and recommendation [5, 8].",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "We evaluate our method in two experi-\nment scenarios: (1) In click-through rate (CTR) prediction, we apply\nthe trained model to each piece of interactions in the test set and\noutput the predicted click probability.",
+      "category": "Experiment",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "The above findings empirically demonstrate that\nthe similarity of proximity structures of two items in the KG could\nassist in measuring their relatedness in RS.",
+      "category": "ModelCandidate",
+      "implication": "Relevant for similarity-based retrieval and lookalike targeting",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "RippleNet also achieves outstanding performance in top-K\nrecommendation as shown in Figures 5, 6, and 7.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "RippleNet overcomes the limitations of existing embedding-\nbased and path-based KG-aware recommendation methods by in-\ntroducing preference propagation, which automatically propagates\nusers’ potential preferences and explores their hierarchical inter-\nests in the KG.",
+      "category": "Data",
+      "implication": "Can inform intent modeling for recommendation systems",
+      "open_question": "How to address the limitation described: RippleNet overcomes the limitations of existing embedding-\nbased and path-based KG-aware recommendation methods by in-\ntroducing preference propagation, which automatically propagates\nusers’ potential",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Permission to make digital or hard copies of part or all of this work for personal or\nclassroom use is granted without fee provided that copies are not made or distributed\nfor profit or commercial advantage and that copies bear this notice and the full citation\non the first page.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Among recommenda-\ntion strategies, collaborative filtering (CF), which considers users’\nhistorical interactions and makes recommendations based on their\npotential common preferences, has achieved great success [12].",
+      "category": "ModelCandidate",
+      "implication": "Can inform intent modeling for recommendation systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "However, CF-based methods usually suffer from the sparsity of\nuser-item interactions and the cold start problem.",
+      "category": "FailureRisk",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "How to address the limitation described: However, CF-based methods usually suffer from the sparsity of\nuser-item interactions and the cold start problem.",
+      "testable_hypothesis": ""
+    }
+  ]
+}

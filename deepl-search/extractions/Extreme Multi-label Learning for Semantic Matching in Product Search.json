@@ -1,0 +1,15 @@
+{
+  "source": "Extreme Multi-label Learning for Semantic Matching in Product Search",
+  "source_group": "Awesome-ML-Papers/Ranking",
+  "processed_at": "2026-06-08T12:00:00Z",
+  "agent": "agent03_embeddings_mf_ranking_search_compiled",
+  "concepts": [
+    {
+      "finding": "Formulates product search as XMC: queries -> relevant products (labels). Tree-based XR-Linear (PECOS) model achieves 60.9% Recall@100 with 1.25ms latency vs DSSM's 36.2% with 3.13ms latency. Hierarchical linear models with n-gram TF-IDF features enable logarithmic inference time. Outperforms BERT-based encoders when latency is constrained.",
+      "category": "Model Candidate",
+      "implication": "Keyword-intent classification can be formulated as XMC: keywords = instances, intents = labels. Tree-based partitioning of the intent space enables logarithmic-time inference for large intent taxonomies. Sparse linear models (TF-IDF features) with hierarchical partitioning can match or exceed deep embedding models.",
+      "open_question": "Is the keyword-intent mapping better modeled as a flat XMC problem or a hierarchical classification?",
+      "testable_hypothesis": "Tree-based XMC (XR-Linear) on TF-IDF keyword features achieves competitive accuracy to deep embedding methods for keyword-to-intent assignment, with order-of-magnitude lower latency."
+    }
+  ]
+}

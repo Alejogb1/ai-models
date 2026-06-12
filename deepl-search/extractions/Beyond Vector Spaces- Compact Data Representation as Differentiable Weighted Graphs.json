@@ -1,0 +1,15 @@
+{
+  "source": "Beyond Vector Spaces- Compact Data Representation as Differentiable Weighted Graphs",
+  "source_group": "Awesome-ML-Papers/Embeddings",
+  "processed_at": "2026-06-08T12:00:00Z",
+  "agent": "agent_batch_generation",
+  "concepts": [
+    {
+      "finding": "Proposes differentiable weighted graphs (DWG) as an alternative to fixed vector embeddings. Graph structure and edge weights are learned end-to-end via backpropagation. DWGs capture asymmetric relationships that vector embeddings cannot. Achieves superior performance on graph reconstruction and link prediction tasks.",
+      "category": "ModelCandidate",
+      "implication": "Keyword relationships are inherently asymmetric (keyword A appears with B more often than B with A). Differentiable graphs can model asymmetric keyword-intent relationships better than symmetric vector embeddings.",
+      "open_question": "How important is asymmetry in keyword-intent relationships? Can asymmetric embeddings improve intent clustering quality?",
+      "testable_hypothesis": "An asymmetric embedding model (where keyword-to-intent score differs from intent-to-keyword) produces more accurate keyword-intent assignments than symmetric cosine similarity."
+    }
+  ]
+}

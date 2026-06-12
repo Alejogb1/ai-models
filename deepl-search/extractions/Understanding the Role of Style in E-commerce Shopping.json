@@ -1,0 +1,148 @@
+{
+  "source": "Understanding the Role of Style in E-commerce Shopping.pdf",
+  "source_group": "Awesome-ML-Papers/Shopping",
+  "processed_at": "2026-06-08",
+  "agent": "agent5_final",
+  "concepts": [
+    {
+      "finding": "For this module, recom-\nmendations are obtained through a two-pass ranking system: First,\nthe relevant candidate listings are generated using nearest neigh-\nbor search (called candidate set selection); second, candidate listings\nare re-ranked using a more expensive model to produce the final\nordered",
+      "category": "ModelCandidate",
+      "implication": "Relevant for similarity-based retrieval and lookalike targeting",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Both\napproaches, for the most part, end up rendering style in a nameless\nand un-interpretable manner, showing only how it can be used\nto improve overall recommendation accuracy, but imparts little\ninsight into how distinctive styles, or even the presence of style,\nimpacts the way buyers interact wit",
+      "category": "Experiment",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "In this paper, we propose a novel method that blends the best\nof both worlds: We leverage domain expertise to extract latent\nstyle embeddings in a supervised manner that preserves the inter-\npretability of the representation.",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "We use Faiss[15], a library for efficient similarity\nsearch, to retrieve the nearest neighbors for each listing in the style\nembedding space.",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "5.4\nSearch Behavior on Style\nWe further analyzed the search log data to specifically show the\npotential use cases of style in order to improve search ranking\nmodels.",
+      "category": "BehavioralTests",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "We train a supervised, style-aware deep neural\nnetwork that is shown to predict item style with high accuracy,\nwhile generating style-aware embeddings that can be used in down-\nstream recommendation tasks.",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Among our findings, we show that items with a strong\nStrength of Style (any style) are significantly correlated with more\nfavorites, and more purchases.",
+      "category": "ModelCandidate",
+      "implication": "Can inform intent modeling for recommendation systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Second, we take advantage of the fact that a small population\nof Etsy buyers are, in fact, familiar with different stylistic names,\nand use them in their search queries (e.g.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "4.2\nStyle Embeddings\nIn addition to style prediction, we describe an important, second\napplication of our model: the ability to extract low-dimensional,\nstyle-aware representations that can capture style succinctly.",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "In or-\nder to evaluate the effectiveness of stylistic similarity, we use the\nstyle embeddings in a production listing-to-listing recommenda-\ntions module that is served to live traffic.",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "We share in our analysis, based on\nover a year’s worth of transaction data and show that these findings\nare crucial to understanding how to more explicitly leverage style\nsignal in industry-scale recommender systems.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "KEYWORDS\nsupervised learning; embeddings; style; e-commerce; user behavior\nACM Reference Format:\nHao Jiang1*, Aakash Sabharwal2*, Adam Henderson2, Diane Hu2, Liangjie\nHong2.",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Permission to make digital or hard copies of all or part of this work for personal or\nclassroom use is granted without fee provided that copies are not made or distributed\nfor profit or commercial advantage and that copies bear this notice and the full citation\non the first page.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "At Etsy, an\nonline marketplace for handmade and vintage goods with over 30\nmillion diverse listings, the ability to capture style is particularly\nimportant as buyers often come to the site to find items that match\ntheir eclectic tastes.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "We also show that the\nmulti-modal style classifier achieves high accuracy over other com-\npetitive baselines on two labeled datasets, one derived from implicit\nfeedback, and the other produced by merchandising experts.",
+      "category": "LabelValidation",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "In recent years, many recommender systems have come to lever-\nage image-recognition methods to improve recommender systems\nby finding visually similar items to aid in product discovery [14, 34,\n36] or to understand user visual preferences to better personalize\nrecommended items [13, 23].",
+      "category": "ModelCandidate",
+      "implication": "Can inform intent modeling for recommendation systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Of greater relevance to our\nproposed work are those visual recommender systems that have\nbeen developed for the online fashion industry, where explicit cloth-\ning items (e.g.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "We also do so in\na supervised manner by leveraging domain expertise such that\nthe underlying system can give interpretable results, leading to\nmore explainable recommendations.",
+      "category": "LabelValidation",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Second, having decided on a consistent style\ndefinition and a set of style classes, significant time and domain\nexpertise is required to provide a manually annotated dataset.",
+      "category": "Experiment",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "For example, for a user who searched “art\ndeco ring\", the items the user clicked on, favorited, added-to-cart\nand purchased within the same search query session were assigned\nto the “art deco\" class.",
+      "category": "ModelCandidate",
+      "implication": "Can inform intent modeling for recommendation systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    }
+  ]
+}

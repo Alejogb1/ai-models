@@ -1,0 +1,15 @@
+{
+  "source": "Pre-trained Language Model for Web-scale Retrieval in Baidu Search",
+  "source_group": "Awesome-ML-Papers/Ranking",
+  "processed_at": "2026-06-08T12:00:00Z",
+  "agent": "agent_batch_generation",
+  "concepts": [
+    {
+      "finding": "Baidu uses dual-encoder architecture for web-scale retrieval: query encoder + document encoder, both initialized from pre-trained ERNIE. Key contributions: (1) knowledge distillation from cross-attention ranker to dual-encoder, (2) hard negative mining via teacher ranker, (3) asynchronous index refresh for fresh content. 8% improvement in recall@K.",
+      "category": "ModelCandidate",
+      "implication": "Knowledge distillation from cross-attention to dual-encoder can improve keyword embedding quality: train a cross-attention teacher (slow, accurate) on keyword-intent pairs, distill to dual-encoder student (fast, deployment-ready). Hard negatives from teacher improve embedding discrimination.",
+      "open_question": "Can cross-attention distillation improve keyword embedding quality for intent clustering? What teacher-student architecture is appropriate?",
+      "testable_hypothesis": "Knowledge distillation from a cross-attention keyword-intent model to a dual-encoder improves intent matching recall by 5%+ while maintaining embedding retrieval latency."
+    }
+  ]
+}

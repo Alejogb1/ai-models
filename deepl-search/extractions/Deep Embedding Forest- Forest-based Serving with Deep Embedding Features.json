@@ -1,0 +1,148 @@
+{
+  "source": "Deep Embedding Forest- Forest-based Serving with Deep Embedding Features.pdf",
+  "source_group": "Awesome-ML-Papers/CTR-CVR-Prediction",
+  "processed_at": "2026-06-08",
+  "agent": "agent5_final",
+  "concepts": [
+    {
+      "finding": "Afer comparing with a joint opti-\nmization algorithm called partial fuzziﬁcation, also proposed in this\npaper, it is concluded that the two-step Deep Embedding Forest has\nachieved near optimal performance.",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "2 sets up\nthe context of the application domain where the Deep Embedding\nForest is developed.",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "2\nSPONSORED SEARCH\nDeep Embedding Forest is discussed in the context of sponsored\nsearch of a major search engine.",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "A click is usually logged with other information\navailable at the run-time\nClick through rate: Total number of clicks over total num-\nber of impressions\nClick Prediction: A critical model of the platform that pre-\ndicts the likelihood a user clicks on a given ad for a given\nquery\nSponsored search is",
+      "category": "ModelCandidate",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Te complexity of embedding a sparse feature is O(n¯0ne), where\nn¯0 is the number of non-zero elements, and ne is the dimension\n2Te word prediction in this context refers to a general scoring operation that is\napplicable to classiﬁcation, regression, ranking, and so on\nFeature #1\nFeature #2\nFeature #",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Te problem\nis to predict the probability of click on an ad (see context in Sec.",
+      "category": "FailureRisk",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Secondly, our work is mainly motivated\nby obtaining eﬃcient prediction while maintaining high perfor-\nmance, whereas the principal motivation for pre-training in those\nprevious papers is mostly to achieve high-level abstraction.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Tis work proposes a\nDeep Embedding Forest model that beneﬁts from the best of both\nworlds.",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Built on top of a representative DNN model called Deep Cross-\ning [21], and two forest/tree-based models including XGBoost and\nLightGBM, a two-step Deep Embedding Forest algorithm is demon-\nstrated to achieve on-par or slightly beter performance as com-\npared with the DNN counterpart, with only a fr",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Experiments based on large\nscale data sets (up to 1 billion samples) from a major sponsored\nsearch engine proves the eﬃcacy of the proposed model.",
+      "category": "Experiment",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "DNNs\nhave been used as a powerful machine learning tool in both industry\nand research for its ability of automatic feature engineering on\nvarious kinds of raw data including but not limited to speech, text\nor image sources without acquiring domain expertises [8, 15, 20, 21].",
+      "category": "FailureRisk",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "However, the construction\nof strong abstracted features to make the raw data meaningful for\ntree-based models requires in depth domain knowledge and is ofen\ntime-consuming.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "How to address the limitation described: However, the construction\nof strong abstracted features to make the raw data meaningful for\ntree-based models requires in depth domain knowledge and is ofen\ntime-consuming.",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "3 gives examples of features in the context\nof the sponsored search.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "In brief, sponsored search is responsible\nfor showing ads alongside organic search results.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Te goal of the platform is to show the user the\nadvertisement that best matches the user’s intent, which was ex-\npressed mainly through a speciﬁc query.",
+      "category": "TargetConstruct",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "However, given the richness of the problem space, the various\ntypes of features, and the sheer volume of data, we think our results\ncan be generalized to other applications with similar scale.",
+      "category": "FailureRisk",
+      "implication": "Relevant for similarity-based retrieval and lookalike targeting",
+      "open_question": "How to address the limitation described: However, given the richness of the problem space, the various\ntypes of features, and the sheer volume of data, we think our results\ncan be generalized to other applications with similar scale.",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Feature name\nType\nDimension\nQery\nText\n49,292\nKeyword\nText\n49,292\nTitle\nText\n49,292\nMatchType\nCategory\n4\nCampaignID\nID\n10,001\nCampaignIDCount\nNumerical\n5\nTable 1: Examples of heterogeneous and high dimensional\nfeatures used in typical applications of sponsored search\n3\nFEATURE REPRESENTATION\nTis sect",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Te model signiﬁcantly exceeded the oﬄine AUC of a click\nprediction model in a major sponsored search engine.",
+      "category": "ModelCandidate",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Speciﬁcally, the search of the best structure and the corresponding\ndecision and weight parameters in the forest layer usually relies\non greedy approaches, which are not compatible with the gradient-\nbased search for the neural-based embedding layers.",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "First, a Deep Crossing model is trained with the input dataset to\ninitialize the embedding layers.",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    }
+  ]
+}

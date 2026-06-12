@@ -1,0 +1,15 @@
+{
+  "source": "Learning From Positive and Unlabeled Data- A Survey.pdf",
+  "source_group": "Awesome-ML-Papers/Surveys",
+  "processed_at": "2026-06-08",
+  "agent": "agent6_remaining",
+  "concepts": [
+    {
+      "finding": "PU learning addresses training with only positive labels and unlabeled data (which may contain both positives and negatives). Key approaches: treating unlabeled as negative with class prior correction, biased SVM, risk-estimation-based methods.",
+      "category": "Data",
+      "implication": "PU learning is directly applicable to search where we observe clicks (positive) but lack explicit negative feedback; unclicked documents may be irrelevant or unseen.",
+      "open_question": "How should the class prior (fraction of positives in unlabeled data) be estimated for click-based search logs?",
+      "testable_hypothesis": "A PU learning approach with estimated class prior will improve search ranking NDCG by 5%+ over treating unclicked items as negative examples."
+    }
+  ]
+}

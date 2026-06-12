@@ -1,0 +1,1242 @@
+RecWalk: Nearly Uncoupled Random Walks
+for Top-N Recommendation
+Athanasios N. Nikolakopoulos
+Digital Technology Center, University of Minnesota
+anikolak@umn.edu
+George Karypis
+Computer Science & Engineering, University of Minnesota
+karypis@umn.edu
+ABSTRACT
+Random walks can provide a powerful tool for harvesting the rich
+network of interactions captured within item-based models for top-
+n recommendation. They can exploit indirect relations between
+the items, mitigate the effects of sparsity, ensure wider itemspace
+coverage, as well as increase the diversity of recommendation lists.
+Their potential however, is hindered by the tendency of the walks to
+rapidly concentrate towards the central nodes of the graph, thereby
+significantly restricting the range of K-step distributions that can
+be exploited for personalized recommendations. In this work we
+introduce RecWalk; a novel random walk-based method that lever-
+ages the spectral properties of nearly uncoupled Markov chains to
+provably lift this limitation and prolong the influence of users’
+past preferences on the successive steps of the walk—allowing the
+walker to explore the underlying network more fruitfully. A com-
+prehensive set of experiments on real-world datasets verify the
+theoretically predicted properties of the proposed approach and
+indicate that they are directly linked to significant improvements
+in top-n recommendation accuracy. They also highlight RecWalk’s
+potential in providing a framework for boosting the performance of
+item-based models. RecWalk achieves state-of-the-art top-n recom-
+mendation quality outperforming several competing approaches,
+including recently proposed methods that rely on deep neural net-
+works.
+ACM Reference Format:
+Athanasios N. Nikolakopoulos and George Karypis. 2019. RecWalk: Nearly
+Uncoupled Random Walks for Top-N Recommendation. In The Twelfth
+ACM International Conference on Web Search and Data Mining (WSDM ’19),
+February 11–15, 2019, Melbourne, VIC, Australia. ACM, New York, NY, USA,
+9 pages. https://doi.org/10.1145/3289600.3291016
+1
+INTRODUCTION
+Top-n recommendation algorithms provide ranked lists of items
+tailored to the particular tastes of the users, as depicted by their
+past interactions within the system. Over the past years they have
+become an indispensable component of most e-commerce applica-
+tions as well as content delivery platforms.
+Item-based methods are among the most popular approaches for
+top-n recommendation [11, 33, 38]. Such methods work by building
+Permission to make digital or hard copies of all or part of this work for personal or
+classroom use is granted without fee provided that copies are not made or distributed
+for profit or commercial advantage and that copies bear this notice and the full citation
+on the first page. Copyrights for components of this work owned by others than the
+author(s) must be honored. Abstracting with credit is permitted. To copy otherwise, or
+republish, to post on servers or to redistribute to lists, requires prior specific permission
+and/or a fee. Request permissions from permissions@acm.org.
+WSDM ’19, February 11–15, 2019, Melbourne, VIC, Australia
+© 2019 Copyright held by the owner/author(s). Publication rights licensed to ACM.
+ACM ISBN 978-1-4503-5940-5/19/02...$15.00
+https://doi.org/10.1145/3289600.3291016
+a model that captures the relations between the items, which is then
+used to recommend new items that are “close” to the ones each user
+has consumed in the past. Item-based models have been shown
+to achieve high top-n recommendation accuracy [33, 38] while
+being scalable and easy to interpret [11]. The fact, however, that
+they typically consider only direct inter-item relations can impose
+fundamental limitations to their quality and make them brittle to
+the presence of sparsity—leading to poor itemspace coverage and
+significant decay in performance [3]. Random-walk-based methods
+are particularly well-suited for alleviating such problems. Having
+the innate ability to relate items that are not directly connected by
+propagating information along the edges of the underlying graph,
+random walk methods are more robust to the effects of sparsity and
+they can afford better coverage of the itemspace. However their
+effectiveness in terms of top-n recommendation can be limited by
+the tendency of the walks to concentrate probability mass towards
+the central nodes of the graph—thus disproportionately boosting the
+recommendation scores of popular items in the system. This means
+that in order to produce high quality recommendations random-
+walk-based techniques are restricted to exploit just the first few
+steps of the walk that are still influenced by the personalized starting
+distribution. This is in accordance to the mathematical properties
+of random walks and it has also been empirically verified that
+when applied to real-world networks, short-length random walks
+typically work best [7, 8, 12].
+In this work we introduce RecWalk; a novel framework for
+top-n recommendations that aims to combine the potential of item-
+based models to discern meaningful relations between the items,
+with the inherent ability of random walks to diffuse these relations
+across the itemspace and exploit the rich network of interactions
+they shape. RecWalk produces recommendations based on a random
+walk with node-dependent restarts designed to prolong the influence
+of the personalized initialization on the successive K-step landing
+probabilities of the walk—thereby eliminating the need of clipping
+the walks early. Intuitively, this gives the walker “more time” to
+harvest the information captured within the item model before suc-
+cumbing to the “pull” of central nodes. The advocated random walk
+construction leverages the spectral properties of nearly uncoupled
+Markov chains [9] in order to enforce a time-scale dissociation of the
+stochastic dynamics of the walk towards equilibrium—thus increas-
+ing the number of successive landing probabilities that carry person-
+alized information useful for top-n recommendation. The properties
+of our model are backed by rigorous theoretical analysis of the mix-
+ing characteristics of the walk which we empirically verify that are
+indeed intertwined with top-n recommendation accuracy. A com-
+prehensive set of experiments on real-world datasets showcase the
+potential of the proposed methodology in providing a framework
+for boosting the performance of item models. RecWalk achieves
+WSDM ’19, February 11–15, 2019, Melbourne, VIC, Australia
+Nikolakopoulos and Karypis
+high recommendation quality outperforming state-of-the-art com-
+peting approaches, including recently proposed methods relying on
+deep neural networks. Open source implementation of the method
+is available at: https://github.com/nikolakopoulos/RecWalk.
+2
+PROPOSED METHOD
+Definitions. Let U = {1, . . . ,U } be a set of users and I = {1, . . . , I}
+a set of items. Let R ∈RU ×I be the user-item interaction matrix;
+i.e. the matrix whose ui-th element is 1 if user u has interacted
+with item i, and 0 otherwise. Each user u ∈U is modeled by a
+vector rTu ∈RI which coincides with the corresponding row of the
+user-item interaction matrix R; similarly, each item i ∈I will be
+modeled by a vector ri ∈RU which coincides with the correspond-
+ing column of matrix R. The rows and columns of R are assumed
+to be non-zero; i.e. every user has interacted with at least one item,
+and for every item there exists at least one user who has interacted
+with it. Finally, we use the term item model to refer to a matrix
+W ∈RI×I the ij-th element of which gives a measure of proximity
+or similarity between items i and j.
+2.1
+Random Walks and Item Models
+The fundamental premise of the present work is that combining
+random walks and item models allows for more effective utilization
+of the information captured in the item model; considering direct as
+well as transitive relations between the items, and also alleviating
+sparsity related problems. However directly applying random walks
+on item models can lead to a number of problems that arise from
+their inherent mathematical properties and the way these relate to
+the underlying top-n recommendation task.
+Imagine of a random walker “jumping” from node to node on
+an item-to-item graph with transition probabilities proportional to
+the inter-item proximity scores depicted by an item model. If the
+starting distribution of this walker reflects the items consumed by
+a particular user u in the past, the probability the walker “lands”
+on different nodes after K steps provide an intuitive measure of
+proximity that can be used to rank the nodes and recommend items
+to user u accordingly.
+Specifically, if W denotes the item model and S ≜Diag(W1)−1W
+the transition probability matrix of the walk, personalized recom-
+mendations for each user u can be produced e.g. by utilizing the
+K-step landing probability distributions of a walk rooted on the items
+consumed by u:
+πT
+u ≜ϕT
+uSK,
+ϕT
+u ≜
+rT
+u
+∥rTu ∥1
+(1)
+or by computing the stationary distribution of a random walk with
+restarts on S, using ϕTu as the restarting distribution. The latter
+approach is the well-known personalized PageRank model [34] with
+teleportation vector ϕTu and damping factor p, and its stationary
+distribution can be expressed [22] as
+πT
+u ≜ϕT
+u
+∞
+Õ
+k=0
+(1 −p)pkSk .
+(2)
+Clearly, both schemes harvest the information captured in the K-
+step landing probabilities {ϕTuSk }k=0,1,.... In the former case, the
+recommendations are produced by using a fixed K; in the latter case
+they are computed as a weighted sum of all landing probabilities,
+with the K-step’s contribution weighted by (1 −p)pk. But, how
+do these landing probabilities change as the number of steps K
+increases? For how long will they still be significantly influenced
+by user’s prior history as depicted in ϕTu?
+When S is irreducible and aperiodic—which is typically the case
+in practice—the landing probabilities will converge to a unique lim-
+iting distribution irrespectively of the initialization of the walk [15].
+This means that for large enough K the K-step landing probabil-
+ities will no longer be “personalized” in the sense that they will
+become independent of the user-specific starting vector ϕTu. Fur-
+thermore, long before reaching equilibrium, the usefulness of these
+vectors in terms of recommendation will start to decay as more and
+more probability mass gets concentrated to the central nodes of
+the graph—thereby restricting the number of landing probability
+distributions that are helpful for personalized recommendation.
+This imposes a fundamental limitation to the ability of the walk to
+properly exploit the information encoded in the item model.
+Motivated by this, here we propose RecWalk; a novel random-
+walk model designed to give control over the stochastic dynamics
+of the walk towards equilibrium; provably, and irrespectively of
+the dataset or the specific item model onto which it is applied. In
+RecWalk the item model is incorporated as a direct inter-item tran-
+sition component of a walk on the user-item bipartite network. This
+component is followed by the random walker with a fixed proba-
+bility determined by a model parameter that controls the spectral
+characteristics of the underlying walk. This allows for effective ex-
+ploration of the item model while the influence of the personalized
+initialization on the successive landing probability distributions
+remains strong. Incorporating the item model in a walk on the
+user-item graph (instead of the item graph alone) is crucial in pro-
+viding control over the mixing properties; and as we will see in
+the experimental section of this work such mixing properties are
+intimately linked with top-n recommendation accuracy.
+2.2
+The RecWalk Stochastic Process
+We define G ≜({U, I}, E) to be the user-item bipartite network; i.e
+the network with adjacency matrix AG ∈R(U +I)×(U +I) given by
+AG ≜
+ 0
+R
+RT
+0
+
+.
+(3)
+Consider a random walker jumping from node to node on G. Sup-
+pose the walker currently occupies node c ∈U ∪I. In order to
+determine her next step transition she flips a biased coin that yields
+heads with probability α and tails with probability (1 −α):
+(1) If it turns heads, then:
+(a) if c ∈U, the walker jumps to one of the items rated by
+the user corresponding to node c uniformly at random;
+(b) if c ∈I, the walker jumps to one of the users that have
+rated the current item uniformly at random;
+(2) If it turns tails, then:
+(a) if c ∈U, the walker stays put;
+(b) if c ∈I, the walker jumps to a related item abiding by
+an inter-item transition probability matrix (to be explicitly
+defined in the following section).
+The stochastic process that describes this random walk is defined
+to be a homogeneous discrete time Markov chain with state space
+RecWalk
+WSDM ’19, February 11–15, 2019, Melbourne, VIC, Australia
+U ∪I; i.e. the transition probabilities from any given node c to the
+other nodes are fixed and independent of the nodes visited by the
+random walker before reaching c.
+2.3
+The Transition Probability Matrix
+The transition probability matrix P that governs the behavior of
+our random walker can be usefully expressed as a weighted sum of
+two stochastic matrices H and M as
+P ≜αH + (1 −α)M
+(4)
+where 0 < α < 1, is a parameter that controls the involvement of
+these two components in the final model. Matrix H can be thought
+as the transition probability matrix of a simple random walk on the
+user-item bipartite network. Since every row and column of matrix
+R are non zero, matrix H is well-defined and it can be expressed as
+H ≜Diag(AG1)−1AG.
+(5)
+Matrix M, is defined as
+M ≜
+I
+0
+0
+MI
+
+(6)
+where I ∈RU ×U the identity matrix and MI ∈RI×I an inter-item
+transition probability matrix designed to capture relations between
+the items. In particular, given an item model with non-negative
+weights W we define this matrix using the following stochasticity
+adjustment strategy:
+MI ≜
+1
+∥W∥∞
+W + Diag(1 −
+1
+∥W∥∞
+W1).
+(7)
+The first term divides all the elements by the maximum row-sum
+of W and the second enforces stochasticity by adding residuals to
+the diagonal, appropriately. The motivation behind this definition
+is to retain the information captured by the relative differences of
+the inter-item relations in W, ensuring that [W]ij ≥[W]i′j′ ⇒
+[MI]ij ≥[MI]i′j′ for all i , j,i′ , j′. This prevents items that
+are loosely related to the rest of the itemspace to disproportion-
+ately influence the inter-item transitions and introduce noise to the
+model.
+2.3.1
+Choice of the core Item-model. The construction of matrix W
+itself can be approached in several ways depending on the available
+information, the characteristics of the underlying recommendation
+problem, the properties of matrix R, etc. The fact that random walk
+methods can achieve naturally item-space coverage allows us to
+define this component in a way that enforces locality in the relations
+between the items, having also the advantage to be easy to compute.
+In particular, we propose the use of a locally restricted variant
+of the well-known SLIM method [33] that is forced to consider
+only fixed-size neighborhoods when learning relations between
+the items. Concretely, for any given item i we find the set of its C
+closest neighbors (in terms of cosine similarity between their vector
+representations) and we form a matrix Ni ∈RI×C, by selecting the
+corresponding columns of the initial matrix R. We then solve for
+each item the optimization problem
+minimize
+x∈RC
+1
+2 ∥ri −Nix∥2
+2 + γ1∥x∥1 + 1
+2γ2∥x∥2
+2
+subject to
+x ≥0
+(8)
+and we fill the corresponding elements in the i-th column of matrix
+W. The complete procedure for building the RecWalk model is
+given in Algorithm 1.
+2.4
+Recommendation Strategies
+Having defined the RecWalk transition probability matrix we can
+produce recommendations by exploiting the information captured
+in the successive landing probability distributions of a walk initial-
+ized in a user-specific way. Here, we will consider two recommen-
+dation strategies; namely
+RecWalkK-step: The recommendation score of user u for item
+i is defined to be the probability the random walker lands
+on node i after K steps, given that she started on node u.
+Therefore the recommendation score for item i is given by
+the corresponding elements of
+πT
+u ≜eT
+uPK
+(9)
+where eu ∈RU +I is a vector that contains the element 1 on
+the position that corresponds to user u and zeros elsewhere.
+The computation of the recommendations is presented in
+Algorithm 2 and it entails Θ(K nnz(P)) operations, where
+nnz(P) is the number of nonzero elements in P.
+RecWalkPR: The recommendation score of user u for item i
+is defined to be the element that corresponds to item i in the
+limiting distribution of a random walk with restarts on P,
+with damping factor η and teleportation distribution eu:
+πT
+u ≜lim
+K→∞eT
+u(ηP + (1 −η)1eT
+u)K .
+(10)
+This can be computed based on the power method as in Al-
+gorithm 3. Producing recommendations for a user involves
+Θ((logϵ/logη) nnz(P)) floating point operations for conver-
+gence up to a tolerance ϵ [28].
+2.5
+Theoretical Properties
+As we will show in the rest of this section, a key property of the
+RecWalk model is that for small values of parameter α the RecWalk
+chain is going to be nearly uncoupled into a large number of blocks,
+thereby allowing the random walk process dynamics towards equi-
+librium to disentangle into a slow-mixing and a fast-mixing com-
+ponent. This implies personalized landing probabilities even when
+the number of steps gets large.
+2.5.1
+Nearly Uncoupled Markov Chains. A nearly uncoupled Markov
+chain is a discrete time chain whose transition probability matrix is
+almost block diagonal [9, 41]. Formally, let Z ∈Rn×n be the transi-
+tion probability matrix of an irreducible and aperiodic Markov chain.
+Matrix Z can always be written as Z = Z⋆+εC, where Z⋆is a block-
+diagonal matrix of order n, given by Z⋆= Diag(Z⋆
+11, Z⋆
+22, . . . , Z⋆
+LL);
+and matrices Z⋆
+II are irreducible stochastic matrices of order n(I).
+Hence, n = ÍL
+I=1 n(I) , and because both Z and Z⋆are stochastic,
+the row-sums of C are zero.
+WSDM ’19, February 11–15, 2019, Melbourne, VIC, Australia
+Nikolakopoulos and Karypis
+Algorithm 1 RecWalkModel
+Input: Implicit feedback matrix R, parameters: α, γ1, γ2, C.
+Output: RecWalk transition probability matrix P.
+parfor i ∈I do
+Find the C nearest neighbors of item i and form Ni
+minimize
+x∈RC
+1
+2 ∥ri −Nix∥2
+2 + γ1∥x∥1 + 1
+2γ2∥x∥2
+2
+subject to
+x ≥0
+Fill the corresponding elements in the i−th column of W.
+end parfor
+MI ←
+1
+∥W∥∞W + Diag(1 −
+1
+∥W∥∞W1)
+AG ←
+ 0
+R
+RT
+0
+
+P ←α Diag(AG1)−1AG + (1 −α)
+I
+0
+0
+MI
+
+Matrix C and the non-negative real number ε are chosen such
+that for all rows
+ε = max
+mI
+Õ
+J,I
+n(J)
+Õ
+l=1
+ZmI lJ
+(11)
+ε
+Õ
+J,I
+n(J)
+Õ
+l=1
+CmI lJ =
+Õ
+J,I
+n(J)
+Õ
+l=1
+ZmI lJ
+(12)
+where we use ZmI lJ to denote the element at the intersection of
+the m-th row and l-th column of the ZI J submatrix of Z.
+Parameter ε is referred to as the maximum degree of coupling
+between the blocks. When ε is sufficiently small, the Markov chain
+with transition probability matrix Z is called nearly uncoupled into
+L blocks [9].
+2.5.2
+Mixing properties of RecWalk. Since the discrete time Markov
+chain defined by P is finite and aperiodic,1 as the number of steps
+K increases the landing probabilities of RecWalk will converge to
+a limiting distribution. It is well known (see e.g.[42]) that the rate
+of convergence to this distribution depends on the modulus of the
+subdominant eigenvalue of the transition probability matrix of the
+walk. In particular, the asymptotic rate of convergence to the limit-
+ing distribution is the rate at which |λ2(P)|k →0. Intuitively, the
+smaller |λ2(P)| is, the sooner the landing probability distributions
+will start yielding recommendation vectors that are “unpersonal-
+ized,” in the sense that they are the same for all users irrespectively
+of the items with which they have interacted.
+The following theorem sheds more light to the spectral properties
+of matrix P.
+Theorem 2.1. Let P be the RecWalk transition probability matrix
+with α ∈(0, 1) defined over a connected user-item network G, and
+also let λ(P) be the set of the eigenvalues of P. Irrespectively of the
+item model used to define matrix MI it holds
+(a) 1 −2α ∈λ(P)
+(b) when α is small enough the Markov chain with transition
+probability matrix P will be nearly uncoupled into at least
+U + 1 blocks.
+1Note that aperiodicity is ensured by the nonzero diagonal of M (see e.g. [27]).
+Algorithm 2 RecWalkK-step
+Input: RecWalk model P, user u ∈U.
+Output: Recommendation vector πu.
+πTu ←eTu
+for k ∈1, . . . , K do
+πTu ←πTuP
+end for
+Algorithm 3 RecWalkPR
+Input: RecWalk model P, user u ∈U, damping factor η.
+Output: Recommendation vector πu.
+xT
+(0) ←eTu
+k ←0
+repeat
+k ←k + 1
+xT
+(k) ←ηxT
+(k−1)P + (1 −η)eTu
+Normalize xT
+(k)
+until ∥xT
+(k) −xT
+(k−1)∥1 < tol
+πu ←x(k)
+Proof. When G is connected, matrix H is irreducible [22]. Fur-
+thermore, since the graph is bipartite a simple random walk on G
+results in a periodic Markov chain with period d = 2. Therefore,
+from the Perron-Frobenius theorem [15] we get that
+λ1(H) = 1,
+and
+λ2(H) = e2iπ/d = eiπ = −1.
+The so-called Perron eigenvalue λ1(H) is associated with the right
+eigenvector 1; whereas eigenvalue λ2(H) with a right eigenvector
+which we denote v.
+The special structure of H makes it easy to guess the form of
+the eigenvector v as well as to verify that it actually denotes an
+eigenvector of matrix M too. In particular, we have
+v ≜[
+|U | user nodes
+z                 }|                 {
+1
+1
+1
+· · ·
+1
+|I | item nodes
+z                     }|                     {
+−1
+−1
+· · ·
+−1].
+It is easy to see that v is indeed an eigenvector of both matrices H
+and M. In particular, we have
+Hv =
+ 0
+H12
+H21
+0
+  1U
+−1I
+
+=
+−1U
+1I
+
+= −v
+(13)
+from which we get that (−1, v) is an eigenpair of matrix H; and
+Mv =
+
+1U
+−MI1I
+
+= v
+(14)
+which implies that (1, v) is an eigenpair of matrix M.
+Now consider a non-singular matrix, Q ≜ 1
+v
+X , which
+contains in its first two columns the eigenvectors 1 and v. Also let
+Q−1 ≜
+©­­
+«
+yT
+1
+yT
+2
+YT
+ª®®
+¬
+.
+(15)
+RecWalk
+WSDM ’19, February 11–15, 2019, Melbourne, VIC, Australia
+By definition it holds Q−1Q = I, which can be usefully written as
+©­­
+«
+yT
+11
+yT
+1v
+yT
+1X
+yT
+21
+yT
+2v
+yT
+2X
+YT1
+YTv
+YTX
+ª®®
+¬
+=
+©­­
+«
+1
+0
+0
+0
+1
+0
+0
+0
+I
+ª®®
+¬
+.
+(16)
+Now, if we consider the similarity transformation of the RecWalk
+transition probability matrix, Q−1PQ, also taking into consideration
+(13), (14) and the identities (16), we have
+Q−1PQ
+=
+Q−1 (αH + (1 −α)M) Q = · · · =
+=
+©­­
+«
+1
+0
+αyT
+1HX + (1 −α)yT
+1MX
+0
+1 −2α
+αyT
+2HX + (1 −α)yT
+2MX
+0
+0
+αYTHX + (1 −α)YTMX
+ª®®
+¬
+(17)
+from which we directly establish that 1 −2α is an eigenvalue of
+matrix P, and the first part of the theorem is proved.
+To prove the second part it suffices to show that there exists
+a partition of the state space into blocks such that the maximum
+probability of leaving a block upon a single transition is upper-
+bounded by α [41]. In particular, consider the partition
+A ≜{{u1}, {u2}, . . . , {uU }, I}.
+(18)
+By definition, in the RecWalk model the probability of leaving u is
+equal to α, for all u ∈U. Concretely,
+Pr{jump from u ∈U to any j , u} =
+Õ
+j,u
+Puj =
+Õ
+j,u
+αHuj = α.
+Similarly, the probability of leaving block I upon a transition is
+Pr{jump from i ∈I to any ℓ< I} =
+Õ
+ℓ<I
+Piℓ=
+Õ
+ℓ<I
+αHiℓ= α.
+Therefore, the RecWalk chain can always be decomposed accord-
+ing to A such that the maximum degree of coupling between the
+involved blocks is exactly equal to α. Hence, choosing α to be suffi-
+ciently small ensures that the chain will be nearly uncoupled into
+(at least) U + 1 blocks.
+□
+Theorem 2.1 asserts that the proposed random walk construc-
+tion ensures the existence of an eigenvalue equal to 1 −2α. This
+means that the modulus of the eigenvalue that determines the rate
+of convergence to the limiting distribution will be at least 1 −2α.
+Hence, choosing α allows us to ensure that the RecWalk process
+will converge as slow as we need to increase the number of landing
+probability distributions that can still serve as personalized recom-
+mendation vectors in our model—irrespectively of the particular
+user-item network or the chosen item model upon which it is built.
+Moreover note that the spectral “fingerprint” of nearly uncoupled
+Markov chains is the existence of a set of subdominand eigenvalues
+that are relatively close (but not equal) to 1 [9]. In our case, for
+small values of α these eigenvalues are expected to be clustered
+close to the value 1 −α (cf. (17)). The number of these eigenvalues
+depicts the number of blocks of states into which the chain is nearly
+uncoupled. Therefore, subject to α being small the RecWalk chain
+will have at least U + 1 eigenvalues “clustered” around the value 1,
+which means that matrix P can be expressed as
+P = 1πT + Tslow + Tfast
+(19)
+where πT is the stationary distribution of the walk, Tslow is a slow
+transient component, and Tfast is a fast transient component (see
+[41] for details). As K gets large the fast transient term will diminish
+while the elements of the slow transient term will remain large
+enough to ensure that the recommendation vectors are not com-
+pletely dominated by 1πT. Of course, as K gets larger and larger
+the relative influence of the first term will become stronger and
+stronger, up to the point where each user is assigned the exact
+same recommendation vector πT; however this outcome will be
+delayed by the existence of the slow transient term Tslow. Note that
+in a simple random walk on W such time-scale dissociation of the
+stochastic dynamics of the walk is typically absent; and certainly it
+cannot be guaranteed in advance. On the contrary, the proposed
+random walk construction in RecWalk provides a clear mechanism
+to ensure such property, and as we will see in the experimental
+section of this paper this property alone can lead to significant
+improvements in top-n recommendation quality compared to what
+one would get by using the item model directly.
+3
+RELATED WORK
+Over the past decade a vast number of algorithms have been pro-
+posed to tackle the top-n recommendation task. These include
+neighborhood-based methods [11, 33]; latent-space methods [10,
+18, 21, 31, 43]; graph-based methods [7, 8, 20]; and more recently
+methods relying on deep neural networks [17, 23, 44]. Recom-
+mendation methods relying on random walks have also been de-
+ployed in several large-scale industrial settings with remarkable
+success [12, 14, 16]. RecWalk combines item-models with random
+walks, and therefore lies at the intersection between neighborhood-
+and graph-based methods; the inter-item transition component cap-
+tures the neighborhoods of the items which are then incorporated
+on a random walk framework to produce recommendations.
+The construction of RecWalk is inspired by the properties of
+nearly uncoupled Markov chains. The analysis of nearly uncoupled
+systems—also referred to as nearly decomposable systems—has been
+pioneered by Simon [40], who reported on state aggregation in
+linear models of economic systems. However, the universality of
+Simon’s ideas has permitted the theory to be used with significant
+success in the analysis of complex systems arising in social sciences
+and economics [4, 35, 37], evolutionary biology [39], cognitive sci-
+ence [24, 25], administrative sciences and management [45, 46], etc.
+The introduction of these ideas in the fields of computer science and
+engineering can be traced back to Courtois [9] who applied Simon’s
+theory in the performance analysis of computer systems. More re-
+cently near decomposability has been recognized as a property of
+the Web [19] and it has inspired the development of algorithms
+for faster computation of PageRank [6, 47] (building on a large
+body of related research in the field of numerical linear algebra; see
+e.g. [26, 41, 42]) as well as the development of new network central-
+ity measures [13, 29, 32]. In the field of recommender systems the
+notion of decomposability has inspired the development of methods
+for incorporating meta-information about the items [30] with the
+blocks chosen to highlight known structural/organizational proper-
+ties of the underlying itemspace. Here, on the contrary, we exploit
+decomposability in the “time-domain” with the blocks defined to
+separate the short-term from the long-term temporal dynamics of
+the walk in order to effect the desired mixing properties that can
+lead to improved recommendation performance.
+WSDM ’19, February 11–15, 2019, Melbourne, VIC, Australia
+Nikolakopoulos and Karypis
+4
+EXPERIMENTAL SETTING
+4.1
+Datasets
+Our experimental evaluation is based on three real-world pub-
+licly available datasets; namely (i) the movielens dataset (obtained
+from [1]) which contains the ratings of 6,040 users for 3,706 movies
+and it has been used extensively for the evaluation of top-n rec-
+ommendation methods; (ii) the yahoo dataset (obtained from [31])
+which is a subset of the Yahoo!R2Music dataset [2] containing the
+ratings of 7,307 users for 3,312 songs; and (iii) the pinterest dataset
+(obtained from [17]) which captures the interactions of 55,187 users
+regarding 9,916 images where each interaction denotes whether
+the user has “pinned” the image to her own board.
+4.2
+Evaluation Methodology and Metrics
+To evaluate the top-n recommendation performance, we adopted
+the widely used leave-one-out evaluation protocol [17, 21, 31, 33, 36].
+In particular, for each user we randomly select one item she liked2
+and we create a test set T. The rest of the dataset is used for training
+the models. For model selection we repeat the same procedure on
+the training data and we create a validation set V; and for each
+method considered we explore the hyperparameter space to find
+the model that yields the best performance in recommending the
+items in V, and then we evaluate its out-of-sample performance
+based on the held-out items in T. For the evaluation we consider
+for each user her corresponding test item alongside 999 randomly
+sampled unseen items and we rank the 1000 item lists based on the
+recommendation scores produced by each method. During training
+of all competing methods we consider only binary feedback.
+The evaluation of the top-n recommendation performance is
+based on three widely used ranking-based metrics; namely the hit
+ratio (HR@n), the average reciprocal hit rank (ARHR@n), and the
+truncated normalized discounted cumulative gain (NDCG@n) over
+the set of users (due to space constraints we refer the reader to [23,
+31] for a detailed definition). For each user, all metrics compare the
+predicted rank of the held-out item with the ideal recommendation
+vector which ranks the held-out item first among the items in each
+user’s test-set list. For all competing methods we get the predicted
+rank by sorting the recommendation scores that correspond to
+the items included in each user’s test-set list. While HR@n gives
+a perfect score if the held-out item is ranked within the first n,
+ARHR@n and NDCG@n use a monotonically increasing discount
+to emphasize the importance of the actual position of the held-out
+item in the top-n recommendation list.
+5
+EXPERIMENTAL RESULTS
+5.1
+Effect of Parameter α
+The theoretical analysis of our method suggests that parameter α
+controls the convergence properties of the RecWalk process and
+it can be chosen to enable a time-scale dissociation of the stochas-
+tic dynamics towards equilibrium that ensures a larger number
+2When rating information is available in the original data, the per-user target item is
+randomly sampled among the highest rated items of each particular user in order to
+ensure that it indeed denotes an item that the user liked. Such approach is in accordance
+with the methodology described in the seminal papers [10, 21]; in our setting, however,
+all users are equally represented in the testset.
+of personalized landing distributions. Here we verify experimen-
+tally3 the predicted properties and we evaluate their effect on the
+recommendation quality of the K-step landing probabilities.
+We build the item model W that yields the best performance
+on the validation set (γ1 = 10,γ2 = 10,C = 0.1|I|) and we use it
+to create matrix MI as in (7). We then build the RecWalk model,
+we run it for different values of α ranging from 0.005 to 0.5, and
+we report: (i) the performance in terms of average NDCG@n (for
+n = 10) across all users for values of steps K up to 30 (Fig.1-A); (ii)
+the spectra of the corresponding transition probability matrices P
+(Fig.1-B); (iii) the peak performance per parameter α along with the
+step for which it was achieved (Fig.1-C); and (iv) the performance of
+RecWalk with respect to using the base model W directly (Fig.1-D).
+We find that as the value of α gets smaller the top-n recom-
+mendation quality increases and stabilizes for α < 0.01. Similarly
+the number of steps that yield the best performance increase (see
+Fig.1-C). The spectrum of the corresponding transition probability
+matrices reflects the theoretically predicted properties of the model.
+Indeed for very small values of α we observe that the subdomi-
+nant eigenvalues cluster near the value 1, thus forming the slowly
+varying component of matrix P, which ensures that the succes-
+sive landing probabilities of the random walk are influenced by
+the initial state for longer. Furthermore, we find that the proposed
+methodology entails a significant increase in performance with re-
+spect to what one would get by using the proposed base item-model
+directly. In particular the recommendation performance of the K-
+step landing probabilities of RecWalk overpasses the performance
+of the base model (see Fig.1-D) for a wide range of steps up to a
+maximum increase of 39.09% for K = 18 steps.
+Our results suggest that the mixing properties of the RecWalk
+chain are indeed intertwined with the top-n recommendation qual-
+ity and can lead to a significant boost in performance. This justifies
+the intuition that motivated the particular design of the walk.
+5.2
+RecWalk as a Framework
+In the definition of the inter-item transition probability matrix we
+proposed a particular strategy for constructing matrix W that was
+designed to promote locality on the direct inter-item transitions
+while being easy to compute. Instead of this particular matrix W
+one could use any model that captures inter-item relations. But does
+our approach offer any benefit with respect to performing simple
+random walks on the corresponding item-model or to simply using
+the item model directly?
+Here we explore this question by empirically evaluating two
+commonly used item models. Namely:
+(1) a cosine similarity model Wcos defined such that its ij-th
+element is given by rT
+i rj/(∥ri ∥∥rj ∥);
+(2) a SLIM model which learns a matrix Wslim by solving an
+ℓ1, ℓ2 regularized optimization problem (see [33] for details).
+We consider the respective base models alongside six approaches
+based on random walks; namely (i) SRW, which recommends us-
+ing the K-step distribution of a simple random walk on W with
+transition probability matrix S initialized with ϕTu as in (1); (ii)
+PR, which produces recommendations based on S as in (2); (iii-iv)
+3Due to space constrains we report results on the movielens dataset; similar patterns
+arise using the other datasets as well.
+RecWalk
+WSDM ’19, February 11–15, 2019, Melbourne, VIC, Australia
+0
+5
+10
+15
+20
+25
+30
+10.00
+20.00
+30.00
+steps
+NDCG [%]
+(A) Performance per Step
+1
+2000
+4000
+6000
+8000
+10000
+0.000
+0.500
+1.000
+i
+|λi(P)|
+(B) Spectrum of RecWalk
+0.005
+0.01
+0.1
+0.3
+0.5
+25.00
+30.00
+35.00
+18
+18
+11
+5
+3
+α
+NDCG [%]
+(C) Peak Performance per α
+α = 0.005
+α = 0.01
+α = 0.1
+α = 0.3
+α = 0.5
+0
+50
+100
+25.00
+30.00
+35.00
+steps
+NDCG [%]
+(D) RecWalk vs Base Item Model
+Figure 1: Fig (A) reports the performance of RecWalk in terms of NDCG@10 as a function of the steps for different values of the
+parameter α. Fig (B) plots the spectrum of the RecWalk transition probability matrix for different values of α. Fig (C) reports
+the peak performance for the different values of α, as well as the number of steps for which it is achieved (on top of each bar).
+Fig (D) reports RecWalk performance (with α fixed at 0.005) for different number of steps compared to the performance one
+would get using the item model directly (blue dashed line).
+RecWalkK-step and RecWalkPR with transition matrix P constructed
+using the respective item models for the definition of the inter-item
+transition probability component; (v) RecWalk[MI]K-step which
+produces recommendations as in (1) but using the RecWalk inter-
+item transition probability matrix introduced in (7) instead of S;
+and (vi) RecWalk[MI]PR, which produces recommendations as in
+(2) using RecWalk’s MI instead of S.
+Table 1: Top-n Recommendation Quality under Different
+Random Walk Constructions
+Method
+COS
+SLIM
+Base model
+17.61
+27.28
+SRW
+17.82
+25.37
+PR
+18.11
+25.37
+RecWalkK-step
+20.52
+31.87
+RecWalkPR
+20.33
+31.80
+RecWalk[MI]K-step
+17.85
+31.41
+RecWalk[MI]PR
+20.27
+31.78
+Hyperparameters: SRW: K∈{1, . . . , 50}; PR: p ∈{0.1, . . . , 0.9};
+SLIM: λ, β ∈{0.1, 0.5, 1, 3, 5, 10, 20}; RecWalk: α = 0.005 and
+S ∈{1, . . . , 30} for RecWalkK-step and η ∈{0.1, 0.2, . . . , 0.9}
+for RecWalkPR.
+We run all models on the movielens dataset and in Table 1 we
+report their performance on the NDCG@n metric. We see that
+RecWalkK-step and RecWalkPR were able to boost the performance
+of both item models (up to +16.52% for COS and +16.82% for SLIM)
+with the performance difference between the two variants being
+insignificant. Applying simple random walks (SRW) or random walks
+with restarts (PR) directly to the row-normalized version of the
+item graph does not perform well (+2.84% in case of COS and -7% in
+case of SLIM). In particular in the case of SRW we observed a rapid
+decay in performance (after the first step for SLIM and after the
+first few steps for COS); similarly in case of PR the best performance
+was obtained for very small values of p—enforcing essentially the
+K-step landing probabilities after the first few steps to contribute
+negligibly to the production of the recommendation scores (cf. (2)).
+Using RecWalk’s inter-item transition probability matrix alone on
+the other hand performed very well especially when we use the
+SLIM model as a base.
+To gain more insight of the observed differences in performance
+of the walks on the item graphs, we also plot the spectra of the
+transition probability matrices MI, alongside the spectra of the
+respective matrices S (Fig. 2). We see that in case of S the magni-
+tude of the eigenvalues cause the walks to mix very quickly. In
+case of matrix MI on the other hand, the eigenvalues decay more
+gracefully and on the SLIM graph in particular, there appears to be
+a large number of eigenvalues near 1, which delay the convergence
+of the landing probabilities distributions towards equilibrium. This
+effect is not as pronounced in case of COS which is reflected in the
+small increase in performance in case of RecWalk[MI]K-step.
+WSDM ’19, February 11–15, 2019, Melbourne, VIC, Australia
+Nikolakopoulos and Karypis
+Table 2: Top-n Recommendation Quality of the Competing Approaches in Terms of HR, ARHR and NDCG
+movielens
+yahoo
+pinterest
+Method
+HR [%]
+ARHR [%]
+NDCG [%]
+HR [%]
+ARHR [%]
+NDCG [%]
+HR [%]
+ARHR [%]
+NDCG [%]
+EigenRec
+45.21
+20.44
+26.35
+48.12
+23.30
+29.23
+33.81
+13.51
+18.41
+PureSVD
+44.14
+19.33
+25.36
+38.68
+18.30
+22.62
+30.97
+11.85
+16.30
+RP3b
+34.87
+15.02
+19.66
+41.51
+17.82
+22.94
+27.01
+8.07
+12.45
+SLIM
+46.34
+21.39
+27.28
+52.44
+26.15
+32.35
+34.17
+13.63
+18.57
+Mult-DAE
+44.06
+18.97
+24.83
+45.37
+21.46
+27.07
+35.03
+13.79
+18.77
+Mult-VAE
+44.35
+19.50
+25.31
+45.09
+21.22
+26.80
+35.13
+13.73
+18.71
+RecWalkK-step
+50.28
+27.20
+33.13
+55.02
+28.94
+35.10
+35.38
+14.07
+18.95
+RecWalkPR
+52.47
+27.29
+34.09
+54.92
+28.74
+34.91
+35.29
+14.07
+19.00
+Hyperparameters: RecWalk: (fixed) α = 0.005, C ∈{0.1|I |, 0.25|I |} γ1, γ2 ∈{1, . . . , 15} and K ∈{1, . . . , 30} for RecWalkK-step and η = {0.1, . . . , 0.9}
+for RecWalkPR; EigenRec: f ∈{5, 10, . . . , 300}, d ∈{−2, −1.95, . . . , 2}; RP3b: b ∈{0, 0.05, . . . , 1}; SLIM: λ, β ∈{0.1, 0.5, 1, 3, 5, 10, 20}; Mult-VAEpr-
+Mult-DAE: we used the hyperparameter tuning approach provided by the authors in their publicly available implementation; for each model we considered both
+architectures proposed in [23]; namely [I −200 −I] and [I −600 −200 −600 −I].
+0
+1,000 2,000 3,000 4,000
+0.00
+0.50
+1.00
+i
+|λi |
+COS
+0
+1,000 2,000 3,000 4,000
+0.00
+0.50
+1.00
+i
+SLIM
+Figure 2: The figure plots the spectra of the transition proba-
+bility matrices S (green line) and MI (blue line) defined using
+the corresponding item models.
+Again our experiments reveal a clear connection between the
+mixing properties of the walks and their potential in achieving
+good recommendation quality. Note also that the stochasticity ad-
+justment strategy proposed in (7) seems to promote slow mixing
+in itself. However, using MI alone cannot in general guarantee
+this property irrespectively of the underlying item model whereas
+using the complete RecWalk model can give absolute control over
+convergence (as Theorem 2.1 predicted).
+5.3
+Performance against Competing
+Approaches
+We evaluate the top-n recommendation accuracy of RecWalkK-step
+and RecWalkPR against competing approaches.
+5.3.1
+Competing Baselines. We compare against six state-of-the-
+art baselines; namely (i) the well-known item-based method SLIM [33]
+which builds a sparse item model by solving an ℓ1, ℓ2-regularized
+optimization problem; (ii) the random-walk approach RP3b [7],
+which recommends based on a short-length walk on the user-
+item graph after rescaling the landing probabilities to compensate
+for the bias towards popular items; (iii) the well-known PureSVD
+method [10], which produces recommendations based on the trun-
+cated SVD of R; (iv) the EigenRec method [31], which builds a fac-
+tored item model based on a scaled cosine similarity matrix; as well
+as the recently proposed deep learning methods (v-vi) Mult-VAE
+and Mult-DAE [23] which extend variational and denoising autoen-
+coders to collaborative filtering using a multinomial likelihood and
+were shown to achieve state-of-the-art recommendation quality,
+outperforming several other deep-network-based approaches.
+5.3.2
+Results. Table 2 reports the top-n recommendation perfor-
+mance of the competing approaches. The performance was mea-
+sured in terms of HR@n, ARHR@n and NDCG@n, focusing on the
+n = 10. Model selection was performed for each dataset and metric
+following the procedure detailed in Section 4.2 and considering for
+each method the hyperparameters reported on Table 2. We see that
+both variants of RecWalk outperform all other methods considered
+on every metric and for all datasets. The results indicate the poten-
+tial of the proposed methodology in achieving high quality top-n
+recommendations.
+6
+CONCLUSIONS AND FUTURE DIRECTIONS
+Combining random walks with item models has the potential of
+exploiting better the information encoded in the inter-item rela-
+tions which can lead to increased top-n recommendation accuracy.
+To gain this benefit, however, one needs to define judiciously the
+transition probabilities of the walks in order to counterbalance their
+tendency to rapidly concentrate towards the central nodes of the
+graph. To this end we introduced RecWalk; a novel random walk
+framework for top-n recommendations that can provably provide
+control over convergence allowing the walk to harvest more ef-
+fectively the rich network of interactions encoded within the item
+model on top of which it is built. Our experiments reveal that the
+mixing properties of the walks are indeed intertwined with top-n
+recommendation performance. A very interesting direction we are
+currently pursuing involves the exploration of methods for statisti-
+cal learning in the space of landing probabilities [5] produced by
+RecWalk. Here we proposed two simple recommendation strategies
+to exploit these landing probabilities that were able to provide high
+top-n recommendation accuracy, outperforming several state-of-
+the-art competing approaches. Our findings showcase the value of
+combining item-models with graph-based techniques.
+RecWalk
+WSDM ’19, February 11–15, 2019, Melbourne, VIC, Australia
+ACKNOWLEDGMENTS
+This work was supported in part by NSF (1447788, 1704074, 1757916,
+1834251), Army Research Office (W911NF1810344), Intel Corp, and
+the Digital Technology Center at the University of Minnesota. Ac-
+cess to research and computing facilities was provided by the Digital
+Technology Center and the Minnesota Supercomputing Institute.
+REFERENCES
+[1] [n. d.]. GroupLens. http://grouplens.org/.
+[2] [n. d.]. Yahoo Webscope Program. https://webscope.sandbox.yahoo.com/.
+[3] Gediminas Adomavicius and Alexander Tuzhilin. 2005. Toward the next gen-
+eration of recommender systems: A survey of the state-of-the-art and possible
+extensions. IEEE Transactions on Knowledge & Data Engineering 6 (2005), 734–749.
+[4] Albert Ando, Franklin M Fisher, and Herbert Alexander Simon. 1963. Essays on
+the structure of social science models. Mit Press Cambridge.
+[5] Dimitris Berberidis, Athanasios N Nikolakopoulos, and Georgios B Giannakis.
+2018. Adaptive Diffusions for Scalable Learning over Graphs. arXiv preprint
+arXiv:1804.02081 (2018).
+[6] A. Cevahir, C. Aykanat, A. Turk, and B.B. Cambazoglu. 2011. Site-Based Parti-
+tioning and Repartitioning Techniques for Parallel PageRank Computation. IEEE
+Trans. Parallel Distrib. Syst., 22, 5 (2011), 786–802.
+[7] Fabian Christoffel, Bibek Paudel, Chris Newell, and Abraham Bernstein. 2015.
+Blockbusters and wallflowers: Accurate, diverse, and scalable recommendations
+with random walks. In Proceedings of the 9th ACM Conference on Recommender
+Systems. ACM, 163–170.
+[8] Colin Cooper, Sang Hyuk Lee, Tomasz Radzik, and Yiannis Siantos. 2014. Ran-
+dom Walks in Recommender Systems: Exact Computation and Simulations. In
+Proceedings of the 23rd International Conference on World Wide Web. ACM, New
+York, NY, USA, 811–816. https://doi.org/10.1145/2567948.2579244
+[9] Pierre-Jacque Courtois. 1977. Decomposability: Queueing and Computer System Ap-
+plications. Academic Press. http://books.google.gr/books?id=jD5RAAAAMAAJ
+[10] Paolo Cremonesi, Yehuda Koren, and Roberto Turrin. 2010. Performance of
+recommender algorithms on top-n recommendation tasks. In Proceedings of
+the fourth ACM conference on Recommender systems (RecSys ’10). ACM, 39–46.
+https://doi.org/10.1145/1864708.1864721
+[11] Christian Desrosiers and George Karypis. 2011. A Comprehensive Survey of
+Neighborhood-based Recommendation Methods. In Recommender Systems Hand-
+book, Francesco Ricci, Lior Rokach, Bracha Shapira, and Paul B. Kantor (Eds.).
+Springer US, 107–144. https://doi.org/10.1007/978-0-387-85820-3_4
+[12] Chantat Eksombatchai, Pranav Jindal, Jerry Zitao Liu, Yuchen Liu, Rahul Sharma,
+Charles Sugnet, Mark Ulrich, and Jure Leskovec. 2018. Pixie: A System for
+Recommending 3+ Billion Items to 200+ Million Users in Real-Time. In Proceedings
+of the 2018 World Wide Web Conference (WWW ’18). 1775–1784. https://doi.org/
+10.1145/3178876.3186183
+[13] Guang Feng, Tie-Yan Liu, Ying Wang, Ying Bao, Zhiming Ma, Xu-Dong Zhang,
+and Wei-Ying Ma. 2006. AggregateRank: bringing order to web sites. In Pro-
+ceedings of the 29th annual international ACM SIGIR conference on Research and
+development in information retrieval (SIGIR ’06). ACM, New York, NY, USA, 75–82.
+https://doi.org/10.1145/1148170.1148187
+[14] Ashish Goel, Pankaj Gupta, John Sirois, Dong Wang, Aneesh Sharma, and Siva
+Gurumurthy. 2015. The Who-To-Follow System at Twitter: Strategy, Algorithms,
+and Revenue Impact. Interfaces 45, 1 (Feb. 2015), 98–107. https://doi.org/10.1287/
+inte.2014.0784
+[15] Geoffrey Grimmett and David Stirzaker. 2001. Probability and random processes.
+Oxford university press.
+[16] Pankaj Gupta, Ashish Goel, Jimmy Lin, Aneesh Sharma, Dong Wang, and Reza
+Zadeh. 2013. WTF: The Who to Follow Service at Twitter. In Proceedings of the
+22Nd International Conference on World Wide Web (WWW ’13). ACM, New York,
+NY, USA, 505–514. https://doi.org/10.1145/2488388.2488433
+[17] Xiangnan He, Lizi Liao, Hanwang Zhang, Liqiang Nie, Xia Hu, and Tat-Seng
+Chua. 2017. Neural Collaborative Filtering. In Proceedings of the 26th International
+Conference on World Wide Web (WWW ’17). International World Wide Web
+Conferences Steering Committee, Republic and Canton of Geneva, Switzerland,
+173–182. https://doi.org/10.1145/3038912.3052569
+[18] Yifan Hu, Yehuda Koren, and Chris Volinsky. 2008. Collaborative filtering for im-
+plicit feedback datasets. In Data Mining, 2008. ICDM’08. Eighth IEEE International
+Conference on. Ieee, 263–272.
+[19] Sepandar D. Kamvar, Taher H. Haveliwala, Christopher D. Manning, and Gene H.
+Golub. 2003. Exploiting the Block Structure of the Web for Computing PageRank.
+In Stanford University Technical Report.
+[20] Zhao Kang, Chong Peng, Ming Yang, and Qiang Cheng. 2016. Top-n recommen-
+dation on graphs. In Proceedings of the 25th ACM International on Conference on
+Information and Knowledge Management. ACM, 2101–2106.
+[21] Yehuda Koren. 2010. Factor in the neighbors: Scalable and accurate collaborative
+filtering. ACM Trans on Knowledge Discovery from Data (TKDD) 4, 1 (2010), 1.
+[22] Amy N. Langville and Carl D. Meyer. 2011. Google’s PageRank and beyond: The
+science of search engine rankings. Princeton University Press.
+[23] Dawen Liang, Rahul G. Krishnan, Matthew D. Hoffman, and Tony Jebara. 2018.
+Variational Autoencoders for Collaborative Filtering. In Proceedings of the 2018
+World Wide Web Conference (WWW ’18). 689–698.
+https://doi.org/10.1145/
+3178876.3186150
+[24] David Meunier, Renaud Lambiotte, and Edward T Bullmore. 2010. Modular and
+hierarchically modular organization of brain networks. Front Neurosci 4 (2010).
+[25] D. Meunier, R. Lambiotte, A. Fornito, K. D. Ersche, and E. T. Bullmore. 2009.
+Hierarchical modularity in human brain functional networks. Front Neuroinform.
+3 (2009).
+[26] Carl D. Meyer. 1989. Stochastic complementation, uncoupling Markov chains,
+and the theory of nearly reducible systems. SIAM Rev. 31, 2 (June 1989), 240–2

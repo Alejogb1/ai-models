@@ -1,0 +1,15 @@
+{
+  "source": "2017. CIKM HIN2Vec",
+  "source_group": "Awesome-ML-Papers/Embeddings",
+  "processed_at": "2026-06-08T12:00:00Z",
+  "agent": "agent_batch_generation",
+  "concepts": [
+    {
+      "finding": "HIN2Vec learns node embeddings in heterogeneous information networks via meta-path-based random walks. Uses a neural network to predict if two nodes are connected via a given meta-path. Outperforms metapath2vec and DeepWalk on node classification and clustering tasks.",
+      "category": "ModelCandidate",
+      "implication": "Meta-path based embedding can capture typed relationships between keywords (e.g., keyword-IS_USED_IN-intent). Different meta-paths reveal different semantic relationships between keywords.",
+      "open_question": "What meta-paths best capture keyword-intent relationships? Should meta-paths be manually designed or automatically learned?",
+      "testable_hypothesis": "Meta-path-based keyword embeddings (HIN2Vec) produce more interpretable intent clusters than homogeneous graph embeddings (DeepWalk)."
+    }
+  ]
+}

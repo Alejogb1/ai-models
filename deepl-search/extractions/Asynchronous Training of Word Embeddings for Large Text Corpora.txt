@@ -1,0 +1,1231 @@
+Asynchronous Training of Word Embeddings for Large Text
+Corpora
+Avishek Anand
+L3S Research Center
+Hannover, Lower Saxony, Germany
+anand@l3s.de
+Megha Khosla
+L3S Research Center
+Hannover, Lower Saxony, Germany
+khosla@l3s.de
+Jaspreet Singh
+L3S Research Center
+Hannover, Lower Saxony, Germany
+singh@l3s.de
+Jan-Hendrik Zab
+L3S Research Center
+Hannover, Lower Saxony, Germany
+zab@l3s.de
+Zijian Zhang
+L3S Research Center
+Hannover, Lower Saxony, Germany
+zzhang@l3s.de
+ABSTRACT
+Word embeddings are a powerful approach for analyzing language
+and have been widely popular in numerous tasks in information
+retrieval and text mining. Training embeddings over huge cor-
+pora is computationally expensive because the input is typically
+sequentially processed and parameters are synchronously updated.
+Distributed architectures for asynchronous training that have been
+proposed either focus on scaling vocabulary sizes and dimensional-
+ity or suffer from expensive synchronization latencies.
+In this paper, we propose a scalable approach to train word
+embeddings by partitioning the input space instead in order to
+scale to massive text corpora while not sacrificing the performance
+of the embeddings. Our training procedure does not involve any
+parameter synchronization except a final sub-model merge phase
+that typically executes in a few minutes. Our distributed training
+scales seamlessly to large corpus sizes and we get comparable and
+sometimes even up to 45% performance improvement in a variety of
+NLP benchmarks using models trained by our distributed procedure
+which requires 1/10 of the time taken by the baseline approach.
+Finally we also show that we are robust to missing words in sub-
+models and are able to effectively reconstruct word representations.
+ACM Reference Format:
+Avishek Anand, Megha Khosla, Jaspreet Singh, Jan-Hendrik Zab, and Zijian
+Zhang. 2019. Asynchronous Training of Word Embeddings for Large Text
+Corpora. In The Twelfth ACM International Conference on Web Search and
+Data Mining (WSDM ’19), February 11–15, 2019, Melbourne, VIC, Australia.
+ACM, New York, NY, USA, 9 pages. https://doi.org/10.1145/3289600.3291011
+1
+INTRODUCTION
+Word representations or word embeddings are low dimensional,
+continuous and dense representations of words in a semantic vector
+space. Such embeddings are routinely used as input representations
+in neural network architectures tasks such as syntactic parsing [31],
+Permission to make digital or hard copies of all or part of this work for personal or
+classroom use is granted without fee provided that copies are not made or distributed
+for profit or commercial advantage and that copies bear this notice and the full citation
+on the first page. Copyrights for components of this work owned by others than ACM
+must be honored. Abstracting with credit is permitted. To copy otherwise, or republish,
+to post on servers or to redistribute to lists, requires prior specific permission and/or a
+fee. Request permissions from permissions@acm.org.
+WSDM ’19, February 11–15, 2019, Melbourne, VIC, Australia
+© 2019 Association for Computing Machinery.
+ACM ISBN 978-1-4503-5940-5/19/02...$15.00
+https://doi.org/10.1145/3289600.3291011
+sentiment analysis [32], machine translation [7], image annotation
+[37], query modeling, document representations [41] and in the
+construction of neural models for ranking [22, 24].
+Word representations are typically learned in an unsupervised
+manner from large text corpora – traditionally by matrix factor-
+ization approaches [18] and more recently by employing neural
+networks [4, 20, 21]. One particularly popular implementation
+is skip-gram with negative sampling (SGNS) [21] also known as
+Word2Vec. The popularity of the SGNS approach is due to faster
+training times based on the advancements in asynchronous gradi-
+ent descent through lock-free updates [27] and careful model up-
+dates using negative sampling [15], sub-sampling and vocabulary
+pruning [20]. Although these improvements make instance-level
+training faster, the input inherently has to be processed sequentially
+making training massive datasets slower. As an example training
+embeddings over the entire English Wikipedia (≈14 GB) takes around
+17.8 hours with all the optimizations described.
+Distributed architectures for SGNS have also been proposed
+to this extent but with different objectives. Ordentlich et al. [25]
+try scaling SGNS training by partitioning the embedding dimen-
+sions, while [34] partition the vocabulary space to scale to large
+vocabulary sizes. We propose approaches that instead partition the
+input space. Other distributed approaches for training ML mod-
+els [3, 11, 38, 40] that do partition the input space rely on expensive
+parameter synchronization procedures that typically incur network
+latencies.
+In this paper, we propose a scalable approach to train word em-
+beddings by partitioning the input space in order to scale to massive
+text corpora while not sacrificing the performance of the embed-
+dings. Our approach is simple, easy to implement and effective
+when compared against both centralized and distributed baseline
+approaches in a host of word similarity, analogy and categorization
+benchmarks. Our training procedure does not involve any param-
+eter synchronization except a final sub-model merge phase that
+typically executes in a few minutes.
+In detail, we propose a simple data-division strategy by creating
+representative random samples from the input data. We support
+our data-division strategy using the result from [17] which shows
+that for a Word2Vec model trained using negative sampling, the
+representational capacity of trained embeddings depends on the
+word and word-context distributions. We show that our sampling
+techniques in fact preserve these distributions, which allows us to
+arXiv:1812.03825v1  [cs.LG]  7 Dec 2018
+build sub-models without deviating much from the original perfor-
+mance of the word representations. More importantly, this enables
+our models to be trained in parallel and asynchronously over each
+of these samples without the need of any parameter synchroniza-
+tion. Our sampling strategy therefore offers us the following two
+main advantages over previous work in this direction. Firstly, it
+allows our approach to be truly parallel depending on the number
+of existing workers and is independent of the skew and embed-
+dings as in [25] and [34] respectively. Training can therefore be
+easily leveraged by highly scalable parallel data processing plat-
+forms. Secondly, and more importantly there are no intermediate
+synchronization phases eliminating further network latencies.
+In the end a combined model is generated by merging all asyn-
+chronously trained representations into a single consistent repre-
+sentative embedding that actively takes sparsity and missing vo-
+cabulary into account. We propose a generalization of Generalized
+Procrustes Analysis to merge sub-models with missing vocabulary.
+Finally, we perform extensive evaluation on two large text datasets
+Wikipedia (14 GB) and Web (268 GB) to demonstrate the effective-
+ness and efficiency of our approaches. Our distributed training
+scales seamlessly to the corpus sizes and we show that we can train
+embeddings on the Wikipedia dataset in 2 hours as opposed to 17.8
+hours (with the standard implementation inclusive of asynchronous
+SGD and negative sampling). Moreover, we show that we get com-
+parable and sometimes even up to 45% performance improvement
+in a variety of NLP benchmarks using models trained by our dis-
+tributed procedure which requires 1/10 of the time taken by the
+baseline approach. Finally we show that we are robust to missing
+words in sub-models and are able to effectively reconstruct word
+representations. We release the code for our implementation in
+https://github.com/jhzab/dist_w2v.
+In summary, we make the following contributions in this paper:
+• We propose asynchronous methods for training word em-
+bedding models on large input text corpora based on simple,
+easy to implement sampling approach supported by empiri-
+cal and theoretical justifications.
+• We propose effective sub-model merging approach ALiR that
+is also robust to out-of-vocabulary terms.
+• We perform extensive experimental evaluation on 14 GB
+of a Wikipedia and 268 GB of Web to showcase both the
+scalability and effectiveness of our approaches.
+2
+RELATED WORK
+We classify the previous works into the following categories: (1)
+parallelizing SGD given large input corpora, (2) learning reliable
+embeddings by combining word representations.
+Efficient and Scalable SGNS. The original implementation of
+Word2Vec by Mikolov et al. [20] uses Hogwild [27] to parallelize
+stochastic gradient descent (SGD). Hogwild is a parallel SGD al-
+gorithm that seeks to ignore conflicts between model updates on
+different threads and allows updates to proceed even in the pres-
+ence of conflicts. Indeed for large vocabulary sizes updates across
+threads are unlikely to be of the same input word which explains
+the rarity of conflicts which could be ignored without affecting the
+convergence. Popular implementation of Word2Vec, later imple-
+mented into software packages like Gensim 1, TensorFlow 2 uses
+multithreading to increase training speed.
+The approach by Ji et al. [15], implemented similarly in MLlib 3,
+further exploits the locality in model updates by combining the
+lock-free scheme of Hogwild with mini-batching of model updates
+involving the same target word and shared negative samples. Their
+shared memory multi-core solutions are thereby able to exploit
+level-3 BLAS operations. However, their distributed implementation
+is still not perfectly asynchronous and needs global parameter
+synchronizations.
+Vuurens et.al. [36] on the other hand proposes an efficient caching
+strategy that provides a comparable efficiency gain over the hierar-
+chical softmax variant of the Word2Vec. Ordentlich et. al [25] pro-
+poses a distributed Word2Vec training procedure that distributes
+the word vectors by partitioning the embedding dimensions across
+workers and parallelizes vector training to reduce training latency.
+Unlike, partitioning the embedded dimensions [25] we draw multi-
+ple samplefrom the training set. Our approach is naturally scalable
+to increasing training data sizes unlike embedding partitioning
+where the scalability is limited to the embeddings dimensionality.
+Recently, Stergiou et al. [34] also propose a partitioning approach
+where the objective is to scale to large vocabularies. Specifically
+they develop a distributed algorithm for sampling from a discrete
+distribution and use it to optimize Negative Sampling for SGNS
+Word2Vec which allows scaling to large vocabularies. We note
+that our focus is different from this work as we aim to scale for
+large training sets instead of large vocabularies.
+Combining Word Representations. Now we review the ap-
+proaches that have been employed to merge multiple trained mod-
+els. Garten et al. [9] put forward an approach, where a model from
+Word2Vec and a model from DVRS [35] are combined. As a com-
+bination strategy, they employ vector concatenation and linear
+addition between vectors corresponding to the same word from
+different models and demonstrate that the combined model per-
+forms even better than the best setting of individual ones, especially
+when the training data is limited. For learning reliable embeddings
+from a limited training data Avo Muromägi et al. [23] propose a
+different strategy such that they combine the models trained with
+the same system and on the same dataset, albeit using different
+random initialization. Goikoetxea et al. [12] show that a simple
+concatenation of independently learned embeddings from different
+sources like text corpora or WordNet outperforms more complex
+combination techniques in word similarity and relatedness datasets.
+We use this as our baseline as well referred to as Concat. Ghan-
+nay et al. [10] evaluates different approaches to combine word
+embeddings to identify effective word embeddings that can achieve
+good performances on all tasks. None of these approaches take into
+account missing word information, or out-of-vocabulary (OOV)
+terms, and have a strong assumption that all the input embeddings
+should have the same vocabulary. Speer and Chin [33] present an
+ensemble method that combines embeddings produced by GloVe
+[26] and Word2Vec with structured knowledge sources, merging
+1http://rare-technologies.com/word2vec-in-python-part-two-optimizing/
+2https://www.tensorflow.org
+3https://spark.apache.org/docs/latest/mllib-feature-extraction.html
+their information into a common representation with a large, mul-
+tilingual vocabulary. They use a locally linear alignment procedure
+[42] to align overlapping words in GloVe and Word2Vec embed-
+dings. The embedding corresponding to a non overlapping word
+is then computed as the average of the embeddings of the nearest
+overlapping terms, weighted by their cosine similarity. The other
+work that attempts to reconcile OOV information is [39] but our
+merging approach ALiR can be seen as a generalization of their
+approach where their result is the output after one round of ALiR.
+3
+OUR APPROACH
+Preliminaries. In this work, we focus on the SGNS implementation
+of Word2Vec. SGNS assumes a collection of words {wi } ∈VW and
+their contexts c ∈VC, where VW and VC are the word and context
+vocabularies. A context c ∈VC of the word wi is a word from
+the sequence of words wi−win, ...,wi−1,wi+1, ...,wi+win for some
+fixed window sizewin. Let D be a multi-set of all word-context pairs
+observed in the corpus. Let ®w, ®c ∈Rd be the d-dimensional word
+embeddings of word w and context c, specified by the mappings:
+W : VW →Rd,
+C : VC →Rd . SGNS aims to find mappings
+W and C such that the following objective specified for each pair
+(w,c) ∈D is maximized.
+logσ( ®w.®c) + k · Ec′∼PD (logσ(−®w. ®c′)),
+(1)
+where σ(x) =
+1
+1−exp(−x) is the sigmoid function. For each positive
+example (w,c), k negative samples (w,c′) are drawn from a noise
+distribution. Here we use the unigram distribution raised to power
+of 3/4 as the noise distribution over contexts similar to the original
+paper [20]. Usually Equation (1) is optimized via the stochastic gra-
+dient descent procedure that is performed during passing through
+the corpus [20].
+Previous work has also focused on the theoretical analysis of
+SGNS, for instance, Levy and Goldberg [17] showed that for suffi-
+ciently large d and generating negative samples via uniform distri-
+bution over unigrams, SGNS is an implicit matrix factorization of
+shifted PMI matrix. In particular, they showed that SGNS’s objective
+is optimized by setting ®w · ®c = PMI(w,c) −logk for every (w,c)
+pair, i.e,
+®w · ®c = log P(w,c)
+P(w)P(c) −logk,
+(2)
+where P(w,c) is the joint probability distribution of word context
+pairs, P(w) and P(c) are the probability distributions for word and
+context respectively in the given text corpora.
+The above results suggests that if we train SGNS models on
+two corpora with the same word (unigram) and word-context (bi-
+gram) distributions we would expect similar embeddings which
+also motivates our approach as outlined below.
+Objective and Approach Outline. Our approach is built on the
+following hypothesis which we elaborate and validate in the rest
+of the paper.
+Hypothesis 1. Let the original corpus C is divided into sub-
+corpora C1,C2, · · · ,Ck such that the unigram and bigram distribu-
+tions are preserved (on average) with respect to their distributions
+in the original corpus. The final word representations for C (with
+comparable quality) can then be obtained by finding the combined
+●
+●
+●
+●
+0.2
+0.4
+0.6
+0.8
+1.0
+1%
+2%
+10%
+20%
+1%
+2%
+10%
+20%
+size of sub−corpora
+average KL−Divergence
+words
+●
+●
+●
+●
+4
+6
+8
+1%
+2%
+10%
+20%
+1%
+2%
+10%
+20%
+size of sub−corpora
+average KL−Divergence
+bigrams
+Figure 1: Average KL-Divergence of words/bigrams distribu-
+tion from sub-corpus to original corpus, averaged over 10
+sub-corpora. (partitioning in Red, and Random Sampling in
+Blue)
+representations of the asynchronously trained embeddings for the
+sub-corpora.
+In order to validate our hypothesis we begin by proposing a easy
+to implement random sampling scheme (supported by theoretical
+and empirical justifications) to divide the original input corpus, in
+the divide phase (cf Section 3.1), into multiple sub-corpora such
+that each sub-corpus is an independent representative sample of
+the original input. The independence criteria allows us to train
+sub-corpora asynchronously in parallel, in the train phase (cf Sec-
+tion 3.2), which leads to the speedups in training time. The second
+part of our hypothesis deals with finding a combined representa-
+tion from the obtained representations of the sub-models in the
+merge phase (cf Section 3.3). In addition to testing some simple
+schemes of finding the combined representation we develop a vari-
+ant of Generalized Procrustes Analysis[13] which helps to find
+effective combined representation over the union of vocabulary of
+all sub-models (note that some words might be missing in some
+sub-models).
+3.1
+The Divide Phase
+The first part of our hypothesis deals with the divide phase where
+our proposed strategy should divide the data into a number of sub-
+corpora such that the unigram and bigram distributions are pre-
+served. From the distributional hypothesis we know that the quality
+of a word embedding suffers if a large fraction of its context/co-
+occuring words are missing from the sub-corpus C′. In other words
+it is desirable to ensure that we do not miss words and word contexts
+in a sub-corpora.
+Based on this intuition, we propose a simple and effective random
+sampling approach to divide the input data (a set of sentences) into
+multiple smaller sub-corpora. In particular we propose random
+sampling using a sampling rate ofr(in%), in which we choose 100/r
+samples of rN/100 sentences each by choosing sentences indepen-
+dently and uniformly at random with replacement. We support our
+proposed technique by showing theoretically and empirically that
+the unigram and bigram distributions are preserved, on average, in
+the sub-corpora. In particular we prove the following theorem in
+case of unigram distribution.
+Theorem 1. Let |w|C denote the frequency of word w in a given
+corpus C and TC denote the total number of words in C . Let PC(w)
+denotes the probability that a randomly drawn out word from any
+sentence in C is the word w. For any sub-corpus C′ drawn from the
+original corpus C using random sampling and any word , w we have
+E
+ |w|C′
+TC′
+
+= PC(w).
+We also analytically compute a threshold such that if the proba-
+bility of occurrence of a word w in C is above this threshold, then
+the expected number of sub-corpora not containing w is exponen-
+tially small in N.
+Theorem 2. Let u = r/100 where r is the sampling rate. Let ℓ
+be the sentence length. If PC(w) > 1 −(1 −u)
+1−u
+ℓu , then the expected
+number of randomly sampled sub-corpora which misses a word w is
+exp(−O(N)).
+Plugging in for example u = 0.1 and ℓ= 100, we infer from the
+above result that it is highly unlikely that a word with an occurrence
+probability greater than 0.0095 is missed. We also show empirically
+that our sampling strategy allows us to cover a large percentage of
+the vocabulary. Because of space limitations, the proofs are provided
+in the supplementary material.
+Empirical Evidence. In Figure 1 we plot the KL divergence from
+the empirical unigram and bigram distributions of a sample (aver-
+aged by randomly picking 10 samples from all samples or partitions)
+to distributions of the complete training data. In this experiment
+we compare random sampling with another simple data division
+approach, called eqal partitioning, in which we sequentially di-
+vide the whole corpus containing N sentences into 100/r partitions
+containing equal number of rN/100 sentences. The lower KL diver-
+gence in the unigram and the bigram distribution using random
+sampling strategy indicates that the randomly created samples are
+better representatives of the complete training data as compared to
+those created by the eqal partitioning strategy. In addition we
+also show that each created sub-model corresponding to a small
+sampling rate (see Section 5.2) of input data performs comparable
+to the model built on the complete corpus. We also present the
+statistics of vocabulary sizes of the original corpus and that cov-
+ered by the sampled sub-corpora in the supplementary material. In
+particular, random sampling strategy allows for a good coverage,
+for instance the size of common vocabulary among the sub-corpora
+(after thresholding on frequency in each sub-corpora) is already
+more than 61% of the top 300K vocabulary in the original corpus
+( Note that this corresponds to intersection of vocabularies of the
+sub-corpora and the union of vocabularies will be much larger).
+In the next section, we elaborate the MapReduce framework used
+for training the sub-corpora in parallel and asynchronously. In the
+MapReduce framework we use a simple yet impressive (in terms
+of effectiveness) variant of random sampling strategy which we
+refer to as Shuffle. Shuffle also allows for a high coverage of
+vocabulary, for instance, the size of common vocabulary among
+sub-corpora is already 99.93% of the vocabulary size in the original
+corpus.
+3.2
+The Train Phase and the Shuffle Approach
+We implement the sampling and training in a MapReduce frame-
+work to utilize parallel data loading and processing. Unlike earlier
+works [25, 34] that maintain and synchronize model state by ex-
+pensive and frequent synchronization through message passing we
+employ a stateless approach for training.
+In our approach the mappers are responsible for sampling the
+input into sub-corpora and the reducers are responsible for training.
+Say that we have a sampling rate r% thus needing to divide the
+corpus into n = 100/r sub-corpora also resulting inn corresponding
+models. We set the number of reducers to the number of models,
+i.e. n reducers, with each reducer being responsible for training
+a model. The mappers implement the sampling by maintaining n
+random number generators, one for each sub-corpora. For each
+input sentence we decide to assign it to a sub-corpora with a prob-
+ability of r/100 (for each of the n sub-corpora) and the sentence
+is then sent to corresponding reducer/s. Note that a sentence can
+be assigned to multiple sub-corpora. The n reducers then train
+and generate a sub-model asynchronously on the sentences sent
+to them by the mappers. Training over multiple epochs involves
+multiple passes over the same training data. In distributed data
+processing frameworks like MapReduce this is typically realized
+using multiple rounds – one for each epoch.
+The Shuffle Approach. To ensure that the same models receive
+exactly the same input, some amount of materialization of the
+samples is required (assuming the input is not memory resident) –
+this is both wasteful and non-trivial. We instead propose a stateless
+approach called Shuffle where in each epoch (MapReduce round)
+we do not require that each sub-model receives exactly the same
+input sample as in the previous round/s. Note that each sub-model
+still receives the same fraction of the overall input data even if not
+the same training data. There are two distinct advantages to this.
+First, the training procedure is truly stateless and hence scalable.
+This is because we do not have to ensure the same training instances
+go to the same reducers which is typically implemented using
+content-based hashing techniques. Secondly, and more importantly
+providing different samples across epochs to the same model has
+regularization effects and performs better than when the same
+input is seen across epochs (referred to as random sampling in
+our experiments).
+3.3
+The Merge Phase
+In this section, we deal with the second part of our hypothesis, that
+is the merge phase, in which we are interested in finding a single
+embedding matrix (sometimes also known as the consensus embed-
+ding matrix) given n d-dimensional word embedding matrices. Here
+we distinguish between two cases: (1) when all the n sub-models
+have the same vocabulary and (2) when there exist words (present
+in atleast one sub-model) that are missing in one or more of the
+given matrices.
+3.3.1
+Case 1: Merging Sub-models with Common Vocabulary. A
+very simple approach for case 1 is to concatenate the resulting
+matrices to obtain the final representation. Formally, let V ′ be the
+collection of words that appear in all n sub-models. For the n trained
+sub-models with resulting word matrices M1, ..., Mn (only for words
+in V ′) each of dimension |V ′| × d, the simplest and surprisingly
+effective approach (as we will see in our experiments) is to simply
+concatenate the word matrices Mconcat of dimensions |V ′|×dn. We
+refer to this baseline as Concat or Mconcat =
+M1|M2| · · · |Mn
+.
+However, in the presence of a large number of sub-models the
+size of the merged matrix might already become large and hence
+undesirable. A simple alternative then is to employ Principle Com-
+ponent Analysis or PCA over the concatenated matrix and use a
+subset of the principle components as a representation, i.e., the first
+d principal components of Mconcat . We point to the reader that
+element wise averaging of the embedding vectors would not work
+unless the respective embeddings are first aligned. To understand
+this, consider the following case of 2 sub-models with 3 words
+represented by vectors w1
+1 = [1, 1], w2
+1 = [99, 0], w3
+1 = [1, −1] for
+the first sub-model and w1
+2 = [−1, 1], w2
+2 = [−99, 0], w3
+2 = [−1, −1]
+corresponding to the second sub-model. In each sub-model word 1
+is most similar with word 3, but in the averaged model (w1 = [0, 1],
+w2 = [0, 0], w3 = [0, −1]) it is not the case. The problem is that
+the two embeddings are created independently and are in different
+spaces and need to be at first aligned.
+We next consider the case when one or more words are missing in
+some sub-models. We develop a variation of Generalized Procrustes
+Analysis (GPA) to deal with the missing vocabulary problem.
+3.3.2
+Case 2: Merging Sub-models with Partial Vocabulary. The
+GPA approach to find consensus representation can be summarized
+as follows.
+(1) Initialize the combined representation, say Y by choosing
+randomly one of the representations or with random values.
+(2) Align all the representations to Y.
+(3) Calculate Y ′ as the mean of the aligned representations.
+(4) If the error difference between Y and Y ′ is above a threshold,
+set Y = Y ′ and return to step 2.
+Our proposed approach referred to as ALiR (Alternating Linear
+Regression) follows the general principle of GPA with a novel adap-
+tation to the case where some rows might be missing in some of the
+given representations. Formally ALiR learns a common representa-
+tion Y from multiple embeddings {Mi }. Moreover, the vocabulary
+of Y corresponds to the union of the vocabulary of all Mi. We
+describe the approach in the following.
+Initialization.We experimented with two approaches for initializa-
+tion: (i) randomly initialize all entries of Y (ii) initialize the entries
+corresponding to the vocabulary intersection with the correspond-
+ing representations obtained by performing PCA over Mconcat .
+During each iteration the algorithm then performs the following
+steps:
+(1) Estimate Translation: For each Mi we first determine M′
+i
+(present) and M∗
+i (missing) corresponding to the vocabulary
+that is present or missing in model Mi. We denote the em-
+beddings Y ′ and Y ∗are the sub-matrices corresponding to
+the present and missing parts. We learn a transformationWi
+to aligm Mi to Yi using the classical Orthogonal Procrustes
+Analysis [30].
+(2) Estimating missing values: We then estimate the corre-
+sponding M∗
+i by solving Y ∗= M∗
+i Wi where we use Wi and
+Y ∗from the previous steps.
+(3) Update Joint Embedding: Update Y to be the mean of the
+translations of all n models as follows and go to step 2. Steps
+1, 2, 3 are repeated till the change in the average normal-
+ized Frobenius norm of displacement matrix, computed as
+1
+n
+Ír
+i=0
+∥Y −MiWi ∥F
+√
+|V |·d
+will become smaller than a predefined
+threshold value.
+4
+EXPERIMENTAL SETUP
+Benchmark
+Task
+Evaluation
+#unique
+#tests or
+name
+Type
+Measure
+words
+#clusters
+MEN [6]
+Similarity
+Spearman’s ρ
+751
+3000
+RG65 [29]
+Similarity
+Spearman’s ρ
+48
+65
+RareWords [19]
+Similarity
+Spearman’s ρ
+2951
+2034
+WS353 [8]
+Similarity
+Spearman’s ρ
+437
+353
+AP [1]
+Categorization
+purity
+402
+21
+Battig [2]
+Categorization
+purity
+4393
+56
+Google [20]
+Analogy
+Accuracy
+905
+19558
+SemEval [16]
+Analogy
+Accuracy
+3224
+2531
+Table 1: Benchmarks statistics.
+In order to establish the effectiveness and efficiency of our ap-
+proach, we answer the following research questions in our experi-
+mental evaluation.
+• RQ I: How does our proposed approach scale in terms of increas-
+ing data and increased parallelism? (Results in Section 5.1.)
+• RQ II: Which is the most effective sampling approach in parti-
+tioning the input corpus ?(Results in Section 5.2)
+• RQ III: What are the factors that determine the effectiveness
+of merging approaches and how do they handle sparsity and
+incompleteness in training ? (Results in Section 5.3 5.4.)
+We first describe the experimental setup and materials used towards
+answering these research questions.
+4.1
+Datasets
+We used two large text datasets, Wikipedia and Web, in our experi-
+ments. Both corpora are pre-processed by removing non-textual
+elements, sentence splitting, and tokenization.
+Wikipedia refers to the English Wikipedia (August 2016 dump; un-
+compressed size = 14GB). The Wikipedia corpus contains 4, 227, 933
+sentences, spanning 2, 313, 580, 449 tokens. We use the Wikipedia
+corpus for all our effectiveness and scalability experiments.
+Web refers to a large text corpora of Web pages crawled in 2007
+from the .co.uk domain. The dataset is 286 GB uncompressed.
+The Web corpus is far larger and contains 1, 198, 460, 804 sentences
+and 47, 297, 217, 342 tokens. We use the Web corpus only for our
+scalability experiments since building a baseline model for Web is
+computationally prohibitive.
+Evaluation Benchmarks. We test our models on a large set of
+benchmarks developed in the NLP community also suggested in
+[14]. Specifically, we select benchmarks to evaluate similarity, cate-
+gorization and analogy tasks (cf. Table 1) using word embeddings.
+4.2
+Models Built
+We built the SGNS models using Gensim4 framework ver. 3.4.0’s
+word2vec implementation which trains representations using SGD
+and Hogwild [27]. Gensim was configured to automatically use
+CPU-based BLAS5 acceleration.
+For training, the window size is set to 10, i.e. 10 words to each
+side of the focus word. We fix the number of dimensions to 500
+4https://radimrehurek.com/gensim/
+5Using Intel® Math Kernel Library
+Division
+Sampling
+AP
+Battig
+MEN
+RG65
+RareWords
+WS353
+Google
+SemEval
+Approach
+Rate
+eqal partitioning
+10%
+0.614 (0)
+0.450 (210)
+0.687 (0)
+0.741 (0)
+0.374 (200)
+0.636 (18)
+0.533 (0)
+0.178 (61)
+random sampling
+10%
+0.587 (0)
+0.433 (217)
+0.676 (0)
+0.745 (0)
+0.367 (270)
+0.628 (18)
+0.577 (0)
+0.182 (63)
+Shuffle
+10%
+0.600 (2)
+0.447 (254)
+0.712 (0)
+0.781 (0)
+0.331 (499)
+0.651 (18)
+0.657 (1)
+0.185 (82)
+eqal partitioning
+1%
+0.488 (0)
+0.370 (173)
+0.393 (0)
+0.508 (0)
+0.288 (76)
+0.378 (18)
+0.239 (0)
+0.162 (44)
+random sampling
+1%
+0.512 (0)
+0.363 (177)
+0.410 (0)
+0.530 (0)
+0.280 (81)
+0.372 (18)
+0.267 (0)
+0.162 (45)
+Shuffle
+1%
+0.567 (2)
+0.434 (254)
+0.680 (0)
+0.774 (0)
+0.329 (499)
+0.617 (18)
+0.331 (1)
+0.164 (82)
+Hogwild
+–
+0.607 (0)
+0.442 (149)
+0.752 (0)
+0.731 (0)
+0.262 (54)
+0.666 (18)
+0.639 (0)
+0.175 (39)
+MLLib, 10 Cores
+–
+0.567 (2)
+0.407 (253)
+0.671 (0)
+0.691 (0)
+0.238 (487)
+0.567 (18)
+0.464 (1)
+0.152 (81)
+MLLib, 100 Cores
+–
+0.510 (2)
+0.366 (353)
+0.618 (0)
+0.670 (0)
+0.237 (487)
+0.578 (18)
+0.351 (1)
+0.130 (81)
+Table 2: Evaluation results for different sampling strategies. Merging using ALiR initialized with Pca and run for 3 epochs. The
+numbers in parentheses indicate the count of words in each benchmark’s vocabulary that is not present in the final merged
+model. Underlined values correspond to best result per sampling rate per benchmark. Bold values represent best result per
+benchmark.
+for the Hogwild baseline and the sub–models. For the Hogwild and
+the Shuffle approach we set the size of vocabulary to 300, 000
+(filtered by frequency) for both datasets before training. The vo-
+cabulary for Shuffle is precomputed and set in the first epoch. In
+the eqal partitioning and random sampling approaches, the
+word frequency threshold was set to 100/k, where k is the count of
+sub-models. This implies that for each sub-model only words that
+appear more than 100/k times are used in the vocabulary. Further-
+more, we created two more baseline models using Spark MLLib6
+with the same parameters as above, except for the vocabulary size
+which is only limited by a min. threshold of 100.
+We also implemented Ordentlich et al. [25] for an additional base-
+line to compare against. The implementation was done in Python7,
+but we didn’t include any results since the runtime for just the 25%
+subset of the Wikipedia dataset was nearly 55 hours, making it
+unfeasible for larger data sizes. Our implementation was spending
+most of the time running the actual computations and waiting for
+the results of the shards.
+The Hogwild model is built on a single node with 256 GB of
+RAM and 2 Intel Xeon CPU E5-2620 v4 with 10 threads. The N-
+divided sub-models and the MLLib models are trained on a compute
+cluster distributed using Cloudera 5.13. Our compute cluster has 37
+nodes: 10 nodes with 64GB RAM and 2x Intel Xeon CPU E5-2609
+@ 2.40GHz, 13 nodes with 128GB RAM and 2x Intel Xeon CPU
+E5-2620 v2 @ 2.10GHz, 2 nodes with 128GB RAM and 2x Intel Xeon
+CPU E5-2620 v3 @ 2.40GHz and 12 nodes with 256GB RAM and
+Intel Xeon CPU E5-2620 v4 @ 2.10GHz. All nodes are connected
+via Intel OmniPath with a theoretical max throughput of 58Gbps.
+We use 10 threads for the sub-models as well.
+The models have an associated sampling rate ofr% which implies
+that the input is divided into S = 100/r samples. If N is the total
+number of sentences, then each sample contains N/S sentences.
+5
+EXPERIMENTAL RESULTS
+In this section, we finally provide answers to the research questions
+posed in the previous section.
+6Apache Spark 2.3.1 for Hadoop 2.6
+7Running all the computations via numpy using the Intel MKL BLAS implementation.
+Figure 2: Time required for training increasing proportions
+of the Wikipedia and Web datasets with a 10% sampling rate.
+Time for merging was omitted since they are negligible in
+comparison and too small to be visible.
+5.1
+Wallclock times
+Firstly, we look at the training times of our approaches in contrast
+to the time taken to train the Hogwild model (Table 4) as well as
+two MLLib models.
+We believe that optimizations relating to more efficient negative
+sampling [15] are orthogonal to our approaches and can be applied
+in a complementary manner. We observe that the Hogwild model
+takes 17.8 hours to train for the Wikipedia dataset. The MLLib
+models only differ in the number of executors, 10 and 100, running
+for 35.8 and 4.5 hours respectively. In our executor set-up, we ensure
+that each model or sub-model is computed using an equal number
+of threads. For instance the 10 executor model corresponds to the
+Hogwild model which uses 10 threads and the 100 executor model
+corresponds to the 10% Shuffle model which is using 10 threads
+per sub–model. Comparing training times, the 50% Shuffle models
+took an average training time of 600 minutes and the 10% Shuffle
+model took 142 minutes (as presented in Table 4). Firstly, this shows
+that SGNS scales (almost) linearly to input size making it feasible
+to train models in parallel in an asynchronous manner. We can
+also see a decrease in the scaling performance when going to the
+1% Shuffle model which took 64 minutes on average. This was
+most likely caused by using only 2 threads per reducer compared
+to the 10 threads per reducer for the other sampling rates which
+was necessary due to insufficient number of cores in the cluster.
+We also checked if we see the linear scaling for different data sizes
+Sampling
+Merging
+AP
+Battig
+MEN
+RG65
+RareWords
+WS353
+Google
+SemEval
+Rate
+Approach
+10%
+Concat
+0.614 (2)
+0.435 (254)
+0.756 (0)
+0.771 (0)
+0.278 (499)
+0.646 (18)
+0.674 (1)
+0.190 (82)
+10%
+Pca
+0.654 (2)
+0.452 (254)
+0.719 (0)
+0.786 (0)
+0.329 (499)
+0.650 (18)
+0.652 (1)
+0.183 (82)
+10%
+ALiR (Rand)
+0.604 (2)
+0.441 (254)
+0.715 (0)
+0.781 (0)
+0.329 (499)
+0.652 (18)
+0.652 (1)
+0.183 (82)
+10%
+ALiR (PCA)
+0.600 (2)
+0.447 (254)
+0.712 (0)
+0.781 (0)
+0.331 (499)
+0.651 (18)
+0.657 (1)
+0.185 (82)
+10%
+Single Model
+0.591
+0.412
+0.726
+0.735
+0.207
+0.621
+0.616
+0.168
+5%
+Concat
+0.602 (2)
+0.435 (254)
+0.748 (0)
+0.763 (0)
+0.272 (499)
+0.641 (18)
+0.621 (1)
+0.184 (82)
+5%
+Pca
+0.609 (2)
+0.472 (254)
+0.732 (0)
+0.798 (0)
+0.252 (499)
+0.623 (18)
+0.704 (1)
+0.182 (82)
+5%
+ALiR (Rand)
+0.609 (2)
+0.473 (254)
+0.729 (0)
+0.802 (0)
+0.278 (499)
+0.615 (18)
+0.506 (1)
+0.182 (82)
+5%
+ALiR (PCA)
+0.631 (2)
+0.479 (254)
+0.729 (0)
+0.803 (0)
+0.280 (499)
+0.617 (18)
+0.517 (1)
+0.183 (82)
+1%
+Concat
+0.560 (2)
+0.399 (259)
+0.711 (0)
+0.776 (0)
+0.244 (505)
+0.629 (18)
+0.472 (1)
+0.167 (84)
+1%
+Pca
+0.550 (2)
+0.419 (259)
+0.683 (0)
+0.777 (0)
+0.252 (505)
+0.616 (18)
+0.348 (1)
+0.170 (84)
+1%
+ALiR (Rand)
+0.607 (2)
+0.440 (254)
+0.680 (0)
+0.778 (0)
+0.329 (499)
+0.616 (18)
+0.329 (1)
+0.173 (82)
+1%
+ALiR (Pca)
+0.567 (2)
+0.434 (254)
+0.680 (0)
+0.774 (0)
+0.329 (499)
+0.617 (18)
+0.331 (1)
+0.175 (82)
+1%
+Single Model
+0.481
+0.346
+0.528
+0.685
+0.187
+0.422
+0.040
+0.120
+Hogwild
+0.607 (0)
+0.442 (149)
+0.752 (0)
+0.731 (0)
+0.262 (54)
+0.666 (18)
+0.639 (0)
+0.175 (39)
+Table 3: Evaluation results for different sampling rates and merging methods. The numbers in parentheses indicate the count
+of unique words in each benchmark’s vocabulary that is not presented in the combined models or OOV terms. ALiR (Rand)
+and ALiR (Pca) correspond to ALiR initialized by Random and Pca vectors respectively.
+Sampling
+Avg. Training
+PCA
+ALiR
+Rate
+Time
+(3 epochs)
+1%
+64 mins
+3.7 mins
+33.5 mins
+5%
+83 mins
+3.0 mins
+7.10 mins
+6.67%
+104 mins
+2.5 mins
+5.80 mins
+10%
+142 mins
+1.5 mins
+6.50 mins
+20%
+288 mins
+1.5 mins
+2.27 mins
+25%
+312 mins
+1.2 mins
+1.83 mins
+33%
+406 mins
+1.2 mins
+1.48 mins
+50%
+600 mins
+1.5 mins
+1.00 mins
+Hogwild
+1068 mins
+–
+–
+MLLib, 10 Cores
+2146 mins
+–
+–
+MLLib, 100 Cores
+268 mins
+–
+–
+Table 4: Wall-clock times for training and merging sub-
+models on the Wikipedia dataset with the Shuffle ap-
+proach.
+for the 10% Shuffle model. This is still the case even for the larger
+web dataset as shown on the left hand side of Figure 2. One can also
+observe a linear scaling for our approach on the smaller Wikipedia
+dataset, where we additionally compare the training time to the 100
+executors MLLib model which needs approximately twice as much
+training time. Note that these times also take into account the map
+and shuffle steps which have to be executed for each epoch.
+We now discuss the time taken to merge sub-models. We only
+show results for Pca and ALiR since creating the concatenated
+model takes a negligible amount of time, and both depend on the
+concatenated model.
+However Pca computation scales seamlessly with increasing
+number of sub-models (as shown in the table) with an increase of
+only 2.2 minutes when the number of sub-models increase from
+10 to 100. ALiR on the other hand takes a bit longer; merging 100
+models takes 33.5 mins vs 6.5 mins when using Pca. Merging with
+ALiR however has performance benefits as shown in section 5.3.
+When using a 10% sampling rate, the merge times for both Pca and
+ALiR are small when compared to the training time and performance
+is roughly the same in most benchmarks. For 1% sampling however,
+the overall time taken is 67.7 minutes when merging with Pca and
+97.5 minutes with ALiR. While ALiR takes nearly 50% longer, it also
+performs better in 6/8 benchmarks (see Table 3).
+5.2
+Effect of Sampling
+We begin by comparing the effect of two sampling approaches:
+Shuffle and random sampling. We contrast it with eqal parti-
+tioning for completeness in Table 2. We fix the merging strategy as
+ALiR (trained over 3 iterations, after which there is no change in per-
+formance) and report results for each of the sampling approaches.
+We also experimented with two sampling rates – {1%, 10%} to check
+if different sample rates affects performance. We recall that the dif-
+ference between random sampling and Shuffle approaches is
+that each reducer in the Shuffle approach might receive a different
+sample in each epoch whereas in random sampling the sample for
+each reducer is fixed and does not change with epochs.
+The first observation we make is that Shuffle outperforms ran-
+dom sampling for 1% sampling rate in all benchmarks and all except
+RareWords for 10% sampling rate. This establishes the superiority
+of Shuffle over random sampling and our intuition that using
+Shuffle (which uses different samples across epochs for the same
+sub-models) has a regularizing effect. Also, as expected Shuffle
+outperforms eqal partitioning in all the benchmarks with a
+sampling rate of 1% consistently and by a large margin. For example,
+the gains in MEN for 1% sampling is almost 100% and in RG65 is
+50%. The gains are not as pronounced when a smaller sampling rate
+of 1% is employed but still Shuffle is able to outperform eqal
+partitioning in all benchmarks. This also validates our justifica-
+tion of choosing random sampling and specifically Shuffle since it
+is able to preserve word and word-context distributions for each of
+the sub-models. Moreover, the common vocabulary in sub-models
+is much higher in case of Shuffle than eqal partitioning.
+The main result of this paper which also validates our Hypoth-
+esis is that merging larger sample sizes, i.e., Shuffle with 10%
+sampling rate results in a performance that is either competitive or
+in most cases better than Hogwild. With the exception of MEN, we
+outperform the baseline in all benchmarks consistently. Sometimes
+Shuffle even with 1% sampling rate outperforms the baseline
+(RG65). At the same time our approach is much faster than the
+Hogwild as already discussed.
+5.3
+Effect of Merging
+In the next set of experiments we present the results for merging
+the in-parallel computed sub-models. For this experiment we use
+the following merging techniques:
+• Concatenating corresponding word vectors from each sample re-
+ferred to as Concat. This approach is typically used as a baseline
+in many works [9, 12].
+• Principle Component Analysis (referred to as Pca) over the ma-
+trix formed from the concatenated vectors.
+• Our ALiR approach that can either be initialized randomly de-
+noted as ALiR (Rand) or using the output of Pca i.e., ALiR (Pca).
+• Single Model corresponds to using one sub-model instead of
+the merged model.
+We also experimented with other complex dimensionality reduc-
+tion approaches: low rank alignment or LRA [5] and LLE [28] but
+we did not see considerable improvements over simpler approaches
+like Pca. Additionally, these approaches are computationally more
+expensive and are prohibitive to employ when combining hundreds
+of models. For Pca and ALiR the target dimensionality is always set
+to be the same as the dimensionality of the Hogwild vectors. Since
+we established the superiority of Shuffle in the previous section
+we simply use Shuffle as the sampling approach. We consider 3
+different sampling rates for these experiments.
+The results are presented in Table 3. We observe that ALiR consis-
+tently performs best among its counterparts for the same sampling
+rates. Firstly, ALiR outperforms Pca in 6/8 benchmarks for 1% sam-
+pling rate and 4/8 for 10% sampling rates. The closest competitor
+to ALiR is unsurprisingly Concat that has a much higher dimen-
+sionality d ∗n where d is the dimensionality and n is the number
+of sub-models. However, Concat is both impractical because of its
+high memory requirements and has a lower performance for a large
+number of smaller sub-models, i.e., 1% sampling rate. The lower
+performance can be attributed to a decreasing number of terms that
+are indeed present in the vocabulary common to all sub-models.
+Secondly, as expected, the performance of models constructed using
+a higher sampling rate have a better performance as compared to
+those built using a smaller sampling rate.
+One of the highlights in this experiment is that ALiR with ran-
+dom initialization outperforms the baseline by 25% on RareWords.
+RareWords is a difficult benchmark for embedding approaches in
+the sense that it has a high number of low frequency terms. Having
+a superior performance indicates the ability of ALiR to be robust in
+OOV scenarios. We note here that merging approach has a clear
+advantage of just using a single sub-model in terms of vocabulary
+coverage. Moreover, our results corresponding to using just one
+sub-model (averaged over single sub-models) as reported in Table 3
+show significant gains achieved by the merged model.
+In the next set of experiments we focus more on the scenario
+where there are more missing words in the sub-models and how
+well ALiR reconstructs them.
+5.4
+Effect of Sparsity and Missing Vocabulary
+We assume that for the representation to be reconstructed, the
+word should be at least present in one of the sub-models. From the
+previous experimental setup, we found that the vocabulary covers
+nearly all unique words in most benchmarks. In Table 3, we already
+see for Battig and RareWords (where we have many OOV terms),
+ALiR outperforms Concat and Pca across sampling rates. Also
+notice that the number of missing vocabulary terms is consistently
+lower or equal for ALiR since our approach uses a union of the
+vocabulary terms whereas Concat and Pca take an intersection of
+vocabulary terms across sub-models.
+To study this effect more closely, we simulate the effect of more
+OOV terms by systematically removing benchmark words from
+sub-models. Figure 3 show the effect of removing 10% and 50% of
+the unique words from each benchmark for at least one sub-model.
+In these experiments, we randomly vary the number of sub-models
+from which we remove benchmark words, fix the sampling rate to
+10% and use Shuffle. From the results we notice that ALiR outper-
+forms Concat and Pca for all benchmarks since it can construct
+representations for missing words. Concat and Pca however ignore
+words not present in sub-models since no default vector is assumed
+for OOV words. This robustness to missing words is particularly
+strong when there are many OOV terms for the sub-models. For
+AP, MEN and Google, where we have nearly no OOV terms prior
+to removal, we observe that ALiR does worse than Concat and Pca
+(Table 3, sampling rate 10%). However for the same benchmarks,
+when removing 10% of benchmark words, ALiR performs just as
+well whereas Concat and Pca perform significantly worse.
+This effect is more pronounced across all benchmarks when
+removing 50% of the unique words. While ALiR dips slightly in
+performance, Concat and Pca’s performance drop is drastic (0.59
+vs 0.27 for Concat, 0.57 vs 0.17 for Pca in MEN). This result indi-
+cates that for collections with very large vocabularies, our parallel
+asynchronous training procedure with ALiR can find good repre-
+sentations even if vocabularies are inconsistent across sub-models.
+6
+CONCLUSIONS
+In this paper, we propose a scalable approach to train word embed-
+dings by partitioning the input space in order to scale to massive
+text corpora while not sacrificing the performance of the embed-
+dings. Our approach is simple, easy to implement and effective
+when compared against the baseline representation in a host of
+word similarity, analogy and categorization benchmarks. Our train-
+ing procedure does not involve any parameter synchronization
+except a final sub-model merge phase that typically executes in a
+few minutes.
+ACKNOWLEDGMENTS
+This work is partially funded by ALEXANDRIA (ERC 339233) and
+SoBigData (Grant agreement No. 654024).
+REFERENCES
+[1] A. Almuhareb and M. Poesio. Concept learning and categorization from the web.
+In Proceedings of the Cognitive Science Society, volume 27, 2005.
+[2] W. F. Battig and W. E. Montague. Category norms of verbal items in 56 cate-
+gories a replication and extension of the connecticut category norms. Journal of
+experimental Psychology, 80(3p2):1, 1969.
+[3] M. Boehm, S. Tatikonda, B. Reinwald, P. Sen, Y. Tian, D. R. Burdick, and
+S. Vaithyanathan. Hybrid parallelization strategies for large-scale machine learn-
+ing in systemml. Proceedings of the VLDB Endowment, 7(7):553–564, 2014.
+[4] P. Bojanowski, E. Grave, A. Joulin, and T. Mikolov. Enriching word vectors with
+subword information. arXiv preprint arXiv:1607.04606, 2016.
+[5] T. Boucher, C. Carey, S. Mahadevan, and M. D. Dyar. Aligning mixed manifolds.
+In AAAI, pages 2511–2517, 2015.
+10% words removed
+50% words removed
+Figure 3: Performance of missing-word reconstruction using ALiR when compared to Concat and Pca. k% of unique words
+from benchmark removed for at least one sub-model.
+[6] E. Bruni, N.-K. Tran, and M. Baroni. Multimodal distributional semantics. J. Artif.
+Intell. Res.(JAIR), 49(2014):1–47, 2014.
+[7] K. Cho, B. Van Merriënboer, C. Gulcehre, D. Bahdanau, F. Bougares, H. Schwenk,
+and Y. Bengio. Learning phrase representations using RNN encoder-decoder for
+statistical machine translation. arXiv preprint arXiv:1406.1078, 2014.
+[8] L. Finkelstein, E. Gabrilovich, Y. Matias, E. Rivlin, Z. Solan, G. Wolfman, and
+E. Ruppin. Placing search in context: The concept revisited. In Proceedings of the
+10th international conference on World Wide Web, pages 406–414. ACM, 2001.
+[9] J. Garten, K. Sagae, V. Ustun, and M. Dehghani. Combining distributed vector
+representations for words. In VS@ HLT-NAACL, pages 95–101, 2015.
+[10] S. Ghannay, B. Favre, Y. Esteve, and N. Camelin. Word embedding evaluation
+and combination. In LREC, 2016.
+[11] A. Ghoting, R. Krishnamurthy, E. Pednault, B. Reinwald, V. Sindhwani,
+S. Tatikonda, Y. Tian, and S. Vaithyanathan. Systemml: Declarative

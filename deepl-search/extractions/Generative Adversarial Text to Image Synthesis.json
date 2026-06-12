@@ -1,0 +1,15 @@
+{
+  "source": "Generative Adversarial Text to Image Synthesis.pdf",
+  "source_group": "Awesome-ML-Papers/GANs",
+  "processed_at": "2026-06-08",
+  "agent": "agent6_remaining",
+  "concepts": [
+    {
+      "finding": "GANs conditioned on text embeddings can generate convincing 64x64 images from natural language descriptions, using a character-level text encoder to capture fine-grained textual details.",
+      "category": "TargetConstruct",
+      "implication": "Text-to-image synthesis demonstrates that text embeddings can capture fine-grained visual semantics, relevant for understanding how query representations encode visual product attributes.",
+      "open_question": "How detailed are query embeddings at capturing visual vs. functional attributes?",
+      "testable_hypothesis": "Query embeddings trained on e-commerce search logs will encode visual attributes with lower fidelity than functional attributes, as measured by attribute prediction probes."
+    }
+  ]
+}

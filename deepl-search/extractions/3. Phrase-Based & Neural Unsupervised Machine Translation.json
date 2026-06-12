@@ -1,0 +1,15 @@
+{
+  "source": "3. Phrase-Based & Neural Unsupervised Machine Translation.pdf",
+  "source_group": "Awesome-ML-Papers/Neural Machine Translation",
+  "processed_at": "2026-06-08",
+  "agent": "agent6_remaining",
+  "concepts": [
+    {
+      "finding": "Both phrase-based and neural unsupervised MT benefit from careful initialization (cross-lingual embeddings), denoising language models, and iterative back-translation, achieving 28.1 BLEU on WMT En-Fr.",
+      "category": "Baseline",
+      "implication": "Key ingredients for unsupervised cross-lingual transfer: good initialization + denoising + self-training, a pattern that transfers to unsupervised query understanding tasks.",
+      "open_question": "Which of these three ingredients is most critical for unsupervised query understanding?",
+      "testable_hypothesis": "Self-training via iterative back-translation will provide the largest marginal gain (+8% F1) for unsupervised query intent classification."
+    }
+  ]
+}

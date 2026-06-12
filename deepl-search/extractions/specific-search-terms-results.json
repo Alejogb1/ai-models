@@ -1,0 +1,92 @@
+{
+  "source": "specific-search-terms-results.md",
+  "source_group": "Deepl-Search/Architecture",
+  "processed_at": "2026-06-08",
+  "agent": "agent5_final",
+  "concepts": [
+    {
+      "finding": "Google Ads API requires token-bucket rate limiter + message queues. Per customer_id limiting; scale via MCC sub-account distribution.",
+      "category": "Data",
+      "implication": "Data ingestion must handle rate limits via queue-based decoupling and multi-account distribution.",
+      "open_question": "What optimal batch size maximizes throughput without rate limits?",
+      "testable_hypothesis": "10+ sub-accounts with exponential backoff achieves 10x throughput vs single-account."
+    },
+    {
+      "finding": "TfidfVectorizer char_wb (2,4) n-grams robust to typos. Cosine similarity at 50k+ needs sparse chunking to avoid OOM.",
+      "category": "Data",
+      "implication": "Character n-grams robust to query noise. Memory management via sparse chunking essential at scale.",
+      "open_question": "What n-gram range balances typo robustness with efficiency?",
+      "testable_hypothesis": "Bigrams+trigrams capture 90% of robust similarity with 60% less memory than 2-5 grams."
+    },
+    {
+      "finding": "Queries <3 tokens cause IDF instability. Use sublinear_tf=True and smooth IDF constant for short-tail weight normalization.",
+      "category": "Data",
+      "implication": "Short queries (1-2 words) statistically unstable. Sublinear TF scaling normalizes clustering contribution.",
+      "open_question": "What fraction of real queries are 1-2 words, and how does IDF instability affect clustering?",
+      "testable_hypothesis": "Sublinear TF improves short query clustering coherence by 15% vs standard TF-IDF."
+    },
+    {
+      "finding": "all-MiniLM-L6-v2 with max_seq_length=256 optimal for keywords. 512 provides zero benefit while inflating tensors.",
+      "category": "ModelCandidate",
+      "implication": "256-token context optimal for query embeddings. Longer wastes GPU memory without quality gain.",
+      "open_question": "Does optimal context window vary by domain (e-commerce vs informational)?",
+      "testable_hypothesis": "256-token embeddings achieve same clustering quality as 512-token with 40% less GPU memory."
+    },
+    {
+      "finding": "GPU batch optimization: batch_size=256-1024 on RTX 4090/A100. Higher batches need pipeline stream management for memory leak prevention.",
+      "category": "Experiment",
+      "implication": "Batch size optimization and memory management critical for production embedding generation.",
+      "open_question": "What batch size optimizes throughput/memory stability for long embedding runs?",
+      "testable_hypothesis": "Batch size 512 provides optimal throughput/VRAM with stable memory over 1M+ queries."
+    },
+    {
+      "finding": "pgvector HNSW index provides sub-10ms queries for 50M+ vectors, trading negligible recall vs IVF exact.",
+      "category": "ModelCandidate",
+      "implication": "HNSW enables real-time query similarity at production scale with sub-10ms latency.",
+      "open_question": "What HNSW parameters (M, ef_construction) optimize recall/latency for intent search?",
+      "testable_hypothesis": "HNSW M=16, ef_construction=200 achieves >98% recall at sub-5ms latency."
+    },
+    {
+      "finding": "UMAP n_neighbors=15, n_components=5 isolates local structure. Dimensionality reduction essential before HDBSCAN.",
+      "category": "Data",
+      "implication": "5d UMAP embeddings preserve intent structure while enabling effective HDBSCAN clustering.",
+      "open_question": "Is 5d universally optimal UMAP dimension for query intent or domain-dependent?",
+      "testable_hypothesis": "UMAP to 5d produces more stable intent clusters than 2d or 10d reduction."
+    },
+    {
+      "finding": "HDBSCAN min_cluster_size=5 isolates micro-intents but yields ~30% noise. Granularity via min_cluster_size and epsilon.",
+      "category": "TargetConstruct",
+      "implication": "30%+ unclustered queries is expected for diverse corpora. Micro-intent detection needs small min sizes.",
+      "open_question": "What fraction of unclusterable queries is acceptable in production taxonomies?",
+      "testable_hypothesis": "HDBSCAN outliers exhibit distinct patterns suggesting genuine unique intents, not failures."
+    },
+    {
+      "finding": "BERTopic with c-TF-IDF extracts top 10 words per cluster for automatic labels. Enables interpretable taxonomies without manual labeling.",
+      "category": "ModelCandidate",
+      "implication": "Automated taxonomy generation via BERTopic. Each cluster gets interpretable keywords for human validation.",
+      "open_question": "How reliable are BERTopic labels vs human-curated taxonomies?",
+      "testable_hypothesis": "c-TF-IDF topic keywords achieve >80% agreement with human intent labels."
+    },
+    {
+      "finding": "PII filtering required: phones, emails, names via Microsoft Presidio + regex. k-anonymity (k<5) strips niche queries.",
+      "category": "LabelValidation",
+      "implication": "GDPR/CCPA compliance requires PII removal before modeling. k-anonymity removes long-tail queries.",
+      "open_question": "What is distribution impact of k-anonymity on cluster coverage and quality?",
+      "testable_hypothesis": "k=5 removes <5% volume but may remove up to 20% of unique micro-intents."
+    },
+    {
+      "finding": "Production monitoring: API quotas (Prometheus), embedding drift (Wasserstein/KS test weekly), data freshness (168h threshold triggers DAG).",
+      "category": "Evaluation",
+      "implication": "Three monitoring dimensions: pipeline health, model health, data freshness. Automated retraining triggers.",
+      "open_question": "What Wasserstein threshold indicates actionable embedding drift requiring retraining?",
+      "testable_hypothesis": "Wasserstein >0.1 between weekly distributions correlates with >5% accuracy degradation."
+    },
+    {
+      "finding": "Columnar storage (Parquet/Delta Lake) with partitioning. Raw/processed separation for reproducibility.",
+      "category": "Data",
+      "implication": "Proper data architecture with columnar storage and partitioning essential for analytics efficiency.",
+      "open_question": "What partitioning strategy optimizes intent analytics query performance?",
+      "testable_hypothesis": "Weekly-partitioned Parquet achieves 3x faster query times than monthly partitioning."
+    }
+  ]
+}

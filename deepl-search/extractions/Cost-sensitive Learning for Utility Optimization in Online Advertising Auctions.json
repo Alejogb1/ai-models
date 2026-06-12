@@ -1,0 +1,148 @@
+{
+  "source": "Cost-sensitive Learning for Utility Optimization in Online Advertising Auctions.pdf",
+  "source_group": "Awesome-ML-Papers/CTR-CVR-Prediction",
+  "processed_at": "2026-06-08",
+  "agent": "agent5_final",
+  "concepts": [
+    {
+      "finding": "4\nEXPERIMENTS\nIn this section, we present our experimental results when applying\nour method to improve a state-of-the-art conversion-rate prediction\nmodel for bidding in online advertising auctions.",
+      "category": "Baseline",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "To be able to\nevaluate our method, we introduce a simplified cost and revenue\nscheme where all clicks have a constant cost of 1, and for each\nadvertising campaign the CPA is inversely proportional with the\nhistorical post-click conversion rate, meaning that each advertising\ncampaign c is assumed to ",
+      "category": "Experiment",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Cost-sensitive Learning for Utility Optimization in\nOnline Advertising Auctions\nFlavian Vasile\nCriteo\nParis, France\nf.vasile@criteo.com\nDamien Lefortier∗\nFacebook\nLondon, UK\ndlefortier@fb.com\nOlivier Chapelle∗\nGoogle\nMountain View, CA\nolivier@chapelle.cc\nABSTRACT\nOne of the most challenging problems",
+      "category": "FailureRisk",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "3.2\nWeighted Log Loss\nAs a result of our findings from Section 3.1, we introduce a weighted\nnegative log likelihood (denoted as WNLL) in the context of online\nbidding and study its behavior.",
+      "category": "BehavioralTests",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "We finally demonstrated that our method allows us to im-\nprove a state-of-the-art CR prediction model used for bidding in\nonline advertising auctions and leads to large significant lifts in\noffline performance (on a public data set) and online performance\nas evaluated through an A/B test.",
+      "category": "Baseline",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "We present and\nanalyze a new cost weighting scheme and show that significant\ngains in offline and online performance can be achieved.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Then, in\nSection 3, we introduce our method for taking into account the\nadvertisers’ CPAs when training our CR model, which is based on\nour analysis of the relationship between the Utility loss [9] and the\nstandard log loss.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "In this paper, we use\nthe logistic regression approach from [6] because of the confirmed\nstate-of-the-art results on click prediction together with the relative\nease of implementation and the fact that the model learning can\nbe parallelized efficiently.",
+      "category": "Baseline",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "In\nthis paper, to bridge the gap, we formally analyze the relationship\nbetween optimizing the Utility metric and the log loss, which is\nconsidered as one of the state-of-the-art approaches in conversion\nmodeling.",
+      "category": "Baseline",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "CCS CONCEPTS\n• Information systems →Online advertising; • Computing\nmethodologies →Machine learning approaches;\nKEYWORDS\nDisplay advertising; machine learning; conversion prediction\nACM Reference format:\nFlavian Vasile, Damien Lefortier, and Olivier Chapelle.",
+      "category": "ModelCandidate",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Permission to make digital or hard copies of part or all of this work for personal or\nclassroom use is granted without fee provided that copies are not made or distributed\nfor profit or commercial advantage and that copies bear this notice and the full citation\non the first page.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "In this case, the cost\nis referred as CPC (cost-per-(ad)click) or CPA (cost-per-conversion).",
+      "category": "ModelCandidate",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "In order to determine the winner\nfor CPC and CPA clients, where the pay-off to the publisher is\nconditioned on a user action, the bids get converted in expected\nvalues (also known as eCPMs) using click and conversion rate (CR)\nprediction models.",
+      "category": "ModelCandidate",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "In this paper, we investigate a novel way of taking into account\nthe sales’ CPAs in our CR prediction model for bidding in online\nadvertising auctions, thus bridging the gap between the recently\nproposed business-aware offline metrics and the current state-of-\nthe-art CR prediction models.",
+      "category": "Experiment",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "In Section 2,\nwe present the setting, i.e., our state-of-the-art CR model, the bidder\naround it, and the recent business-aware offline metrics.",
+      "category": "Baseline",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Finally, in Section 4, we present our experimental\nresults, both offline and online, before concluding in Section 5.",
+      "category": "Experiment",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "2.1\nLogistic regression for CR modelling\nCurrent state-of-the-art CR prediction methods range from logistic\nregression [6, 14], to log-linear models [2], to a combination of\nlog-linear models with decision trees [8], and to combining pure\nresponse rate prediction with ad ranking [12].",
+      "category": "Baseline",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "2.2\nBidder\nWe review in this section the way in which the probabilities of clicks\nand conversions are used for bidding in an online advertiser auction.",
+      "category": "ModelCandidate",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "It values a certain action—click or conversion—at a\ncertain valuev and estimates the probability of the user performing\nthat action if the ad is displayed to be p.",
+      "category": "ModelCandidate",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "We propose the following\nmethod to solve this problem.",
+      "category": "FailureRisk",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    }
+  ]
+}

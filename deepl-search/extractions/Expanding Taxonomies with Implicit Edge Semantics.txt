@@ -1,0 +1,1283 @@
+Expanding Taxonomies with Implicit Edge Semantics
+Anonymous
+Anonymous Institution
+Anonymous@Anonymous.edu
+ABSTRACT
+Curated taxonomies enhance the performance of machine-learning
+systems via high-quality structured knowledge. However, manually
+curating a large and rapidly-evolving taxonomy is infeasible. In
+this work, we propose Arborist, an approach to automatically
+expand textual taxonomies by predicting the parents of new tax-
+onomy nodes. Unlike previous work, Arborist handles the more
+challenging scenario of taxonomies with heterogeneous edge seman-
+tics that are unobserved. Arborist learns latent representations of
+the edge semantics along with embeddings of the taxonomy nodes
+to measure taxonomic relatedness between node pairs. Arborist
+is then trained by optimizing a large-margin ranking loss with a
+dynamic margin function. We propose a principled formulation of
+the margin function, which theoretically guarantees that Arborist
+minimizes an upper-bound on the shortest-path distance between
+the predicted parents and actual parents in the taxonomy. Via ex-
+tensive evaluation on a curated taxonomy at Pinterest and several
+public datasets, we demonstrate that Arborist outperforms the
+state-of-the-art, achieving up to 59% in mean reciprocal rank and
+83% in recall at 15. We also explore the ability of Arborist to infer
+nodes’ taxonomic-roles, without explicit supervision on this task.
+ACM Reference Format:
+Anonymous. 2020. Expanding Taxonomies with Implicit Edge Semantics. In
+Proceedings of Conference Name (Conference ’20). ACM, New York, NY, USA,
+Article 4, 11 pages. https://doi.org/10.475/123_4
+1
+INTRODUCTION
+Curated taxonomies have improved the performance of machine-
+learning systems on a variety of tasks via high-quality structured
+knowledge. Classification using class-label taxonomies has been
+shown to be more accurate, both empirically [14, 36, 64, 71] and
+theoretically [5, 6]. Products, movie and music taxonomies have
+enabled more relevant recommendations in both the static and se-
+quential settings [25, 27, 28, 79, 81]. Taxonomies have also powered
+advances in web search [1], user-behavior modeling [38] and model
+interpretability [34].
+1Google Shopping: http://google.com/basepages/producttype/taxonomy.en-US.txt
+2Mozilla Website Directory: http://dmoztools.net
+3The Pinterest Taxonomy: [23]
+Permission to make digital or hard copies of all or part of this work for personal or
+classroom use is granted without fee provided that copies are not made or distributed
+for profit or commercial advantage and that copies bear this notice and the full citation
+on the first page. Copyrights for components of this work owned by others than ACM
+must be honored. Abstracting with credit is permitted. To copy otherwise, or republish,
+to post on servers or to redistribute to lists, requires prior specific permission and/or a
+fee. Request permissions from permissions@acm.org.
+Conference ’20, MonthName XX-XX, 2020, City, ST, USA
+© 2020 Association for Computing Machinery.
+ACM ISBN 123-4567-24-567/08/06...$15.00
+https://doi.org/10.475/123_4
+SPORTS
+SOCCER
+BASKETBALL
+PELE
+KAKA
+NCAA
+NBA
+KOBE
+SHAQ
+Query q
+eNBA
+eq
+MNBA
+IS-TYPE-OF
+IS-PLAYER-OF
+IS-LEAGUE-OF
+IMPLICIT EDGE SEMANTICS
+x
+s(q, NBA)
+P1
+...
+P2
+PK
+x
+wNBA
+Figure 1: Overview of Arborist expanding a taxonomy with
+implicit, heterogeneous edge semantics (colored). Arborist
+learns to measure the taxonomic relatedness s(q,v) of a
+query-node pair with feature-vectors eq and ev. Relatedness
+is defined via linear maps P1, . . . , PK and node-embeddings
+wv, jointly trained to minimize a large-margin ranking loss.
+Several platforms1−3 have come to rely on curated taxonomies to
+power their user-profiling, content categorization and recommen-
+dation systems. With the influx of new content on the platform, it
+is crucial to update these taxonomies to remain relevant. However,
+manual curation in the face of rapidly-evolving content is infeasible.
+We thus focus on the problem of automatic taxonomy expansion.
+We are specifically motivated by the task of expanding the Pinterest
+Taxonomy: a curated hierarchy of over 10,000 interests that forms
+the backbone of user and content understanding at Pinterest. Inter-
+ests are textual phrases describing concepts that may be general
+(such as architecture and health) or specific (such as mid-century
+architecture and mental well-being). Interests are used to categorize
+both Pinterest users and the content they create, and subsequently
+used for recommendations [17, 33] and interest-based ad targeting.
+In the most recent taxonomy expansion effort, 8 curators ap-
+pended a total of 6,000 new taxonomy nodes in a month [23]: a
+total of over 500 taxonomist-hours (by conservative estimates) at
+the rate of 5 minutes per new taxonomy node. This is in stark con-
+trast to the millions of new visual bookmarks added by Pinterest
+users every day day, each potentially introducing a new interest to
+the platform. Automatic taxonomy expansion is thus the only fea-
+sible approach to maintain the relevance of recommended content
+and ads as the platform experiences rapid growth.
+The taxonomy expansion problem is challenging for several rea-
+sons. For large-scale taxonomies having thousands of nodes, any
+query node (to be appended to the taxonomy) has a plethora of
+potential parents. Learning a binary classifier to predict whether
+a query-node pair is taxonomically related is afflicted by the issue
+Conference ’20, MonthName XX-XX, 2020, City, ST, USA
+Anonymous
+of lexical memorization [30]. Instead of learning to represent taxo-
+nomic relationships, simple classifiers learn that certain nodes are
+prototypical parents. For any query-node pair where the node is a
+prototypical parent, the classifiers (often incorrectly) predict the
+existence of a taxonomic relationship.
+Hence, it is crucial to explicitly model taxonomic relationships.
+This is difficult when the taxonomy has heterogeneous edge seman-
+tics. For example, the Pinterest Taxonomy contains both is-in edges
+connecting places and is-type-of edges connecting dog breeds.
+Moreover, the edge semantics are not explicitly recorded during
+the taxonomic curation process: they are implicit and unobserved.
+In addition, the business-critical nature of curated taxonomies man-
+dates that automatic taxonomy expansion be overseen by in-house
+experts, or risk causing business-wide failures. This introduces the
+additional burden of easy human-verification.
+Recent successes in textual taxonomy expansion were based on
+learning transformations of word-embeddings [18, 20, 62, 75] and
+comprise the current state-of-the-art [9, 12]. However, these ap-
+proaches assume homogeneous edge semantics. Knowledge-base
+embeddings [11, 46, 61] and hierarchical embeddings [21, 44, 63]
+enable accurate link-prediction in knowledge graphs with hetero-
+geneous, explicit edge-types. Yet, neither embedding approach can
+handle unobserved edge-types, or construct embeddings for unseen
+nodes. Finally, the issue of ease of human-verification in automatic
+taxonomy expansion remains unexplored.
+We thus propose Arborist, a method to expand textual tax-
+onomies with implicit edge semantics. Arborist learns node em-
+beddings, along with linear maps that are shared across the taxon-
+omy, to represent the latent edge semantics. The combination of
+local and global taxonomic information equips Arborist with the
+flexibility to capture heterogeneous edge semantics while remain-
+ing robust to missing or misplaced nodes. The node embeddings and
+linear maps are trained to optimize a taxonomic-relatedness score,
+such that child-parent node pairs are scored higher than other pairs
+by a large margin. Distinct from previous approaches, Arborist
+is guaranteed to predict parents that are near the actual parents
+in the taxonomy: this facilitates human-verification by restricting
+corrections to small taxonomic neighborhoods. Fig. 1 illustrates
+Arborist operating on the Pinterest Taxonomy.
+In summary, we make the following contributions:
+I. We introduce Arborist, a taxonomy expansion method that
+combines global and local taxonomic information to explicitly
+model heterogeneous and unobserved edge semantics.
+II. We prove that Arborist minimizes an upper-bound on the
+shortest-path distances between the predicted and actual tax-
+onomy parents. This property is invaluable for human verifica-
+tion, since incorrectly appended nodes may be easily corrected
+by probing a small local taxonomy neighborhood.
+III. We evaluate Arborist on several datasets, metrics and com-
+pare to several baselines to demonstrate performance exceed-
+ing the present state-of-the-art. We conduct an in-depth abla-
+tion study to study the effect of each hyperparameter.
+IV. We explore the ability of Arborist to infer nodes’ taxonomic-
+roles, without being explicitly trained for role-classification.
+Reproducibility: Code and data (where not proprietary) will be
+publicly shared at https://xxx.github.io on acceptance.
+Edge Semantics
+Predictions
+Method
+Heterogeneous Implicit Inductive
+Hypernym Prediction
+✗
+✗
+✓
+via Lexical Patterns [26, 42, 57]
+via Word Embeddings [8, 51, 56, 67, 70]
+via Projection Learning [9, 20, 62, 75]
+Knowledge-Graph Embeddings [11, 46, 61]
+✓
+✗
+✗
+Hierarchical Embeddings
+✓
+✓
+✗
+in Euclidean Space [15, 31, 43, 63, 65]
+in Hyperbolic Space [3, 13, 21, 44]
+in Gaussian Space [66]
+HiExpan [55]
+✗
+✓
+✓
+Arborist (this work)
+✓
+✓
+✓
+Table 1: Related work. Inductive approaches can add both
+new nodes and new edges. HiExpan and lexical-pattern hy-
+pernym predictors require a text corpus.
+2
+RELATED WORK
+Taxonomy expansion is related to hypernym prediction. Hypernym
+predictors learn to represent the is-a relationship using a training
+taxonomy with homogeneous is-a semantics (such as WordNet [40])
+and (optionally) a textual corpus. While earlier approaches relied
+on lexical patterns [26, 42, 57], recent methods learn classifiers
+operating on pre-trained word-embeddings [8, 51, 56, 67, 70]. A few
+methods learn word-embeddings tailored for hypernym prediction
+[4, 77], but cannot infer the embeddings of unseen nodes to be added
+to the taxonomy (they are not inductive). Taxonomy learning via
+hypernym prediction is surveyed in [68].
+The state-of-the-art in hypernym prediction is via piecewise
+projection-learning on word-embeddings [20]. In this approach, a
+projection matrix is learned for each cluster of the word-embedding
+space to minimize the L2-norm between the projected child’s word-
+embedding and parent’s word-embedding. This approach was later
+extended to use randomly sampled non-parents (negative samples)
+during training [62] and to jointly learn the clusters and their pro-
+jection matrices [75]. A variant of projection-learning called CRIM
+[9] incorporates negative sampling, word-embedding fine-tuning
+and multiple projection matrices to achieve the best performance
+in the SemEval 2018 hypernym discovery task [12]. We compare
+Arborist with CRIM in our evaluation.
+HiExpan [55] expands taxonomies with unobserved but homo-
+geneous edge semantics, given a training taxonomy and textual
+corpus. The method iteratively expands the taxonomy-width via
+set-expansion and taxonomy-depth via weakly-supervised rela-
+tion extraction. Both subprocedures require a large textual corpus,
+which is unavailable in our scenario. The expansion is task-guided,
+since the edge semantics are inferred from the training taxonomy
+instead of being explicitly provided.
+Knowledge-base completion is the closely related task of infer-
+ring missing links in knowledge-graphs with heterogeneous edge
+semantics that are explicitly observed. Recent approaches learn em-
+beddings for nodes and edge types and predict links via algebraic
+operations [11, 46, 58, 61], which is reminiscent of earlier work
+on learning relational embeddings [47, 53, 54]. Since the embed-
+dings are derived from the given knowledge-graph, they cannot be
+inferred for unseen nodes or unobserved edge types.
+Expanding Taxonomies with Implicit Edge Semantics
+Conference ’20, MonthName XX-XX, 2020, City, ST, USA
+Hierarchical embeddings have been recently proposed that learn
+embeddings for taxonomy nodes in Euclidean [15, 31, 43, 63, 65],
+hyperbolic [3, 13, 21, 44, 45] or other expressive spaces [66]. These
+embeddings may be supervised by a training taxonomy, or unsu-
+pervised and operate on a textual corpus. Hierarchical embeddings
+do not assume specific lexical relationship types or homogeneity in
+the taxonomy. However, current hierarchical embedding methods
+cannot infer the embeddings of unseen taxonomy nodes, and are
+only effective in predicting missing taxonomy links.
+Taxonomy induction is the related unsupervised task of con-
+structing a taxonomy from a textual corpus [7, 35, 76]. Though
+the target taxonomy semantics are typically fixed to known lexical
+relationships (such as is-a or is-in), recent work has extended tax-
+onomy induction to accommodate arbitrary edge semantics [78].
+Taxonomy expansion is complementary to taxonomy induction,
+and is the logical next step in the taxonomy learning process [68].
+Our proposed method draws on several theoretical concepts
+from similarity and distance metric-learning [41, 52, 74]; specifi-
+cally their large-margin [71, 72], hierarchical [14, 64] and learning-
+to-rank [32, 37] formulations. We are also inspired by work on
+graph-embeddings [24, 49, 60]; specifically on structural-role em-
+beddings [2, 16, 50]. With our development of Arborist we estab-
+lish principled connections between these learning tasks and the
+taxonomy expansion problem.
+3
+PROBLEM OVERVIEW
+We now formalize the taxonomy expansion problem. Denote by
+T = (V, E) the taxonomy to be expanded, represented as a directed
+acyclic graph. Each nodeu ∈V is a textual phrase and each directed
+edge (u,v) ∈E represents a taxonomic relationship between a child
+u ∈V and its parentv ∈V . We assume that each nodeu is equipped
+with a feature-vector eu ∈Rd derived using an external procedure,
+such as via unsupervised word-embeddings [39, 48, 59].
+We impose weak assumptions on the nature of the taxonomy.
+Specifically, we expect child-parent relationships in the taxonomy
+to satisfy the distributional inclusion hypothesis [22]: the parent is
+(i) related to, and (ii) more general than the child. We also expect
+the taxonomy to follow a hierarchical structure: each child is only
+linked to its least-general related nodes. Note that a taxonomy node
+may have multiple parents.
+The specific semantics of the edges are unobserved and possibly
+heterogeneous, depending on the taxonomist’s business goals. For
+example, geographic taxonomies have homogeneous edge seman-
+tics (such as is-in) whereas more general taxonomies such as the
+Pinterest Taxonomy exhibit heterogeneous edge semantics (such
+as is-subclass-of and is-part-of).
+Given an unseen query node and a ground-truth taxonomy, our
+goal is to append the query node to the taxonomy as a new leaf
+node. In practice, in-house taxonomists expect an ordered list of
+predicted parents for the query node that can be verified before
+updating the taxonomy. Thus, we formalize this objective as the
+following ranking problem:
+Problem 1 (Taxonomy Expansion). Given a taxonomy T =
+(V, E), feature vectors eu ∈Rd for each node u ∈V and a query
+q < V with feature vector eq ∈Rd, rank the taxonomy nodes such
+that the true parent(s) of q are ranked higher than its non-parents.
+4
+PROPOSED METHOD: ARBORIST
+At its core, Arborist learns to measure the taxonomic related-
+ness of node-pairs as a function of their respective feature vectors
+(§4.1). Taxonomic relatedness is defined in terms of two learnable
+parameters: (i) embeddings of the taxonomy nodes capturing their
+taxonomic roles, and (ii) a collection of linear maps that are shared
+across the taxonomy. The parameters are trained to minimize a
+large-margin ranking loss (§4.2), with a theoretically-grounded
+dynamic margin function (§4.3). To ensure fast convergence, Ar-
+borist employs distance-weighted negative sampling (§4.4). We
+now describe Arborist in detail.
+4.1
+Measuring Taxonomic Relatedness
+We seek to define a function s : V × V →R that can be trained to
+measure the taxonomic relatedness of node-pairs. For a child node
+u and parent node v, a straightforward definition of s using a linear
+map M ∈Rd×d is as follows:
+s(u,v) = (euM) · ev .
+(1)
+where M is learned from the child-parent node-pairs in the ground-
+truth taxonomy. Intuitively, M represents each taxonomic relation-
+ship as a linear transformation in the nodes’ feature-space. However,
+heterogeneous edge semantics may not be represented well by a
+single transformation. Hence, we capture the heterogeneity in edge
+semantics using a different linear map Mv at each parent node v:
+s(u,v) = (euMv) · ev .
+(2)
+A similar formulation was used in learning hierarchical similarity
+metrics [64]. A critical problem with this formulation is the ex-
+plosion in the number of parameters to O(d2|V |), where typically
+d = O(100) and |V | = O(1000). Additionally, the training data is
+fragmented into node-level subsets to train each linear map. Over-
+all, this constrains the method’s scalability, reduces its robustness
+to training data with missing or misplaced taxonomy nodes, and
+increases its tendency to overfit.
+We mitigate this problem by exploiting the fact that the number
+of distinct edge semantics in a taxonomy is often much smaller
+than O(|V |). Concretely, we assume k latent edge semantics and
+define each linear map as a weighted combination of k linear-maps
+P1, . . . , Pk ∈Rd×d that are shared across all taxonomy nodes:
+Mv =
+k
+Õ
+i=1
+wv[i] × Pi.
+(3)
+Here, wv ∈Rk is an embedding of the node v to be learned. This
+formulation reduces the number of parameters to O(d2k + k|V |)
+without fragmenting the training data.
+We further constrain the node-embeddings by defining them in
+terms of the node feature-vectors as follows:
+wv = f (ev)
+(4)
+where f : Rd →Rk is an arbitrary function to be learned. Con-
+straining the node-embeddings in this manner improves robustness
+for nodes having a large number of missing children, which are
+more susceptible to noise. We instantiate f as a simple linear-map;
+we did not see significant gains from more complex functions.
+Conference ’20, MonthName XX-XX, 2020, City, ST, USA
+Anonymous
+4.2
+Learning and Prediction
+We now seek to rank the taxonomy nodes for a given query node
+such that its true parents are ranked higher than other nodes. To
+improve robustness and generalization, we train the model such that
+child-parent node-pairs have higher taxonomic relatedness than
+other node-pairs by a large margin. Formally, our goal is to satisfy
+the following constraint for every child-parent pair (u,v) ∈E:
+s(u,v) ≥s(u,v′) + γ(u,v,v′)
+∀v′ ∈V −H(u),
+(5)
+where H(u) ⊂V is the set of parents of u, v′ is a non-parent node
+and γ(u,v,v′) is the desired margin defined as a function of the
+child, parent and non-parent nodes.
+We now derive the loss function to be minimized in order to
+satisfy the large-margin constraint (5). Denote by E(u,v,v′) the
+degree to which a non-parent node v′ violates the large-margin
+constraint of child-parent pair (u,v):
+E(u,v,v′) = max[0,s(u,v′) −s(u,v) + γ(u,v,v′)].
+(6)
+When the large-margin constraint is satisfied, E(u,v,v′) = 0 and
+the non-parent incurs no violation. Otherwise, E(u,v,v′) > 0.
+The overall loss function L(T) is the total violation of the large-
+margin constraints by the non-parents corresponding to every
+child-parent pair (u,v):
+L(T) =
+Õ
+(u,v)∈E
+Õ
+v′∈V −H(u)
+E(u,v,v′)
+(7)
+The node embeddings wv and linear-maps P1, . . . , Pk are jointly
+trained to minimize L(T) via gradient-descent. Given the trained
+parameters and a query node q < V having feature-vector eq, pre-
+dictions are made by ranking the taxonomy nodes v in decreasing
+order of their taxonomic relatedness s(q,v).
+4.3
+Dynamic Margin Function
+An L2-norm variant of the large-margin loss in (7) was recently
+proposed as the triplet loss [52] for similarity-learning in computer
+vision. The triplet loss employs a constant margin γ for all training
+pairs, which is tuned via cross-validation. To accommodate more
+complex decision boundaries, several approaches extend the triplet
+loss with dynamic or adaptive margins, set using heuristics [69] or
+learned from the data [19].
+We propose a principled dynamic margin function that requires
+no tuning, learning or heuristics. We relate the margin to the
+shortest-path distances in the taxonomy between the predicted and
+true parent nodes. Denote by d(·, ·) the undirected shortest-path
+distance between two nodes in the taxonomy. With the following
+theorem, we bound the undirected shortest-path distance between
+the highest-ranked predicted parent ˆv(u) = arg max ˜v s(u, ˜v) and
+any true parent v for every child node u:
+Proposition 1. When γ(u,v,v′) = d(v,v′), L(T) is an upper-
+bound on the sum of the undirected shortest-path distances between
+the highest-ranked predicted parents and true parents:
+Õ
+(u,v)∈E
+d(v, ˆv(u)) ≤L(T).
+Proof. The highest-ranked predicted parent for a node is its
+most-related taxonomy node. The following inequality thus follows:
+s(u, ˆv(u)) −s(u, ˜v) ≥0
+∀˜v ∈V .
+(8)
+Since γ(u,v, ˆv(u)) = d(v, ˆv(u)), we can use (6) and (8) to lower-
+bound the large-margin violation of the predicted parent:
+E(u,v, ˆv(u))
+=
+max[0,s(u, ˆv(u)) −s(u,v) + γ(u,v, ˆv(u))]
+≥
+s(u, ˆv(u)) −s(u,v) + γ(u,v, ˆv(u))
+≥
+γ(u,v, ˆv(u)) = d(v, ˆv(u))
+(9)
+Using the fact that E(u,v,v′) ≥0 and summing over child-parent
+pairs and their corresponding non-parents concludes our proof:
+L(T)
+=
+Õ
+(u,v)∈E
+Õ
+v′∈V −H(u)
+E(u,v,v′)
+(10)
+≥
+Õ
+(u,v)∈E
+E(u,v, ˆv(u))
+≥
+Õ
+(u,v)∈E
+d(v, ˆv(u)).
+□
+(11)
+Thus, minimizing the loss in (7) also minimizes an upper-bound
+on the sum of shortest-path distances between the highest-ranked
+predictions and true parent nodes. This guarantees that the pre-
+dicted parent nodes are near the true parent nodes in the ground-
+truth taxonomy. Intuitively, setting γ(u,v,v′) = d(v,v′) encour-
+ages non-parent nodes that are further away in the taxonomy to
+be scored relatively lower on taxonomic relatedness.
+This guarantee is important from the perspective of taxonomic
+experts; if Arborist incorrectly predicts the parent of a query-
+node, the taxonomic expert need only probe a small neighborhood
+around the predicted parent node in the taxonomy in order to
+find the correct parent. This requires substantially less effort than
+searching the entire taxonomy for the correct parent.
+4.4
+Scalable Negative Sampling
+Summing over all the non-parents v′ ∈V −H(u) for each pair
+(u,v) ∈E requires computing O(VE) taxonomic relatedness scores
+in every iteration of the minimization process, which is infeasi-
+ble for large-scale taxonomies. To improve scalability, we instead
+sample m non-parents (or negative samples) from V −H(u).
+The negative-sampling distribution plays an important role in the
+convergence of gradient-based minimization of the large-margin
+loss. In practice, sampling negatives uniformly results in extremely
+slow convergence. This is because negative samples that incur zero
+violation of the large-margin constraint in (6) contribute nothing to
+the gradient. Hence, heuristics such as “semi-hard negative mining”
+[52] have been proposed to select more effective negative samples.
+We employ a negative-sampling distribution based on distance-
+weighted negative-sampling [73], which we found provides a favor-
+able tradeoff between the computational effort of negative-sampling
+and the rate of convergence of minimization. We sample each non-
+parent v′ for a node-pair (u,v) with probability:
+Pr(v′|(u,v)) ∝eu · ev′.
+(12)
+Expanding Taxonomies with Implicit Edge Semantics
+Conference ’20, MonthName XX-XX, 2020, City, ST, USA
+Dataset
+Pinterest
+SemEval
+Mammal
+Number of edges
+10,768
+18,827
+5,765
+Number of nodes
+10,792
+8,154
+5,080
+Training nodes
+7,919
+7,374
+4543
+Test nodes
+2,873
+780
+537
+Depth
+7
+∞
+18
+Heterogenous Edges
+✓
+✗
+✓
+Table 2: Taxonomy datasets. Test sets have 15% of the leaf
+nodes and their outgoing edges. Taxonomy depth is the
+longest shortest-path length, or ∞if directed-cycles exist.
+5
+EVALUATION
+5.1
+Datasets and Metrics
+We evaluate Arborist in three different scenarios, each correspond-
+ing to a different taxonomy dataset (summarized in Table 2).
+Semi-synthetic heterogeneous taxonomy (Mammal). We con-
+struct a taxonomy from WordNet [40] by extracting the subgraph
+rooted at mammal.n.01, restricted to noun nodes and edges of three
+types: (i) hypernyms capturing is-a semantics (for example, rhino
+is-a odd-toed ungulate), (ii) part-holonyms capturing is-part-of-
+whole semantics (for example, hoof is-part-of-whole ungulate),
+and (iii) substance-holonyms, capturing is-part-of-substance se-
+mantics (for example, collagen is-part-of-substance cartilage).
+Other edge types in WordNet were either the reverse-form of the
+selected edge types, or cannot exist in a valid hierarchy (such as the
+synonym edge type). We compute the 300-dimensional FastText
+embedding [10] for each node.
+Benchmark homogeneous taxonomy (SemEval). We com-
+bine the train and test subsets of the SemEval 1A taxonomy used in
+the SemEval 2018 hypernym discovery shared task [12]. While this
+taxonomy exhibits homogeneous is-a semantics, it is a manually-
+verified benchmark for taxonomy expansion that enables compari-
+son with the state-of-the-art. As with Mammal, we compute the
+300-dimensional FastText embedding [10] for each node.
+Gold heterogeneous taxonomy (Pinterest). Pinterest is an
+expert-curated taxonomy that forms a core component of user and
+content understanding at Pinterest. The taxonomy nodes may be
+concrete entities (such as New York) or abstract concepts (such as
+Mental Wellbeing) from a wide array of domains such as fashion,
+health and travel. Each node represents an interest associated with
+a user or visual bookmark on Pinterest. The taxonomy exhibits
+implicit and heterogeneous edge semantics. We compute the 300-
+dimensional PinText embedding [80] for each node.
+To compute the embeddings of multi-word nodes in any dataset,
+we mean-pool the embeddings of their constituent words. For each
+dataset, we hold-out a 15% sample of the leaf nodes as a test subset
+and use the remainder for training and validation.
+Metrics. We measure the ranking quality of the predicted par-
+ents using the mean reciprocal rank (MRR). For a test query-parent
+pair, the reciprocal rank of the true test parent is the multiplicative
+inverse of its rank in the predicted parents list. If a test query has
+multiple parents, we use the the reciprocal of the highest ranked
+true parent. The MRR is the mean of the reciprocal ranks over all
+test queries, ranging from 0% (worst) to 100% (best).
+Pinterest
+SemEval
+Mammal
+Method
+Acc.(%) F1 (%) Acc. (%) F1 (%) Acc. (%) F1 (%)
+Vec-Concat
+86.216
+86.462
+62.618
+59.255
+72.466
+72.089
+Vec-Sum
+88.148
+87.741
+64.950
+60.600
+78.294
+77.236
+Vec-Diff
+87.783
+87.005
+66.469
+63.379
+77.787
+75.716
+Vec-Prod
+87.121
+85.953
+68.374
+65.670
+80.152
+78.017
+Table 3: Accuracy (Acc.) and F1-score (F1) in percentage of
+hypernym detectors on binary classification of child-parent
+pairs. Threshold set to 0.5. For both metrics, 100.0 is best.
+We also measure the recall at 15 (Recall@15) of the predicted
+parents, which is the fraction of test queries for which any of the
+true test parents lie in the top 15 predicted parents. This metric
+ignores the actual position of the parent in the predicted parent list.
+Finally, we measure the undirected shortest-path distance (SPDist)
+in the taxonomy between the top-ranked predicted parent and the
+true test-parent, averaged over all test queries. If the top-ranked
+predicted parent and the true test-parent lie in disconnected com-
+ponents of the taxonomy, their distance is set to the maximum
+distance between any two nodes in the taxonomy. This metric
+quantifies how easily a taxonomic expert can verify and fix incor-
+rectly attached nodes by probing a small neighborhood around
+their predicted parents.
+5.2
+Evaluating Hypernym Detectors for
+Taxonomy Expansion
+A straightforward approach to expand taxonomies is via state-of-
+the-art hypernym detectors [8, 51, 56, 70]. Hypernym detectors are
+binary classifiers that predict whether a node-pair is taxonomically-
+related. They operate on features derived from the feature-vectors
+of the node-pair via simple algebraic operations. We evaluate hy-
+pernym detectors based on vector concatenation (VEC-CONCAT),
+addition (VEC-SUM), subtraction (VEC-DIFF) and elementwise-
+product (VEC-PROD). For each hypernym detector, we train a bi-
+nary Random Forest classifier with 100 trees1 on a balanced training
+set, constructed by randomly sampling an unconnected node-pair
+for each connected node-pair in the training data.
+We verify that the trained hypernym detectors perform well in
+classifying taxonomically-related node-pairs, achieving F1 scores
+between 54-88% (Table 3). Notice that all hypernym detectors per-
+form relatively better on Pinterest than on SemEval and Mammal;
+a trend we will observe throughout our evaluation. This may be
+attributed to the feature-vectors for Pinterest being fine-tuned on
+Pinterest content, in contrast with the feature-vectors for SemEval
+and Mammal trained on an unrelated web corpus.
+Also notice that no single hypernym detector outperforms all the
+others across datasets. This suggests that taxonomic relationships
+are difficult to represent universally with simple algebraic oper-
+ations. Further, the best performing hypernym detector for each
+dataset achieves the lowest mean shortest-path distance (SPDist)
+between the predicted and true parents. This empirically motivates
+the utility of our theoretical guarantee (§4.3) for taxonomy expan-
+sion performance.
+1All other options were set to the scikit-learn-0.21.3 defaults.
+Conference ’20, MonthName XX-XX, 2020, City, ST, USA
+Anonymous
+Pinterest
+SemEval
+Mammal
+MRR (%)
+Recall@15 (%)
+SPDist
+MRR (%)
+Recall@15 (%)
+SPDist
+MRR (%)
+Recall@15 (%)
+SPDist
+Vec-Concat
+41.831
+64.671
+3.816
+20.992
+33.155
+3.474
+14.995
+30.726
+4.274
+Vec-Sum
+33.891
+62.548
+4.124
+17.803
+27.607
+4.047
+19.611
+38.175
+4.186
+Vec-Diff
+41.185
+67.699
+3.494
+18.514
+30.949
+4.163
+31.386
+46.182
+3.674
+Vec-Prod
+42.233
+68.743
+3.144
+17.483
+31.083
+4.178
+32.177
+48.976
+3.665
+CRIM
+53.223
+79.325
+2.393
+34.113
+53.877
+3.157
+21.345
+52.700
+4.080
+Arborist
+59.044
+83.606
+2.220
+44.867
+68.104
+2.105
+29.354
+61.639
+3.225
+Table 4: Mean reciprocal rank (MRR) and recall at 15 in percentage, and the mean shortest-path distance (SPDist) between the
+true parents and the highest-ranked predicted parents. For MRR and recall at 15, 100.0 is best. For SPDist, 0.0 is best. The best
+performing method for each dataset and metric combination is emphasized in bold.
+Query
+Predicted Parents
+Accurate Predictions (true parents in the top 4 predicted parents)
+luxor
+africa travel, european travel, asia travel, greece
+2nd month baby
+baby stage, baby, baby names, preparing for baby
+depression
+mental illness, stress, mental wellbeing, disease
+ramadan
+hosting occasions, holiday, sukkot, middle east and african cuisine
+minion humor
+humor, people humor, character humor, funny
+Inaccurate Predictions (true parents not in the top 4 predicted parents)
+artificial flowers
+planting, dried flowers, DIY flowers, edible seeds
+thor
+adventure movie, action movie, science movie, adventure games
+smartwatch
+wearable devices, phone accessories, electronics, computer
+disney makeup
+halloween makeup, makeup, costume makeup, character makeup
+holocaust
+history, german history, american history, world war
+Predictions for Non-Taxonomic Pinterest Search Queries
+what causes blackheads
+skin concern, mental illness, feelings, disease
+meatloaf cupcakes
+cupcakes, desserts, no bake meals, steak
+benefits of raw carrots
+food and drinks, vegetables, diet, healthy recipes
+kids alarm clock
+toddlers and preschoolers, child care, baby sleep issues, baby
+humorus texts
+poems, quotes, authors, religious studies
+Table 5: Top 4 predicted parents by Arborist on Pinterest for a sample of test queries (top, middle) and search queries not
+present in the taxonomy (bottom). The true parent for each query is emphasized in bold.
+We now evaluate hypernym detectors on the taxonomy expan-
+sion task. We use the predicted probability of a node-pair being
+taxonomically related to rank the taxonomy nodes for each test
+query node. The results are in Table 4. The results demonstrate that
+hypernym detectors can serve as strong baselines for taxonomy ex-
+pansion. This is especially true for high-quality feature-vectors like
+in PinText, which may capture hierarchical relationships between
+taxonomy nodes by virtue of being fine-tuned on relevant corpora.
+Intriguingly, hypernym detectors outperform all other methods
+on Mammal (in terms of the MRR). The nodes in the Mammal
+taxonomy are dominated by scientific terms, which are rare in the
+crawled web corpora used to train the input FastText embeddings.
+Hence, the embeddings may not contain enough information to
+infer hierarchical relationships. With such information-poor em-
+beddings (with respect to the given taxonomy), simpler models such
+as hypernym detectors may be preferable. Hypernym detectors are
+worse off on other metrics, but not by a significant margin.
+5.3
+Comparing Arborist with
+k-Projection Learning (CRIM)
+We now compare Arborist with CRIM [9], a variant of projection-
+learning [20] that outperformed competing methods by a significant
+margin on the SemEval 2018 hypernym discovery shared task [12].
+CRIM learns a global weighted combination M of k linear-maps to
+represent all taxonomic relationships. The taxonomic relatedness
+of a node-pair u,v is measured as s(u,v) = (euM) · ev, where eu
+and ev are the node-pair feature vectors. M is trained to minimize
+a binary cross-entropy loss similar to that of word2vec [39].
+We reimplement the supervised (corpus-free) variant of CRIM
+with the initialization, fine-tuning and negative-sampling heuristics
+described in [12]. We discard the positive-subsampling and multi-
+task learning heuristics that were found to be detrimental. We
+optimize both Arborist and CRIM using Adam [29] and tune their
+hyperparameters on a validation subset of the training data. Since
+Arborist and CRIM converge at different rates, we train both
+Expanding Taxonomies with Implicit Edge Semantics
+Conference ’20, MonthName XX-XX, 2020, City, ST, USA
+methods for 150 epochs (for Pinterest and SemEval) or 500 epochs
+(for Mammal) and select the trained model at the epoch with the
+highest validation MRR (see appendix for details).
+Taxonomy expansion results are reported in Table 4. Overall,
+Arborist and CRIM improve over the hypernym detectors on all
+datasets and evaluation metrics, by over 200% in some cases. This
+justifies explicitly optimizing for the taxonomy expansion ranking
+task, and representing taxonomic relationships with more com-
+plex functions of the node-pair feature-vectors. Further, Arborist
+outperforms CRIM on all datasets and evaluation metrics. Inter-
+estingly, Arborist also outperforms CRIM on the homogeneous
+SemEval taxonomy. This may be attributed to SemEval indeed
+having unobserved heterogeneity in its edge semantics.
+Table 5 reports the top-ranked predicted parents by Arborist
+on Pinterest for both accurately and inaccurately-predicted test
+queries (true parents are emphasized in bold). The results showcase
+predictions on a variety of node-types present in the Pinterest
+taxonomy, from concrete entities such as locations (Luxor) and
+fictional characters (Thor) to abstract concepts such as depression.
+We observe that even inaccurately-predicted parents conform to
+some notion of relatedness and immediate hierarchy, suggesting
+potentially missing edges in the taxonomy.
+We also showcase Arborist’s predictions for search queries made
+on Pinterest that are not present in the taxonomy (Table 5, bottom).
+Qualitatively, Arborist is able to accurately associate unseen natu-
+ral language queries to potentially related nodes in the Pinterest
+taxonomy. Of note is the search query what causes blackheads,
+which is not just associated with its obvious parent skin concern,
+but also to the very relevant parent feelings.
+5.4
+Ablation Study
+The performance of Arborist may be attributed to two key model-
+ing choices: (i) learning node-specific embeddings wv to capture
+heterogeneous edge semantics, and (ii) optimizing a large-margin
+ranking loss with dynamic margins. We now evaluate the impact
+of each of these modeling choices on taxonomy expansion perfor-
+mance with a suite of ablation experiments conducted on Pinterest.
+We use CRIM as a baseline. The results are summarized in Fig. 2.
+We first restrict Arborist to a single embedding for all nodes
+(termed single-role). With this restriction, Arborist can no longer
+capture heterogeneous edge semantics. Performance gains over
+CRIM can only attributed to the large-margin loss. Fig. 2(a) shows
+that Arborist still improves over CRIM by 2 percentage points,
+demonstrating the utility of the large-margin loss.
+Next, we allow Arborist to capture heterogeneous edge seman-
+tics, but modify it to minimize the BCE loss used by CRIM. In this
+configuration, performance gains over CRIM can be attributed to
+capturing heterogeneous edge semantics. From Fig. 2(a), we find
+that this configuration improves over CRIM by 4 percentage points.
+Thus, capturing heterogeneous edge semantics has a greater mar-
+ginal impact on performance than the choice of loss function.
+Finally, we modify Arborist to use constant margins and evalu-
+ate its performance with different margin values. The performance
+at the best margin value is reported in Fig. 2(a). We find that the
+restriction to constant margins affects performance severely, in
+addition to introducing another hyperparameter to tune. For no
+CRIM
+Single 
+role
+BCE
+loss
+Const.
+margin
+Arborist
+45
+50
+55
+60
+65
+MRR (%)
+Modified Arborist
+(a) Summary of ablation study
+0.01
+0.1
+1.0
+5.0
+10.0
+Constant margin (u, v, v′) =
+20
+30
+40
+50
+60
+MRR (%)
+Arborist with dynamic margins
+(b) MRR for each value of constant margin vs. dynamic margins
+0
+50 100 150
+Training Epoch
+0.0
+0.2
+0.4
+0.6
+0.8
+Training loss
+0
+50
+100 150
+Training Epoch
+0
+200
+400
+600
+800
+1000
+Distance-weighted
+Uniform
+Number of
+active
+samples
+(c) Uniform vs. distance-weighted negative-sampling
+Figure 2: Ablation study of Arborist on Pinterest: (a) sum-
+mary of results, (b) effect of dynamic margins vs. constant
+margins, (c) effect of uniform negative sampling vs. distance-
+weighted negative sampling.
+constant margin-value did performance exceed that of Arborist
+with dynamic margins (Fig. 2(b)).
+The negative-sampling distribution plays a critical role in the
+convergence of the loss function. To understand its effect on tax-
+onomy expansion performance, Fig. 2(c) (left) shows the training
+loss of Arborist at each training epoch with uniform negative
+sampling and distance-weighted negative sampling. With uniform
+negative-sampling, the training loss quickly drops to near-zero,
+leading to extremely slow convergence. This is due to the lack
+of active negative-samples that contribute non-zero values to the
+training-loss. This is evident from Fig. 2(c) (right), which shows
+the number of active negative-samples at each training epoch for
+uniform and distance-weighted negative sampling. With distance-
+weighted negative sampling, the number of active samples drops
+at a slower rate. This prevents the training loss from dropping to
+near-zero too quickly and facilitates faster convergence.
+Conference ’20, MonthName XX-XX, 2020, City, ST, USA
+Anonymous
+8
+16 32 48 64
+k
+30
+40
+50
+60
+MRR (%)
+1
+2
+5
+10
+15
+m
+20 40 60 80
+Train Fraction (%)
+10
+20
+30
+40
+50
+60
+MRR (%)
+0
+50 100 150
+Train Epoch
+3.25
+3.75
+4.25
+4.75
+SPDist
+Figure 3: Effect of the number of linear maps k (top-left),
+the number of negative samples m (top-right) and the train-
+ing data fraction (bottom-left) on the MRR of Arborist on
+Pinterest. Also shown (bottom-right) is the average undi-
+rected shortest-path distance between predicted and true
+test parents (SPDist) with training epoch.
+5.5
+Effect of Hyperparameters
+Fig. 3 shows the MRR of Arborist on Pinterest for different val-
+ues of the number of linear maps k (top-left) and the number of
+negative samples m (top-right). We find that increasing k improves
+taxonomy expansion performance monotonically, due to the in-
+creased model flexibility. Increasing m improves performance to a
+certain limit, after which there is no significant improvement. A
+larger m promotes a larger number of active negative samples that
+contribute to the gradient of the loss, leading to faster convergence.
+The obtained MRR for different k and m in Fig. 3 also indicates
+that the performance of Arborist is not sensitive to small variations
+in k and m. Thus, tuning k and m by cross-validating over a coarse
+grid of values suffices in practice. Our recommendation is to set
+k and m to be as large as possible, within the constraints of the
+available compute time and memory.
+We also evaluate the robustness of Arborist as the fraction of
+training data available decreases in Fig. 3 (bottom-left). We find that
+Arborist remains performant until more than half the training
+data is discarded, at which point it performs on par with hypernym
+detectors trained on 85% of the taxonomy. This robustness may be
+attributed to the sharing of information between different nodes via
+the global linear maps; nodes that lack sufficient incoming edges to
+learn from may benefit from similar nodes that have sufficient data.
+In Fig. 3 (bottom-right), we also demonstrate that Arborist
+reduces the mean undirected shortest-path distance between the
+predicted and true test parent nodes (SPDist) in each training epoch.
+While our proposition in §4.3 guarantees the same for the training
+data, Fig. 3 suggests that the same result may also hold for unseen
+test data. We delegate formal treatment of this generalization ability
+to future work.
+microglia
+gastrula
+eye
+oligodendroglia
+cetacean
+eardrum
+cusk
+archenteron
+periwinkle
+female
+body
+horse's
+foot
+bridge
+kingfish
+rod
+edible
+cockle
+croaker
+columbiform
+bird
+webworm
+moth
+requiem
+shark
+bee
+colubrid
+snake
+parrot
+rat
+kangaroo
+greenling
+snapping
+turtle
+arthropod
+woolly
+aphidtineoid
+gastropod
+percoid
+fish
+goat
+antelope
+Hypernym
+Part Holonym
+Figure 4: Taxonomic roles inferred by Arborist on the Mam-
+mal taxonomy. One-dimensional PCA projection (on the y-
+axis) of the node-embeddings wv for all internal nodes v.
+Nodes colored by their assigned roles. Nodes assigned to the
+substance holonym role omitted due to rarity.
+5.6
+Inferred Taxonomic Roles
+We now qualitatively explore the embeddings of each node wv
+learned by Arborist. We are interested in whether these embed-
+dings serve as a good proxy for the nodes’ taxonomic roles, without
+being explicitly trained for taxonomic role classification. We ex-
+ploit the availability of ground-truth edge-semantics available in the
+Mammal taxonomy to assign one of three taxonomic roles to each
+internal node: hypernym (is-a), part-holonym (is-part-of-whole)
+or substance-holonym (is-part-of-substance). We construct the
+assignment based on each nodes’ most frequent incoming edge
+type. Statistics of the assignment are reported in Table 6. Due to
+the rarity of the substance-holonym role, we omit it from future
+consideration in this section.
+To understand the variation in node-embeddings with their
+ground-truth taxonomic roles, we visualize in Fig. 4 the 1-dimensional
+PCA projections (on the y-axis) of wv for all the internal nodes of
+the Mammal taxonomy. Nodes are colored based on their assigned
+taxonomic role, and a random sample of nodes are labelled by
+their associated text. While we do not observe any distinct cluster-
+ing (even with two-dimensional PCA or t-SNE projections), we do
+observe a systematic variation in the taxonomic-role with the node-
+embedding. Fig. 4 reveals a continuous transition of taxonomic
+roles along the PCA dimension (the y-axis) from the hypernym role
+(at the bottom) to the part-holonym role (at the top).
+Expanding Taxonomies with Implicit Edge Semantics
+Conference ’20, MonthName XX-XX, 2020, City, ST, USA
+Node Role
+Number of nodes
+Hypernym (is-a)
+1164
+Part-Holonym (is-part-of-whole)
+260
+Substance-Holonym (is-part-of-substance)
+13
+Table 6: Number of internal nodes in Mammal assigned to
+each role, based on their most frequent incoming edge-type.
+Role-Classifier
+ROC-AUC (%)
+F1-Score (%)
+Accuracy (%)
+Majority Class
+50.000
+32.000
+80.946
+Random Forest
+76.001
+44.536
+81.641
+Table 7: Performance of node-role classification using the
+embeddings wv learned by Arborist. Nodes restricted to
+internal nodes with hypernym or part-holonym roles, split
+into 50% train and test subsets. Thresholds for F1-score and
+accuracy tuned on the test subset.
+This suggests that, while simple clustering may not be able to
+recover taxonomic roles from node-embeddings, more complex
+models may succeed. To quantify if any signal exists in the node-
+embedding that predicts its taxonomic role, we train a Random For-
+est classifier with 100 trees on the node-embeddings and report the
+taxonomic-role classification performance in Table 7. The classifier
+performs significantly better than simply predicting the majority
+class (hypernym). This confirms the existence of some predictive
+signal in the node-embedding for taxonomic-role classification. We
+delegate further study on the recovery of taxonomic-roles from
+node embeddings to future work.
+6
+CONCLUSION
+We have proposed Arborist, an approach to automatically expand
+textual taxonomies with heterogeneous edge semantics that are un-
+observed. Arborist learns latent representations of the edge seman-
+tics, along with node embeddings capturing their taxonomic roles,
+to measure taxonomic relatedness between node-pairs. Arborist is
+trained by optimizing a large-margin ranking loss with a dynamic
+margin function, which is theoretically guaranteed to minimize an
+upper-bound on the shortest-path distance between the predicted
+parents and actual parents in the taxonomy. The shared linear maps
+representing the edge semantics and large-margin ranking loss im-
+prove robustness and generalization. Via extensive evaluation on a
+large-scale taxonomy at Pinterest and several public datasets, we
+have demonstrated that Arborist outperforms the state-of-the-art.
+The inferred taxonomic roles further induce a useful categorization
+of the taxonomy nodes that merits further exploration. In future
+work, we plan to develop an online update mechanism to train
+Arborist in a streaming fashion. We also plan to derive confidence
+scores for the predicted parents, providing an additional knob for
+human experts to filter out irrelevant predictions.
+7
+ACKNOWLEDGEMENTS
+Redacted for anonymity.
+APPENDIX: IMPLEMENTATION DETAILS
+We describe in this appendix several implementation details that
+we found were crucial for performance.
+7.1
+Dichotomous node feature-vectors
+For each node v, we create two versions of its feature-vector, e1v
+to use when the node appears in eq. (2) as a child and e2v to use
+when it appears as a parent. We fix e1v but allow e2v to be optimized
+during training. This is analogous to the pivot and context vectors
+in word2vec [39].
+7.2
+Parameter initialization
+We adopt the following initialization strategy for both Arborist
+and CRIM. Node feature-vectors are normalized to have unit L2
+norm before training (but are allowed to have unrestricted norms
+henceforth). The linear maps P1, . . . , Pk are initialized to the iden-
+tity matrix plus zero-mean Gaussian noise with standard-deviation
+0.01 (as in [9]). For Arborist, we only construct Mv for internal
+nodes in the training taxonomy, since leaf nodes have no incom-
+ing edges to learn from. This significantly reduces the number of
+parameters (in a complete binary tree, leaf nodes account for over
+half the nodes in the tree).
+7.3
+Margin pre-computation
+We pre-compute and store the margins γ(u,v,v′) = d(v,v′) by
+computing the the undirected shortest-path distance between all
+pairs of nodes in the training taxonomy using breadth-first search
+in O(V 2 + VE) time. We set the distance between disconnected
+nodes to the maximum shortest-path distance between any two
+nodes in the training taxonomy dmax.
+7.4
+Score and margin scaling
+Scores s(u,v) are unbounded, while margins γ(u,v,v′) = d(v,v′)
+are typically small non-negative integers. Hence, we scale the score
+to lie in [0, 1] by applying a sigmoid transformation. We also scale
+the margin to lie in [0, 1] by normalizing it by dmax, the maximum
+distance between any two nodes. This causes the margin-violations
+(eq. 6) to become extremely small floating-point values and lead to
+numerical instabilities. To alleviate this issue, both the score and
+margin are further log-transformed.
+7.5
+Non-uniform negative-sampling
+We find that CRIM tends to rank parent nodes with a large number
+of children highly; a form of lexical memorization [30]. We alleviate
+this by sampling non-parents with probability proportional to the
+number of children they have. While this significantly improved
+the performance of CRIM, it did not have any significant effect on
+that of Arborist.
+7.6
+Cross-validation
+We found the validation loss to be a poor proxy for taxonomy
+expansion performance (exemplified by the loss curves in Fig. 5).
+Hence, we use the validation MRR for model selection instead.
+Conference ’20, MonthName XX-XX, 2020, City, ST, USA
+Anonymous
+0
+100
+200
+300
+400
+500
+Epoch
+0
+2
+4
+6
+Train Loss
+Val. Loss
+0
+100
+200
+300
+400
+500
+Epoch
+0
+5
+10
+15
+20
+Val. MRR
+(a) CRIM on Mammal
+0
+100
+200
+300
+400
+500
+Epoch
+0.0
+0.2
+0.4
+Train Loss
+Val. Loss
+0
+100
+200
+300
+400
+500
+Epoch
+0
+5
+10
+15
+20
+25
+30
+Val. MRR
+(b) Arborist on Mammal
+Figure 5: Train/validation loss curves (left) and validation
+MRR with epoch (right) of CRIM and Arborist on Mammal.
+Dataset
+Pinterest
+SemEval
+Mammal
+Arborist
+No. of train epochs
+150
+150
+500
+No. of projections
+48
+64
+48
+No. of neg. samples
+5
+15
+5
+Batch-size
+4096
+4096
+4096
+Learning-rate
+0.0005
+0.0005
+0.0005
+CRIM
+No. of train epochs
+150
+150
+500
+No. o

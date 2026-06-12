@@ -1,0 +1,15 @@
+{
+  "source": "YOLO.pdf",
+  "source_group": "Awesome-ML-Papers/CV",
+  "processed_at": "2026-06-08",
+  "agent": "agent6_remaining",
+  "concepts": [
+    {
+      "finding": "YOLO reframes object detection as a single regression problem, directly predicting bounding boxes and class probabilities from full images in one evaluation, achieving 45 FPS with 63.4 mAP on VOC2007.",
+      "category": "ModelCandidate",
+      "implication": "Unified end-to-end models that bypass multi-stage pipelines can dramatically reduce latency while maintaining accuracy, directly transferable to real-time query intent classification.",
+      "open_question": "Can a similar unified architecture predict query intent directly from raw query text without separate retrieval/ranking stages?",
+      "testable_hypothesis": "A unified end-to-end query intent classifier will achieve lower latency than a multi-stage pipeline while maintaining within 5% of its accuracy."
+    }
+  ]
+}

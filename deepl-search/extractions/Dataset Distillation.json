@@ -1,0 +1,148 @@
+{
+  "source": "Dataset Distillation.pdf",
+  "source_group": "Awesome-ML-Papers/Other",
+  "processed_at": "2026-06-08",
+  "agent": "agent5_final",
+  "concepts": [
+    {
+      "finding": "Below, we introduce a different learning objective to further\ndemonstrate the ﬂexibility of our method.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Experiments on multiple datasets\nshow the advantage of our approach compared to alternative methods.",
+      "category": "Baseline",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "We demonstrate that a handful of distilled images can be used to train a model with a ﬁxed initialization\nto achieve surprisingly high performance.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Extensive experiments on four publicly available datasets, MNIST, CIFAR10, PASCAL-VOC, and\nCUB-200, show that our approach often outperforms existing methods.",
+      "category": "Baseline",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "This advantage makes our method potentially effective for online training\nalgorithms and useful for the case where malicious users hijack the data feeding pipeline for only one\ngradient step (e.g., one network transmission).",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Our method\noutperforms few-shot domain adaptation (Motiian et al., 2017) and other baselines in most settings.",
+      "category": "Baseline",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "For example, we show that it is possible to compress 60, 000\nMNIST training images into just 10 synthetic distilled images (one per class) and\nachieve close to original performance with only a few gradient descent steps, given\na ﬁxed network initialization.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "We show that we\ncan go as low as one synthetic image per category, training the same model to reach surprisingly\ngood performance on these synthetic images.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Finally, we study a simple linear model, deriving a lower bound on the\nsize of distilled data required to achieve the same performance as training on the full dataset.",
+      "category": "Experiment",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "However, methods (Zhu, 2013; 2015) inspired by this concept need the existence of\ntarget models, which our method does not require.",
+      "category": "TargetConstruct",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "How to address the limitation described: However, methods (Zhu, 2013; 2015) inspired by this concept need the existence of\ntarget models, which our method does not require.",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "In Section 3.3, we further study a linear network case to help readers understand both the\nproperty and limitation of our method.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "How to address the limitation described: In Section 3.3, we further study a linear network case to help readers understand both the\nproperty and limitation of our method.",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Finally, Section 3.5 and Section 3.6 demonstrate how to obtain\ndistilled images with different initialization distributions and learning objectives.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "To address the limitation of\nusing a single GD step, we extend our method to multiple GD steps in the next section.",
+      "category": "FailureRisk",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "How to address the limitation described: To address the limitation of\nusing a single GD step, we extend our method to multiple GD steps in the next section.",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Such learned distilled data essentially ﬁne-tune weights\npre-trained on one dataset to perform well for a new dataset, thus bridging the gap between the two\ndomains.",
+      "category": "Experiment",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Domain mismatch and dataset bias represent a challenging problem in machine learning\ntoday (Torralba & Efros, 2011).",
+      "category": "Experiment",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Figure 4a shows that using more steps signiﬁcantly improves the results.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Section 3.3 has shown theoretical limitations of using only one step in\na simple linear case.",
+      "category": "FailureRisk",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "How to address the limitation described: Section 3.3 has shown theoretical limitations of using only one step in\na simple linear case.",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Our method with both ﬁxed and\nrandom initializations outperforms all the baselines on CIFAR10 and most of the baselines on MNIST.",
+      "category": "Baseline",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "4.2\nDISTILLATION WITH DIFFERENT INITIALIZATIONS AND OBJECTIVES\nNext, we show two extended settings of our main algorithm discussed in Section 3.5 and Section 3.6.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Our method signiﬁcantly outperforms the baselines.",
+      "category": "Baseline",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    }
+  ]
+}

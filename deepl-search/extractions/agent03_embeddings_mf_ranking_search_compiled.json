@@ -1,0 +1,322 @@
+[
+  {
+    "source": "Query Intent Detection using CNN (Hashemi et al., Yahoo! 2016)",
+    "finding": "CNN-based query vector representations (trained on word2vec + CNN with filters of size 2,3,4 + max pooling) used as features for multi-class intent classification. Achieved 81.6% accuracy on 125 low-level classes and 90.3% on 14 high-level classes. Query vectors enable semantically similar queries to cluster together via k-Means.",
+    "category": "Model Candidate",
+    "implication": "CNN-based query encoders can produce intent-aware query embeddings suitable for clustering into JTBD categories. The hierarchical taxonomy (3800+ low-level intents, 350 high-level) provides a blueprint for structuring keyword-to-intent taxonomies.",
+    "open_question": "How many intent classes are optimal for a keyword-intent product? Can a flat vs hierarchical clustering approach produce more actionable JTBD clusters?",
+    "testable_hypothesis": "CNN-extracted query embeddings will produce higher NMI (Normalized Mutual Information) clustering than simple word2vec averaging when measured against manually labeled intent categories."
+  },
+  {
+    "source": "Query Intent Detection using CNN (Hashemi et al.)",
+    "finding": "Query clustering case study: k-Means (k=125) on CNN query vectors grouped semantically similar queries together. E.g., queries about 'george selvie wiki', 'james brown biography', 'bob toski bio' clustered together. Some clusters contained mixtures of related intents (e.g., movie cast AND musical band members in same cluster).",
+    "category": "Evaluation",
+    "implication": "k-Means on query embeddings with k equal to number of intent classes provides a validation approach. Cluster purity can indicate embedding quality and taxonomy alignment.",
+    "open_question": "Should k-Means k be set to expected number of intents, or determined via elbow/silhouette methods?",
+    "testable_hypothesis": "Clustering on intent-tuned CNN embeddings will show higher cluster purity than on generic word2vec averaging embeddings."
+  },
+  {
+    "source": "Search Retargeting using Directed Query Embeddings (Grbovic et al., Yahoo! 2015)",
+    "finding": "query2vec: Two-level hierarchical neural language model. Upper layer models temporal context of query sequences (skip-gram). Bottom layer models word sequences within a query (CBOW). Optimizes joint log-likelihood of: (1) predicting neighboring queries, (2) predicting query from its words, (3) predicting words from context+query. Trained on 12B search sessions, 45M+ query vectors.",
+    "category": "Model Candidate",
+    "implication": "Temporal query sequences (sessions) can be leveraged to learn query embeddings that capture search intent transitions. Joint word+query modeling helps tail queries by relying more on content vs context.",
+    "open_question": "How to define session boundaries for keyword clustering when search history is not available? Can synthetic sequences be generated?",
+    "testable_hypothesis": "Session-trained query embeddings yield better intent clustering than single-query embeddings because they capture reformulation patterns."
+  },
+  {
+    "source": "Search Retargeting using Directed Query Embeddings",
+    "finding": "Directed ad-query2vec modeled temporal direction (only past queries predict future) and incorporated ad click context. Achieved 0.91% yield rate improvement and 1.12% CTR improvement over standard keyword lists. Increased user coverage by 13%.",
+    "category": "Experiment",
+    "implication": "Directed (causal) embeddings that only use past context can better predict future user intent. Incorporating negative signals (skipped ads) improves embedding quality for intent prediction.",
+    "open_question": "Should keyword-intent clustering use undirected (symmetric) or directed (causal) co-occurrence?",
+    "testable_hypothesis": "Directed embeddings that only use context preceding a keyword in a session will form more predictive intent clusters than undirected embeddings."
+  },
+  {
+    "source": "Scalable Semantic Matching of Queries to Ads (Grbovic et al., Yahoo! SIGIR 2016)",
+    "finding": "search2vec: Skip-gram over search sessions (queries, ad clicks, link clicks) learning joint query-ad embeddings in 300-d space. Incorporated implicit negatives (skipped ads above clicked ad) and dwell-time weighting. Trained on 9.1B sessions, 126M unique queries, 42.9M ads, 131.7M links via distributed parameter server. 10x faster than single-machine training.",
+    "category": "Model Candidate",
+    "implication": "Joint embedding of queries, ads, and link clicks creates a unified semantic space. Implicit negatives from user behavior (skipped items) provide training signal. Dwell time weighting distinguishes good clicks from accidental clicks.",
+    "open_question": "For keyword-to-intent clustering, what constitutes a 'positive' vs 'negative' signal when user behavior data is limited?",
+    "testable_hypothesis": "Incorporating implicit negatives (keywords from different user-intent categories that were skipped) improves cluster separation compared to random negatives only."
+  },
+  {
+    "source": "Scalable Semantic Matching of Queries to Ads (search2vec)",
+    "finding": "search2vec achieved oAUC 0.7254 and Macro NDCG 0.8303 on editorial query-ad pairs. With dwell time + implicit negatives: oAUC 0.7392, Macro NDCG 0.8569. Online A/B test: search2vec +6.21% CTR, search2vec_dwell,in +10.64% CTR vs baseline.",
+    "category": "Evaluation",
+    "implication": "Editorial judgments of query-ad relevance are a reliable offline evaluation. Online A/B testing on CTR validates offline metrics. Threshold of 0.65 cosine similarity captures most Good/Excellent/P perfect pairs.",
+    "open_question": "What offline evaluation metrics best predict online performance for keyword clustering?",
+    "testable_hypothesis": "NDCG@K on editorial judgments correlates with downstream task performance in keyword-intent clustering products."
+  },
+  {
+    "source": "Embedding-based Retrieval in Facebook Search (Huang et al., KDD 2020)",
+    "finding": "Unified embedding model: two-tower architecture with triplet loss (margin m critical - 5-10% recall variance). Query encoder incorporates text (char n-grams + word n-grams), location features (+2.20% recall), social embedding features (+1.77% recall). Searcher context is integral - not just text.",
+    "category": "Target Construct",
+    "implication": "Intent/query understanding must incorporate user context (location, social graph, demographics), not just query text. Embedding-based retrieval is a recall optimization problem first, precision optimization second.",
+    "open_question": "What contextual signals are available and relevant for keyword clustering without user-level data?",
+    "testable_hypothesis": "Adding location and domain-specific features to keyword embeddings improves cluster purity over text-only embeddings."
+  },
+  {
+    "source": "Embedding-based Retrieval in Facebook Search",
+    "finding": "Training data findings: random negatives outperform non-click impressions as negatives (55% recall regression with non-click impressions). Click as positive and impression as positive perform equally. Hard mining strategies improve model's ability to differentiate similar results.",
+    "category": "Data",
+    "implication": "For pairwise/triplet training, random negatives are often better than impression-based negatives because they better approximate the real retrieval distribution. Hard negatives matter for fine-grained differentiation.",
+    "open_question": "For keyword clustering, should negatives be random keywords or carefully chosen near-neighbor keywords?",
+    "testable_hypothesis": "Using 'hard' negatives (keywords from adjacent intent categories) in triplet loss produces better cluster separation than random negatives."
+  },
+  {
+    "source": "PinText: Multitask Text Embedding System (Pinterest 2019)",
+    "finding": "Multitask learning framework: joint training of multiple objectives (search ranking, related Pins, board prediction, ads) produces better query/Pin embeddings than single-task. Shared embedding layer with task-specific towers.",
+    "category": "Model Candidate",
+    "implication": "Multitask learning for keyword embeddings can capture multiple facets of intent simultaneously. A keyword might have different intents depending on context (e.g., 'apple' as fruit vs tech).",
+    "open_question": "How to define multiple tasks that jointly improve keyword-intent understanding?",
+    "testable_hypothesis": "Multi-task learned keyword embeddings (e.g., clustering + ranking + classification) outperform single-task embeddings for intent clustering."
+  },
+  {
+    "source": "PTE: Predictive Text Embedding through Large-scale Heterogeneous Text Networks (Tang et al., 2015)",
+    "finding": "Heterogeneous text network embedding: constructs bipartite networks of word-word, word-document, and word-label. Learns embeddings via LINE (first-order + second-order proximity) over this heterogeneous graph. Preserves both local and global structure.",
+    "category": "Model Candidate",
+    "implication": "Keyword clustering can benefit from heterogeneous network construction: keyword-keyword co-occurrence, keyword-document, keyword-intent label relations. This captures richer semantic signal than just keyword co-occurrence.",
+    "open_question": "What node types (keywords, documents, intents, categories) should form the heterogeneous network for keyword clustering?",
+    "testable_hypothesis": "A heterogeneous embedding approach (PTE-style) for keywords, documents, and intent labels will outperform homogeneous keyword-only embeddings for intent clustering."
+  },
+  {
+    "source": "StarSpace: Embed All The Things (Facebook 2017)",
+    "finding": "General-purpose neural embedding framework for multi-relational data. Learns embeddings for any entity type (words, sentences, documents, users, items, labels) in the same space using a unified pairwise similarity loss with negative sampling. Supports classification, ranking, similarity, and content-based recommendation.",
+    "category": "Model Candidate",
+    "implication": "A unified embedding framework where keywords, intents, documents, and user segments all exist in the same vector space enables direct similarity computation between any entity types.",
+    "open_question": "Should intents be modeled as learnable embeddings or as centroid clusters of keyword embeddings?",
+    "testable_hypothesis": "Learning intent embeddings jointly with keyword embeddings (StarSpace-style) produces more coherent clusters than post-hoc clustering of keyword embeddings."
+  },
+  {
+    "source": "Item2Vec (Barkan & Koenigstein, Microsoft 2016)",
+    "finding": "Applies Skip-gram with Negative Sampling (SGNS) to item-based collaborative filtering. Treats item sets/baskets as sequences (discarding temporal order). Each pair of items in the same set is a positive example. Window size = set size. Outperforms SVD for item similarity, especially for unpopular items (68% vs 58.4% genre classification accuracy).",
+    "category": "Model Candidate",
+    "implication": "Keyword clustering can use Item2Vec-style co-occurrence within documents/queries as positive signals. The subsampling of frequent words and negative sampling by unigram^0.75 distribution helps with tail queries.",
+    "open_question": "Do keywords in the same search session or document define a 'basket'? What constitutes a meaningful co-occurrence set?",
+    "testable_hypothesis": "Item2Vec on keyword co-occurrence within search sessions produces better intent clusters than matrix factorization (SVD) of keyword-keyword co-occurrence."
+  },
+  {
+    "source": "DeepWalk (Perozzi et al., KDD 2014)",
+    "finding": "Network embedding via truncated random walks treated as sentences. Applies Skip-gram to vertex sequences generated by random walks on graph. Outperforms spectral methods with 60% less training data. Learns label-independent representations capturing community structure.",
+    "category": "Model Candidate",
+    "implication": "Keyword co-occurrence can be modeled as a graph where nodes are keywords, edges are co-occurrence weights. Random walks generate 'keyword sentences' that capture higher-order relationships beyond direct co-occurrence.",
+    "open_question": "What edge weighting scheme best captures keyword relatedness for JTBD clustering?",
+    "testable_hypothesis": "DeepWalk embeddings on a keyword co-occurrence graph will capture higher-order intent relationships that direct co-occurrence (word2vec) misses."
+  },
+  {
+    "source": "node2vec (Grover & Leskovec, KDD 2016)",
+    "finding": "Biased random walk with two parameters: p (return parameter - likelihood of revisiting a node) and q (in-out parameter - BFS vs DFS exploration). p and q can be learned from labeled data. BFS captures structural equivalence, DFS captures homophily. Outperforms DeepWalk by 26.7% on multi-label classification and 12.6% on link prediction.",
+    "category": "Model Candidate",
+    "implication": "If keyword-intent clustering requires capturing both lexical similarity (homophily - keywords co-occurring together) and functional similarity (structural equivalence - keywords playing similar roles), node2vec's tunable p and q parameters can balance these.",
+    "open_question": "What is the optimal node2vec p/q tradeoff for keyword-intent clustering? Is BFS-like or DFS-like exploration more important?",
+    "testable_hypothesis": "node2vec embeddings (with tuned p, q) will outperform DeepWalk at recovering known intent categories from keyword co-occurrence graphs."
+  },
+  {
+    "source": "LINE (Tang et al., WWW 2015)",
+    "finding": "Preserves first-order proximity (observed links) and second-order proximity (shared neighborhood). Second-order proximity captures that nodes with shared neighbors should be similar even with no direct edge. Edge-sampling algorithm addresses gradient explosion with weighted edges. Scales to millions of nodes on single machine.",
+    "category": "Model Candidate",
+    "implication": "Second-order proximity in keyword graphs captures that two keywords are similar if they co-occur with similar neighbor keywords - even if they never directly co-occur. This is critical for synonyms and paraphrases.",
+    "open_question": "What is the relative importance of first-order vs second-order proximity for keyword intent clustering?",
+    "testable_hypothesis": "Second-order proximity (LINE 2nd order) better captures synonym intent relationships than first-order proximity for keyword embeddings."
+  },
+  {
+    "source": "GloVe (Pennington et al., EMNLP 2014)",
+    "finding": "Global log-bilinear regression model that trains on word-word co-occurrence counts. Combines advantages of matrix factorization (global statistical efficiency) and local context window methods (linear substructure). Achieved 75% on word analogy task. Ratio of co-occurrence probabilities (not probabilities themselves) encodes meaning.",
+    "category": "Model Candidate",
+    "implication": "For keyword embedding from text corpora, GloVe's use of global co-occurrence statistics provides efficient training. The ratio P(k|keyword1)/P(k|keyword2) being the meaningful signal suggests keyword-intent relationships can be captured via co-occurrence ratios with context words.",
+    "open_question": "Is GloVe or word2vec better for keyword-level (not word-level) embedding? How to construct keyword-keyword co-occurrence matrices?",
+    "testable_hypothesis": "GloVe embeddings on keyword co-occurrence matrices will produce more stable intent clusters than word2vec on the same data due to GloVe's global statistical efficiency."
+  },
+  {
+    "source": "Airbnb Embedding (Grbovic & Cheng, KDD 2018)",
+    "finding": "Two embedding types: (1) Listing embeddings from click sessions (800M sessions) for short-term personalization - skip-gram with booked listing as global context. (2) User-type & listing-type embeddings from booking sequences for long-term personalization. Key innovations: congregated search negative sampling (same-market negatives), rejections as explicit negatives, cold-start via metadata.",
+    "category": "Data",
+    "implication": "For keyword clustering: (1) Use booked/converted sessions as global context to anchor intent clusters. (2) Market-specific negative sampling prevents trivial separation by domain. (3) User-type embeddings address data sparsity via bucketing of attributes.",
+    "open_question": "Should keyword clustering incorporate 'global context' keywords (like 'booked' items) that anchor the intent?",
+    "testable_hypothesis": "Adding converted/clicked-through keywords as 'global context' during embedding training improves intent cluster coherence measured by conversion prediction."
+  },
+  {
+    "source": "Alibaba Embedding (Wang et al., KDD 2018)",
+    "finding": "Three graph embedding methods for 2 billion items: BGE (Base Graph Embedding via DeepWalk on item graph from user behavior), GES (with side information - category, brand, price), EGES (Enhanced with weighted aggregation of side information). Weighted item graph from session sequences outperforms CF co-occurrence.",
+    "category": "Data",
+    "implication": "Side information (category, brand, price range) can bootstrap cold-start keyword embeddings. When a keyword has few co-occurrences, its side information (language, domain, topic labels) can provide signal via weighted aggregation.",
+    "open_question": "What side information (synonyms, categories, language, domain) should weight into keyword embeddings for cold keywords?",
+    "testable_hypothesis": "EGES-weighted side information embeddings improve cluster assignment accuracy for low-frequency ('tail') keywords by 10%+ over unweighted aggregation."
+  },
+  {
+    "source": "BPR: Bayesian Personalized Ranking (Rendle et al., UAI 2009)",
+    "finding": "Generic optimization criterion for personalized ranking from implicit feedback. Optimizes pairwise ranking (item i > item j for user u) rather than predicting absolute scores. BPR-Opt derived from maximum posterior estimator, analogous to AUC maximization. LearnBPR uses SGD with bootstrap sampling of triples.",
+    "category": "Label/Validation",
+    "implication": "For keyword clustering validation: pairwise ranking of 'this keyword belongs to intent A more than intent B' may be more robust than pointwise classification. BPR can optimize cluster assignment quality by emphasizing relative rankings.",
+    "open_question": "Can BPR-style pairwise objectives be used for semi-supervised keyword-intent clustering where only some keyword-intent pairs are known?",
+    "testable_hypothesis": "A BPR-optimized clustering model (predicting keyword_i > keyword_j for a given intent) outperforms pointwise classification for keyword-intent assignment."
+  },
+  {
+    "source": "Deep Neural Networks for YouTube Recommendations (Covington et al., RecSys 2016)",
+    "finding": "Two-stage retrieval + ranking funnel. Candidate generation: extreme multiclass classification (millions of video classes) with sampled softmax (importance-weighted negative sampling). Learned user embeddings as function of watch history, search tokens, demographics. At serving: nearest neighbor search in embedding space. Ranking: separate DNN predicting expected watch time (not CTR) via weighted logistic regression. 'Example Age' feature captures freshness (time since upload).",
+    "category": "Model Candidate",
+    "implication": "Two-stage architecture can apply: (1) Stage 1: keyword -> intent candidate generation via softmax over intent classes. (2) Stage 2: rank intents by relevance to keyword. Freshness feature ('Example Age') is critical if keywords have temporal trends.",
+    "open_question": "Should keyword-intent matching be a single-stage scoring or two-stage (candidate generation + ranking) as in YouTube?",
+    "testable_hypothesis": "A two-stage keyword-intent model (generation with sampled softmax + ranking with DNN) scales better to 1000+ intents than a single flat classifier."
+  },
+  {
+    "source": "Extreme Multi-label Classification for Semantic Matching in Product Search (Chang et al., Amazon KDD 2021)",
+    "finding": "Formulates product search as XMC: queries -> relevant products (labels). Tree-based XR-Linear (PECOS) model achieves 60.9% Recall@100 with 1.25ms latency vs DSSM's 36.2% with 3.13ms latency. Hierarchical linear models with n-gram TF-IDF features enable logarithmic inference time. Outperforms BERT-based encoders when latency is constrained.",
+    "category": "Model Candidate",
+    "implication": "Keyword-intent classification can be formulated as XMC: keywords = instances, intents = labels. Tree-based partitioning of the intent space enables logarithmic-time inference for large intent taxonomies. Sparse linear models (TF-IDF features) with hierarchical partitioning can match or exceed deep embedding models.",
+    "open_question": "Is the keyword-intent mapping better modeled as a flat XMC problem or a hierarchical classification?",
+    "testable_hypothesis": "Tree-based XMC (XR-Linear) on TF-IDF keyword features achieves competitive accuracy to deep embedding methods for keyword-to-intent assignment, with order-of-magnitude lower latency."
+  },
+  {
+    "source": "Neural Ranking Models with Weak Supervision (Dehghani et al., SIGIR 2017)",
+    "finding": "Train neural ranking models using BM25 scores as weak supervision. Pre-training on billions of weakly labeled instances + fine-tuning on small labeled data. Achieves 13% and 35% MAP improvement over BM25 on Robust and ClueWeb. Key: pairwise ranking objectives outperform pointwise; letting network learn representations generalizes better.",
+    "category": "Label/Validation",
+    "implication": "Weak supervision can bootstrap keyword-intent clustering: use heuristic/rule-based keyword-intent assignments as weak labels. Pairwise training objectives ('intent A > intent B for keyword K') generalize better than pointwise classification of weak labels.",
+    "open_question": "What weak supervision signals (search logs, taxonomy rules, LLM-based labeling) are most effective for bootstrapping keyword-intent models?",
+    "testable_hypothesis": "A neural ranker pre-trained on weak keyword-intent labels and fine-tuned on curated data outperforms a model trained on curated data only, especially for tail keywords."
+  },
+  {
+    "source": "Are Neural Rankers Still Outperformed by GBDT? (Qin et al., Google ICLR 2021)",
+    "finding": "LambdaMART (GBDT implementation LightGBM) substantially outperforms recent neural LTR models on benchmark datasets with numerical features. Neural models need: (1) log1p feature transformation, (2) data augmentation (Gaussian noise) for high-capacity networks, (3) self-attention for listwise context, (4) latent cross interactions. After these fixes, neural equals GBDT.",
+    "category": "Model Candidate",
+    "implication": "For keyword-intent ranking with numerical features (frequency, tf-idf scores, etc.), LambdaMART/GBDT is a strong baseline that neural models may not beat without careful architecture. If the problem reduces to ranking keywords by intent relevance, tree-based methods remain state-of-the-art for tabular features.",
+    "open_question": "For keyword clustering features (frequency, co-occurrence stats, n-gram overlaps), are tree-based or embedding-based models more effective?",
+    "testable_hypothesis": "LambdaMART on engineered keyword features (co-occurrence statistics, entity type, length, etc.) will match or exceed neural embedding models for keyword-to-intent classification accuracy."
+  },
+  {
+    "source": "IR Textbook (Buttcher, Clarke, Cormack 2010)",
+    "finding": "Classic IR evaluation: precision, recall, F1, MAP, NDCG. Relevance is the core construct - judged by trained assessors on a graded scale (e.g., Bad/Fair/Good/Excellent/P perfect). Pooling method for creating judgment sets: top-K from multiple systems. Inter-assessor agreement (Kappa) measures annotation quality. Inverted index is fundamental for efficient term-matching.",
+    "category": "Evaluation",
+    "implication": "Keyword-intent cluster evaluation should use graded relevance (not binary). Pooling across multiple clustering methods produces robust evaluation sets. NDCG captures ranking quality within clusters.",
+    "open_question": "What is the appropriate relevance scale for keyword-intent assignments (e.g., 'Perfect match' through 'Unrelated')?",
+    "testable_hypothesis": "A graded relevance measure for keyword-intent cluster quality (like NDCG) provides more reliable evaluation than binary precision/recall."
+  },
+  {
+    "source": "IR Textbook",
+    "finding": "Evaluation methodology: hold-out splitting, cross-validation, statistical significance testing (t-test, Wilcoxon, bootstrap). Query-level evaluation (average per-query metrics). A/B testing for online evaluation with interleaving experiments for lower variance.",
+    "category": "Experiment",
+    "implication": "For keyword clustering: evaluate per-intent (like per-query) and average across all intents. Statistical significance tests are essential when comparing clustering methods. A/B testing of clusters via search/recommendation downstream tasks.",
+    "open_question": "What is the minimum labeled dataset size for statistically significant evaluation of keyword clustering?",
+    "testable_hypothesis": "Bootstrap significance testing reveals meaningful differences between clustering methods at n=500 labeled keywords."
+  },
+  {
+    "source": "Building Knowledge Graphs (Barrasa & Webber, O'Reilly 2023)",
+    "finding": "Knowledge graphs provide contextualized understanding via connected data. Property graph model: nodes (entities with labels + properties), relationships (typed, directed, with properties). Taxonomies provide hierarchical organization schemas. Ontologies enable multi-level relationships. Graph algorithms (centrality, community detection, path similarity) enable graph-native ML.",
+    "category": "Target Construct",
+    "implication": "Keyword-intent-JTBD relationships naturally form a knowledge graph: keywords → relationships → intents → relationships → JTBDs. Graph traversal enables explainable path-based similarity. Taxonomies organize intents hierarchically (like the Yahoo! taxonomy).",
+    "open_question": "Should intents be nodes in a knowledge graph (with relationships between them) or a flat label set?",
+    "testable_hypothesis": "A knowledge graph representation of keyword-intent relationships (with typed edges like 'IS_A', 'RELATED_TO', 'IS_INSTANCE_OF') enables more explainable and queryable intent matching than a flat embedding space."
+  },
+  {
+    "source": "Building Knowledge Graphs - Semantic Search & Similarity (Chapter 12)",
+    "finding": "Document similarity via graph connections: annotated entities provide navigation paths ('From Strings to Things'). Entity resolution pipeline: data preparation → entity matching → build/update master entity records. Graph-based semantic similarity: path similarity, Leacock-Chodorow, Wu-Palmer measures. Cold start addressed via side information.",
+    "category": "Data",
+    "implication": "Keyword disambiguation pipeline: (1) prepare keyword data, (2) match keywords to intents, (3) build/update keyword-intent mapping. Graph-based similarity (shortest path, common ancestor in taxonomy) measures keyword-intent relatedness.",
+    "open_question": "Is path-based similarity (in a taxonomy) or embedding-based similarity better for keyword-to-intent matching?",
+    "testable_hypothesis": "A hybrid approach (graph path similarity + embedding similarity) outperforms either individually for keyword-intent assignment."
+  },
+  {
+    "source": "Query Refinement Survey (Taheri et al., IJCA 2025)",
+    "finding": "Four major neural architectures for query refinement: (1) Embedding models: Word2Vec, GloVe for static semantics; (2) RNNs/GRUs: model temporal query sequences but suffer from vanishing gradients; (3) Seq2Seq with attention: encoder-decoder for generating reformulations; (4) Transformers (BERT, GPT): multi-head attention for deep contextual understanding. Comparative analysis: Transformers = very high semantic understanding + context modeling + personalization but low efficiency + scalability; Embedding models = high efficiency + scalability but low context modeling.",
+    "category": "Target Construct",
+    "implication": "Embedding models are most scalable for keyword-intent clustering (high efficiency, high scalability). Transformers provide best semantic understanding but at high cost. For a product that clusters thousands+ keywords into intents, embedding-based approaches offer the best speed-quality tradeoff.",
+    "open_question": "Is hybrid approach (embedding-based clustering + transformer-based refinement for ambiguous keywords) optimal?",
+    "testable_hypothesis": "A cascade (fast embedding-based candidate generation + slow transformer-based reranking of ambiguous keywords) provides the best accuracy-latency tradeoff for keyword-intent clustering."
+  },
+  {
+    "source": "Query Refinement Survey - Applications (Section 3)",
+    "finding": "Personalization approaches: early methods used click-based profiles; recent methods (Zhou 2020, Yao 2022) train personalized word embeddings that differ per user. Social-network-based personalization (Zhou 2023) leverages friend networks for cold-start users. In e-commerce: 'add/remove/replace' strategies with 'replace' being most prevalent.",
+    "category": "Behavioral Tests",
+    "implication": "Keyword clustering may need personalization: same keyword can signal different intents for different user segments. Intent clusters should be context-aware or user-adaptive.",
+    "open_question": "Should keyword-intent mapping be universal or personalized per user segment/vertical?",
+    "testable_hypothesis": "A/B test shows that personalized keyword-intent mapping (varying clusters by user segment) improves downstream conversion over universal mapping by 5%+."
+  },
+  {
+    "source": "PTE + General-Purpose User Embeddings (various)",
+    "finding": "Asynchronous training of embeddings for large text corpora: allows training on data streams without full pass synchronization. Heterogeneous graph-based intent learning (Ren et al.): uses queries, webpages, Wikipedia concepts. Meta-path2vec: metapath-based random walks on heterogeneous graphs for embedding.",
+    "category": "Data",
+    "implication": "Heterogeneous graphs offer richer signal for keyword embedding than homogeneous keyword-only graphs. Incorporating web page content, categories, and external knowledge (Wikipedia, ConceptNet, DBpedia) as node types enriches intent signals.",
+    "open_question": "Which external knowledge sources (WordNet, Wikipedia, ConceptNet, DBpedia) contribute most to keyword-intent clustering?",
+    "testable_hypothesis": "A meta-path-based heterogeneous embedding that connects keywords to Wikipedia concepts and categories improves intent cluster quality by 15%+ over keyword-only embeddings."
+  },
+  {
+    "source": "End-to-End RL for Automatic Taxonomy Induction / Expanding Taxonomies with Implicit Edge Semantics",
+    "finding": "Taxonomy expansion: given existing taxonomy, learn to place new terms into correct parent nodes. RL-based navigation of taxonomy tree for placing new concepts. Implicit edge semantics: edges in taxonomy have semantics (type-of, part-of, related-to) that can be learned from data.",
+    "category": "Behavioral Tests",
+    "implication": "Keyword-intent taxonomies can be incrementally expanded as new keywords emerge. New keywords can be placed into the taxonomy via RL or nearest neighbor methods.",
+    "open_question": "Should keyword-intent taxonomy be static or dynamic (evolving as new keywords/patterns emerge)?",
+    "testable_hypothesis": "An automated taxonomy expansion system can place 80%+ of new keywords into correct parent intents with precision > 0.7."
+  },
+  {
+    "source": "SimClusters: Community-Based Representations (Twitter), RecWalk (Random Walks for Top-N)",
+    "finding": "SimClusters: community detection on graph, then represent nodes by community affiliation vectors. RecWalk: nearly uncoupled random walks on user-item bipartite graph for recommendation. Personalized PageRank as item-item similarity.",
+    "category": "Model Candidate",
+    "implication": "Community detection algorithms can identify keyword 'communities' that correspond to intents/JTBDs. Random walk with restart from a keyword seeds an intent cluster.",
+    "open_question": "Are spectral clustering or random-walk-based methods better for identifying keyword intents from co-occurrence graphs?",
+    "testable_hypothesis": "Personalized PageRank from a set of seed keywords produces more coherent intent clusters than spectral clustering of the keyword co-occurrence matrix."
+  },
+  {
+    "source": "Factorization Meets the Item Embedding / Regularizing MF with User/Item Embeddings",
+    "finding": "Regularizing matrix factorization with item embeddings from co-occurrence improves recommendation quality. Combining MF interaction signal with embedding similarity signal produces better representations than either alone.",
+    "category": "Model Candidate",
+    "implication": "Hybrid approach: combine matrix factorization (explicit keyword-intent interactions) with embedding-based similarity (keyword-keyword and intent-intent similarities) for robust keyword-intent matching.",
+    "open_question": "What is the optimal combination weight for MF (explicit signals) vs embedding similarity (implicit signals) in keyword-intent models?",
+    "testable_hypothesis": "A combined MF + embedding model for keyword-intent scoring outperforms either pure MF or pure embedding model in recall@K and NDCG."
+  },
+  {
+    "source": "Debiasing Item-to-Item Recommendations with Small Annotated Datasets",
+    "finding": "Bias in implicit feedback data: popularity bias, exposure bias, selection bias. Small high-quality editorial datasets can debias large-scale behavioral data. Importance sampling and inverse propensity weighting address exposure bias.",
+    "category": "Failure/Risk",
+    "implication": "Keyword co-occurrence data suffers from popularity bias (head keywords dominate), exposure bias (some intents are more visible), and selection bias (only observed co-occurrences count). Small curated keyword-intent pairs can debias large-scale behavioral co-occurrence.",
+    "open_question": "How to debias keyword co-occurrence data for intent clustering? What are the sources of bias?",
+    "testable_hypothesis": "Inverse propensity weighting of keyword co-occurrence counts (downweighting popular keywords) improves intent cluster purity for tail keywords."
+  },
+  {
+    "source": "Collaborative Filtering for Implicit Feedback Datasets (Hu et al.) / Fast MF for Online Recommendation",
+    "finding": "Implicit feedback: confidence-weighted alternating least squares (ALS) for large-scale implicit data. Treats non-observed interactions as negative with low confidence, observed as positive with high confidence. Fast incremental MF enables online updates as new interactions arrive.",
+    "category": "Data",
+    "implication": "Keyword-intent data is implicit (not direct ratings). Confidence weighting: observed keyword-intent pairs > non-observed. Online/incremental learning enables handling new keywords and intents without full retraining.",
+    "open_question": "What confidence weights for keyword-intent pairs (based on frequency, recency, relevance) optimize clustering quality?",
+    "testable_hypothesis": "Confidence-weighted implicit MF for keyword-intent prediction outperforms binary classification of keyword-intent pairs."
+  },
+  {
+    "source": "Variational Autoencoders for Collaborative Filtering (Liang et al., 2018)",
+    "finding": "Multinomial VAE for collaborative filtering with implicit feedback. VAE with multinomial likelihood outperforms MF and linear models. Bayesian variational inference provides uncertainty estimates for recommendations.",
+    "category": "Model Candidate",
+    "implication": "Variational methods can model keyword-intent uncertainty. A keyword can belong to multiple intents with different probabilities. Uncertainty estimates enable confidence-based routing.",
+    "open_question": "Should keyword-intent assignments be multi-label (probabilistic) or single-label (deterministic)?",
+    "testable_hypothesis": "A multinomial VAE clustering keywords into soft intents outperforms k-Means hard clustering in downstream task performance (e.g., search ranking)."
+  },
+  {
+    "source": "Monolith: Real Time Recommendation at ByteDance 2022",
+    "finding": "Real-time training system with collisionless embedding table and streaming training. Embeddings updated in near real-time as new user interactions occur. Two-tower architecture with real-time embedding synchronization.",
+    "category": "Failure/Risk",
+    "implication": "Real-world deployment of embedding-based models requires: (1) high-throughput embedding serving, (2) incremental/streaming updates, (3) collision-free embedding tables for reliable training.",
+    "open_question": "What infrastructure is needed for production keyword-intent clustering serving? Is batch processing sufficient or is real-time needed?",
+    "testable_hypothesis": "An incremental/online clustering system for keywords adapts to distribution shifts in 24h vs batch retraining requiring 7+ days."
+  },
+  {
+    "source": "Graph Convolutional Neural Networks for Web-Scale Recommender Systems (GraphSAGE / PinSage)",
+    "finding": "Inductive graph embedding: learn aggregation functions that can embed new/unseen nodes without retraining. PinSage at Pinterest: random-walk-based neighbor sampling + attention aggregation for web-scale graph embedding (3B nodes, 18B edges). 99%+ coverage of daily active pins.",
+    "category": "Model Candidate",
+    "implication": "Inductive GNN methods can embed new keywords without retraining by aggregating features from their neighbors in the co-occurrence graph. This addresses the cold-start keyword problem.",
+    "open_question": "Can inductive GNN methods generalize to new keywords with only textual features (no historical co-occurrences)?",
+    "testable_hypothesis": "An inductive GNN (GraphSAGE) for keyword embeddings achieves 80%+ OOV recall for new keyword intent prediction."
+  },
+  {
+    "source": "End-to-End Reinforcement Learning for Automatic Taxonomy Induction",
+    "finding": "RL agent navigates taxonomy tree to place new terms. State = current node in taxonomy. Action = move to child/sibling. Reward = correct placement verified against ground truth. Learns placement policy from existing taxonomy structure.",
+    "category": "Behavioral Tests",
+    "implication": "Automated placement of new keywords into intent taxonomy can be trained as an RL problem. This enables continuous taxonomy expansion without human curation.",
+    "open_question": "Is supervised taxonomy placement or RL-based placement more sample-efficient for keyword taxonomy expansion?",
+    "testable_hypothesis": "RL-based taxonomy placement learns to place keywords with fewer training examples than supervised approaches by exploiting taxonomy structure."
+  },
+  {
+    "source": "Convolutional Matrix Factorization for Document Context-Aware Recommendation",
+    "finding": "ConvMF: integrates CNN (for document modeling) with PMF (Probabilistic MF). CNN extracts document contextual features to inform item embeddings. Addresses cold-start: new items with content can be embedded even without interaction data.",
+    "category": "Model Candidate",
+    "implication": "Keyword text content (the words that form the keyword) can inform its embedding via CNN encoding. Keywords with similar lexical structure may have related intents.",
+    "open_question": "How much does the lexical content of a keyword (its words) vs its usage context (co-occurring keywords/documents) contribute to intent prediction?",
+    "testable_hypothesis": "A ConvMF-style model combining keyword text (content) with keyword co-occurrence (context) outperforms content-only or context-only models for keyword-intent prediction."
+  }
+]

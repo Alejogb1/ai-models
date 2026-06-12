@@ -1,0 +1,148 @@
+{
+  "source": "[Deep Crossing] Deep Crossing - Web-Scale Modeling without Manually Crafted Combinatorial Features (Microsoft 2016).pdf",
+  "source_group": "Awesome-ML-Papers/CTR-CVR-Prediction",
+  "processed_at": "2026-06-08",
+  "agent": "agent5_final",
+  "concepts": [
+    {
+      "finding": "A click is usually logged with other infor-\nmation available at the run-time\nClick through rate: Total number of clicks over total num-\nber of impressions\nClick Prediction: A critical model of the platform that\npredicts the likelihood a user clicks on a given ad for\na given query\nSponsored search is",
+      "category": "ModelCandidate",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "For web-scale\napplications, however, the variety and volume of features\nmake these manually crafted features expensive to create,\nmaintain, and deploy.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "How to address the limitation described: For web-scale\napplications, however, the variety and volume of features\nmake these manually crafted features expensive to create,\nmaintain, and deploy.",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "The important crossing features are\ndiscovered implicitly by the networks, which are comprised\nof an embedding and stacking layer, as well as a cascade of\nResidual Units.",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "It was able to build, from scratch, two\nweb-scale models for a major paid search engine, and achieve\nsuperior results with only a sub-set of the features used in\nthe production models.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "This demonstrates the potential of\nusing Deep Crossing as a general modeling paradigm to im-\nprove existing products, as well as to speed up the devel-\nopment of new models with a fraction of the investment in\nfeature engineering and acquisition of deep domain knowl-\nedge.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "In the computer vi-\nsion community, SIFT-like [13] features were the key drivers\nbehind the then state-of-the-art performance of ImageNet\ncompetitions.",
+      "category": "Baseline",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "In web-scale applications, ﬁnding ad-\nditional combinatorial features to improve an existing model\nis a daunting task due to the large search space, and the\nslow turnaround in the training and evaluation cycle given\nbillions of samples.",
+      "category": "Experiment",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Feature name\nType\nDimension\nQuery\nText\n49,292\nKeyword\nText\n49,292\nTitle\nText\n49,292\nMatchType\nCategory\n4\nCampaignID\nID\n10,001\nCampaignIDCount\nNumerical\n5\nTable 1: Examples of individual features\nworth noting that Deep Crossing does in some way generate\ncombinatorial features during the learning proc",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "By utilizing a\npartially connected structure, Neocognitron achieved shift\ninvariance which is an important property for visual recog-\nnition tasks.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "The learned embedding captures the semantic\nmeaning of words and sentences, and has been applied to\nsponsored search, question answering, and machine transla-\ntion with strong results.",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "SPONSORED SEARCH\nDeep Crossing is discussed in the context of sponsored\nsearch of a major search engine.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "In brief, sponsored search is\nresponsible for showing ads alongside organic search results.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "The goal of the platform\nis to show the user the advertisement that best matches the\nuser’s intent, which was expressed mainly through a speciﬁc\nquery.",
+      "category": "TargetConstruct",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "However, given the richness of the problem space, the various\ntypes of features, and the sheer volume of data, we think our\nresults can be generalized to other applications with similar\nscale.",
+      "category": "FailureRisk",
+      "implication": "Relevant for similarity-based retrieval and lookalike targeting",
+      "open_question": "How to address the limitation described: However, given the richness of the problem space, the various\ntypes of features, and the sheer volume of data, we think our\nresults can be generalized to other applications with similar\nscale.",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "One solution is to use a pair of companion\nfeatures as exempliﬁed in the table, where CampaignID is\n\nFeature #1\nFeature #2\nMultiple Residual Units\nObjective\nScoring Layer\nFeature #n\nStacking Layer\nEmbedding #1\nEmbedding #n\nFigure 1: Deep Crossing Model Architecture\na one-hot representation consistin",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "The label yi in the click prediction\nproblem is a user click.",
+      "category": "LabelValidation",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "This is an important property of embedding in Deep\nCrossing.",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Unlike the embedding only approaches such as\nword2vec [14], it is an integral part of the overall optimiza-\ntion process.",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "It should be pointed out that the size of the embedding\nlayers has signiﬁcant impact on the overall size of the model.",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "The BMUF algorithm improves over\ntraditional model averaging (MA) and alternating direction\nmethod of multipliers (ADMM) while keeping the advantage\nof the low communication cost of these methods.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    }
+  ]
+}

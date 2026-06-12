@@ -1,0 +1,15 @@
+{
+  "source": "Pre-Training Tasks for Embedding-Based Large-Scale Retrieval",
+  "source_group": "Awesome-ML-Papers/Ranking",
+  "processed_at": "2026-06-08T12:00:00Z",
+  "agent": "agent_batch_generation",
+  "concepts": [
+    {
+      "finding": "Pre-training tasks for dual-encoder retrieval models: (1) Inverse Cloze Task (predict context given sentence), (2) Sentence prediction (predict next sentence), (3) Masked LM term prediction. ICT provides strongest signal for retrieval. Pre-training + fine-tuning on MS MARCO achieves SOTA on recall. Key insight: pre-training tasks designed specifically for retrieval (not just language modeling) matter.",
+      "category": "ModelCandidate",
+      "implication": "For keyword embedding pre-training: design tasks that predict keyword context (co-occurring terms, search sessions, clicked documents) rather than general language modeling. ICT-style: given keyword, predict its co-occurrence context in search sessions.",
+      "open_question": "What pre-training tasks best capture keyword-intent relationships? Is ICT on search sessions more effective than on documents?",
+      "testable_hypothesis": "Keyword embeddings pre-trained with retrieval-specific tasks (predicting co-occurring queries in sessions) outperform LM-pre-trained embeddings for keyword-intent clustering."
+    }
+  ]
+}

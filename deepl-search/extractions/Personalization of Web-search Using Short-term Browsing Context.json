@@ -1,0 +1,15 @@
+{
+  "source": "Personalization of Web-search Using Short-term Browsing Context",
+  "source_group": "Awesome-ML-Papers/Ranking",
+  "processed_at": "2026-06-08T12:00:00Z",
+  "agent": "agent_batch_generation",
+  "concepts": [
+    {
+      "finding": "Personalizes search results using short-term browsing context (recent queries, clicked results, dwell time). Short-term context via: (1) context-aware query expansion, (2) re-ranking results based on browsing history, (3) user intent inferred from recent behavior. 10-20% improvement in search relevance metrics.",
+      "category": "Experiment",
+      "implication": "Keyword intent can be disambiguated using contextual signals: previous keywords in session, click behavior, time of day, device type. Same keyword (\"jordan\") has different intent depending on context (athlete vs country vs shoes).",
+      "open_question": "Should keyword-intent mapping be context-dependent (varying by session/user signals) or static? What contextual signals are available without user-level tracking?",
+      "testable_hypothesis": "Context-aware keyword intent disambiguation (using session context signals) improves intent accuracy by 15%+ over static keyword-to-intent mapping for ambiguous keywords."
+    }
+  ]
+}

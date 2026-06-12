@@ -1,0 +1,106 @@
+{
+  "source": "Ten Simple Rules for Reproducible Research in Jupyter Notebooks.pdf",
+  "source_group": "Awesome-ML-Papers/Other",
+  "processed_at": "2026-06-08",
+  "agent": "agent5_final",
+  "concepts": [
+    {
+      "finding": "However, computational notebooks like Jupyter Notebook do \nnot address all barriers to reproducibility, and introduce unique challenges of their own, many of \nwhich stem from their interactivity.",
+      "category": "FailureRisk",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "How to address the limitation described: However, computational notebooks like Jupyter Notebook do \nnot address all barriers to reproducibility, and introduce unique challenges of their own, many of \nwhich stem from their interactivity.",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "These studies show \nthat many scientists leverage notebooks’ interactivity to create analytic playgrounds, but find it \ndifficult to turn them into clear descriptions of research that can be read and re-run by others.",
+      "category": "FailureRisk",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "It enables \nresearchers to build with confidence on the methods and findings of others, reuse and extend \ncomputational pipelines, and thereby drive scientific progress.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "We aim to augment this existing wellspring of advice by addressing the unique \nchallenges and opportunities for reproducibility that arise when using computational notebooks \nlike Jupyter Notebooks for research.",
+      "category": "FailureRisk",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "How to address the limitation described: We aim to augment this existing wellspring of advice by addressing the unique \nchallenges and opportunities for reproducibility that arise when using computational notebooks \nlike Jupyter Notebooks fo",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "An informal study [10], proposed by Mietchen, that re-ran \nJupyter Notebooks mentioned in publications in PubMedCentral found only a small fraction of \nthe sampled notebooks could be re-run without difficulty due to problems accessing data, \nunresolved dependencies, and platform differences.",
+      "category": "FailureRisk",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "The explosive growth of computational notebooks provides a unique opportunity to support \nreproducible research, but the current lack of clear explanation in many notebooks and some \nusers’ resistance to sharing their messy notebooks suggests that additional tools, processes, \nand guidelines may be ",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Second, the code is developed following the rules proposed here about \nquality standards (Rule 4-7).",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Finally, the notebook is made available, along with its data (Rule 8) \nin a manner encouraging public exploration and contribution (Rules 9-10).",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Rule 1: Tell a Story for an Audience \nOne key benefit of using Jupyter Notebooks is being able to interleave explanatory text with \ncode and results to create a computational narrative [8].",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Rule 6: Use Version Control \nVersion control is a critical adjunct to notebook use, because the interactive nature of notebooks \nmakes it easy to accidentally change or delete important content.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Furthermore, since notebooks \ncontain code, and code inevitably contains bugs, being able to determine the history of when a \ngiven bug you have discovered was introduced to the code vs when it was fixed – and thus what \nanalyses it may have affected – is a key capability in scientific computation.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Commit \nyourself to reproducibility as key element of all your research group’s computational work, not a \nphase performed after an analysis is complete or an afterthought triggered by journal or \nreviewer demands.",
+      "category": "ModelCandidate",
+      "implication": "Applicable to user/item clustering for personalization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "However, the advent of computational notebooks presents new \nopportunities and challenges for reproducibility, both easing precise documentation of complex \nworkflows, and complicating it by means of interactivity.",
+      "category": "FailureRisk",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "How to address the limitation described: However, the advent of computational notebooks presents new \nopportunities and challenges for reproducibility, both easing precise documentation of complex \nworkflows, and complicating it by means of ",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "We present ten simple rules for \nreproducible research in computational notebooks, focusing on annotation of the analysis, \norganization of code, and ease of reuse.",
+      "category": "LabelValidation",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    }
+  ]
+}

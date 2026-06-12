@@ -1,0 +1,148 @@
+{
+  "source": "23-062_1f58623a-ee21-44b9-a262-276047bc5543.pdf",
+  "source_group": "Web-Sources",
+  "processed_at": "2026-06-08",
+  "agent": "agent5_final",
+  "concepts": [
+    {
+      "finding": "Second, we demonstrate a practical method\nfor market researchers to enhance LLMs’ responses by incorporating previous survey data\nfrom similar contexts via fine-tuning.",
+      "category": "ModelCandidate",
+      "implication": "Relevant for similarity-based retrieval and lookalike targeting",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "However, as we show, whether that information translates into accurate prefer-\nence estimates is far from guaranteed, and the approach comes with important limitations that\n1Note that we access GPT directly using OpenAI’s API rather than through the more widely-used ChatGPT\ninterface.",
+      "category": "FailureRisk",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "How to address the limitation described: However, as we show, whether that information translates into accurate prefer-\nence estimates is far from guaranteed, and the approach comes with important limitations that\n1Note that we access GPT di",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Although our results show some promise, research in this area is preliminary, and more work is\nneeded to identify best practices and limitations for learning customer preferences from LLMs.",
+      "category": "FailureRisk",
+      "implication": "Can inform intent modeling for recommendation systems",
+      "open_question": "How to address the limitation described: Although our results show some promise, research in this area is preliminary, and more work is\nneeded to identify best practices and limitations for learning customer preferences from LLMs.",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "First, it was the latest model that was recommended by\nOpenAI for fine tuning during the time we ran our human studies, a feature we were interested\nin exploring, and we wanted to ensure all our results rely on the same GPT model.Second, GPT-\n3.5 Turbo was OpenAI’s most cost-effective advanced model",
+      "category": "BehavioralTests",
+      "implication": "Can inform intent modeling for recommendation systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "In crafting the prompts\nfor our querying approach, our main goal was to explore and demonstrate ways to use GPT\nas a market research tool rather than to optimize prompts to achieve a particularly level of\naccuracy or reliability.",
+      "category": "Experiment",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "If so, which one?”\nAlthough their meaning is quite similar, in practice we find that the first phrase yields only\na handful of responses in which the outside option is chosen, while the second phrase larger\noutside option shares.",
+      "category": "ModelCandidate",
+      "implication": "Relevant for similarity-based retrieval and lookalike targeting",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "However, important failures are also\ncommon: GPT overestimates WTP for fluoride by roughly 3×, assigns the wrong sign to WTP\nfor new toothpaste flavors (cucumber, pancake) in the baseline, shows a negative WTP for\nlarger laptop screens in contrast to human preferences, and substantially misestimates",
+      "category": "Baseline",
+      "implication": "Can inform intent modeling for recommendation systems",
+      "open_question": "How to address the limitation described: However, important failures are also\ncommon: GPT overestimates WTP for fluoride by roughly 3×, assigns the wrong sign to WTP\nfor new toothpaste flavors (cucumber, pancake) in the baseline, shows a neg",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Other recent work has demonstrated early success using GPT as a tool to simulate human\nGPT for facts, we do not consider hallucination to be of critical importance for our research question.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Thus, while we expect that GPT’s responses to marketing questions will\nbe qualitatively similar to humans, key questions still remain as to whether GPT’s responses to\nthese types of market research surveys will provide estimates of preferences that are realistic\nand consistent with estimates using h",
+      "category": "ModelCandidate",
+      "implication": "Can inform intent modeling for recommendation systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "For instance, because GPT is “pre-trained,” without\nadditional fresh human survey data provided by the researcher or access to the internet, it may\n35\n\nreveal static preferences (although our methodology can mitigate this issue by augmenting the\nLLM with human studies).",
+      "category": "FailureRisk",
+      "implication": "Can inform intent modeling for recommendation systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "If so, which one?”\n41\n\nWeb Appendix\nA\nGuidelines and Limitations in Querying GPT\nDesigning and running the studies in this paper has allowed us to identify some simple guide-\nlines that improve the quality of the responses given by GPT, as well as important cases in\nwhich GPT exhibits particular sen",
+      "category": "FailureRisk",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "How to address the limitation described: If so, which one?”\n41\n\nWeb Appendix\nA\nGuidelines and Limitations in Querying GPT\nDesigning and running the studies in this paper has allowed us to identify some simple guide-\nlines that improve the qu",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Finally, we also demonstrate that the WTP for these items depends on the size and the\ncontext, as the WTP for soda can at a supermarket is lower than at a restaurant (Figure W1d)\nand the WTP for a bottle of wine is higher than for a glass of wine (Figure W1f).",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "However, we expect these costs to decline dramatically over\ntime, and there are already multiple steps researchers can take to make our approach cheaper.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "How to address the limitation described: However, we expect these costs to decline dramatically over\ntime, and there are already multiple steps researchers can take to make our approach cheaper.",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "This manuscript was previously circulated with the title “Using GPT for Market Research.”\n†Office of the Chief Economist, Microsoft; jamesbrand@microsoft.com and donald.ngwe@microsoft.com\n‡Harvard Business School; aisraeli@hbs.edu\n\nUsing LLMs for Market Research\nAbstract\nLarge language models (LLMs)",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "In this paper we explore the uses and limitations of LLMs for researchers and\npractitioners who aim to understand consumer preferences.",
+      "category": "FailureRisk",
+      "implication": "Can inform intent modeling for recommendation systems",
+      "open_question": "How to address the limitation described: In this paper we explore the uses and limitations of LLMs for researchers and\npractitioners who aim to understand consumer preferences.",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "First, we show that estimates of willingness-to-pay for products and features derived from\nLLM responses are sometimes comparable to estimates from human studies, but are often\ninaccurate and in some cases wrong-signed.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "This method improves alignment with human re-\nsponses for existing and, importantly, new product features within the same product cat-\negory and population.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "We do not find similar improvements in the alignment for new\nproduct categories or for differences between customer segments.",
+      "category": "ModelCandidate",
+      "implication": "Applicable to user/item clustering for personalization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Keywords: Large language models (LLMs), Generative Artificial Intelligence (Gen AI), Gener-\native Pre-trained Transformer (GPT), Market research, Consumer preferences, Artificial Intel-\nligence, Conjoint Analysis.",
+      "category": "ModelCandidate",
+      "implication": "Can inform intent modeling for recommendation systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "LLMs power several well-known AI-augmented solutions for coding (e.g.,\nGithub Copilot) and search (e.g., Bing, Gemini), and a small number of studies have shown\nthat they can also replicate limited real-world behavior, including voting (Argyle et al., 2023),\nrational behavior (Horton (2023) and Chen",
+      "category": "FailureRisk",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    }
+  ]
+}

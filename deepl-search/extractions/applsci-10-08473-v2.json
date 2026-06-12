@@ -1,0 +1,148 @@
+{
+  "source": "applsci-10-08473-v2.pdf",
+  "source_group": "Web-Sources",
+  "processed_at": "2026-06-08",
+  "agent": "agent5_final",
+  "concepts": [
+    {
+      "finding": "This study proposes a novel framework for identifying customers’ unmet\nneeds on online social media using the Context Tree through the Hierarchical Search of Concept\nSpaces (HSCS) algorithm.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "The proposed method is Context Tree,\nwhich is a tree structure expressing user context while searching for related keywords hierarchically.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "To discover the corresponding context, it is important to use documents whose related\nkeyword wi of the primary keyword p is present, but p is not present.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "The main contribution of the Context Tree with HSCS algorithm is that the proposed method\npresented a way of utilizing online social media data, focusing on idea and concept screening stages in\nthe early stages of the NPD process.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "However, the proposed approach has some limitations because it still requires human eﬀort to\nmake ideas for new functions and speciﬁcations of a new product from the Context Tree.",
+      "category": "FailureRisk",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "How to address the limitation described: However, the proposed approach has some limitations because it still requires human eﬀort to\nmake ideas for new functions and speciﬁcations of a new product from the Context Tree.",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "However, while these studies are useful for ﬁnding customer context retrospectively, it is more\nimportant to ﬁnd needs that do not satisfy customers in terms of NPD and UCD.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "How to address the limitation described: However, while these studies are useful for ﬁnding customer context retrospectively, it is more\nimportant to ﬁnd needs that do not satisfy customers in terms of NPD and UCD.",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "The branches\nof the Context Tree are expanded by the Hierarchical Search of Concept Spaces (HSCS) algorithm,\nwhich is proposed by this study.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "In Section 3, the Context Tree\nproposed in this study is introduced.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "The bigger\nproblem, however, is that the speciﬁcity of survey results may deteriorate due to limitations on the\nnumber of questionnaires [20].",
+      "category": "FailureRisk",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "How to address the limitation described: The bigger\nproblem, however, is that the speciﬁcity of survey results may deteriorate due to limitations on the\nnumber of questionnaires [20].",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "showed that market research techniques could express manifest needs, though they have diﬃculty\ntransferring latent needs in certain contexts [22].",
+      "category": "Data",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "The important things in\nthe proposed framework particularly are word extraction, word normalization, and out-of-vocabulary\nproblem-solving.",
+      "category": "FailureRisk",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Constructing the Context Tree Using Hierarchical Search Concept Space (HSCS) Algorithm\nAfter the completion of data gathering and pre-processing, the Context Tree, a novel model that\nrepresents the user’s context and unmet needs in online social media, is ready to be created.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "The Context\nTree refers to a data structure that extends branches by searching other detailed keywords related\nto a speciﬁc keyword iteratively.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "The Hierarchical Search Concept Space (HSCS) algorithm is also\nproposed as a method that creates the Context Tree.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "The Context Tree enables intuitive and structural insight search\nfor people who participate in the NPD process by summarizing documents that correspond to the\nkeyword array eﬀectively.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Determining the Primal Keyword\nBefore describing the process of constructing Context Trees, two important terms must be deﬁned.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Finding Related Keywords that Appear with the Primal Keyword\nThis step extends the Context Tree by extracting related keywords w1, w2, w3, .",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "To prevent this problem, this study employed a method that identiﬁed the user’s context from the\ncorresponding concept space based on the extracted related keywords.",
+      "category": "FailureRisk",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Extracting user contexts using\nrelated keywords has advantages of not only convenient expert interpretation but also quantitative\nevaluation through the frequency of keywords that respond to the corresponding context.",
+      "category": "Experiment",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "The clustering algorithm, one of the unsupervised machine learning methods, is also diﬃcult to\nachieve our research purpose in the same context.",
+      "category": "LabelValidation",
+      "implication": "Applicable to user/item clustering for personalization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    }
+  ]
+}

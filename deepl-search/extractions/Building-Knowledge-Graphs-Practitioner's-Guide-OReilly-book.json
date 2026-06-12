@@ -1,0 +1,141 @@
+{
+  "source": "Building-Knowledge-Graphs-Practitioner's-Guide-OReilly-book.pdf",
+  "source_group": "Web-Sources",
+  "processed_at": "2026-06-08",
+  "agent": "agent5_final",
+  "concepts": [
+    {
+      "finding": "A Cypher query finds similar articles using a precomputed similarity\nmetric\nMATCH (a1:Article)-[r:similar]-(recommendation)\nWHERE a1.url = $url1\nRETURN recommendation,\n       r.metric AS similarity_metric\nORDER BY similarity_metric DESC LIMIT 5\nThe Cold Start Problem\nDocument similarity is useful fo",
+      "category": "Experiment",
+      "implication": "Relevant for similarity-based retrieval and lookalike targeting",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "211\n\nThe second part of the search problem is ranking the results.",
+      "category": "FailureRisk",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "This book shows how the con‐\nnected context provided by knowledge graphs enables you to extract greater value\nfrom existing data, drive automation and process optimization, improve predictions,\nand support an agile response to changing business environments.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "There are no join-bomb problems to be\nconcerned about, and since the cost of traversing a single relation‐\nship is very low (on the order of millionths of a second), a great\ndeal of graph search work can be performed very quickly.",
+      "category": "FailureRisk",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Setting up the domain model in the Neo4j Data Importer\nFirst, add your CSV files like those shown in Examples 4-1, 4-2, 4-3, and 4-4 by\nbrowsing for them in the left panel of the tool.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "While there is active research work on distributed graph processing and the underlay\nrequired to make it efficient (e.g., software-defined high-performance networks),\nat time of this writing, the scale-up approach used by Neo4j Graph Data Science\nremains the fastest and most practical method.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "These\nrules can vary in complexity but generally will be based on exact matches (useful\nfor strong identifiers), will approximate matches based on a definition of distance\n(numeric, dates, embeddings), and may also introduce elements of fuzziness (string\nsimilarity, value approximation, etc.).",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Recommendations for upskilling based on project history\nThe examples you’ve seen provide immediate value for solving\nimportant HR problems.",
+      "category": "FailureRisk",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Google search today is underpinned by a series of sophisticated algorithms and\ndata, but both PageRank and the Google Knowledge Graph remain fundamental for\nmaking sense of the web today.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Keyword-based search has been\nenhanced with features like wildcard searches, fuzzy searches, and the possibility of\ncombining keywords using logical expressions with different ways of ranking results\n(like term frequency–inverse document frequency).",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "This chapter will cover the first\nproblem, and the second will be explored in Chapter 13.",
+      "category": "FailureRisk",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "The articles in\nthe example, just as products in a catalog can be classified according to multiple\ndimensions, effectively creating multiple complementary paths for both semantic\nsearch and similarity.",
+      "category": "ModelCandidate",
+      "implication": "Relevant for similarity-based retrieval and lookalike targeting",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Linking categories in Cypher\nMATCH (e:Entity { name: $entityname })\nMATCH (c:Category)\nWHERE e.name IN c.alts\nWITH e, collect(c) AS candidate_cats\nWITH e, selection_logic(candidate_cats) AS selected_cat\nMERGE (e)-[:references]->(selected_cat)\n230 \n| \nChapter 12: Semantic Search and Similarity\n\nThe s",
+      "category": "FailureRisk",
+      "implication": "Relevant for similarity-based retrieval and lookalike targeting",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "It can be as simple as picking one\nrandom one, or assigning weights based on the relevance in the context, which could\nbe computed using domain-specific heuristics or structural features like distance,\ncentrality, or others.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "In the first part, you will learn how NER can\nbe complemented with fact extraction to build a knowledge graph for answering\nquestions as opposed to document search and recommendation.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "You applied\nNER and entity disambiguation to the items (products, articles, documents…) in\na collection to annotate them and build a knowledge graph capable of doing effec‐\ntive semantic search over large sets of documents or computing semantic similarity\nbetween documents to drive recommendation an",
+      "category": "ModelCandidate",
+      "implication": "Relevant for similarity-based retrieval and lookalike targeting",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Calculating the Wu and Palmer similarity metric in Python\nfrom nltk.corpus import wordnet as wn\ndog = wn.synset('dog.n.01')\nlion = wn.synset('lion.n.01')\nprint(dog.definition())\nprint(lion.definition())\nprint(wn.wup_similarity(dog, lion))\nOne of the advantages of storing the lexical database in a kn",
+      "category": "Experiment",
+      "implication": "Relevant for similarity-based retrieval and lookalike targeting",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "In fact, in the book Knowledge\nGraphs: Data in Context for Responsive Businesses (O’Reilly), we highlighted the busi‐\nness benefits of knowledge graph adoption aimed at an audience of CIOs and CDOs.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Constant width italic\nShows text that should be replaced with user-supplied values or by values deter‐\nmined by context.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    }
+  ]
+}

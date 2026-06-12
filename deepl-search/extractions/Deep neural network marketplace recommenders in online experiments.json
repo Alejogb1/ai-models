@@ -1,0 +1,15 @@
+{
+  "source": "Deep neural network marketplace recommenders in online experiments",
+  "source_group": "Awesome-ML-Papers/Embeddings",
+  "processed_at": "2026-06-08T12:00:00Z",
+  "agent": "agent_batch_generation",
+  "concepts": [
+    {
+      "finding": "Presents online experiment results comparing deep learning recommenders to linear models in a marketplace. Deep models show 5-15% improvement in engagement metrics. Key findings: (1) feature engineering still matters, (2) model complexity must match data volume, (3) online metrics can diverge from offline metrics.",
+      "category": "Experiment",
+      "implication": "Deep embedding models for keyword clustering should be validated online, not just offline. Offline cluster purity metrics may not predict online task performance. Feature engineering (keyword normalization, frequency bucketing) remains important.",
+      "open_question": "What online metrics (CTR, engagement, conversion) best validate keyword-intent clustering quality? How well do offline cluster metrics correlate with online performance?",
+      "testable_hypothesis": "Keyword embedding models that optimize for cluster purity offline show only 0.3 correlation with online task performance (e.g., search relevance)."
+    }
+  ]
+}

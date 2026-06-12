@@ -1,0 +1,15 @@
+{
+  "source": "GloVe- Global Vectors for Word Representation",
+  "source_group": "Awesome-ML-Papers/Embeddings",
+  "processed_at": "2026-06-08T12:00:00Z",
+  "agent": "agent03_embeddings_mf_ranking_search_compiled",
+  "concepts": [
+    {
+      "finding": "Global log-bilinear regression model that trains on word-word co-occurrence counts. Combines advantages of matrix factorization (global statistical efficiency) and local context window methods (linear substructure). Achieved 75% on word analogy task. Ratio of co-occurrence probabilities (not probabilities themselves) encodes meaning.",
+      "category": "Model Candidate",
+      "implication": "For keyword embedding from text corpora, GloVe's use of global co-occurrence statistics provides efficient training. The ratio P(k|keyword1)/P(k|keyword2) being the meaningful signal suggests keyword-intent relationships can be captured via co-occurrence ratios with context words.",
+      "open_question": "Is GloVe or word2vec better for keyword-level (not word-level) embedding? How to construct keyword-keyword co-occurrence matrices?",
+      "testable_hypothesis": "GloVe embeddings on keyword co-occurrence matrices will produce more stable intent clusters than word2vec on the same data due to GloVe's global statistical efficiency."
+    }
+  ]
+}

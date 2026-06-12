@@ -1,0 +1,15 @@
+{
+  "source": "Where To Next - A Dynamic Model of User Preferences",
+  "source_group": "Awesome-ML-Papers/MF",
+  "processed_at": "2026-06-08T12:00:00Z",
+  "agent": "agent_batch_generation",
+  "concepts": [
+    {
+      "finding": "Dynamic preference model for sequential recommendation (location check-ins). User preference = weighted combination of (1) long-term static preferences, (2) short-term recent transitions, (3) periodic patterns (weekly routines). Tensor factorization models user-time-item interactions. Outperforms static MF and Markov-chain models by 15-25%.",
+      "category": "ModelCandidate",
+      "implication": "Dynamic keyword intent model: keyword intent = weighted combination of (1) static long-term intent (always about cars), (2) short-term session intent (currently about repair), (3) periodic intent patterns (financial keywords on weekdays, entertainment on weekends).",
+      "open_question": "What is the optimal weighting between static, session, and periodic components for keyword intent prediction?",
+      "testable_hypothesis": "A dynamic keyword intent model (static + session + periodic components) outperforms static-only models by 10%+ on time-dependent keyword intent classification."
+    }
+  ]
+}

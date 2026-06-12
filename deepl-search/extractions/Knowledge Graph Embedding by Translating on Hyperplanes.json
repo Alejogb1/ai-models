@@ -1,0 +1,15 @@
+{
+  "source": "Knowledge Graph Embedding by Translating on Hyperplanes",
+  "source_group": "Awesome-ML-Papers/Embeddings",
+  "processed_at": "2026-06-08T12:00:00Z",
+  "agent": "agent_batch_generation",
+  "concepts": [
+    {
+      "finding": "TransH: knowledge graph embedding for N-ary and reflexive relations. Each relation has a hyperplane (normal vector) and a translation vector on that hyperplane. Addresses TransE limitations with 1-N, N-1, and N-N relations. Outperforms TransE on link prediction and triple classification benchmarks.",
+      "category": "ModelCandidate",
+      "implication": "Keyword-intent relationships can involve multiple intents per keyword (N-N relations). TransH models each intent as a hyperplane with keywords projecting differently per intent. Keywords can belong to multiple intents with different \"translations.\"",
+      "open_question": "Should keyword-to-intent mapping use TransE-style (one embedding per entity) or TransH-style (relation-specific projections)?",
+      "testable_hypothesis": "A TransH-style model where each intent has a projection hyperplane produces better multi-label keyword-intent assignments than TransE-style embeddings."
+    }
+  ]
+}

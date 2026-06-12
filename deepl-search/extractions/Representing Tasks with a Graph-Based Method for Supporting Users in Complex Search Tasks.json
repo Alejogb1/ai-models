@@ -1,0 +1,15 @@
+{
+  "source": "Representing Tasks with a Graph-Based Method for Supporting Users in Complex Search Tasks.pdf",
+  "source_group": "Web-Sources",
+  "processed_at": "2026-06-08",
+  "agent": "agent5_final",
+  "concepts": [
+    {
+      "finding": "Paper: Representing Tasks with a Graph-Based Method for Supporting Users in Complex Search Tasks",
+      "category": "ModelCandidate",
+      "implication": "General ML/AI methodology paper",
+      "open_question": "",
+      "testable_hypothesis": ""
+    }
+  ]
+}

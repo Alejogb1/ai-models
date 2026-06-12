@@ -1,0 +1,15 @@
+{
+  "source": "A Multi-View Deep Learning Approach for Cross Domain User Modeling in Recommendation Systems",
+  "source_group": "Awesome-ML-Papers/MF",
+  "processed_at": "2026-06-08T12:00:00Z",
+  "agent": "agent_batch_generation",
+  "concepts": [
+    {
+      "finding": "Cross-domain recommendation using multi-view deep learning. User representation from multiple domains (movies, books, music) via separate autoencoders per domain. Shared hidden layer captures cross-domain user preferences. Addresses sparsity by transferring knowledge across domains.",
+      "category": "ModelCandidate",
+      "implication": "Cross-domain keyword intent: keywords from different domains (search, social, e-commerce) can be mapped to shared intent space. Multi-view learning handles domain-specific keyword patterns while sharing common intent structure.",
+      "open_question": "Can keyword embeddings be improved by multi-task learning across domains (search, social, ads)? What constitutes different \"views\" of keyword intent?",
+      "testable_hypothesis": "Multi-view keyword embeddings (trained across search, social, and e-commerce domains) generalize better to new domains than single-domain embeddings."
+    }
+  ]
+}

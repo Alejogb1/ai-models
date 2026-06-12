@@ -1,0 +1,15 @@
+{
+  "source": "Attention and Transformers.pdf",
+  "source_group": "Awesome-ML-Papers/Other",
+  "processed_at": "2026-06-08",
+  "agent": "agent5_final",
+  "concepts": [
+    {
+      "finding": "Paper: Attention and Transformers",
+      "category": "ModelCandidate",
+      "implication": "General ML/AI methodology paper",
+      "open_question": "",
+      "testable_hypothesis": ""
+    }
+  ]
+}

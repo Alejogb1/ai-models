@@ -1,0 +1,1654 @@
+Findings of the Association for Computational Linguistics: ACL 2023 , pages 7509–7525
+July 9-14, 2023 ©2023 Association for Computational Linguistics
+Extracting Shopping Interest-Related Product Types from the Web
+Yinghao Li1∗, Colin Lockard2, Prashant Shiralkar2, Chao Zhang1
+1Georgia Institute of Technology, Atlanta, USA 2Amazon, Seattle, USA
+1{yinghaoli,chaozhang}@gatech.edu
+2{clockard,shiralp}@amazon.com
+Abstract
+Recommending a diversity of product types
+(PTs) is important for a good shopping experi-
+ence when customers are looking for products
+around their high-level shopping interests (SIs)
+such as hiking. However, the SI-PT connec-
+tion is typically absent in e-commerce prod-
+uct catalogs and expensive to construct man-
+ually due to the volume of potential SIs, which
+prevents us from establishing a recommender
+with easily accessible knowledge systems. To
+establish such connections, we propose to ex-
+tract PTs from the Web pages containing hand-
+crafted PT recommendations for SIs. The ex-
+traction task is formulated as binary HTML
+node classiﬁcation given the general obser-
+vation that an HTML node in our target
+Web pages can present one and only one PT
+phrase. Accordingly, we introduce T RENC,
+which stands for Tree-Transformer Encoders
+for Node Classiﬁcation. It improves the inter-
+node dependency modeling with modiﬁed at-
+tention mechanisms that preserve the long-
+term sibling and ancestor-descendant relations.
+TRENC also injects SI into node features for
+better semantic representation. Trained on
+pages regarding limited SIs, T RENC is ready
+to be applied to other unobserved interests. Ex-
+periments on our manually constructed dataset,
+WEBPT, show that T RENC outperforms the
+best baseline model by 2.37 F1 points in the
+zero-shot setup. The performance indicates
+the feasibility of constructing SI-PT relations
+and using them to power downstream applica-
+tions such as search and recommendation.
+1 Introduction
+Customers of e-commerce websites fall in various
+stages of the purchase funnel1 in their journey to
+purchase speciﬁc products. While lower-funnel
+customers target speciﬁc products or product cat-
+egories, a customer in the middle to upper fun-
+nel only has vague shopping interests (SIs) and
+∗All work performed while interning at Amazon.
+1https://en.wikipedia.org/wiki/Purchase_funnel
+  Hiking
+Guidance for new  
+ As a beginner 
+  - Headlamp 
+  - Sun protect
+What you should get
+before hiking: 
+  A backpack is the
+primary piece of gear for
+day hiking... 
+The essential hiking
+gear list: 
+ - The safety supply is the
+most important  
+ - A pair of ...
+Hiking equipment list: 
+ - Trekking poles 
+ - Long-sleeve shirt 
+ - socks 
+ - ...
+Search Shopping Interest
+Online 
+Hub Pages
+Product
+Type
+Extractor
+Navigation
+Footwear
+Clothing
+Protection
+...
+First-aid kit
+Sunscreen
+Sunglasses
+Multitool
+Headlamp
+Animal repellent
+...
+Product Types Products
+Search Result Presentation
+Figure 1: Example of the system and results to deliver
+as a response to searching for the SI “hiking”.
+requires additional guidance to determine the right
+products to purchase. Existing e-commerce web-
+sites are limited today in their ability to assist them
+in this kind of interest-oriented shopping. For ex-
+ample, a customer searching for COVID-19 crisis
+gets top results showing product types (PTs) such
+as books and test kits, while missing other essential
+categories such as the face mask, thermometer, or
+medicine. Moreover, the search result is a random
+assortment of products, without a clear organiza-
+tion that helps upper-funnel customers discover
+products within relevant categories.
+The main problem is the concept of “shopping
+interest” is generally absent in e-commerce cat-
+alogs, which makes it difﬁcult to directly estab-
+lish the SI-PT connections and give correspond-
+ing recommendations. To circumvent such system
+limitations, customers today are accustomed to re-
+searching their products on hand-curated “hub Web
+pages”2, each related to an SI and presenting PT
+2E.g., hikinginthesmokys.com/hiking-checklist for hiking.
+7509
+
+===PAGE BREAK===
+
+suggestions as organized lists, before returning to
+e-commerce websites. This stretches the total time
+spent on a purchase. We aim to ﬁnd SI-related
+PTs directly on the e-commerce website, reducing
+customer effort for all their interest-oriented needs.
+Figure 1 shows the desired search experience.
+The ﬁrst step to this end is collecting hub pages,
+which is realized by querying Google Search with
+automatically selected prompts (appendix A). The
+rest of the paper focuses on PT extraction from the
+HTML pages, which presents several challenges.
+First, hub websites are heterogeneous in their for-
+mat and terminology, with PTs often interspersed
+among long descriptive paragraphs, making it chal-
+lenging for any solution designed for one or a few
+websites to work well for others. Second, our page
+collection approach assumes that all PTs presented
+on a page are related to the same SI, which may
+not hold true in practice, requiring us to ﬁlter out
+irrelevant PTs. Finally, our goal to ﬁnd PTs for a
+wide range of SIs motivates us to consider a zero-
+shot learning setup (Xian et al., 2019) w.r.t. SIs, to
+generalize to interests not seen during training.
+Representing an HTML document by a Docu-
+ment Object Model (DOM) tree whose nodes are
+HTML tags with text sequences, we formulate PT
+extraction as a node classiﬁcation task that entails
+checking whether its text sequence represents a PT
+phrase. It is based on the empirical discovery that in
+our collected hub pages, a PT phrase generally oc-
+cupies a single DOM node within a coherent group
+of enumerated HTML elements such as section ti-
+tles or bullet points, where knowing one PT phrase
+suggests the potential presence of other PT phrases
+in the neighboring elements (Figure 3a). Node clas-
+siﬁcation emphasizes learning inter-node structural
+dependencies rather than intra-node token interac-
+tions, which results in better generalization to a
+wide variety of HTML structures.
+Due to the absence of a dedicated DOM tree
+encoding method, we propose TRENC (Tree-
+Transformer Encoders for Node Classiﬁcation)
+to ﬁll in the blanks. Adapted from the Trans-
+former (Vaswani et al., 2017), TRENC incorpo-
+rates ancestor-descendant and sibling node rela-
+tions using modiﬁed self-attention mechanisms and
+positional embeddings that are suited to the unique
+DOM node arrangement of the rendered hub pages.
+The ancestor-descendant relation provides relative
+structural information between nodes in the DOM
+node hierarchy, whereas the sibling relation tracks
+the semantical connection among sibling nodes.
+The modiﬁed attention mechanisms reconstruct the
+tree architecture from the linearized input nodes
+and facilitate long-term dependency modeling. To
+capture the relevance between an SI and a node,
+we leverage a gating network to dynamically inte-
+grate SI semantics with a node’s textual semantics,
+which generalizes TRENC to unseen SIs.
+Evaluated on our dataset WEBPT with 453 Web
+pages covering 95 interests, TRENC achieves 2.37
+absolute F1 performance gain over the strongest
+baseline method. Our contributions include
+• a novel and practical research topic of product
+type extraction from the Web pages associated
+with a given shopping interest;
+• TRENC , a Transformer encoder-based model
+with structural attention mechanisms for recov-
+ering the DOM tree architecture from the node
+sequence to promote classiﬁcation;
+• a dataset WEBPT, and comprehensive evalua-
+tions of graph encoding techniques to verify the
+effectiveness of our model design.
+The dataset is made publicly accessible at
+https://github.com/Yinghao-Li/WebIE to promote
+future research.
+2 Related Works
+Web Information Extraction Information ex-
+traction from the semi-structured Web data is a
+long-studied topic (Chang et al., 2006; Banko et al.,
+2007; Sleiman and Corchuelo, 2013). The works
+most relevant to ours are those on product attribute
+extraction (Zheng et al., 2018; Xu et al., 2019;
+Lockard et al., 2020; Zhou et al., 2021; Wang et al.,
+2022; Deng et al., 2022). For example, Zheng
+et al. (2018) train a BiLSTM-CRF network (Huang
+et al., 2015) for each attribute to locate its cor-
+responding values on text sequences. Xu et al.
+(2019) scale it up by injecting the attribute name
+into the network as an attention objective. Wang
+et al. (2022) encode the DOM tree with graph at-
+tention network (Veliˇckovi´c et al., 2018) to incor-
+porate the dependencies between nodes. However,
+attribute extraction is different from our PT extrac-
+tion task at two major points. First, attributes are
+typically extracted from product detail pages, each
+of which mentions multiple attributes; and the at-
+tribute name-value pairs cluster around titles, bullet
+points and descriptions. In contrast, a hub page gen-
+erally focuses on a single SI, with PTs scattered
+throughout the page. Unlike attribute extraction
+7510
+
+===PAGE BREAK===
+
+approaches that limit the searching scope to certain
+regions, the characteristics of hub pages require us
+to consider a page holistically instead of a small
+part. Second, attribute extraction is performed as
+token-level entity recognition in previous works,
+while PT extraction requires a node-level classiﬁ-
+cation, which prevents approaches for the former
+from being directly applied to the latter. To our
+best knowledge, no applicable DOM node classiﬁ-
+cation or similar dataset exists in openly available
+benchmarks such as OGB (Hu et al., 2020).
+Graph Transformers Recently, graph neural
+networks (GNNs) such as the graph convolutional
+network (GCN, Kipf and Welling, 2017) and graph
+attention network (GAT, Veliˇckovi´c et al., 2018;
+Brody et al., 2022) have dominated the graph en-
+coding research. But some works try to model
+graphs using Transformers (Dwivedi and Bresson,
+2020; Maziarka et al., 2020; Ying et al., 2021; Park
+et al., 2022; Wu et al., 2022), to which our work is
+more related. For example, Maziarka et al. (2020)
+add inter-atomic distances into the self-attention
+heads to parameterize the molecular graph struc-
+ture. Also targeting molecules, Graphormer (Ying
+et al., 2021) takes a step further and introduces
+centrality encoding, edge encoding and spacial en-
+coding to evaluate the atom importance and capture
+the edge and graph structure. Park et al. (2022) and
+Wu et al. (2022) extend Transformers to knowl-
+edge graphs with partial message-passing tricks.
+Although applicable, the hierarchical and acyclic
+nature of DOM trees is different from the graphs
+for which the approaches were designed. Directly
+applying them to DOM trees leads to sub-optimal
+performance, as shown in § 5.
+3 Problem Setup
+We possess the DOM tree of a Web page asso-
+ciated with a given shopping interest C. The
+DOM tree can be represented by a set of nodes
+V ={V1,V 2,...,V |V|} as well as a set of edges
+E ={E1,E 2,...,E |E|} that connect the parent
+and children nodes. |V| and|E| are the sizes of
+node and edge sets respectively. We aim to design
+a binary node classiﬁerf :V∪E∪{C}↦→{ 0, 1}|V|
+to judge whether the text sequence in each node is
+a phrase representing a product type. The nodes
+with positive labels are referred to as “PT nodes”
+and the labels are denoted byym = 1,m∈ 1 :|V|.
+We focus our discussion on one DOM tree and use
+m∈ 1 :|V| as its node index.
+Node Embs 
+Path 
+Attention
+Global  
+Pos Embs
+Add & Norm
+Feed 
+Forward
+Add & Norm
+Level 
+Pos Embs
+Sibling
+Attention
+Add & Norm
+Feed 
+Forward
+Add & Norm
+Sibling
+Pos Embs
+Gating
+Classiﬁcation
+Layer
+Output logits 
+Path
+Attention
+Branch
+Sibling
+Attention
+Branch
+Figure 2: Model structure. It adopts path and sibling at-
+tention mechanisms to model the ancestor-descendant
+and sibling relationships among DOM nodes.
+4 Method
+We propose TRENC to model the DOM tree of
+hub Web pages for PT extraction. Figure 2 shows
+the model architecture. We treat the problem as a
+DOM node classiﬁcation task that entails detecting
+whether its textual sequence deﬁnes a PT phrase.
+We ﬁrst create a node representation that integrates
+three basic signals of a node that may be indicative
+of a PT (§ 4.1). We then adapt the Transformer
+architecture by adding two attention mechanisms,
+namely path attention and sibling attention, that al-
+low capturing of inter-node dependencies presented
+by their HTML structure (§ 4.2.1). We also include
+three kinds of positional encodings that assist the
+attention layers with the node’s unique positional
+information within the DOM tree (§ 4.2.2). Finally,
+we integrate the outputs from the path and sibling
+attention layers, which are used in a classiﬁcation
+layer to predict node labels (§ 4.2.3). The imple-
+mentation details are in appendix B.1.
+4.1 Node Features
+Besides the SIC associated with the tree, we con-
+sider two features for each nodeVm: 1) its HTML
+tagtm∈T whereT is a ﬁnite tag set; and 2) the
+text sequenceSm ={wm,1,w m,2,...,w m,|Sm|},
+where|Sm| is the length andw is the token.
+7511
+
+===PAGE BREAK===
+
+0
+2
+4
+3
+5
+1
+Sibling
+pos idx
+0
+0
+1
+0
+1
+2
+Level
+pos idx
+0
+1
+1
+2
+2
+1
+Global
+pos idx
+<root> ""
+<p2> "Hiking equipment list"
+<ul> ""
+<li> "long-sleeve shirt"
+<li> "Trekking poles"
+<p2> "Contact"
+PT
+node?
+no
+no
+no
+yes
+yes
+no
+(a) Example of a simple DOM tree and corresponding positional indices
+Path sets
+0-1
+0-2-3
+0-2-4
+0-5
+Sibling sets
+0
+1-2-5
+3-4
+Path attention mask
+Sibling attention mask
+0
+1
+3
+2
+5
+4
+0 1 2 3 4 5
+0
+1
+3
+2
+5
+4
+0 1 2 3 4 5 (b) Node sets and attention masks
+Figure 3: An example of the model inputs, including the DOM tree components, positional indices and attention
+masks. The path sets and sibling sets in (b) are deﬁned by the global positional indices in (a). In the attention
+masks, white elements have values 0 and the black ones are−∞.
+HTML Tag HTML tags are a ﬁnite vocabulary
+of keywords that deﬁne how browsers display their
+content. Speciﬁcally, they convey the semantic
+nature of their enclosed content. For example, <p>
+denotes a paragraph, while <ul> represents a list.
+Based on the observation that some tags tend to
+contain PT phrases more than others, we capture
+the tag information as a distinct structural feature
+and encodetm with a vector tm∈ Rdmodel using
+an embedding layer. Here, dmodel is the model
+dimensionality as in Transformers.
+Text Sequence Text sequences convey the se-
+mantic character of an HTML document. In ad-
+dition to directly indicating a PT phrase, they can
+also serve as useful contextual information about
+the neighboring nodes’ propensity to contain a PT
+phrase. For example, a node stating “Essentials for
+camping” is a clear indicator that what follows is
+likely a set of camping-related PT nodes.
+We leverage the power of pre-trained language
+models (PLMs) such as BERT (Devlin et al., 2019)
+to properly encode their semantics. For a given
+sequence, BERT generates an embedding wm,i∈
+RdBER T for each tokenwm,i,i∈ 1 :|Sm|, besides
+two special tokenswm,0 andwm,|Sm|+1 represent-
+ing the start and end of the sequence. We derive
+the sequence embedding sm∈ Rdmodel by taking
+an average of all the token embeddings and passing
+it through a feed-forward network (FFN) layer:
+sm = W seq(GELU( 1
+|Sm| + 2
+|Sm|+1∑
+i=0
+wm,i)),
+(1)
+where W seq∈ Rdmodel×dBER T are parameters.
+Shopping Interest Although we assume that a
+DOM tree is associated with only one SI C, in
+rare cases this assumption does not hold. We are
+thereby motivated to capture the relevance between
+a node and the interest. Accordingly, we incorpo-
+rateC with an embedding vector c∈ Rdmodel in a
+similar manner as that for node text sequence (1),
+and let the model learn the relevance between C
+and related PTs to rule out any false positive cases.
+Feature Integration We integrate node features
+into the node embeddingem∈ Rdmodel in two steps
+to honor the distinctiveness between the structural
+feature tm and semantic features sm and c.
+First, we merge the semantic features. Since dif-
+ferent nodes have differing levels of correlations
+with the interest, we use gating vectors (Hochre-
+iter and Schmidhuber, 1997) to automatically con-
+trol how much interest embeddings c should be
+integrated into the sequence embedding sm. We
+calculate the weights g as:
+g(x1, x2) =σ(W1x1 + W2x2 + b), (2)
+where x1 and x2 are feature vectors; W1 and W2
+are trainable square matrices; b is the bias, and
+σ is the sigmoid function. With (2), the updated
+sequence embedding vector becomes
+s′
+m = g(c, sm)⊙ c + sm,
+where⊙ is the element-wise product.
+Then, we integrate the semantic and structural
+embeddings using concatenation followed by an
+FFN layer to maintain the embedding dimensional-
+ity. The integrated node embedding em is
+em = W emb[s′
+m
+T; tT
+m]T,
+7512
+
+===PAGE BREAK===
+
+where [·;·] represents vector concatenation and
+W emb∈ Rdmodel×2dmodel is an FFN layer.
+4.2 T RENC Architecture
+Compared with conventional GNNs that generally
+aggregate only1-hop neighboring messages in each
+layer, Transformers are better at tracking long-term
+dependencies.However, applying the Transformer
+encoder to DOM trees as is can lead us astray be-
+cause it is not designed to naturally accommodate
+the hierarchical structure of a tree. To address this
+limitation, we adapt the Transformer architecture
+by adding structural attention mechanisms with
+node positional encodings to better encode unique
+information within the DOM trees with the existing
+abilities of the Transformer architecture.
+4.2.1 Structural Attentions
+The DOM tree structure presents two kinds of re-
+lations that convey how nodes are related. The
+ancestor-descendant relation, represented by the
+edgesE, conveys the granular nature of a node
+(high or low) within the DOM hierarchy. The sib-
+ling relation between nodes conveys how they se-
+mantically represent a coherent group, as shown in
+Figure 3a. We incorporate these relationships via
+structural attention mechanisms, namely path at-
+tention and sibling attention. Correspondingly, we
+represent these two views of the DOM tree by two
+types of node sets: path node sets and sibling node
+sets. A path setN P⊂V is the ordered collection
+of all nodes in an HTML path, from the root node
+to an arbitrary node, as illustrated in Figure 3b.
+A sibling setN S⊂V consists of the immediate
+children of a non-leaf node. Thereupon, we de-
+velop path and sibling attention mechanisms, as
+described below, to explore the potential of model-
+ing tree structures with Transformers.
+Path Attention The path attention mechanism
+captures the granularity of a node Vm within the
+DOM tree, which carries useful information about
+the node’s tendency to present a PT phrase. It
+limits the attention target of a DOM node to its
+ancestors or descendants only, echoing the edgesE
+that deﬁne the DOM tree structure. Path node sets
+help deﬁne an attention mask toward this purpose
+by leaving out all “off-path” elements during the
+self-attention message passing operation.
+Suppose the input is H P∈ R|V|×dmodel, in each
+attention head, the path attention scores aP
+m ∈
+(0, 1)1×|V| ofVm attending to all DOM nodes are
+aP
+m = SoftMax( H P
+mW Q(H PW K)T
+√dk
++ M P
+m).
+(3)
+Here W∈ Rdmodel×dk are the FFN layers that map
+the latent features to the reduced dk-dimensional
+single-head attention space, as in (Vaswani et al.,
+2017). M P∈{ 0,−∞}|V|×|V| is the path attention
+mask as shown in Figure 3b.∀u,v∈ 1 :|V|,
+M P
+u,v =
+{
+0, ∃N P s.t.Vu∈N P,V v∈N P;
+−∞, otherwise.
+(4)
+aP
+m has non-zero values at positions corresponding
+toVm’s ancestors or descendants. The single-head
+attention output ofVm becomes
+AttnP
+m = aP
+mH PW V. (5)
+The rest of the architecture such as the layer norm
+and the residual connection is the same as in the
+Transformer and thus is omitted.
+Sibling Attention Although sibling relations are
+not described by the edgesE, encoding them can
+provide a useful contextual signal based on the
+observation that sibling PT phrases often form a
+group. Accordingly, analogous to path attention,
+we develop sibling attention by imposing an atten-
+tion mask M S, which forces a node to focus only
+on its siblings via self-attention. The sibling node
+setN S helps deﬁne the mask. Its calculation is
+identical to (3)–(5), except that the variables are
+superscripted by sibling “·S” instead of path “·P”.
+4.2.2 Node Positional Encodings
+Different from graphs, a DOM tree is acyclic and
+heterogeneous; the order of nodes inﬂuences their
+relations and how the elements are rendered. As
+Transformers do not encode such node order, po-
+sitional embeddings are critical to capture such
+positioning. (Yun et al., 2020). We consider three
+types of absolute indices: global, level and sib-
+ling positional indices, as shown in Figure 3a. The
+global positional indexiG
+m represents the position
+of each node in the tree in the depth-ﬁrst order. It
+helps TRENC understand how the nodes are or-
+ganized in the rendered HTML pages. The level
+indexiL
+m and sibling indexiS
+m on the other hand are
+developed to assist the path and sibling attentions.
+iL
+m describes the level or depth of a node, to help
+distinguish a parent from its children during the
+7513
+
+===PAGE BREAK===
+
+path attention, while the iS
+m captures the relative
+order among siblings within the sibling attention.
+We encode positional indices by ﬁrst applying
+sinusoid functions (Vaswani et al., 2017) to convert
+them to vectors iG
+m, iL
+m, iS
+m∈ [0, 1]dmodel, followed
+by applying an afﬁne transformation that maps each
+of them into distinct latent spaces:
+ˆiG
+m = W GiG
+m; ˆiL
+m = W LiL
+m; ˆiS
+m = W SiS
+m,
+where W∈ Rdmodel×dmodel are FFN parameters.
+4.2.3 T RENC Layers
+In each layer, the path and sibling signals are mod-
+eled by two parallel branches, which are identical
+except for the positional embeddings and attention
+mechanisms (Figure 2). Denoting the input feature
+of layerl by H (l)∈ R|V|×dmodel, we have3
+H P
+m = H (l)
+m + ˆiL
+m; H S
+m = H (l)
+m + ˆiS
+m, (6)
+which are passed into the attention sublayers (3)–
+(5) for message passing.4 The branch outputs ˆH P
+and ˆH S are aggregated by a gating layer that gen-
+erates the layer output ˆH (l):
+ˆH (l)
+m =g( ˆH P
+m, ˆH S
+m)⊙ ˆH P
+m+
+(1− g( ˆH P
+m, ˆH S
+m))⊙ ˆH S
+m.
+(7)
+The input of the ﬁrst layer is the summation of the
+node embedding and global positional embedding
+H (1)
+m = em + ˆiG
+m, while the last output ˆH (N ) is
+fed into a classiﬁcation layer to predict node labels,
+assuming the model hasN layers in total.
+4.3 Training and Inference
+We use binary cross-entropy as our training objec-
+tive. Suppose the predicted logit is ˆy, then the loss
+at the level of a DOM tree is calculated as
+ℓ =−
+|V|∑
+m=1
+ym logσ(ˆym)+(1−ym) logσ(1−ˆym).
+During inference, we use 0.5 as a hard classiﬁca-
+tion threshold for the predicted probabilityσ(ˆy).
+5 Evaluation
+In this section, we ﬁrst describe a new dataset of in-
+terests and their associated webpages, speciﬁcally
+created to benchmark methods for the PT extraction
+3Other positional encoding approaches such as (Chen et al.,
+2021) show similar performances.
+4We omit the layer indicator·(l) if possible for simplicity.
+problem. We then evaluate TRENC on the same,
+pitting it against a range of applicable baselines. Fi-
+nally, we look at the effectiveness of various model
+components via ablation studies.
+5.1 Experiments
+Dataset We constructed a dataset containing 95
+shopping interests and queried Google for hub
+pages using automatically selected prompts such
+as “[hiking] equipment list”, where “hiking” is the
+SI. For each SI, we downloaded the top 100 re-
+turned pages and labeled them with PT nodes using
+a semi-automatic process. First, we applied simple
+heuristic rules to create noisy PT labels, based on
+structure and tag matching. Thereafter, for each SI,
+we presented roughly5 webpages having a noisy la-
+bel to a human annotator to further reﬁne the labels.
+Even so, the dataset is not entirely noise-free given
+the subjective nature of the labeling process, with
+many ambiguous cases, such as deciding whether a
+software such as “VSCode” makes a valid product
+type. The pages without any positive human label
+were discarded. This process ultimately resulted
+in a collection of 453 HTML webpages having
+94,167 nodes, among which 12,548 nodes are pos-
+itive. Further details are described in appendix A.
+Setup We focus on a zero-shot setup w.r.t. SIs
+since our goal is to evaluate various methods on
+SIs not seen during training. Therefore, we split
+the collection of webpages stratiﬁed by their asso-
+ciated SIs (recall that a webpage is assumed to be
+associated with only one SI) into training ( 75%),
+validation (10%) and test partitions (15%), ensur-
+ing that no SI is shared across partitions. As our
+dataset is small, we randomly split the collection 5
+times and generated 5 distinct datasets, each with
+the three partitions. This approach is aimed to miti-
+gate the impact of random factors while measuring
+real model performance. We identify the datasets
+as WEBPT-n, wheren∈ 1 : 5 is the split index.
+Baselines We consider the following simple to
+complex methods. 1) Heuristic rules are heuristic
+functions we manually designed to locate PT nodes
+from the DOM trees, which were also used to gener-
+ate the initial, noisy node labels. 2) Text similarity
+decides whether a node is positive based on the co-
+sine similarity between text and SI embeddings. 3)
+Fine-tuned BERT (BERT-FT) ﬁne-tunes a BERT-
+base model to independently classify each tree node
+based on its text. 4)Multilayer perceptron(MLP)
+also classiﬁes each node independently, but with
+7514
+
+===PAGE BREAK===
+
+Models WEBPT-1 WEBPT-2 WEBPT-3 WEBPT-4 WEBPT-5 ¯F1 ( precision / recall )
+Heuristic
+Methods
+Similarity 40.12 39.14 35.84 36.55 33.80 37.09 ( 28.52 / 52.44 )
+Rules 56.53 62.44 56.90 59.68 58.28 58.77 ( 44.20 / 88.02 )
+Supervised
+Methods
+MLP 66.65 66.28 66.31 74.71 61.90 67.17 ( 72.11 / 63.38 )
+BERT-FT 72.50 71.63 73.03 77.87 65.69 72.14 ( 68.32 / 76.65 )
+Graphormer 71.09 81.76 75.73 66.81 69.67 73.01 ( 76.61 / 70.89 )
+GAT 71.31 85.45 74.83 78.40 67.84 75.57 ( 77.07 / 74.28 )
+GCN 76.13 84.07 79.16 81.50 71.92 78.56 ( 84.44 / 73.57 )
+TRENC 79.65 88.26 78.99 82.40 75.35 80.93 ( 84.06 / 77.81 )
+Table 1: Test F1 scores on each dataset WEBPT-n and the macro-averaged results (in %).
+2.5 5.0 7.5 10.0
+Average depth
+0.0
+0.5
+1.0
+F1 scores
+TrENC GCN
+(a) F1 vs. DOM tree depth
+1 2 3 4 5
+Average depth level
+0.6
+0.8
+F1 scores
+TrENC GCN (b) Average F1 vs. depth level
+Figure 4: Test F1 scores against the DOM tree depths.
+ﬁxed BERT text embeddings followed by a set of
+FFN layers. 5) Graph neural networks (GNNs)
+propagate node semantics throughout the graph by
+aggregating neighboring node embeddings. GNN
+family has many variances, and we focus on GCN
+and GAT. 6) Graphormer (Ying et al., 2021), de-
+signed for molecular graphs, adds special encod-
+ings and attention masks to the Transformer model.
+Please see appendix B.2 for implementation details.
+Metrics We evaluate each model with the F 1
+scores corresponding to each split WEBPT-i and
+the macro-averaged F 1 score ¯F1 = 1
+5
+∑5
+n=1 F1n
+with the corresponding macro precision and recall.
+All trainable methods are equipped with early
+stopping techniques based on validation F1 scores.
+To further reduce the inﬂuence of random factors
+without increasing training pressure, we store 5
+snapshots of the models that perform the best on
+the validation dataset during training. During the
+test, we predict 5 sets of labels from the model
+snapshots and use the majority-voted labels as the
+ﬁnal model predictions. It can be regarded as a
+simpliﬁed model ensemble method often used to
+improve model robustness (Dong et al., 2020).
+5.2 Main Results
+Table 1 shows the results of our comparative evalu-
+ation. As seen, TRENC outperforms all methods,
+exceeding the strongest baseline, GCN, by a mar-
+gin of 2.37 absolute F1 on average. Considering
+the small size of our datasets, it is not surprising
+that the test F 1 scores have relatively large vari-
+ation across different data splits, as the correla-
+tion of data distributions of the training and test
+sets is susceptible to random factors. Nonetheless,
+TRENC achieves the best performance on 4 out
+of 5 splits as well as exceeds by a good margin on
+average, which strengthens the conﬁdence of eval-
+uation. Surprisingly, Graphormer underperforms
+GNN models and barely outperforms BERT-FT, a
+model that treats nodes independently without con-
+sidering the tree structures. It indicates that models
+designed for other graphs such as molecular graphs
+are not directly applicable to our case. Instead
+of helping, the features Graphormer emphasizes
+prevent the model from learning a reasonable repre-
+sentation of the DOM tree. Table 1 also shows that
+the cosine similarity between SI and PT embed-
+dings does not present a good performance. This
+is not unexpected as SI and PTs are not usually
+semantically similar, making it a sub-optimal way
+to directly compare their embeddings.
+We also compare TRENC with GCN at varying
+levels of DOM tree complexity. Figure 4a shows
+tree-level F1 scores of each DOM tree against its
+depth, which is the average depth of its nodes
+1
+|V|
+∑|V|
+m=1iL
+m and roughly echos the tree complex-
+ity. Figure 4b divides the depth equally into5 levels
+and presents the average F1 for each level. As seen,
+TRENC has better overall performance than GCN
+at all depths. In addition, the gap between TRENC
+and GCN increases when the tree is deeper, which
+indicates that TRENC can better encode complex
+trees due to the global message-passing ability of
+the self-attention mechanism.
+5.3 Ablation Studies
+We ablate input features and model components
+from TRENC to understand their effectiveness. Ta-
+7515
+
+===PAGE BREAK===
+
+Models Average F1 Gap
+TRENC 80.93 -
+Input
+features
+w/o SI 79.83 1.10↓
+w/o tag 78.82 2.11↓
+w/o text 57.98 22.95↓
+Model
+components
+w/o gating 80.39 0.54↓
+Transformer 78.44 2.49↓
+w/o pos emb 79.60 1.33↓
+w/o pth attn 78.98 1.95↓
+w/o sbl attn 78.04 2.89↓
+Sequence
+encoding
+BERT-large 79.36 1.57↓
+RoBERTa 78.54 2.39↓
+Sentence-BERT 74.73 6.20↓
+Table 2: Ablation study F1 scores (in %). “Pth” is short
+for path; “sbl” is short for sibling; and “pos emb” rep-
+resents positional embeddings.
+ble 2 shows the ablation results.
+Input Features As seen, although removing any
+input feature (§ 4.1) impairs the model perfor-
+mance, text sequence is the most critical feature
+for TRENC. We further notice that without text se-
+quence, TRENC performs quite close to the heuris-
+tic rules that utilize very limited lexical features
+(Table 1). This may indicate that TRENC exhausts
+the structural information available in a DOM tree.
+Although not as signiﬁcant as text sequences,
+incorporating SIs and tags does enhance the model
+performance. Injecting SIs turns the model’s at-
+tention to their correlation with PTs. But such
+improvement is limited as the correlation is not
+strong, as discussed in § 5.2.
+Model Components We investigate the function-
+alities of model components by removing them sep-
+arately. The Transformer model discards edgesE
+and treats the tree as a linearized sequence of nodes
+arranged by their global positional indicesiG. Al-
+though it learns certain structural dependencies, as
+indicated by its advance in comparison with MLP
+(Table 1), missing explicit edge knowledge still
+affects the model’s judgment.
+The results also show that path attention, sibling
+attention and positional encodings all contribute to
+better tree encoding. The row “w/o pos enc” re-
+moves the level and sibling encodings iL, iS but
+keeps the global encoding iG. Without iL and
+iS, the model cannot properly identify the hierar-
+chy and sibling order between nodes and therefore
+performs worse. Compared to path attention, sib-
+ling attention demonstrates a higher importance in
+context understanding, even though removing path
+SI Node text sequence
+FP
+at-home-spa Esthetics or Skin Care
+hiking Merrell Overlook Tall 2 WP Boot
+running Credit card
+FN ﬁshing Rods for River Fishing
+canoeing Water bottle - 1 litre is good
+Table 3: Examples of common mistakes made by
+TRENC. FP/FN indicates false positives/negatives.
+attention means a node no longer has access to any
+other nodes from the tree.
+Sequence Encoding In our implementation, we
+use the uncased BERT-base model withdBERT =
+768 as our encoders for sequence embeddings e
+and concept embeddings c.5 The embeddings are
+ﬁxed during the training process.
+We also test other pre-trained language mod-
+els, including BERT-large, RoBERTa (Liu et al.,
+2019) and Sentence-BERT (Reimers and Gurevych,
+2019), which is designed for comparing the se-
+quence similarities and claims better sentence em-
+bedding performance than BERT. However, Table 2
+shows that none outperforms BERT-base (Devlin
+et al., 2019). The reason might be the incompati-
+bility of their training corpus and objective to our
+task. The results indicate that choosing an encoding
+model is vital to have good performance.
+5.4 Case Studies on Classiﬁcation Mistakes
+Table 3 shows a few false positive (FP) and false
+negative (FN) examples to illustrate certain text se-
+quence patterns where TRENC fails. As seen from
+FP cases, TRENC either struggles to determine
+whether it is a broad PT category ( 1st row), has
+challenges discerning a PT from a speciﬁc product
+(2nd row), or makes mistakes when unavoidable
+non-purchasable items are mentioned on the page
+along with other valid PTs ( 3rd row). From the
+FN cases, we conjecture that long descriptions may
+overwhelm the textual semantics and deviate its
+embedding, thereby preventing TRENC predict
+correctly (4th & 5th rows). The reason might be
+that TRENC have a stronger dependency on the
+node semantics than the structure, which is also in-
+dicated by the ablation results, and properly balanc-
+ing the conditional terms may mitigate this issue.
+5https://huggingface.co/bert-base-uncased
+7516
+
+===PAGE BREAK===
+
+6 Conclusion
+In this paper, we consider a new problem of ex-
+tracting product types from the Web pages that
+are relevant to broad shopping interests such as
+camping. We model the problem as a node classi-
+ﬁcation task and propose TRENC , a Transformer
+encoder-based model that leverages unique char-
+acteristics of DOM trees to perform product type
+extraction. In addition to the node-level signals
+including HTML tags, text sequences and shop-
+ping interest semantics, TRENC design path and
+sibling attention mechanisms based on DOM tree’s
+ancestor-descendant and sibling relations. Together
+with the tree-based positional embeddings, the
+structural attention mechanisms promote the tree
+architecture understanding and make the classiﬁ-
+cation more effective. Zero-shot experiments on a
+new dataset TRENC containing 95 shopping inter-
+ests and 453 pages show that TRENC outperforms
+the baseline graph encoding models. This work
+pushes the frountier of researches of a more or-
+ganized and intuitive result recommendation for
+middle-funnel customers.
+Limitations
+Apart from the issues mentioned in § 5.4, another
+limitation of TRENC is that it does not integrate
+any pre-training process such as BERT, which is
+effective in increasing the language understanding
+ability and adopted by previous works focusing on
+token-level classiﬁcation tasks (Wang et al., 2022;
+Deng et al., 2022). Two factors lead to this deci-
+sion. First, we use DOM nodes instead of tokens
+as the classiﬁcation object and focus on relations
+between nodes rather than tokens. As the node text
+sequence is a composition of an arbitrary number
+of tokens, adopting the conventional masked lan-
+guage modeling (MLM) training objective (Devlin
+et al., 2019) seems impractical since there is no
+direct mapping from an embedding vector, one-hot
+encoded or not, to a sentence. The second reason
+is simply that we do not possess the corpus or com-
+putation resources for model pre-training. In fact,
+we expect a properly designed pre-training scheme
+to bring better node semantics representation and
+SI-PT relation modeling. It is an interesting topic
+and deserves further study.
+Acknowledgments
+This work was supported in part by Amazon.com
+Services LLC, NSF IIS-2008334, IIS-2106961, and
+CAREER IIS-2144338.
+We would like to thank Xian Li, Binxuan Huang,
+Chenwei Zhang, Yan Liang, and Jingbo Shang for
+their insightful advice on this work.
+References
+Michele Banko, Michael J. Cafarella, Stephen Soder-
+land, Matt Broadhead, and Oren Etzioni. 2007.
+Open information extraction from the web. In Pro-
+ceedings of the 20th International Joint Conference
+on Artiﬁcal Intelligence , IJCAI’07, pages 2670–
+2676, San Francisco, CA, USA. Morgan Kaufmann
+Publishers Inc.
+Shaked Brody, Uri Alon, and Eran Yahav. 2022. How
+attentive are graph attention networks? In The Tenth
+International Conference on Learning Representa-
+tions, ICLR 2022, Virtual Event, April 25-29, 2022 .
+OpenReview.net.
+Chia-Hui Chang, M. Kayed, M.R. Girgis, and K.F.
+Shaalan. 2006. A survey of web information extrac-
+tion systems. IEEE Transactions on Knowledge and
+Data Engineering, 18(10):1411–1428.
+Pu-Chin Chen, Henry Tsai, Srinadh Bhojanapalli,
+Hyung Won Chung, Yin-Wen Chang, and Chun-
+Sung Ferng. 2021. A simple and effective positional
+encoding for transformers. In Proceedings of the
+2021 Conference on Empirical Methods in Natural
+Language Processing, pages 2974–2988, Online and
+Punta Cana, Dominican Republic. Association for
+Computational Linguistics.
+Xiang Deng, Prashant Shiralkar, Colin Lockard, Binx-
+uan Huang, and Huan Sun. 2022. DOM-LM: learn-
+ing generalizable representations for HTML docu-
+ments. CoRR, abs/2201.10608.
+Jacob Devlin, Ming-Wei Chang, Kenton Lee, and
+Kristina Toutanova. 2019. BERT: pre-training of
+deep bidirectional transformers for language under-
+standing. In Proceedings of the 2019 Conference
+of the North American Chapter of the Association
+for Computational Linguistics: Human Language
+Technologies, NAACL-HLT 2019, Minneapolis, MN,
+USA, June 2-7, 2019, Volume 1 (Long and Short Pa-
+pers), pages 4171–4186. Association for Computa-
+tional Linguistics.
+Xibin Dong, Zhiwen Yu, Wenming Cao, Yifan Shi, and
+Qianli Ma. 2020. A survey on ensemble learning.
+Frontiers Comput. Sci., 14(2):241–258.
+Vijay Prakash Dwivedi and Xavier Bresson. 2020. A
+generalization of transformer networks to graphs.
+CoRR, abs/2012.09699.
+Matthias Fey and Jan E. Lenssen. 2019. Fast graph
+representation learning with PyTorch Geometric. In
+ICLR Workshop on Representation Learning on
+Graphs and Manifolds.
+7517
+
+===PAGE BREAK===
+
+Sepp Hochreiter and Jürgen Schmidhuber. 1997.
+Long Short-Term Memory. Neural Computation ,
+9(8):1735–1780.
+Weihua Hu, Matthias Fey, Marinka Zitnik, Yuxiao
+Dong, Hongyu Ren, Bowen Liu, Michele Catasta,
+and Jure Leskovec. 2020. Open graph benchmark:
+Datasets for machine learning on graphs. In Ad-
+vances in Neural Information Processing Systems
+33: Annual Conference on Neural Information Pro-
+cessing Systems 2020, NeurIPS 2020, December 6-
+12, 2020, virtual.
+Zhiheng Huang, Wei Xu, and Kai Yu. 2015. Bidi-
+rectional LSTM-CRF models for sequence tagging.
+CoRR, abs/1508.01991.
+Thomas N. Kipf and Max Welling. 2017. Semi-
+supervised classiﬁcation with graph convolutional
+networks. In 5th International Conference on Learn-
+ing Representations, ICLR 2017, Toulon, France,
+April 24-26, 2017, Conference Track Proceedings .
+OpenReview.net.
+Yinhan Liu, Myle Ott, Naman Goyal, Jingfei Du, Man-
+dar Joshi, Danqi Chen, Omer Levy, Mike Lewis,
+Luke Zettlemoyer, and Veselin Stoyanov. 2019.
+Roberta: A robustly optimized BERT pretraining ap-
+proach. CoRR, abs/1907.11692.
+Colin Lockard, Prashant Shiralkar, Xin Luna Dong,
+and Hannaneh Hajishirzi. 2020. ZeroShotCeres:
+Zero-shot relation extraction from semi-structured
+webpages. In Proceedings of the 58th Annual Meet-
+ing of the Association for Computational Linguistics,
+pages 8105–8117, Online. Association for Computa-
+tional Linguistics.
+Ilya Loshchilov and Frank Hutter. 2019. Decou-
+pled weight decay regularization. In 7th Inter-
+national Conference on Learning Representations,
+ICLR 2019, New Orleans, LA, USA, May 6-9, 2019 .
+OpenReview.net.
+Lukasz Maziarka, Tomasz Danel, Slawomir Mucha,
+Krzysztof Rataj, Jacek Tabor, and Stanislaw Jas-
+trzebski. 2020. Molecule attention transformer.
+CoRR, abs/2002.08264.
+Jinyoung Park, Seongjun Yun, Hyeon-Jin Park, Jae-
+woo Kang, Jisu Jeong, Kyung-Min Kim, Jung-Woo
+Ha, and Hyunwoo J. Kim. 2022. Deformable graph
+transformer. CoRR, abs/2206.14337.
+Adam Paszke, Sam Gross, Francisco Massa, Adam
+Lerer, James Bradbury, Gregory Chanan, Trevor
+Killeen, Zeming Lin, Natalia Gimelshein, Luca
+Antiga, Alban Desmaison, Andreas Köpf, Edward Z.
+Yang, Zachary DeVito, Martin Raison, Alykhan Te-
+jani, Sasank Chilamkurthy, Benoit Steiner, Lu Fang,
+Junjie Bai, and Soumith Chintala. 2019. Py-
+torch: An imperative style, high-performance deep
+learning library. In Advances in Neural Informa-
+tion Processing Systems 32: Annual Conference
+on Neural Information Processing Systems 2019,
+NeurIPS 2019, December 8-14, 2019, Vancouver,
+BC, Canada, pages 8024–8035.
+Nils Reimers and Iryna Gurevych. 2019. Sentence-
+bert: Sentence embeddings using siamese bert-
+networks. In Proceedings of the 2019 Conference on
+Empirical Methods in Natural Language Processing
+and the 9th International Joint Conference on Nat-
+ural Language Processing, EMNLP-IJCNLP 2019,
+Hong Kong, China, November 3-7, 2019 , pages
+3980–3990. Association for Computational Linguis-
+tics.
+Hassan A. Sleiman and Rafael Corchuelo. 2013. A sur-
+vey on region extractors from web documents.IEEE
+Transactions on Knowledge and Data Engineering ,
+25(9):1960–1981.
+Ashish Vaswani, Noam Shazeer, Niki Parmar, Jakob
+Uszkoreit, Llion Jones, Aidan N. Gomez, Lukasz
+Kaiser, and Illia Polosukhin. 2017. Attention is all
+you need. In Advances in Neural Information Pro-
+cessing Systems 30: Annual Conference on Neural
+Information Processing Systems 2017, December 4-
+9, 2017, Long Beach, CA, USA, pages 5998–6008.
+Petar Veliˇckovi´c, Guillem Cucurull, Arantxa Casanova,
+Adriana Romero, Pietro Liò, and Yoshua Bengio.
+2018. Graph attention networks. In International
+Conference on Learning Representations.
+Qifan Wang, Yi Fang, Anirudh Ravula, Fuli Feng, Xi-
+aojun Quan, and Dongfang Liu. 2022. Webformer:
+The web-page transformer for structure information
+extraction. In Proceedings of the ACM Web Con-
+ference 2022, WWW ’22, pages 3124–3133, New
+York, NY , USA. Association for Computing Machin-
+ery.
+Thomas Wolf, Lysandre Debut, Victor Sanh, Julien
+Chaumond, Clement Delangue, Anthony Moi, Pier-
+ric Cistac, Tim Rault, Rémi Louf, Morgan Funtow-
+icz, Joe Davison, Sam Shleifer, Patrick von Platen,
+Clara Ma, Yacine Jernite, Julien Plu, Canwen Xu,
+Teven Le Scao, Sylvain Gugger, Mariama Drame,
+Quentin Lhoest, and Alexander M. Rush. 2020.
+Transformers: State-of-the-art natural language pro-
+cessing. In Proceedings of the 2020 Conference on
+Empirical Methods in Natural Language Processing:
+System Demonstrations, pages 38–45, Online. Asso-
+ciation for Computational Linguistics.
+Qitian Wu, Wentao Zhao, Zenan Li, David Wipf, and
+Junchi Yan. 2022. Nodeformer: A scalable graph
+structure learning transformer for node classiﬁcation.
+In Advances in Neural Information Processing Sys-
+tems.
+Yongqin Xian, Christoph H. Lampert, Bernt Schiele,
+and Zeynep Akata. 2019. Zero-shot learning — A
+comprehensive evaluation of the good, the bad and
+the ugly. IEEE Trans. Pattern Anal. Mach. Intell. ,
+41(9):2251–2265.
+7518
+
+===PAGE BREAK===
+
+Huimin Xu, Wenting Wang, Xin Mao, Xinyu Jiang, and
+Man Lan. 2019. Scaling up open tagging from tens
+to thousands: Comprehension empowered attribute
+value extraction from product title. In Proceedings
+of the 57th Annual Meeting of the Association for
+Computational Linguistics , pages 5214–5223, Flo-
+rence, Italy. Association for Computational Linguis-
+tics.
+Chengxuan Ying, Tianle Cai, Shengjie Luo, Shuxin
+Zheng, Guolin Ke, Di He, Yanming Shen, and Tie-
+Yan Liu. 2021. Do transformers really perform
+badly for graph representation? In Advances in Neu-
+ral Information Processing Systems 34: Annual Con-
+ference on Neural Information Processing Systems
+2021, NeurIPS 2021, December 6-14, 2021, virtual ,
+pages 28877–28888.
+Chulhee Yun, Srinadh Bhojanapalli, Ankit Singh
+Rawat, Sashank J. Reddi, and Sanjiv Kumar.
+2020. Are transformers universal approximators
+of sequence-to-sequence functions? In 8th Inter-
+national Conference on Learning Representations,
+ICLR 2020, Addis Ababa, Ethiopia, April 26-30,
+2020. OpenReview.net.
+Guineng Zheng, Subhabrata Mukherjee, Xin Luna
+Dong, and Feifei Li. 2018. Opentag: Open attribute
+value extraction from product proﬁles. In Proceed-
+ings of the 24th ACM SIGKDD International Confer-
+ence on Knowledge Discovery & Data Mining, KDD
+’18, pages 1049–1058, New York, NY , USA. Asso-
+ciation for Computing Machinery.
+Yichao Zhou, Ying Sheng, Nguyen V o, Nick Edmonds,
+and Sandeep Tata. 2021. Simpliﬁed dom trees for
+transferable attribute extraction from the web.
+7519
+
+===PAGE BREAK===
+
+<root> ""
+<p2> "Hiking equipment list"
+<ul> ""
+<li> "long-sleeve shirt"
+<li> "Trekking poles"
+<p2> "Contact"
+<root> ""
+<ul> ""
+<li> "long-sleeve shirt"
+<li> "Trekking poles"
+<p2> "Contact"
+<p2> "Hiking equipment list"
+<footer> "Follow"
+<div> "Facebook"
+<div> "Twitter"
+<div> ""
+<div> ""
+Original DOM Tree Processed DOM Tree
+Figure 5: An example of HTML processing.
+A Dataset Details
+A.1 Dataset Construction
+We build WEBPT to realize a quantitative analy-
+sis of different PT extraction methods. WEBPT
+is a collection of hub pages relevant to a set of
+pre-deﬁned SIs. Its construction process mainly
+consists of 5 steps: 1) deﬁning SIs; 2) crawling
+hub pages; 3) processing HTML documents; 4)
+labeling documents; and 5) splitting data points.
+Deﬁning Shopping Interests As the ﬁrst step,
+we establish a set of SIs through brainstorming.
+Particularly, we focus on popular activities, sports,
+hobbies and special events. Please check Table 6
+and 7 for a complete list of SIs.
+Crawling Hub Pages The hub pages are the
+webpages, each providing PTs related to a speciﬁc
+SI. Due to the variety of SIs, it is infeasible to focus
+on one or several websites for hub page collection.
+For example, a website specializing in sports will
+not provide information on “sewing” with a high
+chance and vice versa. In addition, gathering infor-
+mation from different websites may eliminate the
+bias probably existing in one website, according to
+the law of large numbers.
+Considering this situation, we take advantage
+of Google Search with a simple query selector to
+locate the hub pages. Each SIC is combined with
+sufﬁces “equipment list”, “supply list”, “tool list”
+and “checklist” before being fed into the search
+engine for querying. The system selects the com-
+bination with the largest number of results, whose
+top-100 query results are saved for later usage. We
+keep only the HTML pages and discard other docu-
+ments such as PDFs or CSVs, so the actual number
+of saved documents may vary.
+Processing HTML Documents This step aims
+to simplify the DOM tree structure to facilitate PT
+extraction. The RAW DOM tree is complicated
+<root> ""
+<ul> ""
+<li> "long-sleeve shirt"
+<li> "Trekking poles"
+<p2> "Contact"
+<p2> "Hiking equipment list"
+<div> ""
+Original DOM Tree
+<ul> ""
+<li> "Sunscreen"
+<li> "First-aid kit"
+<li> "Sunglasses"
+<root> ""
+<ul> ""
+<li> "long-sleeve shirt"
+<li> "Trekking poles"
+<p2> "Hiking equipment list"
+<div> ""
+<root> ""
+<p2> "Contact"
+<div> ""
+<ul> ""
+<li> "Sunscreen"
+<li> "First-aid kit"
+<li> "Sunglasses"
+Separated DOM Trees
+Figure 6: An example of separating a DOM tree.
+with decorative and supporting scripts irrelevant
+to the content, which easily submerges the useful
+information we want to extract and decreases the
+false positive rate. We prune the trees by remov-
+ing all headers, footers, and leaf nodes with empty
+text sequences. Then, we replace the nodes with
+only one child by their children to decrease the tree
+depth. To reduce the tree depth, we delete the nodes
+with only one child and then connect their children
+with subsequent subtrees directly with their par-
+ents. The process is illustrated in Figure 5. Exper-
+iments show that this HTML processing strategy
+successively simpliﬁes the DOM structure without
+sacriﬁcing any targeted content.
+Labeling Documents and Splitting Data Points
+These two steps are sufﬁciently discussed in § 5.1
+as will not be repeated. The only supplement is
+that the heuristic method used for initializing the
+noisy labels and compared in Table 1 is empirically
+developed. We omit its discussion since it is com-
+plex and not the focus of this paper. The detailed
+dataset splits are presented in Table 6 and 7.
+Data Processing for Transformers One limita-
+tion of the Transformer models such as BERT and
+TRENC is that they need to set a constraint to the
+length of the input sequence|V| since the complex-
+ity of the self-attention mechanism isO(|V| 2) and
+easily explodes when|V| is too large. Considering
+this drawback, for the node Transformers including
+Graphormer and TRENC , we set 512 as the maxi-
+mum size of a DOM tree and split those that exceed
+this size. In addition, we guarantee that each split
+tree has 64 nodes at minimum. Figure 6 shows an
+example of the separation process.
+A.2 Dataset Statistics
+We present the dataset statistics in Table 4. DOM
+trees are larger than molecular graphs but signiﬁ-
+cantly smaller than knowledge graphs.
+7520
+
+===PAGE BREAK===
+
+Attribute Value
+# Shopping Interests 95
+# DOM Trees 453
+# Total Nodes 94,167
+# Leaf Nodes 70,161
+# Positive PT Nodes 12,548
+Average # Nodes per Tree 207.87
+Maximum # Nodes in a Tree 2,748
+Minimum # Nodes in a Tree 19
+Median # Nodes in a Tree 156
+Average Tree Depth 7.06
+Maximum Tree Depth 18
+Minimum Tree Depth 3
+Median Tree Depth 7
+Average # Trees per SI 4.77
+Average # Nodes per SI 991.23
+Maximum # Nodes for an SI 3,050
+Minimum # Nodes for an SI 363
+Median # Nodes for an SI 935
+Table 4: Dataset statistics.
+A.3 Labeling Quality
+The dataset is labeled by one individual as the task
+is straightforward. To investigate the labeling qual-
+ity, we randomly select 25 DOM trees, removing
+their original labels and presenting them to 2 indi-
+viduals for re-labeling. Table 5 presents the statis-
+tics and results. It shows that our labeling quality
+is decent despite some inevitable disagreements on
+ambiguous cases, as exampled in Figure 7.
+Attribute Value
+# DOM Trees 25
+# Total Nodes 5,938
+# Positive PT Nodes 683
+# Disagreement 87
+# Fleiss’κ 98.53
+Table 5: Annotation quality investigation.
+<root> ""
+<strong> "Men's shirt"
+<p2> "Shirt"
+<div> ""
+Ambiguous Case 1
+<strong> "Women's shirt"
+<span> "..."
+<span> "..."
+<root> ""
+<p> "..."
+<p2> "Shirt"
+<div> ""
+Ambiguous Case 2
+<strong> "shirt"
+<p> "..."
+<p> "..."
+Figure 7: Examples of typical ambiguous annotation
+cases. In case 1, annotators may regard “men’s shirt”
+and “woman’s shirt” as negative as they are subcate-
+gories of the PT “shirt”; in case 2, the latter “shirt” may
+be regarded as negative as it is a repetition surrounded
+by long descriptive sentences.
+A.4 Data Usage
+All Web pages used by WEBPT are included in
+the Common Crawl repository.6 They are intended
+to provide information on a topic or interest, so
+consistent with that idea, we labeled the product
+types on each page. The labels do not contain any
+personally identiﬁable information. We are making
+the annotated dataset available to encourage further
+research on the product type extraction problem.
+The WEBPT dataset is licensed under the Cre-
+ative Commons Attribution 4.0 International Li-
+cense. To view a copy of this license, visit
+http://creativecommons.org/licenses/by/4.0/.
+B Implementation Details
+B.1 T RENC Hyper-Parameters
+We set the model dimensionality dmodel = 128
+and the number of TRENC layersN = 12. Each
+attention branch has 4 attention heads, and the
+single-head attention dimensionalitydk = 32. The
+feed-forward layer above the attention layer (Fig-
+ure 2) ﬁrst maps the features fromdmodel to a 512-
+dimensional latent space and then maps it back.
+The classiﬁcation layer consists of 2 FFN sublay-
+ers that ﬁrst downscale the TRENC layer output
+to 16-dimensional and then to the 1-dimensional
+output logits ˆy. We use the same activation func-
+tions and dropout strategy as described in (Vaswani
+et al., 2017). Our experiments show that the per-
+formance remains similar when we use 6 or 8 as
+the number of heads or use model dimensionality
+dmodel = 512.
+We train the model using10−4 as the peak learn-
+ing rate of the AdamW optimizer (Loshchilov and
+Hutter, 2019) with linear scheduler with 0.1 warm-
+up ratio. The batch size is 8 and the random seed is
+42. We do not take multiple runs for each model on
+each dataset as our dataset and evaluation strategies
+(§ 5.1) can minimize the impact of random factors.
+Using another random seed ( 0) only changes the
+¯F1 scores of TRENC and GCN by 0.03 and 0.05,
+respectively. The model is implemented with the
+“Transformers” library (Wolf et al., 2020) in Py-
+Torch (Paszke et al., 2019). The hyper-parameters
+not mentioned above keep their default values.
+B.2 Baseline Methods
+Text Similarity We adopt the same approach as
+described in § 4.1 with the uncased BERT-base
+6https://commoncrawl.org/
+7521
+
+===PAGE BREAK===
+
+model to generate the text sequence embedding em
+of each node Vm and the concept embeddings c.
+Then, we compute their cosine similarity through
+simm∈ (0, 1) = eT
+mc
+∥em∥∥c∥.
+We decide the classiﬁcation threshold by exhaust-
+ing possible values with 0.01 interval within (0, 1)
+and select the one that gives the largest F 1 score.
+Notice that this threshold searching method is only
+applied to the text similarity baseline. Others take
+a constant threshold 0.5, as described in § 4.3.
+BERT-FT BERT-FT classiﬁes each nodeVm in-
+dependently by ﬁne-tuning the uncased BERT-base
+model with the sequence classiﬁcation task. The
+model input is the combination of the sequence
+Sm and the concept C, i.e., “[CLS]Sm [SEP]
+C [SEP]”. It does not consider the tag tm. We
+append a one-layer FFN to the embedding corre-
+sponding to the [CLS] token to map it to a 1-
+dimensional logit. The training objective is mini-
+mizing the binary cross-entropy.
+MLP MLP can be considered as a TRENC
+model without TRENC layers. In other words,
+it directly feeds the node embeddings e (§ 4.1) into
+the classiﬁcation layer (Figure 2) without consid-
+ering any inter-dependencies between nodes. We
+increase its classiﬁcation layer depth until the vali-
+dation F1 stops improving for a fair comparison.
+GNNs Similar to MLP, GNN models substitute
+the TRENC layers in the TRENC model with the
+GCN and GAT layers, respectively. The GNN lay-
+ers are implemented with the “PyTorch Geometric”
+library (Fey and Lenssen, 2019). The number of
+GNN layers is ﬁne-tuned according to the valida-
+tion performance.
+Graphormer We take the original implementa-
+tion of Ying et al. (2021) and keep all model com-
+ponents.7 The differences are that we initialize the
+node features with node embeddings e instead of
+atom categories, and we train the model with node
+classiﬁcation instead of graph classiﬁcation. We
+keep its scheme for encoding edges but introduce
+only one edge category representing the ancestor-
+descendant relationship.
+7https://github.com/microsoft/Graphormer.
+SI WEBPT-n
+1 2 3 4 5
+3d-printing tr tr tr tr tr
+airsoft-paintball tr tt tr tt tr
+archery tr tr tt vl tr
+astronomy tr tr tr tr tr
+at-home-ﬁtness tr vl tr tt tt
+at-home-spa tt tr tr vl tr
+badminton tr vl tr tr vl
+baking tr tr vl tr tr
+bartending vl tr tr tr tr
+baseball tr tr tr tr tr
+basketball tr tr vl tr tt
+billiards-pool tt vl vl tt tr
+bird-watching tr tt tr tt tr
+boating tr tr tt tr tr
+bowling tr tt tt tr vl
+boxing tr tr tr tr tr
+calligraphy tr tr vl tr vl
+camping tr tr tr tr tr
+candle-making tr tr tr tt vl
+canoeing tr tt tr tr tr
+cheerleading tr tr tr tr tr
+cleaning tr tr tr tr tr
+climbing tt tr tr tr vl
+coffee tr tr tr tr tr
+comics-manga tr tr tr tr tr
+content-creation tt vl tt tr vl
+cricket tr tr vl tt tr
+crossﬁt vl tr tr tr tr
+cycling tr tr tt tr tr
+digital-art tr tr tr vl tr
+diy-home-improvement tr tr tr tr tr
+dj tr tr tr tr tr
+drag-queen tr tr tr tr tt
+drawing-and-sketching tr tr tt tr tr
+fencing tr tr tt tr tr
+ﬁeld-hockey tr vl vl tr tr
+ﬁshing tt vl tr tr tr
+ﬂoral-arranging tr tr tr tr tr
+football vl tr tr tr tr
+gaming tt tr tr tr tr
+gardening tr tt vl vl vl
+golﬁng tr tr tr tr tr
+gymnastics vl tr tr tr tr
+hair-care tr tr vl vl tt
+hiking tt tr tr tr tr
+hockey tr vl tr tr tr
+home-entertainment tt vl tr tr tt
+home-schooling tr tr tr tr tr
+horse-riding tr tr tr tr tt
+Table 6: Shopping interests and their splits in each
+dataset. “Tr”, “vl” and “tt” represent “training”, “val-
+idation” and “test” respectively.
+7522
+
+===PAGE BREAK===
+
+indoor-plants tr tr tt vl tr
+interior-design tr tr tr vl tr
+kayaking tr tr tr tr vl
+knitting tr tt tr tr tr
+lacrosse tr tt tt tr tr
+leathercraft vl tt tr tr tr
+makeup tr tr tr tr tt
+model-trains tr tt tr tr tr
+music-production vl tr tr tr tr
+nails tr tr tt tr tr
+painting tr tr tr tr tt
+paper-crafting tr tr tr tr tr
+parenting tr tr tr tr tr
+party-planning tr tr tr tr tt
+pet tt tr tr tt tr
+pilates tr tr tr tr tr
+pottery tt tr tr tr tr
+rugby tr tr tr tt tr
+running tr tt tr tr tr
+sailing tr tr tr tr tr
+scrapbooking tr tr tr tr tr
+scuba-diving tr tr tt tr tt
+sewing tr tr tr tr tr
+skating tr tr tr tr tr
+skiiing tt tr tr tr tr
+skin-care vl tr vl tr tr
+smart-home tr tr tr tr tr
+snowboarding vl tr tr tr tr
+soap-making vl tr tr tr tt
+soccer tr tr tr tt vl
+softball tr tr tr tr tr
+storage-and-organization tr tt tr tr tt
+student-dorm tr tt tr tr tr
+surﬁng tr tr tr vl tr
+swimming tr tr tr tt tr
+table-tennis tr tr tt tr tt
+teaching tt vl tr tt tr
+tennis tt tr tr tr tr
+travel tr tr tt tr tr
+volleyball tr tr tr tr tr
+weaving-and-spinning tt vl vl vl tr
+wedding tr tt tr tt tr
+wine tr tr tr vl vl
+work-from-home vl tt tr tt tt
+wrestling tr tr tr tr tr
+yoga tr tr tt tt tr
+Table 7: SIs and splits (cont.).
+7523
+
+===PAGE BREAK===
+
+ACL 2023 Responsible NLP Checklist
+A For every submission:
+□ A1. Did you describe the limitations of your work?
+Section 6
+□ A2. Did you discuss any potential risks of your work?
+Our work is totally built upon publicly accessible materials. To the best of our knowledge, It will not
+trigger any ethical or safety concerns.
+□ A3. Do the abstract and introduction summarize the paper’s main claims?
+Section "Abstract" and section 1
+□ A4. Have you used AI writing assistants when working on this paper?
+Left blank.
+B □ Did you use or create scientiﬁc artifacts?
+This topic is mainly discussed in appendix A and appendix B.
+□ B1. Did you cite the creators of artifacts you used?
+Appendix B
+□ B2. Did you discuss the license or terms for use and / or distribution of any artifacts?
+Appendix A.4
+□ B3. Did you discuss if your use of existing artifact(s) was consistent with their intended use, provided
+that it was speciﬁed? For the artifacts you create, do you specify intended use and whether that is
+compatible with the original access conditions (in particular, derivatives of data accessed for research
+purposes should not be used outside of research contexts)?
+Appendix A.4
+□ B4. Did you discuss the steps taken to check whether the data that was collected / used contains any
+information that names or uniquely identiﬁes individual people or offensive content, and the steps
+taken to protect / anonymize it?
+Appendix A.4
+□ B5. Did you provide documentation of the artifacts, e.g., coverage of domains, languages, and
+linguistic phenomena, demographic groups represented, etc.?
+Appendix A
+□ B6. Did you report relevant statistics like the number of examples, details of train / test / dev splits,
+etc. for the data that you used / created? Even for commonly-used benchmark datasets, include the
+number of examples in train / validation / test splits, as these provide necessary context for a reader
+to understand experimental results. For example, small differences in accuracy on large test sets may
+be signiﬁcant, while on small test sets they may not be.
+Appendix A
+C □ Did you run computational experiments?
+Section 5
+□ C1. Did you report the number of parameters in the models used, the total computational budget
+(e.g., GPU hours), and computing infrastructure used?
+Appendix B
+The Responsible NLP Checklist used at ACL 2023 is adopted from NAACL 2022, with the addition of a question on AI writing
+assistance.
+7524
+
+===PAGE BREAK===
+
+□ C2. Did you discuss the experimental setup, including hyperparameter search and best-found
+hyperparameter values?
+Section 5.1
+□ C3. Did you report descriptive statistics about your results (e.g., error bars around results, summary
+statistics from sets of experiments), and is it transparent whether you are reporting the max, mean,
+etc. or just a single run?
+Section 5.2
+□ C4. If you used existing packages (e.g., for preprocessing, for normalization, or for evaluation), did
+you report the implementation, model, and parameter settings used (e.g., NLTK, Spacy, ROUGE,
+etc.)?
+Not applicable. Left blank.
+D □ Did you use human annotators (e.g., crowdworkers) or research with human participants?
+Section 5 and Appendix A
+□ D1. Did you report the full text of instructions given to participants, including e.g., screenshots,
+disclaimers of any risks to participants or annotators, etc.?
+The annotation guideline is straightforward and made orally.
+□ D2. Did you report information about how you recruited (e.g., crowdsourcing platform, students)
+and paid participants, and discuss if such payment is adequate given the participants’ demographic
+(e.g., country of residence)?
+No additional compensation was provided.
+□ D3. Did you discuss whether and how consent was obtained from people whose data you’re
+using/curating? For example, if you collected data via crowdsourcing, did your instructions to
+crowdworkers explain how the data would be used?
+Not applicable. Left blank.
+□ D4. Was the data collection protocol approved (or determined exempt) by an ethics review board?
+Not applicable. Left blank.
+□ D5. Did you report the basic demographic and geographic characteristics of the annotator population
+that is the source of the data?
+Not applicable. Left blank.
+7525

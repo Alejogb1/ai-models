@@ -1,0 +1,15 @@
+{
+  "source": "Convolutional Matrix Factorization for Document Context-Aware Recommendation",
+  "source_group": "Awesome-ML-Papers/MF",
+  "processed_at": "2026-06-08T12:00:00Z",
+  "agent": "agent03_embeddings_mf_ranking_search_compiled",
+  "concepts": [
+    {
+      "finding": "ConvMF: integrates CNN (for document modeling) with PMF (Probabilistic MF). CNN extracts document contextual features to inform item embeddings. Addresses cold-start: new items with content can be embedded even without interaction data.",
+      "category": "Model Candidate",
+      "implication": "Keyword text content (the words that form the keyword) can inform its embedding via CNN encoding. Keywords with similar lexical structure may have related intents.",
+      "open_question": "How much does the lexical content of a keyword (its words) vs its usage context (co-occurring keywords/documents) contribute to intent prediction?",
+      "testable_hypothesis": "A ConvMF-style model combining keyword text (content) with keyword co-occurrence (context) outperforms content-only or context-only models for keyword-intent prediction."
+    }
+  ]
+}

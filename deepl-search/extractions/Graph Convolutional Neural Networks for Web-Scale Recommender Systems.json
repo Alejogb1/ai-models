@@ -1,0 +1,15 @@
+{
+  "source": "Graph Convolutional Neural Networks for Web-Scale Recommender Systems",
+  "source_group": "Awesome-ML-Papers/MF",
+  "processed_at": "2026-06-08T12:00:00Z",
+  "agent": "agent03_embeddings_mf_ranking_search_compiled",
+  "concepts": [
+    {
+      "finding": "Inductive graph embedding: learn aggregation functions that can embed new/unseen nodes without retraining. PinSage at Pinterest: random-walk-based neighbor sampling + attention aggregation for web-scale graph embedding (3B nodes, 18B edges). 99%+ coverage of daily active pins.",
+      "category": "Model Candidate",
+      "implication": "Inductive GNN methods can embed new keywords without retraining by aggregating features from their neighbors in the co-occurrence graph. This addresses the cold-start keyword problem.",
+      "open_question": "Can inductive GNN methods generalize to new keywords with only textual features (no historical co-occurrences)?",
+      "testable_hypothesis": "An inductive GNN (GraphSAGE) for keyword embeddings achieves 80%+ OOV recall for new keyword intent prediction."
+    }
+  ]
+}

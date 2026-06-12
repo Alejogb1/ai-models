@@ -1,0 +1,148 @@
+{
+  "source": "AiAds- Automated and Intelligent Advertising System for Sponsored Search.pdf",
+  "source_group": "Awesome-ML-Papers/CTR-CVR-Prediction",
+  "processed_at": "2026-06-08",
+  "agent": "agent5_final",
+  "concepts": [
+    {
+      "finding": "For the sponsored search market, the tradi-\ntional metrics such as cost-per-click, ad clicks are very indirect for\nperformance advertisers to control and optimize their conversions\nand ROI, and the keyword-level bidding optimization is inefficient\nfor increasing the advertising performance.",
+      "category": "Experiment",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Secondly, in the pay-per-click pricing model, since the keyword\nbids play a direct role in the ranking and pricing of ads, advertis-\ners should bid on each keyword cautiously.",
+      "category": "ModelCandidate",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Thirdly, the creation of search advertising plays an important role\nin ad performance, especially impacts the click-through rate(CTR)\nof ad.",
+      "category": "ModelCandidate",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "As plenty of keywords\nshould be maintained and highly dynamic and competitive auction\nenvironment, the keyword-level bidding language is very inefficient\nand brings great challenges to manual bidding optimization.",
+      "category": "FailureRisk",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "How to address the limitation described: As plenty of keywords\nshould be maintained and highly dynamic and competitive auction\nenvironment, the keyword-level bidding language is very inefficient\nand brings great challenges to manual bidding ",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "AiAds: Automated and Intelligent Advertising System for Sponsored Search\nKDD ’19, August 4–8, 2019, Anchorage, AK, USA\nTable 1: Information of the experiment group\nItem\nNumbers\nAdvertisers\n670\nDaily impressions\n101528334\nDaily clicks\n6528431\nDaily conversions\n378267\nNodes\n119490684\nEdges\n359530239\nF",
+      "category": "Experiment",
+      "implication": "Applicable to user/item clustering for personalization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Based on the pay-per-click pricing model and the keyword\ntargeting technology, the sponsored system runs online auctions\nto determine the allocations and prices of search advertisements.",
+      "category": "TargetConstruct",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "We present the\noverall architecture and modeling techniques for each module of\nthe system and share our lessons learned in solving several key chal-\nlenges.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Finally, online A/B test and long-term grouping experiment\ndemonstrate the advancement and effectiveness of this system.",
+      "category": "Experiment",
+      "implication": "Applicable to user/item clustering for personalization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Traditionally, the pay-per-click pricing model and the keyword\ntargeting technology are the two keys to the business success of\nsponsored search.",
+      "category": "TargetConstruct",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Firstly, keyword targeting requires that the advertiser should\nselect plentiful keywords relevant to their business to increase the\ncoverage of related and targeted search traffic.",
+      "category": "TargetConstruct",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Though the\nsponsored system has provided some keyword recommendation\ntools and multiple match types such as exact, phrase and broad and\nso on, but the keywords and match type set by advertisers still play\nan important role in ad retrieval, and all the retrieved ads should be\narXiv:1907.12118v1  [cs.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Massive search traffic and highly dynamic search intents pose huge\nchallenges for advertisers in their manual selection of keywords.",
+      "category": "TargetConstruct",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "How to address the limitation described: Massive search traffic and highly dynamic search intents pose huge\nchallenges for advertisers in their manual selection of keywords.",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "In\nthis situation, the keywords selected manually by advertisers deter-\nmine the upper-bound of commercial search volumes, sponsored\nsearch engines cannot achieve the actual global optimal matching\nbetween search queries and ads, the advertiser also cannot get suf-\nficient ad impressions if he doesn",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Due to the trade-off\nbetween usability and pertinency, most of the sponsored search sys-\ntems adopt the keyword-level bidding language, and advertiser sets\nthe bid price for keyword to represent his/her willingness to pay\nbased on the click value of this keyword.",
+      "category": "ModelCandidate",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Advertisers from big\nbusinesses usually recruit search engine marketing(SEM) experts\nto optimize their campaigns, while maintaining plenty of keywords\nand their bidding optimization is non-trivial especially for small\nand local businesses that donâĂŹt have dedicated marketing staff.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Moreover, keyword-level bidding language is too coarse-grained\nto represent the real value of each search traffic, it only can give\nan average click value for a cluster of the search volume.",
+      "category": "ModelCandidate",
+      "implication": "Applicable to user/item clustering for personalization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Even for\nthe same search keyword, different time or different locations or\ndifferent users may generate different click values for advertisers.",
+      "category": "ModelCandidate",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "To address these main challenges in sponsored search, we pro-\npose and build an automated and intelligent advertising system,\ncalled AiAds.",
+      "category": "FailureRisk",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "How to address the limitation described: To address these main challenges in sponsored search, we pro-\npose and build an automated and intelligent advertising system,\ncalled AiAds.",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "The main\ncontributions of this work are as follows:\n• We present a straightforward bidding language and corre-\nsponding automated bidding strategy for advertisers to op-\ntimize their campaign performance directly.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "• We conduct the online A/B test and long-term grouping\nexperiment on live traffic of Baidu, all results show that\nthe AiAds system can significantly increase the advertising\nperformance, increase the revenue of the search engine and\nincrease the user experience.",
+      "category": "Experiment",
+      "implication": "Applicable to user/item clustering for personalization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    }
+  ]
+}

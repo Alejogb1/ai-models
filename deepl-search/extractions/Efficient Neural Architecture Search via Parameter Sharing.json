@@ -1,0 +1,15 @@
+{
+  "source": "Efficient Neural Architecture Search via Parameter Sharing.pdf",
+  "source_group": "Awesome-ML-Papers/NAS",
+  "processed_at": "2026-06-08",
+  "agent": "agent6_remaining",
+  "concepts": [
+    {
+      "finding": "ENAS reduces NAS cost (1000x less than original NAS) by forcing all child models to share weights, discovering PTB architecture with 55.8 perplexity and CIFAR-10 architecture with 2.89% error.",
+      "category": "Experiment",
+      "implication": "Weight sharing across model candidates dramatically reduces search cost, making architecture search practical for production teams.",
+      "open_question": "Can weight-sharing NAS scale to search ranking architectures with billions of parameters?",
+      "testable_hypothesis": "A weight-sharing NAS approach will discover a ranking model architecture matching hand-tuned production quality with 100x fewer GPU-hours of search."
+    }
+  ]
+}

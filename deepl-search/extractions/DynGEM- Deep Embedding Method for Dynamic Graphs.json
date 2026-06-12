@@ -1,0 +1,15 @@
+{
+  "source": "DynGEM- Deep Embedding Method for Dynamic Graphs",
+  "source_group": "Awesome-ML-Papers/Embeddings",
+  "processed_at": "2026-06-08T12:00:00Z",
+  "agent": "agent_batch_generation",
+  "concepts": [
+    {
+      "finding": "Dynamic graph embedding using deep autoencoders. Extends SDNE (Structural Deep Network Embedding) with: (1) dynamic graph encoder that evolves over time, (2) temporal smoothness constraint penalizing large changes between timesteps, (3) incremental learning for new nodes. Preserves both local and global graph structure across snapshots.",
+      "category": "ModelCandidate",
+      "implication": "Keyword co-occurrence graphs evolve over time (new keywords emerge, seasonal patterns change). Dynamic embedding methods can track evolving keyword-intent relationships without full retraining.",
+      "open_question": "How often do keyword-intent relationships change? Are seasonal keyword shifts significant enough to warrant dynamic embeddings?",
+      "testable_hypothesis": "Dynamic keyword embeddings that incorporate temporal smoothness produce more stable and accurate intent clusters than independently retrained static embeddings."
+    }
+  ]
+}

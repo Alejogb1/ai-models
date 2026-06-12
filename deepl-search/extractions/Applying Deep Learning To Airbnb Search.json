@@ -1,0 +1,148 @@
+{
+  "source": "Applying Deep Learning To Airbnb Search .pdf",
+  "source_group": "Awesome-ML-Papers/Other",
+  "processed_at": "2026-06-08",
+  "agent": "agent5_final",
+  "concepts": [
+    {
+      "finding": "Tese new ways of looking at the search ranking problem revealed\nsomething interesting: although performances of the alternative\nmodels on test data were comparable to the NN, the listings up-\nranked by them were quite diﬀerent.",
+      "category": "FailureRisk",
+      "implication": "Can inform intent modeling for recommendation systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "CCS CONCEPTS\n•Retrieval models and ranking →Learning to rank; •Machine\nlearning approaches →Neural networks; •Electronic com-\nmerce →Online shopping;\nKEYWORDS\nSearch ranking, Deep learning, e-commerce\n1\nINTRODUCTION\nTe home sharing platform at Airbnb is a two sided marketplace for\nhosts to rent out ",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Figure\n2a shows the comparative improvements in our principal oﬄine\nmetric NDCG (normalized discounted cumulative gain), where the\nimpression of the booked listing is assigned a relevance of 1, and\nall other impressions 0 relevance.",
+      "category": "Experiment",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "2.3\nDecision Tree/Factorization Machine NN\nWhile the main ranking model serving production traﬃc was a NN\nat this point, we had other models under research.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Real-time Personalization using Em-\nbeddings for Search Ranking at Airbnb.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "malay.haldar@airbnb.com\nABSTRACT\nTe application to search ranking is one of the biggest machine\nlearning success stories at Airbnb.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Te task of search\nranking is to respond to the guest with an ordered list of a handful\nof listings from the thousands available in the inventory.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Te very ﬁrst implementation of search ranking was a manually\ncrafed scoring function.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Te search ranking model under discussion is part of an ecosys-\ntem of models, all of which contribute towards deciding which\nlistings to present to the guest.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "It is com-\nmon for guests to do multiple searches, clicking through some of\nthe listings to view their details page.",
+      "category": "ModelCandidate",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Te new model is then\ntested online in an A/B testing framework to see if it can achieve\na statistically signiﬁcant increase in conversions compared to the\ncurrent model.",
+      "category": "Baseline",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Figure 2b shows the comparative increase in conversions from\nthe models.",
+      "category": "ModelCandidate",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Te notable ones\nwere:\n2\n\nEmbedding\nq0\nq1\nL0\nL1\nFactorization Machine\nOther Features\nEmbedding\nFM Prediction\nOutput Logit\nHidden Relu layer\nGradient Boosted Decision Trees\nFigure 3: NN with GBDT tree nodes and FM prediction as features\nFigure 4: DNN learning curve\n• Iterations on the GBDT model with ",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Typical conﬁguration of the network: an input layer\nwith a total of 195 features afer expanding categorical features to\nembeddings, feeding the ﬁrst hidden layer with 127 fully connected\nReLUs, and then the second hidden layer with 83 fully connected\nReLUs.",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "• Similarity of the listing to the past views of the user, com-\nputed based on co-view embeddings [9].",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Tese models tap into data that isn’t directly part of the search\nranking training examples, providing the DNN with additional\ninformation.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "A reason for our excite-\nment was the success other applications had achieved in mapping\nsuch high cardinality categorical features to embeddings, such as\nlearning embeddings for words in NLP applications [6], learning\nembeddings for video and user id in recommender systems [4], etc.",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Tis fundamental limitation generates data that is\nvery sparse at the listing level.",
+      "category": "FailureRisk",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "How to address the limitation described: Tis fundamental limitation generates data that is\nvery sparse at the listing level.",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Most importantly, the listing id embedding was shared as\nit was in the fan-in of the hidden layer.",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Typically a back and forth conversion of the data between JavaTM\nand another language was required and the latency introduced in\nthe process was a blocker for us.",
+      "category": "ModelCandidate",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    }
+  ]
+}

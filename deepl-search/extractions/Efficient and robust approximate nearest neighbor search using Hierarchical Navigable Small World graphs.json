@@ -1,0 +1,22 @@
+{
+  "source": "Efficient and robust approximate nearest neighbor search using Hierarchical Navigable Small World graphs.pdf",
+  "source_group": "Awesome-ML-Papers/Nearest Neighbor Search",
+  "processed_at": "2026-06-08",
+  "agent": "agent6_remaining",
+  "concepts": [
+    {
+      "finding": "HNSW builds a multi-layer graph structure where upper layers have longer edges (coarse search) and lower layers have shorter edges (fine search), achieving logarithmic complexity and strong recall on billion-scale datasets.",
+      "category": "ModelCandidate",
+      "implication": "Hierarchical graph-based ANN search provides state-of-the-art efficiency for embedding-based retrieval in production search systems with controllable recall-speed tradeoff.",
+      "open_question": "What is the optimal layer-capping strategy for HNSW when embedding distribution is non-uniform?",
+      "testable_hypothesis": "HNSW-based vector retrieval will achieve >95% recall@10 on 1B+ document collections with sub-10ms average query latency."
+    },
+    {
+      "finding": "Diverse neighbor selection (not just closest neighbors) during graph construction prevents hubs and improves search quality on clustered data.",
+      "category": "Experiment",
+      "implication": "Diverse neighbor selection is applicable to building better document similarity graphs for search.",
+      "open_question": "How should diversity vs. proximity be balanced in nearest neighbor graph construction for different data distributions?",
+      "testable_hypothesis": "A diverse neighbor selection strategy in ANN graph construction will improve recall by 5%+ on highly clustered embedding spaces."
+    }
+  ]
+}

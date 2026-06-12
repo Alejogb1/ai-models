@@ -1,0 +1,148 @@
+{
+  "source": "Improving Deep Learning For Airbnb Search .pdf",
+  "source_group": "Awesome-ML-Papers/Other",
+  "processed_at": "2026-06-08",
+  "agent": "agent5_final",
+  "concepts": [
+    {
+      "finding": "But operating under the explore-exploit paradigm created severe\nchallenges:\n• Te new listing ranking boost was pulled in diﬀerent di-\nrections by two opposing forces: 1) a degradation of user\nexperience in the short term due to reduced relevance of the\nsearch results (an eﬀect we could measure accur",
+      "category": "FailureRisk",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "How to address the limitation described: But operating under the explore-exploit paradigm created severe\nchallenges:\n• Te new listing ranking boost was pulled in diﬀerent di-\nrections by two opposing forces: 1) a degradation of user\nexperien",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Te application of deep learning to search ranking was one of the most\nimpactful product improvements at Airbnb.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "On handling positional\nbias in ranking, we describe a novel approach that led to one of the most\nsigniﬁcant improvements in tackling inventory that the DNN historically\nfound challenging.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "CCS Concepts: •Retrieval models and ranking →Learning to rank;\n•Machine learning approaches →Neural networks; •Electronic com-\nmerce →Online shopping;\nAdditional Key Words and Phrases: Search ranking, Deep learning, e-commerce\n1\nINTRODUCTION\nAirbnb is a two sided marketplace, bringing together hosts",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Te search ranking problem at Airbnb is to rank the places to stay,\nreferred to as listings, in response to a query from the guest which\ntypically consists of a location, number of guests and checkin/check-\nout dates.",
+      "category": "FailureRisk",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "To add the price hint, we introduce a second label for each training\nexample, indicating which listing in the pair has a lower price and\nwhich one the higher.",
+      "category": "LabelValidation",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Although\nthe two tower architecture was not directly aiming to lower prices,\nwe observed a drop of −2.3% in average price of search results as\na side eﬀect of the increased relevance.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "4.3\nPosition Dropout\nUnder the position based model assumption, adding position as a\ncontrol variable eﬀectively eliminates the position bias prediction\nfrom listing rankings, but it introduces a new problem.",
+      "category": "FailureRisk",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "To solve cold start, we describe our perspective on the\nproblem and changes we made to improve the treatment of new listings on\nthe platform.",
+      "category": "FailureRisk",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Transitioning to deep learning was a major milestone\nin the evolution of search ranking at Airbnb.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Along those lines, we started with the observation that the series\nof successful ranking model launches described in [6] were not only\nassociated with an increase in bookings, but also a reduction in\nthe average listing price of search results.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "X-axis shows how the price of the booked listing oﬀsets from the\nmedian price of search results for a guest.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "For the learned values of the\nparameters, w = 0.33 and b = −0.9, the plot is shown in Figure 2\nover the typical range of P encountered during ranking.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Te oﬄine analysis suﬀered from the limitation that it\nonly evaluated re-ranking the top results available in logs.",
+      "category": "Experiment",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "How to address the limitation described: Te oﬄine analysis suﬀered from the limitation that it\nonly evaluated re-ranking the top results available in logs.",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Figure 5 shows the average diﬀerence between the median\nprice of search results and the booked price for some selected cities.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Te gain was driven by increased ease of\nsearch, as the NDCG computed online improved by +0.7%.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Laying the series of architectural manipulations to rest, next we\nmove on to addressing a ranking challenge that not only aﬀected\nguests, but also the other half of the Airbnb community, the hosts.",
+      "category": "FailureRisk",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "How to address the limitation described: Laying the series of architectural manipulations to rest, next we\nmove on to addressing a ranking challenge that not only aﬀected\nguests, but also the other half of the Airbnb community, the hosts.",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "So when referring to the cold\nstart problem, we focus our atention on the item level cold start (i.e,\nhow to handle new listings in ranking).",
+      "category": "FailureRisk",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Terefore a natural place to investigate user problems\nwas to look for segments of listings where NDCG was lower com-\npared to the overall NDCG.",
+      "category": "FailureRisk",
+      "implication": "Applicable to user/item clustering for personalization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "To solve cold start, we introduced a new\ncomponent feeding the DNN which predicted the user engagement\nfeatures for a new listing, both at training and scoring time.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    }
+  ]
+}

@@ -1,0 +1,148 @@
+{
+  "source": "Audience Expansion for Online Social Network Advertising.pdf",
+  "source_group": "Awesome-ML-Papers/Lookalike",
+  "processed_at": "2026-06-08",
+  "agent": "agent5_final",
+  "concepts": [
+    {
+      "finding": "However, even with this pinpoint targeting ability, a similar\nchallenge to the coverage problem in search advertising re-\nmains, as advertisers usually cannot cover all relevant demo-\ngraphic attributes related to the desired product or service.",
+      "category": "TargetConstruct",
+      "implication": "Relevant for similarity-based retrieval and lookalike targeting",
+      "open_question": "How to address the limitation described: However, even with this pinpoint targeting ability, a similar\nchallenge to the coverage problem in search advertising re-\nmains, as advertisers usually cannot cover all relevant demo-\ngraphic attribut",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "This system is now in production for all traﬃc and has\nprovided signiﬁcant improvements in key metrics for both\nadvertisers and LinkedIn, such as double-digit percentage\nincreases in impressions served across LinkedIn, and triple-\ndigit percentage increases in value achieved for those adver-\ntisers ",
+      "category": "Experiment",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "If a keyword occurs in the apropriate context\n(the search query or the page content), the advertiser then\nenters an auction to show its ad.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "While broad match helps advertisers with the problem of\nchoosing keywords, it does introduce new challenges relat-\ning to bid optimization and mechanism design.",
+      "category": "FailureRisk",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "How to address the limitation described: While broad match helps advertisers with the problem of\nchoosing keywords, it does introduce new challenges relat-\ning to bid optimization and mechanism design.",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Our main contributions are as follows:\n• We present a campaign-agnostic approach to expand\nuser proﬁles.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Keyword advertising includes spon-\nsored search advertising, in which ads are placed alongside\nsearch results for a relevant query, and contextual display ad-\nvertising, in which advertisements are placed on a webpage\nwith relevant content.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "[8] explore the problem of optimal sponsored search\nbidding in the presence of broad match, where the bid for\na single keyword may be applied to many queries of vary-\ning value to the advertiser.",
+      "category": "FailureRisk",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "The formula is chosen based on\nthree criteria: 1) similarity, deﬁned as the proportion of the\noriginal segment in the expanded segment; 2) novelty, de-\nﬁned as the proportion of the expanded segment not in the\noriginal segment; and 3) quality, deﬁned by a performance\nmetric such as CTR or conversion",
+      "category": "Experiment",
+      "implication": "Applicable to user/item clustering for personalization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Therefore,\nwe introduce a personalization scheme to rerank each po-\ntentially expandabe entity with regard to a given user.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "For campaign-agnostic expansion, we use faceted search to\nachieve personalized Similar-X reranking based on member-\nentity propensity score, in which case the member proﬁle in\nthe VSM representation acts as a query against the entity\nindex, with the pool of entities to rank being a facet in the\nsear",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "It is interesting to note that CTR\nremains nearly unchanged globally; the explanation is that\nwhile a user shown an impression due to expansion may be\nsomewhat less likely to click than the campaign’s originally-\ntargeted users, the user is not less likely to click on this im-\npression than on the i",
+      "category": "TargetConstruct",
+      "implication": "Can inform intent modeling for recommendation systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Through large scale online exper-\niments, we show the eﬀectiveness of the proposed approach,\nand as a result, the beneﬁts it brings to the whole market-\nplace including both LinkedIn and advertisers.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Unlike the well\nknown sponsored search model for advertising on search en-\ngines, where advertisers target a list of keywords that they\ndeem relevant to their campaign, advertisers on social net-\nworks are given comprehensive demographic targeting op-\ntions to precisely deﬁne the desired audience.",
+      "category": "TargetConstruct",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Some advertising platforms have provided similar func-\ntionality; however, most commonly the expansion is conversion-\noriented.",
+      "category": "ModelCandidate",
+      "implication": "Relevant for similarity-based retrieval and lookalike targeting",
+      "open_question": "How to address the limitation described: Some advertising platforms have provided similar func-\ntionality; however, most commonly the expansion is conversion-\noriented.",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "In this paper, we propose an eﬃcient system to achieve\nthe above goals.",
+      "category": "TargetConstruct",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "[11] show that associative classiﬁcation (a rule-based\nform of frequent pattern mining) can be more eﬀective than\nother common classiﬁers when training look-alike models for\ncampaigns with few conversions.",
+      "category": "ModelCandidate",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "[2] con-\nsider the problem of look-alike modeling when both a tar-\ngeting segment and advertiser conversion data are available.",
+      "category": "FailureRisk",
+      "implication": "Applicable to user/item clustering for personalization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "A key challenge in applying col-\nlaborative ﬁltering to advertising is the extreme sparsity of\ninteraction between users and campaigns.",
+      "category": "FailureRisk",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "How to address the limitation described: A key challenge in applying col-\nlaborative ﬁltering to advertising is the extreme sparsity of\ninteraction between users and campaigns.",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "CTR prediction can thus act as a safeguard against\nshowing low-relevance ads due to expansion.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "However, this takes a prolonged warm-up time for model\ntraining, and may require some careful setup to eﬀectively\nexplore-exploit the search space.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "How to address the limitation described: However, this takes a prolonged warm-up time for model\ntraining, and may require some careful setup to eﬀectively\nexplore-exploit the search space.",
+      "testable_hypothesis": ""
+    }
+  ]
+}

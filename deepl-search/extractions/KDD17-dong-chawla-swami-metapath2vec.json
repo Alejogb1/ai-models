@@ -1,0 +1,15 @@
+{
+  "source": "KDD17-dong-chawla-swami-metapath2vec",
+  "source_group": "Awesome-ML-Papers/Embeddings",
+  "processed_at": "2026-06-08T12:00:00Z",
+  "agent": "agent_batch_generation",
+  "concepts": [
+    {
+      "finding": "metapath2vec: heterogeneous network embedding using meta-path-based random walks. Meta-path specifies the node type sequence (e.g., APVPA for Author-Paper-Venue-Paper-Author). Heterogeneous Skip-Gram conditions on node type during prediction. metapath2vec++ uses softmax over same-type nodes only. Outperforms DeepWalk and LINE on heterogeneous graph tasks by 15-30%.",
+      "category": "ModelCandidate",
+      "implication": "Meta-path-based walks capture typed relationships in heterogeneous keyword-intent-document graphs. Different meta-paths capture different semantics (keyword-document-keyword vs keyword-intent-keyword). Type-conditional negative sampling improves efficiency.",
+      "open_question": "What meta-path schema best captures keyword-intent relationships? How to design effective meta-paths without domain expertise?",
+      "testable_hypothesis": "metapath2vec with well-designed meta-paths (Keyword-Document-Intent, Keyword-Intent-Keyword) produces more coherent intent clusters than homogeneous DeepWalk on the same graph."
+    }
+  ]
+}

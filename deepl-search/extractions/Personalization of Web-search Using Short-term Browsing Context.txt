@@ -1,0 +1,1314 @@
+Personalization of Web-search Using Short-term
+Browsing Context
+Yury Ustinovskiy
+Yandex
+Leo Tolstoy st. 16, Moscow, Russia
+yuraust@yandex-team.ru
+Pavel Serdyukov
+Yandex
+Leo Tolstoy st. 16, Moscow, Russia
+pavser@yandex-team.ru
+ABSTRACT
+Search and browsing activity is known to be a valuable
+source of information about user’s search intent. It is ex-
+tensively utilized by most of modern search engines to im-
+prove ranking by constructing certain ranking features as
+well as by personalizing search. Personalization aims at two
+major goals: extraction of stable preferences of a user and
+speciﬁcation and disambiguation of the current query. The
+common way to approach these problems is to extract infor-
+mation from user’s search and browsing long-term history
+and to utilize short-term history to determine the context of
+a given query. Personalization of the web search for the ﬁrst
+queries in new search sessions of new users is more diﬃcult
+due to the lack of both long- and short-term data.
+In this paper we study the problem of short-term person-
+alization. To be more precise, we restrict our attention to
+the set of initial queries of search sessions. These, with the
+lack of contextual information, are known to be the most
+challenging for short-term personalization and are not cov-
+ered by previous studies on the subject. To approach this
+problem in the absence of the search context, we employ
+short-term browsing context. We apply a widespread frame-
+work for personalization of search results based on the re-
+ranking approach and evaluate our methods on the large
+scale data. The proposed methods are shown to signiﬁcantly
+improve non-personalized ranking of one of the major com-
+mercial search engines. To the best of our knowledge this
+is the ﬁrst study addressing the problem of short-term per-
+sonalization based on recent browsing history. We ﬁnd that
+performance of this re-ranking approach can be reasonably
+predicted given a query. When we restrict the use of our
+method to the queries with largest expected gain, the re-
+sulting beneﬁt of personalization increases signiﬁcantly.
+Categories and Subject Descriptors
+D.4.6 [Information Storage and Retrieval]: Information
+Search and Retrieval—Search process
+Permission to make digital or hard copies of all or part of this work for personal or
+classroom use is granted without fee provided that copies are not made or distributed
+for proﬁt or commercial advantage and that copies bear this notice and the full cita-
+tion on the ﬁrst page. Copyrights for components of this work owned by others than
+ACM must be honored. Abstracting with credit is permitted. To copy otherwise, or re-
+publish, to post on servers or to redistribute to lists, requires prior speciﬁc permission
+and/or a fee. Request permissions from permissions@acm.org.
+CIKM’13, Oct. 27–Nov. 1, 2013, San Francisco, CA, USA.
+Copyright 2013 ACM 978-1-4503-2263-8/13/10 ...$15.00.
+http://dx.doi.org/10.1145/2505515.2505679.
+Keywords
+Personalization, re-ranking, browsing sessions, search con-
+text, machine learning.
+1.
+INTRODUCTION
+The classical approach to web retrieval considers a user’s
+request aside from her personality, context of the request,
+nature of the search intent. In the past decade the situation
+has drastically changed. Now modern commercial search en-
+gines tend to employ not only information about the query
+itself, but also all knowledge about searcher’s personality
+expressed in her long-term interests, context of the current
+query and her engagement with certain web pages. Recent
+studies [15, 20, 8, 2] show that properly processed click-
+through and browsing logs can signiﬁcantly improve quality
+of the classical ranking. Browsing and search sessions con-
+stitute the major part of user activity studied by researchers
+and provide one of the most powerful sources of data for per-
+sonalization of search results and context-sensitive ranking.
+Search session is a series of intent-related user’s requests
+to a search engine. Similarly, a series of Web pages visited by
+a user with similar intent are referred to as a browsing ses-
+sion. Modern studies [20, 8] prove that usage of search click-
+through logs helps to disambiguate the current information
+need of a searcher as well as to construct her interests proﬁle.
+At the same time, there is not much known about applicabil-
+ity of the browsing sessions to the same tasks, though several
+works [19, 1] provide comprehensive studies of the nature of
+the post-search browsing sessions and suggest various ways
+to incorporate them into the design of a search engine.
+In the current study we address the problem of person-
+alization of the Web search for new users. Since long-term
+search history is sparse or completely absent for them, we
+perform only short-term personalization. Moreover, we re-
+strict our attention to the most arduous queries: ﬁrst queries
+in the search session with lack of even short-term search con-
+text. The research questions motivated our study are:
+1. What portion of queries cannot be covered by person-
+alization methods based on the short-term search con-
+text?
+2. To what extent could short-term browsing context im-
+prove ranking on those queries?
+3. How does the length of the utilized browsing session
+aﬀect the performance of short-term personalization?
+4. How to select exactly those queries that have potential
+to beneﬁt from the given personalization approach?
+By analyzing the search and browsing logs of a major com-
+mercial search engine we demonstrate that a considerable
+volume of queries has very little short-term contextual in-
+formation from the search session itself. These queries are
+challenging for the state-of-the-art short-term personaliza-
+tion methods based on search context, so we adopt a person-
+alization framework based on re-ranking using short-term
+browsing context.
+We also extract various statistics from
+browsing sessions of other users to improve ranking for the
+current user. Each re-ranking approach has its applicabil-
+ity limits and inappropriate employment could even harm
+the quality of a search engine. To cope with this issue we
+present a method of automatic ﬁltering of queries suitable
+for context-aware personalization.
+Our study is completely data-driven, i.e. both sets for
+training and evaluation are extracted from user logs.
+To sum up, the contributions of the present study are:
+• Utilization of short browsing context in a personal-
+ization framework based on re-ranking. Most impor-
+tantly, it allows to improve ranking for queries with the
+lack of search-context and for users without long-term
+interest proﬁles.
+• Development of a framework for automatic learning
+of a ﬁlter that distinguishes queries to be personal-
+ized.
+Each re-ranking algorithm has its own scope,
+and the ﬁltering directly depends on a personalization
+algorithm.
+• Utilization of knowledge about recent browsing experi-
+ence of other users to improve search experience of a
+new user.
+• Comprehensive analysis of importance of various sources
+of data and features extracted from them for short-
+term personalization based on browsing context.
+The rest of the paper is organized as follows. In Section 2
+we describe related work relevant to our research. We brieﬂy
+describe the data employed for further evaluations in Sec-
+tion 3. In Section 4 we give examples of short- and long-
+term-based personalization cases and observe some statis-
+tics about typical search sessions to motivate our study. In
+Section 5 we describe in detail our method based on a com-
+mon framework for personalization. We discuss features em-
+ployed in our study in Section 6 and experiments themselves
+in Section 7. Finally, we conclude our research in Section 8.
+2.
+RELATED WORK
+Personalization of web search gains more and more inter-
+est in the last years. It has been realized that employment
+of contextual and personal information from browsing and
+search logs has the potential to signiﬁcantly improve ranking
+quality.
+The ﬁrst studies on the subject mostly used short-term
+search context and long-term search history. In [15] Shen et
+al. incorporated previous queries and their click-throughs to
+specify the actual information need of a searcher. Authors
+analyzed several context-sensitive language models based on
+queries submitted in the same session and snippets clicked on
+by a user. All methods were evaluated on the TREC collec-
+tion augmented with click-through data. Xiang et al. [20] de-
+veloped Shen’s initial approach further by integrating learn-
+ing to rank ideas into short-term personalization.
+They
+Type\Source of data
+Search session
+Browsing session
+Long-term
+[15] [2] [16]
+[11]
+Short-term
+[20] [2]
+Current study
+Table 1: Types of personalization employed in pre-
+vious studies.
+learned a model on click-based and text-based features ex-
+tracted from search session and evaluated the model on both
+human labelled data and user clicks. Bennett et al. in [2]
+proposed a uniﬁed framework that combines long-term and
+short-term behaviour of a user in a search engine. It com-
+prises queries issued by a user during a long period of activ-
+ity and documents clicked on as well as during short-term
+search session interaction. In [16] Sontag et al. utilize user’s
+long-term search history to tune parameters of user-speciﬁc
+ranking model. The model extracts the personal topic dis-
+tribution on the ODP (Open Directory Project) categories
+and re-weights the results according to this. The method
+shows maximal performance on ambiguous acronyms. Let
+us remind that we tackle the problem of “zero” context in
+terms of the context studied in these papers, as we assume
+that we have neither short-term search session context, nor
+long-term user preferences.
+Recently commercial search engines started to distribute
+special toolbars that record user activity in browsers. These
+browsing logs give more speciﬁc picture of user’s actions on
+the Web and become one of the major sources of personal-
+ization data nowadays. The nature of search trails — parts
+of a browsing log initiated by a query — is the subject of
+study by White et al. in [19]. Authors analyze the evolu-
+tion of various characteristics (e.g. relevance, novelty) in the
+course of the trail. The observations in this work demon-
+strate the possible value of search trails for search engines.
+White et al. in [18] considered a problem of recovering short-
+term interest using both browsing and search context. They
+predicted an optimal weight to assign to context in order
+to combine it with query and predict the ODP label of a
+clicked document. Note that authors leave the problem of
+employment of derived context information in web search for
+a future work and also use the combination of browsing and
+search context, so do not consider the cases, where there is
+no short-term search context available. Matthijs and Radlin-
+ski in [11] study the usefulness of a set of features extracted
+from long-term browsing history by tuning a few parameters
+(without using any actual machine learning algorithm and
+only on 72 queries). Results of both oﬄine experiment on
+this set of queries and online evaluation are reported. Un-
+like Matthijs and Radlinski we utilize short-term browsing
+context for personalization and conduct oﬄine evaluation on
+the large-scale dataset of 500K queries.
+Various types and sources of data for personalization uti-
+lized in the previous studies are summarized in Table 1.
+3.
+DATA
+As we mentioned above, search and browsing history con-
+stitutes the major source of data for short- and long-term
+personalization. While the entire query log is valuable for
+long-term personalization, only some recent records are im-
+portant for short-term personalization. To be more precise,
+only the pages visited with the same or similar informa-
+tion need could possibly give proper context for the cur-
+rent query. The idea of a series of pages (queries) with the
+same intent is usually formalised in the notion of a browsing
+(search) logical session.
+Definition. Browsing (resp. search) logical session (or log-
+ical session) is a subset of the user’s browsing (resp. search)
+log, consisting of intent-related pages, i.e. pages visited with
+the same or similar search goal.
+The problem of accurate identiﬁcation of logical sessions
+is rather hard and is a subject of independent studies [3,
+9]. To avoid unnecessary complications most studies apply
+common convention: a set of successive browsed pages (sub-
+mitted queries) is attributed to one logical session, unless it
+is followed by 30 minutes of inactivity. This simple heuristic
+allows eﬃciently and eﬀectively divide the whole history log
+into intent-related parts. It is an interesting research ques-
+tion (which is addressed in [3, 9, 18] for search sessions) how
+quality of the partition aﬀects quality of the data extracted
+from logical sessions. However this question is out of the
+scope of our study and, following previous works, we divide
+the browsing log into sessions on the basis of 30 minutes in-
+activity timeout. Further these sessions are simply referred
+to as browsing sessions.
+Similarly, the web pages visited by a user prior to for-
+mulating a query q in the same session are called browsing
+context and queries issued before q respectively are called
+search context.
+Now we describe the data organization and information
+that is available in our study.
+Our personalization algo-
+rithm was trained and evaluated on the fully anonymized
+real browsing sessions collected from one of the major search
+engines via its special browser toolbar for 8 days. The tool-
+bar store URLs of all non-personal pages visited by a user
+and links followed during the browsing. It does not store
+texts of the visited web pages. In total we have collected
+200M browsing sessions.
+175M sessions from ﬁrst 7 days
+were used for session statistics extraction, see Section 6. The
+last 8th day was used for the training/test dataset construc-
+tion: we keep all browsing sessions with at least one query
+and with at least one page in the browsing session preced-
+ing the ﬁrst query. To purify our data for the 8th day we
+ﬁltered out all browsing sessions with deliberately useless
+context, namely we deleted a query if all preceding browsed
+pages are private or from the same host as the search engine.
+Since our personalized ranking step and the ﬁnal evaluation
+metrics rely solely on click-through data, we deleted all the
+queries with no clicks on their SERPs. After ﬁltering and
+all puriﬁcations we sampled 500K browsing sessions for per-
+sonalization training and evaluation.
+4.
+MOTIVATION
+Let us start this section with an example of cases cov-
+ered by each of the long- and short-term personalization
+methods. First, assume that we have a researcher with spe-
+cialization in Information Retrieval submitted query ‘MRR‘
+into a search engine. Then he is likely to be interested in
+an article on ‘Mean Reciprocal Rank‘. At the same time, if
+an identical query is submitted by an amateur sportsmen in
+UK, the search engine should return at the ﬁrst position an
+article on ‘Manchester Road Race‘. This is a simple exam-
+ple of an ambiguous query, which is covered by long-term
+personalization. Second, let the same query be submitted
+by a searcher for which a search engine has no complete in-
+formation about her personality, after reading a page with
+0 %
+5 %
+10 %
+15 %
+20 %
+25 %
+30 %
+35 %
+40 %
+ 1
+ 5
+ 10
+ 15
+ 20
+Portion of queries
+Position in search session
+Figure 1: Histogram of positions of queries in their
+search sessions
+0 %
+5 %
+10 %
+15 %
+20 %
+25 %
+30 %
+35 %
+40 %
+45 %
+ 0
+ 5
+ 10
+ 15
+ 20
+Portion of the ﬁrst queries
+The length of the browsing session
+Figure 2: Histogram of lengths of browsing sessions
+prior to formulating the ﬁrst query.
+title ‘Internet marketing‘. Then probably the searcher is in-
+terested in an article on ‘Master Resell Right‘. Here is the
+case, where short-term personalization based on the brows-
+ing context comes out. In either case we improve the quality
+of the original non-personalized ranking by adding personal
+and contextual bias.
+Previous studies on personalization either omit the ﬁrst
+queries in search sessions or process them only with the long-
+term personalization. For instance, in [2] authors consider
+these queries and report zero performance of the personal-
+ization based on the search history and respectively modest
+improvement of personalization based on long history.
+Obviously, the distribution of browsing sessions lengths
+and of number of queries per sessions heavily depend on
+various speciﬁc characteristics of a search engine. However,
+we report these distributions on our data to demonstrate
+the possible beneﬁt from short-term personalization based
+on the browsing sessions in our setting.
+Figure 1 shows the distribution of search positions of queries
+in their sessions. It follows that 39% of queries have no short-
+term search context for personalization (the same numbers
+are reported in [18]) and 58% of queries have ≤1 queries for
+contextualization. It proves that the large portion of queries
+suﬀers from the lack of search context for short-term person-
+alization. To overcome these limits of short-term personal-
+ization based on search context one needs to ﬁnd some new
+source of data.
+One obvious solution is to incorporate long-term history.
+It covers all queries of users with suﬃcient search history
+and in that way allows to cope with ﬁrst requests in search
+sessions, though it does not help new users. Therefore we de-
+cided to analyze the utility of the preceding browsing session
+for short-term personalization. Figure 2 shows the distribu-
+tion of lengths of browsing sessions prior to formulating the
+ﬁrst query. From this plot we conclude that the majority of
+ﬁrst queries in search sessions has very rich browsing con-
+text: all except 41% of queries have at least one preceding
+web page in the same session. Although most queries have
+some browsing context, we are interested in the range of
+applicability of this data and restrict ourselves considering
+K = 1, . . . , 10 pages visited prior to the current query.
+5.
+METHOD
+In this section we describe our method of personalization.
+We start with presenting the general personalization frame-
+work based on a re-ranking approach [20, 8, 2]. This frame-
+work is rather popular due to the simplicity of its implemen-
+tation, the transparency of the ranking process and possi-
+bility of additional tuning. This framework is the core part
+of our approach and we also discuss its speciﬁcations. Es-
+sentially, the method runs in two steps: click prediction and
+re-ranking. Afterwards, we describe the additional query ﬁl-
+tering step, which identiﬁes requests that can be potentially
+enhanced by our personalization method.
+5.1
+Click prediction problem
+Let L = {
+ u, q, S(q), C(q)
+
+} be a set of records from a
+click-through log: each record contains user’s u query q,
+search engine result page S(q) = {s1, . . . , s10} and her clicks
+C(q) = {c1, . . . , c10} on the SERP, ci ∈{0, 1}. At the click
+prediction step we aim to recover ci for each sample of the
+form {u, q, si}. Namely, a sample {u, q, si} receives a posi-
+tive judgement if document si was clicked by the user for the
+query q and gets negative judgement otherwise. Our goal is
+to learn labels ci from the set of features. That is a standard
+way to get personalized relevance judgements [2, 16, 11].
+The features employed in this step are determined by the
+type of personalization performed and by the available data.
+For instance, in the case of long-term personalization we
+can leverage historical information about clicks, queries and
+pages visited by the user. On the contrary, for short-term
+personalization we use user’s actions in the search engine
+and browser during the current session right before formu-
+lating the query. Note that the eﬀective combination of these
+methods is an interesting and challenging research ques-
+tion [18, 2], although it is not the subject of the current
+study. As we have mentioned, we restrict our attention to
+the ﬁrst queries of search sessions, so only browsing context
+could by employed for short-term personalization. For these
+queries with lack of search context we consider K last web
+pages from the browsing session as a context:
+B = {bK, bK−1, . . . , b1}
+|
+{z
+}
+Browsing session
+−→q −→S(q) −→
+C(q)
+|{z}
+Ground truth
+(1)
+In general click prediction problem is very hard and ad-
+mits accurate solution in very restrictive cases (see e.g. [12]).
+However, we are interested in ranking quality of our predic-
+tor rather than in its recall, precision or perplexity.
+5.2
+Re-ranking problem
+From now on let’s assume that the click prediction prob-
+lem is solved, i.e. for each sample {u, q, si} we have value pi
+that estimates ci. The predicted values are utilized to pro-
+duce new ranking of the top k documents retrieved for q by
+original ranking. There is a number of methods in previous
+studies that suggest various ways to perform the re-ranking
+step. Proper approach depends on many factors including
+the quality of estimators pi and features used at the predic-
+tion step. Also some freedom in re-ranking step gives the
+opportunity for additional tuning of personalized ranking.
+The simplest way to personalize SERP is just to rank all
+documents according to the value of pi, assuming that the
+higher pi the more likely it will be clicked. The main disad-
+vantage of the approach is the lack of ﬂexibility: often per-
+sonalization harms the initial ranking’s quality, so we would
+like get rid of undesirable re-rankings.
+To approach that
+problem one can control aggressiveness of personalization
+by introducing smoothing parameter µ ∈[0; 1] and ranking
+using Borda’s ranking fusion (see e.g. [20]):
+score(si) = (1 −µ)
+1
+r(si) + µ1
+i .
+(2)
+where i is the original ranking position, r(si) — the new
+position.
+Large smoothing parameter µ results into “al-
+most” baseline non-personalized ranking, i.e. we swap docu-
+ments only if we are strongly convinced in superiority of one
+over the other. On the contrary, small values of µ lead to
+very aggressive personalization which aﬀects large volume of
+queries. Further in our experiments (see Section 7.4.2) we
+evaluate the eﬀect of smoothing (2) for various values of µ.
+5.3
+Query ﬁltering
+Any re-ranking method is potentially beneﬁcial only for a
+certain subset of queries. Some users, sessions and queries
+in principle could not beneﬁt from certain re-ranking meth-
+ods: often the latter only harms the baseline ranking qual-
+ity. To avoid undesirable losses we construct a classiﬁer that
+predicts the possible gain from personalization for a given
+query. The core diﬀerence from similar classiﬁers described
+in previous studies (see e.g. [14, 17]) is its direct dependence
+on the constructed re-ranking algorithm.
+Let R0 and R1 be two rankings: the baseline and the new
+personalized rankings respectively.
+Assume that for each
+ranking and any query q submitted by a user u we have some
+quality measure M(R0, q). Then we assign to every query q
+a diﬀerence M(R1, q)−M(R0, q). This is our ground truth,
+which distinguishes the queries that beneﬁt from reranking
+from the others. Our aim is to predict whether the diﬀerence
+is greater or smaller than zero. We extract a set of features
+for each pair (u, q) and apply a machine learning approach
+to estimate the value M(R0, q) −M(R1, q).
+Any feature
+F(u, q, si) (including si-independent features) employed at
+the click prediction step results into a new feature averaged
+over all documents from S(q):
+AvF(u, q) = 1
+10
+X
+si∈S(q)
+F(u, q, si).
+In our setting we again take user’s clicks on SERP S(q)
+as implicit relevance judgements and use reciprocal rank of
+the last user’s click as a performance measure M (see equa-
+tion (3) below). It is important to note that feature and
+training set generation for query ﬁltering step can be done
+automatically given click prediction features and its valida-
+tion set. So, learning of ﬁlter does not require any additional
+data and is speciﬁc for our re-ranking method.
+Learned predictor f(u, q, S) allows subtle tuning of a per-
+sonalization method: re-ranking is applied exactly for the
+queries q with f(u, q, S) greater than some ﬁxed threshold
+θ. Setting θ is equivalent to the choice of portion of queries
+aﬀected by personalization.
+6.
+FEATURES
+In this section we ﬁx some notations and give a detailed
+account of features derived from the available data. Let u
+be a user who started her search session with a query q. As-
+sume that pages B = {bK, . . . , b1} were visited by u in the
+same logical session prior to formulating query q (see equa-
+tion (1)). As above, let S(q) = {s1, . . . , s10} be a result page
+for q and C(q) = {c1, . . . , c10} user’s clicks on the result page.
+We pick out up to 10 pages bi visited before q as the source
+of contextual information. The tuple {u, B, q, S(q), C(q)} is
+referred to as conﬁguration.
+Our primary goal is to ﬁnd
+the best ranking for every conﬁguration.
+Each conﬁgura-
+tion plus a document from the result page si forms a sample
+for the click prediction problem with ground truth ci.
+Now we list all features used by our personalized ranker
+and give a brief motivation for their employment. In gen-
+eral, for accurate short-term personalization it is necessary
+to solve two problems: 1) understand whether available con-
+textual information is useful for the ranking of the current
+conﬁguration, and 2) if so, ﬁnd out which documents of S(q)
+are relevant to the contextualized information need. We ex-
+tract features for both of these problems and use them twice:
+during the click prediction step (Section 5.1) and during
+the query ﬁltering step (Section 5.3). We report coverage
+of each feature, as it is important to understand the qual-
+ity of sparse features such us click-through-based statistics,
+see Table 2. Some of personalization algorithms utilize tex-
+tual information from long- and short-term data.However,
+a browser toolbar records visited URLs only and does not
+send the content of pages to the search engine in real-time
+(due to privacy and network latency related reasons).
+We summarise employed classes of features as follows:
+• Characteristics of the query q.
+Features 1-4.
+The better non-personalized ranking for a query the
+less likely we are able to improve its quality, so we use
+NumDocs as a measure of quality of a query. Navi-
+gational queries are requests with intention of ﬁnding
+a particular web page. Thus, if a search engine has
+recognised navigational intent of a query, it is very
+undesirable to aﬀect ﬁrst position during re-ranking.
+To avoid it, we use Nav(q) — predicted probability
+of query q being navigational, produced with the pro-
+prietary classiﬁer inside our search engine. Ambigu-
+ous queries are known to beneﬁt from various types of
+personalization, so we added the entropy of the distri-
+bution over topics of the proprietary directory of web
+sites (similar to ODP) of 10 SERP pages retrieved for
+a query as a measure of ambiguity.
+• Usefulness of browsing session B as the context
+of q.
+Features 5-12.
+Temporal and session-based
+proximity between documents bj’s and query q is an
+important signal for potential improvement of initial
+ranking of S(q) on the basis of the context derived
+from bj. We extract BrowseTime(bj) as the indicator
+of possibility of intent shift and the time spent on bj
+prior to opening a new tab — Time(bj).
+Navigational behaviour of the user in the browser prior
+to formulating a query gives strong evidence of her
+commitment to the current topic. At any moment of
+time user has several opportunities: she can follow a
+link from the current page, go to a previously opened
+tab, click ‘back’ button or start a new tab (e.g. by man-
+ually typing address, following a bookmark or an ex-
+ternal link). We store activities of a user in a browsing
+graph, consisting of visited URL’s and followed links
+(so we do not know which tab user is actually viewing).
+That is: out degrees of vertices — Deg(bj), number of
+leaves — Leaves, edge count — Links, number of ver-
+tices BrLen. The larger BrLen, Leaves, Time(bj),
+Deg(bj) and Links the higher user’s interest in the
+current topic and therefore the closer its relationship
+with a subsequent query.
+• Click-through-based proximity between si and
+bj. Features 13-22. User behaviour during browsing
+session constitutes a rich source of knowledge about
+latent semantic connections among web pages.
+We
+processed the large-scale browsing log of 175M ses-
+sions (see Section 3) and aggregated session statistics
+about co-occurrence of pages and hosts in one brows-
+ing session. The known issue in employment of click-
+through- and browsing-based features is their sparsity.
+To overcome this problem, besides basic page-to-page
+statistics we also extracted their host-to-host analogues
+(see “coverage” column in Table 2).
+Collected raw
+counts are: Nums(p1, p2) — the number of cooccur-
+rences of pages p1 and p2 in one browsing session in
+the same order, Numh(h1, h2) — the number of cooc-
+currences of hosts h1 and h2 in one browsing session
+in the same order.
+Our aim is to use recent browsing experience of other
+users to better understand the current search experi-
+ence of a new user. For each pair of pages bj, si from B
+and C(q) we compute various statistics on the basis of
+these counts: Conditional probability of browsing from
+bj to si:
+PO(si|bj) = Nums(bj, si)
+P Nums(bj, ·);
+Pointwise mutual information of occurrences of bj and
+si in one session in the same order:
+PmiO(si, bj) = log
+P(bj, si)
+P(si)P(bj).
+Also we compute their analogues for hosts and for un-
+ordered cooccurrence (PU(·|·) and PmiU(·, ·)).
+• SERP-aggregated features. Features 33-42. Be-
+sides query- and session-based features we also add
+their analogues averaged over all documents on SERP
+(see Section 5.3). These features are the same for all
+documents si corresponding to a given conﬁguration
+{u, B, q, S(q), C(q)}.
+Their employment helps personalization for two rea-
+sons. First, the averaged features give the evidence on
+Table 2: List of features used in predicting SERP clicks. Coverage is the fraction of records with available
+data for the feature.
+Feature name
+Feature description
+Coverage
+Characteristics of a query
+1
+NumDocs(q)
+Number of documents found for a given query
+100%
+2
+Nav(q)
+Probability that query q is navigational
+100%
+3
+NumWords(q)
+Number of words in q
+100%
+4
+CatEntropy(q)
+Entropy of categories of SERP pages
+100%
+Characteristics of the current browsing session and its individual pages
+5
+Time(bj)
+Time spent on page bi
+100%
+6
+BrowseTime(bj)
+Time spent in the browser after viewing bi prior to formulating a query
+100%
+7
+Pq(bj)
+Probability of formulating any query after visiting bi
+100%
+8
+BrLen
+Length of the browsing session
+100%
+9
+Leaves
+Number of leaves in the browse graph i.e. pages without outbound links
+100%
+10
+Links
+Number of links followed during the browsing session
+100%
+11
+Deg(bj)
+Number of outbound links followed by the user on page bj
+100%
+12
+Deg(hbj)
+Number of outbound links followed by the user on host hbj
+100%
+Click-through-based proximity between si and bj, j ∈1, . . . K
+13
+log PO(si|bj)
+Log of probability of browsing during the session to si after being on
+bj
+7%
+14
+log PU(si|bj)
+Log of probability of browsing during the session to or from si being
+on bj
+8%
+15
+log PO(hsi|hbj)
+Log of probability of browsing during the session to host hsi after being
+on hbj
+55%
+16
+log PU(hsi|hbj)
+Log of probability of browsing during the session to or from host hsi
+being on hbj
+60%
+17
+PmiO(bj, si)
+PMI of coocurrence of bj and si in the same order
+7%
+18
+PmiU(bj, si)
+PMI of coocurrence of bj and si in any order
+8%
+19
+PmiO(hbj, hsi)
+PMI of coocurrence of hosts of bj and si in the same order
+55%
+20
+PmiU(hbj, hsi)
+PMI of coocurrence of hosts of bj and si in any order
+60%
+21
+I(si = bj)
+Sites si and bj are the same
+100%
+22
+I(hsi = hbj)
+Hosts of si and bj are the same
+100%
+Click-through-based proximity between si and the whole B
+23
+maxK
+j=1 log PO(si|bj)
+The maximal value of log PO(si|bj) over bj
+100%
+24
+maxK
+j=1 log PU(si|bj)
+The maximal value of log PU(si|bj) over bj
+100%
+25
+maxK
+j=1 log PO(hsi|hbj)
+The maximal value of log PO(hsi|hbj) over bj
+100%
+26
+maxK
+j=1 log PU(hsi|hbj)
+The maximal value of log PU(hsi|hbj) over bj
+100%
+27
+maxK
+j=1 PmiO(bj, si)
+The maximal value of PmiO(bj, si) over bj
+100%
+28
+maxK
+j=1 PmiU(bj, si)
+The maximal value of PmiU(bj, si) over bj
+100%
+29
+maxK
+j=1 PmiO(hbj, hsi)
+The maximal value of PmiO(hbj, hsi) over bj
+100%
+30
+maxK
+j=1 PmiU(hbj, hsi)
+The maximal value of PmiU(hbj, hsi) over bj
+100%
+External features
+31
+Pos(si)
+Position of si on SERP, namely i
+100%
+32
+Rel(si)
+Relevance of si predicted by the search engine
+100%
+Feature averages over S(q)
+33-42
+AvF
+Averages of features 13-22 over documents si ∈S(q)
+how good si is in comparison with other documents:
+the fact some feature F(si) is “better” than on aver-
+age, i.e F(si) > AvF(si) indicates that si should be
+promoted in the ranking list.
+Second, averaged fea-
+tures measure the relation between browsing session B
+and query q. For instance, large value of AvPO(si|bj)
+implies large number of browsing sessions containing
+page bj and some page from S(q), therefore bj is likely
+to be related to q.
+Features 5, 6, 7, 11-22 were computed for each j ∈1, . . . K.
+Afterwards they were averaged over the most resent k browsed
+pages bj for each k ≤K. For example, feature log PO(si|bj)
+results into K features:
+log PO(si|b1),
+1
+2(log PO(si|b1) + log PO(si|b2)),
+. . . ,
+1
+K (log PO(si|b1) + · · · + log PO(si|bK)).
+Thus, each feature 14-23 and its analogue among features
+33-42 results into K features. If there are l browsed pages
+and l < 10 for a given conﬁguration, then we put aver-
+ages over all l browsed documents instead of averages over
+k > l documents into the ﬁnal feature vector.
+This re-
+sults into 17 + 25 · K features, depending on the number of
+browsed pages under consideration. To measure the value
+of the browsing context, we collect the set of features for
+each K = 1, . . . , 10 and train 10 separate personalization
+algorithms.
+7.
+EXPERIMENTS
+7.1
+Evaluation
+During the evaluation step we compare our re-ranking al-
+gorithm with the baseline — non-personalized ranking of a
+commercial search engine. We stress that commercial en-
+gine is highly tuned, thus any (even relatively small) sig-
+niﬁcant improvement of its results is notable achievement.
+There are several common methods of re-ranking evalua-
+tion.
+One way is to run some online comparison test i.e.
+present to users both rankings (e.g. interleaved, side by side
+or via AB-testing [13, 11, 10]) and measure their prefer-
+ences. However, since presenting possibly inferior results to
+users is highly undesirable, it should be supported by strong
+evidence originating from a certain oﬄine evaluation step.
+In our study we have conducted oﬄine experiments based
+on the common click-through-based evaluation, see e.g. [5,
+11, 2]. In this approach we assign positive judgements ex-
+actly to the results which were clicked on by a user and com-
+pute some standard click metric (e.g. average ﬁrst click po-
+sition, mean reciprocal rank) before and after re-ranking —
+to compute the metric on a re-ranked list we assume that
+the user clicks the same set of documents in spite of re-
+ranking. The relative change of a click metric measures the
+quality of re-ranking. The method allows eﬀective tuning
+of parameters and does not require any additional judge-
+ments or users’ eﬀort besides implicit relevance feedback.
+However, click-through-based evaluation is known to have
+certain weak points. Since users tend to click on the doc-
+uments ranked higher in the result page independently on
+their relevance and to skip possibly relevant result in the
+bottom of the ranking list, this evaluation method just gives
+the lower bound on the algorithm performance, as was also
+pointed out in [16].
+Rk.
+Feature
+Sc.
+1
+Pos(si)
+46
+2
+Nav(q)
+20
+3
+NumWords(q)
+4.7
+4
+NumDocs(q)
+1.7
+5
+CatEntropy(q)
+0.9
+6
+max PmiU(hbj, hsi)
+0.63
+7
+max log PU(hsi|hbj)
+0.57
+8
+AvPmiU(hb2, hsi)
+0.5
+9
+BrowseTime(b5)
+0.5
+10
+Links
+0.47
+11
+max PmiU(bj, si)
+0.44
+12
+Deg(hb10)
+0.44
+13
+Deg(hb9)
+0.42
+14
+BrowseTime(b6)
+0.42
+15
+Av log PU(si|b3)
+0.40
+Table 3: Top 15 features according to the contribu-
+tion to the click prediction model.
+Further we use Min Reciprocal Rank (MinRR) as the ba-
+sic click metric and tune all algorithms relying on it.
+MinRR = 1
+Q
+X
+q
+1
+rk(si(q)),
+(3)
+where rk(si(q)) is the new rank of the last clicked document
+for a query q. This metric is very similar to the one used
+in previous works on personalization (see e.g. [16, 4]) and
+gives more weight to relevant documents at the top of the
+list, thus improvements at the top are more important. We
+also report improvements in terms of several popular click
+metrics: Mean Reciprocal Rank (MeanRR) and First Click
+Position (FCP), considering all clicked documents as rele-
+vant.
+7.2
+Click prediction
+On the collected dataset we run a proprietary implemen-
+tation of Friedman’s gradient boosted decision tree-based
+machine learning algorithm [6]. The processed dataset, col-
+lected during the 8th day, contains 500K conﬁgurations and
+5M samples for learning. We divided it into 5 equal parts
+on the basis of unique user ids and performed 5-fold cross
+validation.
+In Table 3 we report top 15 features according to the
+weighted contribution into the ﬁnal click prediction model
+(see [7, Section 10.13] for the description of those weights).
+It measures weighted improvement of the loss function over
+all employments of a feature during the learning process.
+Similar method of evaluating feature strengths was used
+in [4]. Apparently, Pos is the strongest feature for click pre-
+diction, since it represents the relevance score of the search
+engine and thus is highly correlated with the fact of a click.
+Similarly, Nav is correlated with clicks on the ﬁrst result. In-
+terestingly, features Deg(hb10) and Deg(hb10) are relatively
+high, representing the value of the whole browsing session
+for personalization
+7.3
+Re-ranking
+In this subsection for a given set of features and the click
+prediction algorithm we just reorder documents in S(q) ac-
+cording to the predicted probability of a click, i.e. we do not
+All queries
+Meas. diﬀerent
++/=/-
+3.5K/94K/2.5K
+3.5K/0/2.5K
+MinRR*
++0.05%
++3.7%
+MeanRR*
++0.013%
++0.5%
+FCP*
+-0.18%
+-1.7%
+Table 4:
+Improvements of click metrics (K = 10)
+on the whole stream and on measurably diﬀerent
+queries. *signiﬁcant with p < 0.01 (t-test).
+apply any smoothing or query ﬁltering and report all metric
+changes on the test log. Further we use the similar way to
+analyze the beneﬁt of personalization as [2, 16]. A query q is
+said to be measurably diﬀerent if the original ranking and the
+personalized one have diﬀerent MinRR scores. Obviously,
+the major part of queries is not aﬀected by personalization,
+since the large portion of queries either has already the opti-
+mal value of a click metric (like the only click at top 1), or it
+is supported by a weakly relevant browsing context. How-
+ever, even in this case we detect signiﬁcant improvements
+of click metrics on the full query stream for all models and
+aﬀect up to 6% of all queries. Interestingly, in [2] authors re-
+port 5,42% of queries being aﬀected by search session-based
+short-term personalization.
+We re-rank documents according to the learned models
+and evaluate its quality. In Table 4 we report relative change
+of click metrics among all queries: min reciprocal rank, mean
+reciprocal rank and ﬁrst click position. Due to proprietary
+nature of our data we do not report absolute values of the
+metrics. The numbers in the second column are improve-
+ments on the whole dataset and the numbers in the third
+column are improvements only over measurably diﬀerent
+queries. Further we show how to increase the degree of im-
+provement by focusing on speciﬁc queries.
+7.3.1
+Value of browsing context.
+Now we report the impact of K — the number of pages
+extracted from the browsing session for each query on the
+performance of personalization. Intuitively the more pages
+we consider, the better the quality of the personalized rank-
+ing. At the same time we expect some saturation with the
+growth of K, since distant browsed pages give less and less
+new and useful information for personalization. To support
+these expectations for each K = 1, . . . 10 we extract the set
+of features from Section 6 and learn separate personalization
+algorithm. Improvements of MinRR on measurably diﬀer-
+ent queries and fractions of aﬀected queries as functions of
+K are shown on ﬁgures 3 and 4 respectively. Both plots con-
+ﬁrm monotonic behaviour of the functions. Thus, with the
+growth of browsing context both coverage of personalization
+and its quality increase. Further we consider only K = 10
+as the most beneﬁcial case.
+7.3.2
+Impact of the query characteristics
+Usually personalization is most beneﬁcial on underspec-
+iﬁed ambiguous queries (like ‘MRR’), and it is widely ac-
+cepted to measure its value for a search engine by analyz-
+ing not the entire query ﬂow, but those hard cases [2, 16].
+We evaluated our personalization independently on naviga-
+tional/informational queries (according to our proprietary
+classiﬁer) and on one word / two words / verbose (≥3
+words) queries. Relative improvements of click metrics are
+3.3 %
+3.4 %
+3.5 %
+3.6 %
+3.7 %
+3.8 %
+3.9 %
+ 2
+ 4
+ 6
+ 8
+ 10
+MinRR improvement on 
+ measurably diﬀerent queries
+The length of the browsing session (=K)
+Figure 3: Performance of personalization learned on
+K = 1, . . . 10 browsed pages with 95% conﬁdence in-
+tervals.
+4.8 %
+5 %
+5.2 %
+5.4 %
+5.6 %
+5.8 %
+6 %
+6.2 %
+ 2
+ 4
+ 6
+ 8
+ 10
+Fraction of measurably diﬀerent queries
+The length of the browsing session (=K)
+Figure 4: Fraction of measurably diﬀerent queries
+for personalization learned on K = 1, . . . 10 browsed
+pages with 95% conﬁdence intervals.
+Words
+Meas. diﬀ.%
+MinRR
+MeanRR
+FCP
+1
+4%
++5.2%
++1.6%
+-3.7%
+2
+5.5%
++4.4%
++0.9%
+-2.3%
+≥3
+6.8%
++3.1%
++0.16%
+-0.96%
+IsNav
+Meas. diﬀ.%
+MinRR
+MeanRR
+FCP
++
+2%
++5.3%
++1.5%
+-4%
+-
+7%
++3.6%
++0.4%
+-1.4%
+Table 5: Performance of personalization on various
+sets of queries.
+Relative improvements are com-
+puted on the measurably diﬀerent conﬁgurations.
+All improvements over baseline are signiﬁcant with
+p = 0.01.
+Rank
+Feature
+Contribution
+1
+NumWords(q)
+7.5
+2
+NumDocs(q)
+6.0
+3
+CatEntropy(q)
+4.2
+4
+Nav(q)
+3.1
+5
+BrowseTime(b1)
+2.7
+6
+Pq(b1)
+2.0
+7
+Time(b3)
+1.8
+8
+AvPmiU(hb9, hsi)
+1.8
+9
+AvPmiU(hb1, hsi)
+1.7
+10
+Av log PU(si|b1)
+1.6
+Table 6: Top 10 features according to the contribu-
+tion to the query ﬁltering model
+reported in Table 5. All improvements are reported on mea-
+surably diﬀerent queries.
+As we expected, the one word queries receive signiﬁcantly
+more gain than any other class of queries, because of their
+ambiguity. Expectedly, portion of navigational queries af-
+fected by personalization is relatively small. Though, sur-
+prisingly, its improvement (on measurably diﬀerent queries)
+even more than for non-navigational queries. Reported met-
+ric improvements are comparable with other works on per-
+sonalization, see e.g. [16, 4].
+7.4
+Query ﬁltering
+We use every click prediction model learned on one of the
+10 training folds to measure the change of MRR on the con-
+ﬁgurations from the corresponding validation fold. On this
+data we learn and tune query ﬁltering using gradient boost-
+ing decision tree learning approach. The resulting function
+f(u, d, q, S) estimates expected gain from the personaliza-
+tion for the corresponding conﬁguration.
+7.4.1
+Feature contribution into the query ﬁltering
+In Table 6 we report contributions of top 10 features to
+the performance of the query ﬁltering model f(·).
+Char-
+acteristics of a query are still the most important for the
+query ﬁltering model. Expectedly, features of the most re-
+cent browsed page b1 are more valuable then others.
+7.4.2
+Impact of smoothing and query ﬁltering
+Personalization of search often harms the quality of rank-
+ing, thus one needs some tools to control its aggressiveness.
+We have implemented two methods: smoothing from Equa-
+tion (2) and query ﬁltering from Section 5.3.
+The smoothing just levels out the impact of re-ranking on
+all conﬁgurations and gives more weight to the original rank-
+ing. This approach reduces detriment of re-ranking, though
+it is not much known about its inﬂuence on the set of queries
+still aﬀected by personalization. The extent of smoothing is
+controlled by parameter µ. On the contrary, query ﬁltering
+does not change re-ranking, but bounds the volume of con-
+ﬁgurations aﬀected by personalization. To tune and control
+it, one chooses threshold θ and applies re-ranking to conﬁg-
+uration {u, d, q, S}, if and only if f(u, d, q, S) > θ.
+Dependence of re-ranking performance on smoothing pa-
+rameter is not as interesting, thus instead we report its de-
+pendence on a portion of measurably diﬀerent conﬁgura-
+tions. On Figure 5 we demonstrate two plots: performance
+of the smoothing and the query ﬁltering as functions of a
+3 %
+3.5 %
+4 %
+4.5 %
+5 %
+5.5 %
+0 %
+1 %
+2 %
+3 %
+4 %
+5 %
+6 %
+MinRR improvement 
+ on measurably diﬀerent queries
+Portion of measurably diﬀerent queries
+Filtering
+Fusion
+Figure 5: Impact of the volume of queries aﬀected
+by re-ranking on the MRR performance.
+0 %
+0.5 %
+1 %
+1.5 %
+2 %
+2.5 %
+3 %
+-4
+-3
+-2
+-1
+1
+2
+3
+4
+Portion of documents
+Rank diﬀerence
+Portion of measurably
+diﬀerent conﬁgurations
+6%
+2%
+1%
+Figure 6: Histogram of rank diﬀerences.
+portion of aﬀected queries. Again we compute performance
+only on measurably diﬀerent conﬁgurations. Maximal por-
+tion is achieved at µ = 0 (respectively θ = −∞) and it is
+equal to 6%. By increasing µ (resp. θ) we reduce the volume
+of measurably diﬀerent conﬁgurations and move from the
+right to the left on the plot. While smoothing (blue points)
+is rather noisy and performs almost equally on all portions of
+queries, the ﬁltering (red line) method signiﬁcantly increases
+its performance on the aﬀected conﬁgurations.
+Therefore
+query ﬁltering eﬀectively identiﬁes the queries that beneﬁt
+from re-ranking and signiﬁcantly advances the quality of the
+standard Borda fusion.
+7.5
+Re-ranking variance
+Besides average improvement of a click metric (e.g. MRR)
+it is crucial to control its variance. As in the previous re-
+searches [16, 11] we plot a histogram of rank diﬀerences,
+see Figure 6. It demonstrates the distribution of gains and
+losses in positions of clicked documents. To compare these
+distributions with previous computations, we perform also
+query ﬁltering and reduce portion of measurably diﬀerent
+conﬁgurations from maximum 6% to 2% and 1%.
+On the x axis we have diﬀerence of the original rank of
+a document and the rank after personalization, on y axis
+we have the portion of documents with given rank change
+among all documents with non-zero rank change. The his-
+togram shows that personalization is more aggressive on
+the conﬁgurations that pass ﬁltering. It is expected, since
+these are exactly conﬁgurations with maximal possible ben-
+eﬁt from personalization.
+8.
+CONCLUSIONS
+In the current paper we developed a framework for person-
+alization based on the short-term browsing context. Main
+target of this personalization are queries with the lack of
+short-term search session context, particularly, the ﬁrst queries
+in the search sessions.
+We show, that, in the absence of
+the previous searches, the previously browsed pages provide
+a rich contextual data for the current query. Our person-
+alization algorithm comprises several orthogonal types of
+features and ﬁnally aﬀects up to 6% of queries.
+The al-
+gorithm demonstrates signiﬁcant improvements of the ba-
+sic click metrics over the competitive baseline on the real
+browsing log.
+To avoid undesirable harm of personaliza-
+tion on certain queries, we explore the problem of prelimi-
+nary query ﬁltering and construct a framework for automatic
+model-speciﬁc query ﬁltering. This ﬁltering advances a com-
+mon smoothing method and signiﬁcantly increases metrics
+on the impacted queries. As well as the most of the context-
+aware re-ranking algorithms our method has the largest po-
+tential for improvement on one word queries and informa-
+tional queries.
+Our study can be developed in several directions. First,
+it will be interesting to estimate the range of applicability
+of ﬁltering methods and evaluate them for other re-ranking
+algorithms. Second, the present work touches on the prob-
+lem of query formulation rationales. That is, prediction of
+the appearance of an information need during the browsing
+session and detection of the dissatisfaction with the current
+browsing session. In this study we have employed just sev-
+eral simple statistics to measure the probability of switching
+from a browsing session to a search session, so in the future
+we are planning to develop a more complicated approach to
+predict the emergence of an information need.
+9.
+REFERENCES
+[1] M. Ageev, Q. Guo, D. Lagun, and E. Agichtein. Find
+it if you can: a game for modeling diﬀerent types of
+web search success using interaction data. SIGIR ’11,
+pages 345–354, New York, NY, USA, 2011. ACM.
+[2] P. N. Bennett, R. W. White, W. Chu, S. T. Dumais,
+P. Bailey, F. Borisyuk, and X. Cui. Modeling the
+impact of short- and long-term behavior on search
+personalization. SIGIR ’12, pages 185–194, New York,
+NY, USA, 2012. ACM.
+[3] P. Boldi, F. Bonchi, C. Castillo, D. Donato, A. Gionis,
+and S. Vigna. The query-ﬂow graph: model and
+applications. CIKM ’08, pages 609–618, New York,
+NY, USA, 2008. ACM.
+[4] K. Collins-Thompson, P. N. Bennett, R. W. White,
+S. de la Chica, and D. Sontag. Personalizing web
+search results by reading level. CIKM ’11, pages
+403–412, New York, NY, USA, 2011. ACM.
+[5] Z. Dou, R. Song, and J.-R. Wen. A large-scale
+evaluation and analysis of personalized search
+strategies. WWW ’07, pages 581–590, New York, NY,
+USA, 2007. ACM.
+[6] J. H. Friedman. Stochastic gradient boosting. Comput.
+Stat. Data Anal., 38(4):367–378, Feb. 2002.
+[7] T. Hastie, R. Tibshirani, and J. H

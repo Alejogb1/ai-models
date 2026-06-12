@@ -1,0 +1,15 @@
+{
+  "source": "Joint Representation Learning for Top N Recommendation with Heterogeneous Information Sources",
+  "source_group": "Awesome-ML-Papers/MF",
+  "processed_at": "2026-06-08T12:00:00Z",
+  "agent": "agent_batch_generation",
+  "concepts": [
+    {
+      "finding": "Joint representation learning from heterogeneous information sources: user-item rating matrix + user attributes + item attributes + social connections. Multi-modal deep network fuses diverse signals into unified embeddings. Outperforms single-source methods by 10-20% on top-N recommendation.",
+      "category": "ModelCandidate",
+      "implication": "Multi-source keyword embedding: combine keyword text features, co-occurrence graph, entity links, taxonomy position, language models. Multi-modal fusion via deep network produces robust intent representations.",
+      "open_question": "Which information sources (text, co-occurrence, taxonomy, entity, user data) provide the most unique signal for keyword intent?",
+      "testable_hypothesis": "Multi-source keyword embeddings (text + co-occurrence + entity + taxonomy) achieve 15%+ higher intent cluster quality than single-source embeddings."
+    }
+  ]
+}

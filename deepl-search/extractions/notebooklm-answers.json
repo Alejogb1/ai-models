@@ -1,0 +1,120 @@
+{
+  "source": "notebooklm-answers.md",
+  "source_group": "Deepl-Search/Methodology",
+  "processed_at": "2026-06-08",
+  "agent": "agent5_final",
+  "concepts": [
+    {
+      "finding": "Learnability requires systematic X-to-Y relationship estimable despite noise. Y = f(X) + epsilon. Must have regularity discoverable via hypothesis space search.",
+      "category": "TargetConstruct",
+      "implication": "Shopping intent learnable only if structured regularities tied to purchase goals exist in behavioral data.",
+      "open_question": "Can shopping intent be reliably separated from browsing noise using only behavioral signals?",
+      "testable_hypothesis": "Purchase sessions exhibit systematic behavioral patterns not present in non-purchase sessions."
+    },
+    {
+      "finding": "Generalization requires train/test from same distribution. Stationarity: past persists. IID: independent samples from same joint distribution.",
+      "category": "Data",
+      "implication": "Seasonal/trend shifts break distribution assumptions. Intent models must be retrained as behavior evolves.",
+      "open_question": "How can distribution shift in real-time query streams be detected without ground-truth labels?",
+      "testable_hypothesis": "Wasserstein distance between weekly query embeddings predicts clustering quality degradation."
+    },
+    {
+      "finding": "Dense embeddings share statistical strength across similar features, enabling generalization to unseen events. Sparse-to-dense shift finds combinations without manual engineering.",
+      "category": "ModelCandidate",
+      "implication": "Embedding-based query understanding superior to sparse methods via semantic similarity capture.",
+      "open_question": "What dimensionality optimally balances intent discrimination and generalization for short queries?",
+      "testable_hypothesis": "384d MiniLM embeddings produce more coherent intent clusters than TF-IDF for short queries."
+    },
+    {
+      "finding": "Construct validity: does operational target variable represent the intended higher-order concept? Many constructs lack natural units.",
+      "category": "LabelValidation",
+      "implication": "Intent is latent with no ground-truth units. CTR/conversion are proxies, not direct measures. Must validate operationalization.",
+      "open_question": "What behavioral signature best validates that queries share the same underlying intent?",
+      "testable_hypothesis": "Human-labeled intent clusters show higher coherence on behavioral metrics than lexical similarity clusters."
+    },
+    {
+      "finding": "No model is neutral. Inductive biases encode assumptions. No Free Lunch: no single method dominates all datasets.",
+      "category": "Baseline",
+      "implication": "HDBSCAN, k-means encode different assumptions about cluster shape and density. Evaluate multiple algorithms.",
+      "open_question": "Which clustering algorithm's inductive bias best matches search query intent space structure?",
+      "testable_hypothesis": "HDBSCAN produces more interpretable intent clusters than k-means due to non-uniform density of intent space."
+    },
+    {
+      "finding": "Correlation does not prove causation. ML models observational distributions, not causal ones.",
+      "category": "FailureRisk",
+      "implication": "Query-click correlations may reflect position bias confounding rather than true intent. Causal methods needed.",
+      "open_question": "How much query-click correlation is causal vs. confounded by SERP layout?",
+      "testable_hypothesis": "Debiased click models produce significantly different intent labels than naive CTR aggregation."
+    },
+    {
+      "finding": "Inus conditions: insufficient but non-redundant parts of unnecessary but sufficient conditions. Context-dependent probability increases.",
+      "category": "TargetConstruct",
+      "implication": "No single query feature is necessary/sufficient for intent. Emerges from combined weak indicators.",
+      "open_question": "What minimal feature set is sufficient for reliable intent classification?",
+      "testable_hypothesis": "Intent accuracy plateaus beyond 10 carefully chosen features."
+    },
+    {
+      "finding": "LLM 'understanding' is behavioral proxy. Post-hoc explanations may not reflect actual internal logic. CoT paths may be unfaithful.",
+      "category": "BehavioralTests",
+      "implication": "LLM query labels may be unfaithful post-hoc rationalizations rather than accurate decisions.",
+      "open_question": "Can LLM-generated intent labels be trusted for training downstream models?",
+      "testable_hypothesis": "LLM intent labels for ambiguous queries show low inter-rater reliability across prompting strategies."
+    },
+    {
+      "finding": "Training: constrained parameter search minimizing loss via gradient descent. Overparameterized models generalize via regularization + distributed representations.",
+      "category": "ModelCandidate",
+      "implication": "Large embedding models may overfit to noisy behavioral data. Regularization critical.",
+      "open_question": "What is optimal training signal for query embeddings: clicks, relevance judgments, or semantic similarity?",
+      "testable_hypothesis": "Contrastive learning on query-click pairs outperforms fine-tuning on semantic similarity alone."
+    },
+    {
+      "finding": "Curse of dimensionality: data needs grow exponentially with features. Non-parametric methods fail in high-d.",
+      "category": "Data",
+      "implication": "768d+ embeddings may hurt clustering via distance concentration. UMAP/PCA essential.",
+      "open_question": "What minimum dimension preserves query intent structure for clustering?",
+      "testable_hypothesis": "UMAP to 5-10d improves HDBSCAN quality over full 768d embeddings."
+    },
+    {
+      "finding": "Useful representation preserves latent relationships. Deep learning disentangles factors of variation.",
+      "category": "Data",
+      "implication": "Good query embeddings should disentangle topical, transactional, navigational intent facets separately.",
+      "open_question": "Should query representations be multi-vector for different intent dimensions?",
+      "testable_hypothesis": "Multi-vector representations (topic + intent type + entity) enable finer-grained clustering."
+    },
+    {
+      "finding": "Learning as abstraction = removing irrelevant details to find generalized rules = compression. MDL: best hypothesis gives max compression.",
+      "category": "TargetConstruct",
+      "implication": "Intent categories are compressed behavioral pattern abstractions. Good taxonomies maximize compression.",
+      "open_question": "What category count balances compression and discriminative power?",
+      "testable_hypothesis": "MDL-derived taxonomies align well with human-curated intent taxonomies."
+    },
+    {
+      "finding": "Interpretability = degree of estimable cause-effect relationships within model. White-box vs black-box distinction.",
+      "category": "BehavioralTests",
+      "implication": "Linear probes on frozen embeddings preferred over black-box deep classifiers for production debugging.",
+      "open_question": "How much accuracy must be sacrificed for interpretability in intent classification?",
+      "testable_hypothesis": "Linear classifiers on frozen embeddings achieve >90% of deep model accuracy for broad intent categories."
+    },
+    {
+      "finding": "Irreducible error from unmeasured variables cannot be eliminated. Minimum Bayes error due to stochasticity.",
+      "category": "FailureRisk",
+      "implication": "Some queries are genuinely ambiguous and cannot be perfectly classified regardless of model quality.",
+      "open_question": "What fraction of queries have truly ambiguous intent?",
+      "testable_hypothesis": "Inter-annotator agreement plateaus at 85-90%, bounding achievable accuracy."
+    },
+    {
+      "finding": "Robustness via perturbation and invariance tests. Neural nets are excessively linear -> sensitive to adversarial inputs.",
+      "category": "BehavioralTests",
+      "implication": "Intent classifiers should be tested: meaning-preserving phrasing variations should not change predictions.",
+      "open_question": "What perturbations preserve vs. change query intent?",
+      "testable_hypothesis": "Synonym-substituted queries produce more consistent labels from embedding vs. lexical classifiers."
+    },
+    {
+      "finding": "Concept drift reveals intelligence tied to training distribution. Production deviation exposes invalid assumptions.",
+      "category": "Evaluation",
+      "implication": "Intent patterns drift ('Apple' fruit->tech). Models need continuous monitoring and periodic retraining.",
+      "open_question": "How frequently do query intent distributions shift enough to degrade performance?",
+      "testable_hypothesis": "Quarterly retraining maintains accuracy within 2% of continuously retrained models."
+    }
+  ]
+}

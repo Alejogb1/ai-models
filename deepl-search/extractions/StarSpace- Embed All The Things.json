@@ -1,0 +1,15 @@
+{
+  "source": "StarSpace- Embed All The Things",
+  "source_group": "Awesome-ML-Papers/Embeddings",
+  "processed_at": "2026-06-08T12:00:00Z",
+  "agent": "agent03_embeddings_mf_ranking_search_compiled",
+  "concepts": [
+    {
+      "finding": "General-purpose neural embedding framework for multi-relational data. Learns embeddings for any entity type (words, sentences, documents, users, items, labels) in the same space using a unified pairwise similarity loss with negative sampling. Supports classification, ranking, similarity, and content-based recommendation.",
+      "category": "Model Candidate",
+      "implication": "A unified embedding framework where keywords, intents, documents, and user segments all exist in the same vector space enables direct similarity computation between any entity types.",
+      "open_question": "Should intents be modeled as learnable embeddings or as centroid clusters of keyword embeddings?",
+      "testable_hypothesis": "Learning intent embeddings jointly with keyword embeddings (StarSpace-style) produces more coherent clusters than post-hoc clustering of keyword embeddings."
+    }
+  ]
+}

@@ -1,0 +1,148 @@
+{
+  "source": "IR_Survey_BeiWang_2026.pdf",
+  "source_group": "Web-Sources",
+  "processed_at": "2026-06-08",
+  "agent": "agent5_final",
+  "concepts": [
+    {
+      "finding": "28\n\nPublished in Transactions on Machine Learning Research (02/2026)\nIn the context of Ads ranking, the XMC formulation described in Section 5 has been shown to improve\nranking quality of tail items/Ads (Jain et al., 2019; Dahiya et al., 2021; Yu et al., 2022a; Dahiya et al., 2023;\nGupta et al., 202",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Other critical areas include developing methods for unbiased relevance estimation from\nbiased user feedback (e.g., clicks) (Joachims et al., 2017; Ai et al., 2018b; Wang et al., 2018; Hu et al., 2019)\nand jointly optimizing for both effectiveness and fairness in ranking systems (Singh & Joachims, 20",
+      "category": "ModelCandidate",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "This marked a fundamental change in\napproach: instead of designing novel, task-specific network backbones (e.g., CNNs, LSTMs) on top of static\nword embeddings, research shifted to fine-tuning a single, powerful, and deeply contextualized architecture\nfor IR tasks.",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Dense retrieval models have demonstrated\nnotable effectiveness improvements over BM25 baselines across various tasks including open-domain question\nanswering and web search.",
+      "category": "Baseline",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Notable implementations include SPLADE (Formal et al., 2021a), DeepImpact (Mallia et al., 2021), and\nuniCOIL (Lin & Ma, 2021), which demonstrate that transformer-based sparse representations can achieve\neffectiveness comparable to dense retrieval while maintaining the efficiency benefits of inverted",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Modern advertis-\ning recommendation systems face the fundamental challenge of processing massive candidate sets while\nmaintaining strict latency requirements and ranking quality.",
+      "category": "FailureRisk",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "How to address the limitation described: Modern advertis-\ning recommendation systems face the fundamental challenge of processing massive candidate sets while\nmaintaining strict latency requirements and ranking quality.",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Finally,\ncontextual personalization and the convergence of search and recommendation architectures reflect a broader\nshift toward unified representations of users, documents, and intent (Zamani & Croft, 2018).",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "However, these approaches also face inherent limitations due to their reliance on\nfixed-size embedding vectors, which can struggle to capture all relevant information from the original text\nand may not effectively handle precise lexical matching requirements.",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "How to address the limitation described: However, these approaches also face inherent limitations due to their reliance on\nfixed-size embedding vectors, which can struggle to capture all relevant information from the original text\nand may no",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "However, this cross-encoder schema faces two primary challenges: (1) the fixed context length\nof models like BERT (e.g., 512 tokens) makes processing long documents difficult, and (2) relying on a\nsingle token’s fixed-dimensional representation (e.g., 768-dimensional representation for BERT) may lim",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "How to address the limitation described: However, this cross-encoder schema faces two primary challenges: (1) the fixed context length\nof models like BERT (e.g., 512 tokens) makes processing long documents difficult, and (2) relying on a\nsin",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Modern neural retrievers demonstrated that\nlearned dense embeddings can substantially improve effectiveness over classic lexical baselines, but achieving\nthat gain requires extra compute and index engineering compared to lightweight lexical methods.",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Despite recent efforts to adapt pretrained language models\nsuch as BERT, neural approaches often fail to consistently outperform strong lexical baselines like BM25,\nreinforcing the continued relevance of hybrid and lexically grounded architectures in legally specialized do-\nmains (de Araujo et al., ",
+      "category": "Baseline",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Despite this\nexciting progress, key limitations remain.",
+      "category": "FailureRisk",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "How to address the limitation described: Despite this\nexciting progress, key limitations remain.",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "ColBERT: Efficient and effective passage search via contextualized late\ninteraction over BERT.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "The survey concludes with a forward-looking discussion of open chal-\nlenges and emerging research directions, including architectural optimization for efficiency\nand scalability, robust handling of multimodal and multilingual data, and adaptation to\nnovel application domains such as autonomous searc",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Research in IR primarily centers on two key aspects: (1) extracting better query and document feature rep-\nresentations, and (2) developing more accurate relevance estimators.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "The shift towards neural architectures, particularly Transformer-based\nmodels, has fundamentally transformed IR by enabling rich, contextualized representations and improved\ncapacity for handling complex queries.",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Retrieval (or First-Stage Ranking): In the first stage, a computationally efficient but less precise\nmodel scans the entire collection C (potentially billions of documents) to quickly identify an initial\nset of several hundred or thousand candidate documents.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "This technique was then\ncombined with Multiple Additive Regression Trees (MART), a Gradient Boosted Decision Tree (GBDT)\n7\n\nPublished in Transactions on Machine Learning Research (02/2026)\ncustomized\ndeep network\nrelevance score\nword embeddings\nwhere is whitemarsh island\nthe strategy of island ...",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "word embeddings\ncustomized\ndeep network\nrelevance score\n(b) Interaction-based neural reranker\nFigure 2: Illustration on neural ranking models.",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "5\nNeural Ranking Models\nNeural ranking models emerged to directly address the key limitations of LTR (Section 4).",
+      "category": "FailureRisk",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "How to address the limitation described: 5\nNeural Ranking Models\nNeural ranking models emerged to directly address the key limitations of LTR (Section 4).",
+      "testable_hypothesis": ""
+    }
+  ]
+}

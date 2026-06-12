@@ -1,0 +1,148 @@
+{
+  "source": "2604.22207v1.pdf",
+  "source_group": "Web-Sources",
+  "processed_at": "2026-06-08",
+  "agent": "agent5_final",
+  "concepts": [
+    {
+      "finding": "Regarding the Urban Maintenance dataset — which yielded the\nsecond-highest precision and a substantial recall of 0.70 — the av-\nerage cosine similarity does not rank second for GPT prompts;\nhowever, it does hold the second-highest position for Llama-based\nprompts (Table 2).",
+      "category": "Experiment",
+      "implication": "Relevant for similarity-based retrieval and lookalike targeting",
+      "open_question": "How to address the limitation described: Regarding the Urban Maintenance dataset — which yielded the\nsecond-highest precision and a substantial recall of 0.70 — the av-\nerage cosine similarity does not rank second for GPT prompts;\nhowever, i",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "However, we reported that the combination of the feedback\nmechanism with Few-shot does not deliver any advantage, possibly\nsuggesting that the primary performance ceiling is the prompting\nstrategy applied to the ’critic’ LLM.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "How to address the limitation described: However, we reported that the combination of the feedback\nmechanism with Few-shot does not deliver any advantage, possibly\nsuggesting that the primary performance ceiling is the prompting\nstrategy app",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "1.1\nResearch Questions (RQs)\nWe formalised the evaluation of the proposed architecture through\nthe following RQs:\n• RQ1: What is the effectiveness of the multi-agent architec-\nture in extracting the list of actors, and how it is influenced\nby Shot-prompting?",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "2\nBackground\n2.1\nThe GORE Framework\nIntroduced by Van Lamsweerde in 2001 [21], Goal-Oriented Re-\nquirements Engineering (GORE) is a technique with the primary\nobjective of identifying all goals of a system, defined as Objectives\nthat the system under consideration should achieve, which can be then\nm",
+      "category": "TargetConstruct",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Their findings, which ad-\ndress a challenge similar to that addressed herein, emphasise the\nadvantages of inter-agent communication and orchestration over a\nsingle, monolithic LLM instance.",
+      "category": "FailureRisk",
+      "implication": "Relevant for similarity-based retrieval and lookalike targeting",
+      "open_question": "How to address the limitation described: Their findings, which ad-\ndress a challenge similar to that addressed herein, emphasise the\nadvantages of inter-agent communication and orchestration over a\nsingle, monolithic LLM instance.",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "The approach of computing cosine similarity between BERT\nembeddings effectively distinguishes true semantic equivalence\nfrom surface-level resemblance, ensuring robust adherence to the\nground truth.",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "At the same time, solving the Maximum Weight\nBipartite Matching problem allows us to effectively measure the\nsimilarity between the generated and the reference sets of actors\nor goals.",
+      "category": "TargetConstruct",
+      "implication": "Relevant for similarity-based retrieval and lookalike targeting",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Although the observed\ndifferences are marginal — never exceeding three percentage points\n— the F1-scores achieved during the ablation study consistently\noutperform those of the full architecture across all prompting con-\nfigurations, reaching a peak of 0.78 in the Zero-shot setting.",
+      "category": "Baseline",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "While this indicates that the introduction of the critic agent delivers\na tangible advantage, it confirms that this benefit comes at the cost\nof neutralising the effects of in-context, as this phenomenon was\nalready observed in the high-level goals extraction.",
+      "category": "TargetConstruct",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "6\nLimitations\n6.1\nBias\nSome bias may have been introduced through the examples em-\nployed in the in-context learning.",
+      "category": "FailureRisk",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "How to address the limitation described: 6\nLimitations\n6.1\nBias\nSome bias may have been introduced through the examples em-\nployed in the in-context learning.",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Crucially, the ablation study — conducted by removing the Llama-\nbased feedback mechanism — demonstrated that the proposed ar-\nchitecture yields consistent advantages over a conventional, lin-\near pipeline utilising GPT in isolation.",
+      "category": "BehavioralTests",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "While our approach may serve as an encouraging starting point\nfor developing more accurate systems, we recognise that there re-\nmains substantial room for improvement.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Although\nthe pipeline achieved 61% accuracy in low-level goal identifica-\ntion — the final stage — these results indicate the approach is best\nsuited as a tool to accelerate manual extraction rather than as a\nfull replacement.",
+      "category": "Experiment",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Together with the refinement\nof both the quantity and quality of the Shot examples, future re-\nsearch will integrate Retrieval-Augmented Generation (RAG) and\nChain-of-Thought (CoT) prompting to improve accuracy.",
+      "category": "Experiment",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Permission to make digital or hard copies of all or part of this work for personal or\nclassroom use is granted without fee provided that copies are not made or distributed\nfor profit or commercial advantage and that copies bear this notice and the full citation\non the first page.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "For this reason, we experimented with different variants of\nin-context learning to assess how they affect the proposed archi-\ntecture.",
+      "category": "Experiment",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Although mapping from low-level goals to API endpoints is not the\nmain focus of this study, we include it in our conceptual architecture\nbecause it may provide useful insights about future extensions of\nthis work.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "A key finding of the survey is the current inclination to-\nwards using models without further task-specific optimisation; the\nauthors argue that this trend highlights a requirement for more\nrigorous investigation into advanced model architectures and or-\nchestration — as performed by this work.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "The paper\ndemonstrates the potential of LLMs for automating goal extraction\nand API selection, but it also suffers from limitations in validation,\nincluding inconsistent goal decomposition, unexplained omissions,\nand a lack of structured quality control.",
+      "category": "TargetConstruct",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "How to address the limitation described: The paper\ndemonstrates the potential of LLMs for automating goal extraction\nand API selection, but it also suffers from limitations in validation,\nincluding inconsistent goal decomposition, unexplaine",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Our approach, building on existing work, aims to expand the\ninvestigation of a multi-LLM pipeline for goal extraction and to offer\na further exploratory evaluation of its feasibility and limitations.",
+      "category": "Experiment",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "How to address the limitation described: Our approach, building on existing work, aims to expand the\ninvestigation of a multi-LLM pipeline for goal extraction and to offer\na further exploratory evaluation of its feasibility and limitations.",
+      "testable_hypothesis": ""
+    }
+  ]
+}

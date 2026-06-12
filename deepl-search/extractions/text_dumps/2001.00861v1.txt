@@ -1,0 +1,364 @@
+Modeling Information Need of Users in
+Search Sessions
+Kishaloy Halder1⋆, Heng-Tze Cheng 2, Ellie Ka In Chio 2, Georgios Roumpos 2,
+Tao Wu2, and Ritesh Agarwal 2
+1 School of Computing, National University of Singapore
+kishaloy@comp.nus.edu.sg
+2 Google Research
+{hengtze,echio,roumposg,iotao,riteshag}@google.com
+Abstract. Users issue queries to Search Engines, and try to ﬁnd the
+desired information in the results produced. They repeat this process if
+their information need is not met at the ﬁrst place. It is crucial to identify
+the important words in a query that depict the actual information need
+of the user and will determine the course of a search session. To this
+end, we propose a sequence-to-sequence based neural architecture that
+leverages the set of past queries issued by users, and results that were
+explored by them. Firstly, we employ our model for predicting the words
+in the current query that are important and would be retained in the
+next query. Additionally, as a downstream application of our model, we
+evaluate it on the widely popular task of next query suggestion. We
+show that our intuitive strategy of capturing information need can yield
+superior performance at these tasks on two large real-world search log
+datasets.
+Keywords: Query Suggestion· Query Intent
+1 Introduction
+In a search session, if a user’s need is not completely fulﬁlled by the results
+returned by the Search Engine (SE), they tend to modify their query, and ask
+again—leaving a recurring footprint of the nature query→ clicks→ query→ ...
+in the logs. This set of interactions can be viewed as an exchange of information
+between two agents i.e., user and SE (Figure 1). The user has an information
+need which is reﬂected in the query issued by her (at time t1). The results
+returned by the SE provide some (but may not be all) information relevant to
+the query. We hypothesize that in this situation, the next query (at time t2)
+would be dependent on the information deﬁcit that has occurred so far, i.e., the
+semantic gap between the information need, and the information provided.
+Important words play a crucial role in depicting the real information need
+behind a search. Consider an illustration shown in Figure 2. Users tend to retain
+⋆ Work done during internship at Google Research.
+arXiv:2001.00861v1  [cs.IR]  3 Jan 2020
+
+===PAGE BREAK===
+
+2 K. Halder et al.
+Fig. 1: Illustration of the user-search engine interactions. User ﬁres queries at
+diﬀerent timestamps depending on the “gap” between the information need (or-
+ange), and information provided (green). User ends the session when orange ≈
+green.
+Fig. 2: Illustration of query edit from AOL. Table on the right is the prediction
+target.
+the important words in the subsequent queries ( e.g., ‘check’, ‘engine’, ‘light’),
+and remove the ones that are not ( e.g., ‘honda’, ‘accord’ etc). To model this
+behavior, we aim to answer the following research question (RQ).
+RQ: Can the information deﬁcit help in predicting the query edits?
+We deﬁne query edits by means of two possibilities for every word in it i.e.,
+user may (i) retain or (ii) remove a word in the next query. To answer this, in
+this work we address the task of estimating the probability of retention for every
+word in the current query, given the past interactions within a session. We believe
+that being able to predict which words would be dropped later in the session
+(‘honda’, ‘accord’ in the example shown in Figure 2) can help a search engine
+focus on the core issue (‘check’, ‘engine’, ‘light’) and diversify its search results.
+This will help meet a user’s information need better and faster. We propose
+a novel neural encoder-decoder architecture which explores the role of evolving
+information deﬁcit experienced by the user in a search session. By experimenting
+with two large real-world query log datasets from AOL, and Yandex we show
+that the information deﬁcit does help in predicting the query edits.
+As a downstream application, we employ our model to the widely researched
+next query selection task. We observe that it outperforms state-of-the-art base-
+lines signiﬁcantly, indicating the untapped potential of the evolving information
+need present in search sessions.
+2 Related Work
+Query word deletion prediction has been seen as a strategy for query rewriting
+in the past [10,16]. They propose some hand-coded rules such as deletions from
+“leftmost”, “rightmost” positions in the search query. Although, these methods
+do not capture the query context eﬀectively [18], they present some insights
+
+===PAGE BREAK===
+
+Modeling Information Need of Users in Search Sessions 3
+(a) Overall architecture.
+ (b) Information Deﬁcit.
+Fig. 3: Our model architecture with the Information Deﬁcit component. (a) Over-
+all network. (b) Information Deﬁcit for the current query. We consider the sum
+of the past P Information Deﬁcits w.r.t a query as the ﬁnal one.
+about the nature of query modiﬁcations. Another interesting direction is re-
+ducing the verbosity of queries [1,13,2,8,17]. These methods in general lack the
+context of past queries in a session where users’ information needs keep evolving
+after exploring some of the result pages.
+Next query suggestion, and query reformulation behaviour modeling is a
+heavily researched area. Early works in this domain presented the concept of
+semantic similarity by looking at the queries co-occurring within a session [3],
+query clustering by utilizing the query-click graph [9]. Next query formulation
+is also seen as a generative task [7,4]. Unsurprisingly, the recent deep learning
+based methods outperform previous heuristic based approaches. Introduced in
+[14], Hierarchical Recurrent Encoder Decoder (HRED) uses two-level recurrent
+neural network (RNN) to ﬁrst consider the sequence of words in a query, and the
+sequence of past queries to make the prediction. Attention based networks were
+also proposed which focuses on the out of vocabulary words in the query [6]. To
+incorporate user feedbacks, use of memory network was proposed recently [15].
+Although these models are context aware, they do not explore the relationship
+between the diﬀerent contextual signals which are indicative of the users’ infor-
+mation need. In our experiments we have compared our model to these systems.
+3 Methods
+Our model comprises two major components i.e., (i) Query Encoder, and (ii)
+Information Deﬁcit Encoder as shown in Figure 3.
+Query Encoder. Given a query q with n words, we use a bi-directional Gated
+Recurrent Unit to encode all the words in it [5]. Following are the set of equations
+
+===PAGE BREAK===
+
+4 K. Halder et al.
+(a) URL encoder
+ (b) Encoding Sequence of Past Queries.
+Fig. 4: Components in our network. (a) Architecture diagram for URL encoder.
+A Character Embedding layer is used for all the characters in a URL. GRU url
+encodes the sequence of characters present in it. (b) Architecture for encoding
+sequence of past queries. Output of last time-step of GRU seq is considered as
+the encoding of past queries.
+used:
+hf
+i = GRUf
+enc(wi, hf
+i−1); hb
+i = GRUb
+enc(wi, hb
+i+1); z = hf
+n⊗ hb
+1 (1)
+where, wi is the ith query word, hf
+n, hb
+1 are the GRU encoded representations
+after the ﬁnal (i.e., nth and 1st) time-steps for forward, and backward passes re-
+spectively, z is the ﬁnal encoded representation of the query,⊗ denotes element-
+wise multiplication operation. The encoded query( z) is repeated n times, and is
+fed to GRU dec as a sequence. GRU dec yields a tensor( vi) for each time-step to
+be used for ﬁnal prediction later.
+Information Deﬁcit Encoder. We carefully encode two contextual signals (i)
+P past queries issued by a user, and (ii) the resources she has seen in the session
+so far. We combine these two signals to compute information deﬁcit. We encode
+each of the past queries using the same Query Encoder as in Equation 1. We
+denote the encoded representation of jth past query q−j w.r.t the current query
+q as, z−j.
+After issuing a query, a user tries to ﬁnd the desired information in the
+results and modiﬁes her query accordingly. Ideally, content of the landing pages
+should be considered as result. However, those were not available 3. We encode
+the results using the component in Figure 4a. We concatenate all the urls (in
+the original order) clicked against a query and consider that as a proxy for the
+result. Since urls are often comprising non-standard tokens, they form a highly
+sparse embedding space. To alleviate this, we consider result r as a sequence of
+characters{c1, c2, ..., cm}. We use GRU url which considers a character at every
+3 Most of the urls from AOL log do not exist anymore. Yandex urls are completely
+anonymized.
+
+===PAGE BREAK===
+
+Modeling Information Need of Users in Search Sessions 5
+time-step, and output of the last time-step is considered as the encoded result i.e.,
+u = hurl
+m where hurlk = GRUurl(ck, hurlk−1); hurlk is output after kth character
+in the result. Once we have the encoded representations z−j for the jth past
+query, and u−j for the results explored against it, we deﬁne the information
+deﬁcit (D−j) as,
+D−j = z−j⊖ u−j
+where,⊖ denotes an element-wise subtraction operation. Finally, we sum up
+the information deﬁcits for all the P past queries to get the overall information
+deﬁcit,
+D =
+P∑
+j=1
+D−j
+Final Prediction Layer. We combine the (i) current query representation,
+(ii) overall information deﬁcit and (iii) an encoded representation of the past
+queries to make the ﬁnal prediction. We use GRU seq to encode the sequence of
+past query representations z−1, ...,z−P and denote it as s (shown in Figure 4b).
+Since the ﬁnal prediction is a binary label for each word in the query, we repeat
+the information deﬁcit and past query sequence tensors n times. For ith word,
+we concatenate these three tensors, and pass the resultant tensor xi to the fully
+connected(FC) layers to make the binary prediction.
+xi = concatenate[vi,D, s]; p(yi|xi) = sof tmax(W· xi + b)
+where W, and b are the weight matrices, and bias vector, respectively for the
+fully connected layer; and yi is a probability distribution over two prediction
+classes i.e., retention, removal for the ith word. The loss is binary cross-entropy
+and the network is trained end-to-end using Adam optimizer [12].
+4 Experiments
+We experiment with two large datasets: (i) AOL: a US-based search engine,
+widely used in the literature [6]; (ii) Yandex 4: a search engine based in Russia.
+Pre-processing: To focus on the query reformulation behaviour we consider
+only those queries that (i) are not the same as the subsequent query (ii) have
+more than a single word (iii) are not navigational in nature i.e. do not include
+http markers such as ‘www’, ‘com’ (iv) have at least one word in common with
+the next query. We split all the queries (AOL ∼ 3.6M queries from 1 .5M ses-
+sions, Yandex∼ 11M queries from 6 .6M sessions) into 80-10-10 proportions as
+train-dev-test. We kept top 600K, 400K words as the vocabulary for AOL, and
+Yandex respectively. Since Yandex urls are just anonymized ids, only top 200K
+urls are kept.
+4 https://www.kaggle.com/c/yandex-personalized-web-search-challenge
+
+===PAGE BREAK===
+
+6 K. Halder et al.
+Baselines: We use some recent deep learning based query reformulation meth-
+ods as competitors, Since they are not originally designed for this task, we modify
+their ﬁnal prediction layers for comparison.
+1. Majority Class: Every word is marked ‘retention’ forming a trivial baseline.
+2. CNN-Kim [11]: A CNN without the pooling layer to predict a label for
+each word.
+3. GRU [5]: A vanilla GRU based sequence labeller.
+4. HRED [14]: The sequence of past queries in the same session is used in this
+model.
+5. FMN [15]: A feedback memory network is used in this model.
+The baseline hyper-parameters are set according to the respective papers.
+All models were implemented using Keras with TensorFlow as the backend.
+Word Retention Prediction: In this task, the objective is to predict how a
+user would edit a query. Since there are two classesi.e., ‘removal’, and ‘retention’,
+we calculate accuracy over all the words in a query, normalized by the query
+length. We report the performances in terms of overall accuracy, and F 1 score
+for the ‘removal’ class in Table 2, since the class distribution is not balanced.
+Table 1 shows an illustration. The accuracy scores are presented in Table 2. We
+Table 1: Illustration of accuracy computation for query word retention proba-
+bility prediction task.
+Current Query Next Query Ground
+Truth PredictionAccuracy
+japanese food for takeout asian food for takeout 0, 1, 1, 1 0, 1, 1, 0 0.75
+cheap electronicsbay area cheap electronics oﬀers1, 1, 0, 0 0, 1, 0, 1 0.5
+Average Accuracy 0.625
+observe that our information deﬁcit based model achieves the highest accuracy
+scores with 9.22% and 5.88% improvement over the majority class for the AOL,
+and Yandex respectively.
+Our model performs signiﬁcantly better in correctly identifying the removal
+class with 4.45% and 4.87% improvement over the state-of-the-art FMN model.
+The choice of baselines allows us to study the ablation eﬀect. We observe that
+information deﬁcit helps in boosting the F 1 scores by 6 .81% and 4 .87% w.r.t
+HRED for AOL, and Yandex respectively. The improvement with respect to
+FMN is statistically signiﬁcant according to unpaired t-test with p < 0.001.
+A careful reader might note that both FMN and our model use all three
+input signals. However, the information deﬁcit based modelling makes a diﬀer-
+ence their performances. FMN incorporates the past clicks as a separate signal
+compared to the past queries. Whereas, our model assumes that both originate
+from the same semantic space and uses their diﬀerence in the ﬁnal prediction
+layers. It proves our hypothesis about encoding information deﬁcit explicitly in
+the query reformulation process.
+Next Query Selection: Finally, we employ our model to a real downstream
+task i.e., next query selection in a session. The objective in this task is to select
+the next query out of K most popular candidates. For each query under consid-
+
+===PAGE BREAK===
+
+Modeling Information Need of Users in Search Sessions 7
+Table 2: Experimental results in terms of accuracy and F1 scores for the removal
+class. Our model outperforms the other methods in both metrics.
+Model Input Signals AOL Yandex
+Last QueryPast QueriesPast ClicksAccuracy F1 Accuracy F1
+1. Most Common × × × .628 – .676 –
+2. CNN-Kim [11] ✓ × × .664±.0004 .36 .690±.0086 .36
+3. GRU [5] ✓ × × .678±.0010 .42 .711±.0007 .40
+4. HRED [14] ✓ ✓ × .684±.0011 .44 .713±.0007 .41
+5. FMN [15] ✓ ✓ ✓ .683±.0005 .45 .714±.0008 .41
+6. Our Model ✓ ✓ ✓ .686∗±.0006.47∗ .716∗±.0005.43∗
+eration, we populate the top-K ( K = 20) co-occurred queries that to form the
+candidate set, and include the ground truth next query. This is known as Most
+Popular Suggestion method [14]. Standard 80-10-10 dataset splitting is used for
+train-dev-test.
+This task is considerably diﬀerent from the previous one. We modify the
+architecture as shown in Figure 5a, keeping our core information deﬁcit compo-
+nent unchanged. We encode the last query, and all the candidate queries using
+the same Query Encoder ( cf. Figure 3). Note that, we need a single representa-
+tion of the entire query in this case. Hence, we consider output of the last ( nth)
+time-step of GRU dec as the query representation zq.
+vi = GRUdec(z, vi−1); zq = vn (2)
+The candidate queries (e1,··· , eK) are encoded in the same manner (z1, z2,··· , zk).
+We perform element-wise multiplication between its encoded representation and
+the current query to obtain the similarity, i.e., sim(q, ej) = zq⊗ zj. Again, we
+concatenate the information deﬁcit, and past query tensor with each of the sim-
+ilarity tensors to obtain xj = concatenate[sim(q, ej),D, s]. These (xj) are fed to
+the fully-connected layer for the ﬁnal score prediction.
+p(yj|xj) = sigmoid(W′· xj + b′)
+where W′, and b′ are the weight and bias matrices respectively. The ground
+truth score for the correct next query is 1, and 0 for the incorrect ones. We use
+sigmoid as the activation function in ﬁnal layer, and mean absolute error as
+the loss. During test, we consider the candidate with the maximum score as the
+suggested next query,
+ˆq = argmax
+j={1,··· ,K}
+p(yj|xj)
+We evaluate the competing methods by computing Mean Reciprocal Rank
+(MRR) over test queries. From the scores in Table 5b, we observe that our model
+consistently outperforms the baselines across the datasets. We ﬁnd that the im-
+provement with respect to FMN is statistically signiﬁcant according to unpaired
+t-test with p < 0.001. In this work, we focus on the exchange of information
+between a user and the Search Engine in a session to understand the information
+need of the user. Our model is based on the principle that a user forms a query
+depending on the information deﬁcit that takes place during search sessions.
+
+===PAGE BREAK===
+
+8 K. Halder et al.
+(a) Model for Query Selection Task.
+Model Input Signals MRR
+LQ PQ PC AOL Yandex
+2. CNN-Kim [11] ✓ × × .752 .621
+3. GRU [5] ✓ × × .773 .636
+4. HRED [14] ✓ ✓ × .814 .674
+5. FMN [15] ✓ ✓ ✓ .853 .686
+6. Our Model ✓ ✓ ✓ .864∗ .693∗
+(b) MRR scores for the competing meth-
+ods in the next query suggestion task. Our
+model outperforms the baseline methods.
+Fig. 5: Next Query Selection Setup. (a) Modiﬁed architecture (b) Experimental
+Results.
+Through a novel query word retention prediction task, and the traditional next
+query selection task, we show that our hypothesis generalizes well. We experi-
+ment with two query log datasets with considerably diﬀerent demographic and
+temporal characteristics (e.g., one is from US, other from Russia; time diﬀerence
+of 8 years between their releases) and show that our model works well in both
+cases. In the future, we would like to investigate on how to use such predictive
+models for converging a search session faster.
+References
+1. Balasubramanian, N., Kumaran, G., Carvalho, V.R.: Exploring reductions for long
+web queries. In: Proc. of SIGIR. pp. 571–578. ACM (2010)
+2. Bendersky, M., Croft, W.B.: Discovering key concepts in verbose queries. In: Pro-
+ceedings of the 31st annual international ACM SIGIR conference on Research and
+development in information retrieval. pp. 491–498. ACM (2008)
+3. Boldi, P., Bonchi, F., Castillo, C., Donato, D., Gionis, A., Vigna, S.: The query-ﬂow
+graph: model and applications. In: Proc. of CIKM. pp. 609–618. ACM (2008)
+4. Cao, H., Jiang, D., Pei, J., He, Q., Liao, Z., Chen, E., Li, H.: Context-aware query
+suggestion by mining click-through and session data. In: Proc. of KDD. pp. 875–
+883. ACM (2008)
+5. Chung, J., G¨ ul¸ cehre, C ¸ ., Cho, K., Bengio, Y.: Empirical Evaluation of Gated Re-
+current Neural Networks on Sequence Modeling. In: Proc. of NIPS 2014 Deep
+Learning and Representation Learning Workshop (2014)
+6. Dehghani, M., Rothe, S., Alfonseca, E., Fleury, P.: Learning to attend, copy, and
+generate for session-based query suggestion. In: Proc. of CIKM. pp. 1747–1756.
+ACM (2017)
+7. He, Q., Jiang, D., Liao, Z., Hoi, S.C., Chang, K., Lim, E.P., Li, H.: Web query
+recommendation via sequential query prediction. In: Proc. of ICDE. pp. 1443–1454.
+IEEE (2009)
+
+===PAGE BREAK===
+
+Modeling Information Need of Users in Search Sessions 9
+8. Huston, S., Croft, W.B.: Evaluating verbose query processing techniques. In: Pro-
+ceedings of the 33rd international ACM SIGIR conference on Research and devel-
+opment in information retrieval. pp. 291–298. ACM (2010)
+9. Jain, A., Ozertem, U., Velipasaoglu, E.: Synthesizing high utility suggestions for
+rare web search queries. In: Proc. of SIGIR. pp. 805–814 (2011)
+10. Jones, R., Fain, D.C.: Query word deletion prediction. In: Proc. of SIGIR. pp.
+435–436. ACM (2003)
+11. Kim, Y.: Convolutional neural networks for sentence classiﬁcation. In: Proc. of
+EMNLP (2014)
+12. Kingma, D.P., Ba, J.: Adam: A Method for Stochastic Optimization. In: Proc. of
+ICLR (2014)
+13. Kumaran, G., Carvalho, V.R.: Reducing long queries using query quality predic-
+tors. In: Proc. of SIGIR. pp. 564–571. ACM (2009)
+14. Sordoni, A., Bengio, Y., Vahabi, H., Lioma, C., Grue Simonsen, J., Nie, J.Y.: A
+hierarchical recurrent encoder-decoder for generative context-aware query sugges-
+tion. In: Proc. of CIKM. pp. 553–562. ACM (2015)
+15. Wu, B., Xiong, C., Sun, M., Liu, Z.: Query suggestion with feedback memory
+network. In: Proc. of WWW. pp. 1563–1571 (2018)
+16. Wu, H., Fang, H.: An exploration of query term deletion. In: Proc. of ECIR Work-
+shop on Information Retrieval Over Query Sessions (2011)
+17. Xue, X., Huston, S., Croft, W.B.: Improving verbose queries using subset distri-
+bution. In: Proceedings of the 19th ACM international conference on Information
+and knowledge management. pp. 1059–1068. ACM (2010)
+18. Yang, B., Parikh, N., Singh, G., Sundaresan, N.: A study of query term deletion
+using large-scale e-commerce search logs. In: Proc. of ECIR. pp. 235–246. Springer
+(2014)

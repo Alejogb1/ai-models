@@ -1,0 +1,15 @@
+{
+  "source": "A Survey on Transfer Learning.pdf",
+  "source_group": "Awesome-ML-Papers/Surveys",
+  "processed_at": "2026-06-08",
+  "agent": "agent6_remaining",
+  "concepts": [
+    {
+      "finding": "Transfer learning categorizes into inductive (different tasks, same domain), transductive (same task, different domains), and unsupervised (different but related tasks, unlabeled data) with approaches including instance weighting, feature mapping, and parameter sharing.",
+      "category": "Data",
+      "implication": "Transfer learning taxonomy directly applies to search: adapting models from one query domain to another is a transductive transfer problem.",
+      "open_question": "Which transfer learning approach works best for cross-domain query understanding?",
+      "testable_hypothesis": "Parameter-sharing transfer (fine-tuning a base model) will outperform instance weighting and feature mapping for cross-domain query intent classification across 3 search domains."
+    }
+  ]
+}

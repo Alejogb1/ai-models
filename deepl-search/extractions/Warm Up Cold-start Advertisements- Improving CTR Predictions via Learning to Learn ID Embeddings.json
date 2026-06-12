@@ -1,0 +1,148 @@
+{
+  "source": "Warm Up Cold-start Advertisements- Improving CTR Predictions via Learning to Learn ID Embeddings.pdf",
+  "source_group": "Awesome-ML-Papers/CTR-CVR-Prediction",
+  "processed_at": "2026-06-08",
+  "agent": "agent5_final",
+  "concepts": [
+    {
+      "finding": "Experimental results on three real-world datasets showed that\nMeta-Embedding can significantly improve both the cold-start and\nwarm-up performances for six existing CTR prediction models, rang-\ning from lightweight models such as Factorization Machines to com-\nplicated deep models such as PNN and De",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Experimental results show that six existing\nstate-of-the-art CTR prediction methods can all be drastically\nimproved when leveraging Meta-Embedding for both cold-\nstart new ads and warm-up small-sized ads.",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "The main idea of the proposed\nmethod includes leveraging a parameterized function of ad features\nas the ID embedding generator, and a two-phase simulation over\nold IDs to train the generator by gradient-based meta-learning to\nimprove both cold-start and warm-up performances.",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "To summarize, the contributions of this paper are as follows:\n• We propose Meta-Embedding that learns how to learn em-\nbeddings for new ad IDs to address the cold-start problem.",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "On the two larger datasets, Meta-Embedding also achieved con-\nsiderable improvements as shown in Table 2.",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Overall, we observe that Meta-Embedding is able to significantly\nimproves CTR and CVR predictions for cold-start ads, and can work\nfor almost all the tested base models and datasets in our comparisons.",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Experiments showed that, by replacing trivial random initialization\nwith Meta-Embedding, the cold-start and warm-up performances\ncan be significantly improved.",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "In order to\ndetermine which ad is the most valuable to this user, a key parameter\nis the so-called click-through rate also known as the CTR.",
+      "category": "ModelCandidate",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "To the best of our knowl-\nedge, it is the first work that aims to improve the performance\nof various state-of-the-art CTR prediction methods for both\ncold-start and warm-up phases for new ads under a general\nsupervised learning framework.",
+      "category": "LabelValidation",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "• We propose a simple yet powerful algorithm to train the Meta-\nEmbedding generator using gradient-based meta-learning by\nmaking use of second derivatives when back-propagating.",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "The second block is when we observe the data, receive the prediction loss, and\nupdate the embedding for the first time.",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "3\nLEARNING TO LEARN THE ID\nEMBEDDINGS FOR NEW ADS\nIn this section, we propose Meta-Embedding, a meta-learning based\nmethod for learning to learn the ID embeddings for new ads, to solve\nthe ad cold-start problem.",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Then, we propose the framework of learning\nto learn ID embeddings and introduce our meta-learner induced by\nboth the pre-trained model and a Meta-Embedding generator.",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "To unify these two losses, we propose our final loss function for\nMeta-Embedding as a weighted sum of la and lb,\nlmeta = αla + (1 −α)lb,\n(15)\nwhere α ∈[0, 1] is a coefficient to balance the two phases.",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "(17)\nAlthough it involves second derivatives, i.e., a Hessian-vector, it can\nbe efficiently implemented by existing deep learning libraries that\nallows automatic differentiation, such as TensorFlow [1].",
+      "category": "Data",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Although this dataset is not a dataset\nfor CTR prediction, its small size enables us to easily verify the\neffectiveness of our proposed method.",
+      "category": "Experiment",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "To show the effectiveness of our method, we conduct experi-\nments upon the following representative models:\n• FM: the 2-way Factorization Machine [24].",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "To increase readability, we will show the relative improvements\nin percentage over the baseline cold-start score:\nLogLoss_precentage =\n\u0012\nLogLoss\nLogLossbase-cold\n−1\n\u0013\n× 100%\nAUC_precentage =\n\u0012\nAUC\nAUCbase-cold\n−1\n\u0013\n× 100%\nwhere “base-cold” refer to cold-start scores produced by the base\nmodel with r",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "The main experimental results are shown in Table 2.",
+      "category": "Experiment",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Due to the space lim-\nitation, we only show part of the detailed results: Figure 7 shows\nthe AUC improvements on the Tencent CVR prediction dataset, and\nFigure 8 shows the LogLoss on the KDD Cup search ad dataset.",
+      "category": "Experiment",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    }
+  ]
+}

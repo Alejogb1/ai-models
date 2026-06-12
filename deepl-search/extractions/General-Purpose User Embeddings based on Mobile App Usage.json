@@ -1,0 +1,15 @@
+{
+  "source": "General-Purpose User Embeddings based on Mobile App Usage",
+  "source_group": "Awesome-ML-Papers/Embeddings",
+  "processed_at": "2026-06-08T12:00:00Z",
+  "agent": "agent03_embeddings_mf_ranking_search_compiled",
+  "concepts": [
+    {
+      "finding": "Asynchronous training of embeddings for large text corpora: allows training on data streams without full pass synchronization. Heterogeneous graph-based intent learning (Ren et al.): uses queries, webpages, Wikipedia concepts. Meta-path2vec: metapath-based random walks on heterogeneous graphs for embedding.",
+      "category": "Data",
+      "implication": "Heterogeneous graphs offer richer signal for keyword embedding than homogeneous keyword-only graphs. Incorporating web page content, categories, and external knowledge (Wikipedia, ConceptNet, DBpedia) as node types enriches intent signals.",
+      "open_question": "Which external knowledge sources (WordNet, Wikipedia, ConceptNet, DBpedia) contribute most to keyword-intent clustering?",
+      "testable_hypothesis": "A meta-path-based heterogeneous embedding that connects keywords to Wikipedia concepts and categories improves intent cluster quality by 15%+ over keyword-only embeddings."
+    }
+  ]
+}

@@ -1,0 +1,1382 @@
+JOURNAL OF LATEX CLASS FILES, VOL. 14, NO. 8, MAY 2017
+1
+Attributed Social Network Embedding
+Lizi Liao, Xiangnan He, Hanwang Zhang, and Tat-Seng Chua
+Abstract—Embedding network data into a low-dimensional vector space has shown promising performance for many real-world
+applications, such as node classiﬁcation and entity retrieval. However, most existing methods focused only on leveraging network
+structure. For social networks, besides the network structure, there also exists rich information about social actors, such as user proﬁles
+of friendship networks and textual content of citation networks. These rich attribute information of social actors reveal the homophily
+effect, exerting huge impacts on the formation of social networks. In this paper, we explore the rich evidence source of attributes in
+social networks to improve network embedding. We propose a generic Social Network Embedding framework (SNE), which learns
+representations for social actors (i.e., nodes) by preserving both the structural proximity and attribute proximity. While the structural
+proximity captures the global network structure, the attribute proximity accounts for the homophily effect. To justify our proposal, we
+conduct extensive experiments on four real-world social networks. Compared to the state-of-the-art network embedding approaches,
+SNE can learn more informative representations, achieving substantial gains on the tasks of link prediction and node classiﬁcation.
+Speciﬁcally, SNE signiﬁcantly outperforms node2vec with an 8.2% relative improvement on the link prediction task, and a 12.7% gain
+on the node classiﬁcation task.
+Index Terms—Social Network Representation, Homophily, Deep Learning.
+!
+1
+INTRODUCTION
+S
+OCIAL networks are an important class of networks
+that span a wide variety of media, ranging from social
+websites such as Facebook and Twitter, citation networks of
+academic papers, and telephone caller–callee networks — to
+name a few. Many applications need to mine useful informa-
+tion from social networks. For instance, content providers
+need to cluster users into groups for targeted advertising [1],
+and recommender systems need to estimate the preference
+of a user on items for personalized recommendation [2].
+In order to apply general machine learning techniques on
+network-structured data, it is essential to learn informative
+node representations.
+Recently, research interest in representation learning has
+spread from natural language to network data [3]. Many
+network embedding methods have been proposed [3], [4],
+[5], [6], and show promising performance for various ap-
+plications. However, existing methods primarily focused
+on general class of networks and leveraged the structural
+information only. For social networks, we point out that
+there almost always exists rich information about social
+actors in addition to the link structure. For example, users
+on social websites may have proﬁles like age, gender and
+textual comments. We term all such auxiliary information
+as attributes, which not only refer to user demographics, but
+also include other information such as the afﬁliated texts
+and the possible labels.
+Attributes essentially exert huge impacts on the orga-
+nization of social networks. Many studies have justiﬁed
+its importance, ranging from user demographics [7], to
+•
+X. He is the corresponding author. E-mail: xiangnanhe@gmail.com
+•
+L. Liao is with the NUS Graduate School for Integrative Sciences and
+Engineering, National University of Singapore, Singapore, 117456.
+E-mail: liaolizi.llz@gmail.com
+•
+X. He, H. Zhang and TS. Chua are with National University of Singapore.
+Manuscript received May 12, 2017; revised **** ****.
+ϮϬϬϵ
+ϮϬϬϴ
+ϮϬϬϳ
+͙
+(a) class year
+DĂũŽƌͲϭϬϳ
+͙
+͙
+(b) major
+ŽƌŵͲϮϭϴ
+͙
+͙
+(c) dormitory
+Fig. 1: Attribute homophily largely impacts social net-
+work: we group users in each 4018×4018 user matrix based
+on a speciﬁc attribute. Clear blocks around the diagonal
+show the attribute homophily effect.
+subjective preference like political orientation and personal
+interests [8]. To illustrate this point, we plot the user–user
+friendship matrix of a Facebook dataset from three views1.
+Each row or column denotes a user, and a colored point
+indicates that the corresponding users are friends. Each
+subﬁgure is a re-ordering of users according to a certain
+attribute such as “class year’, “major” and “dormitory”. For
+example, Figure 1(a) ﬁrst groups users by the attribute “class
+year”, and then sort these resulting groups in chronological
+order. As can be seen, there exist clear block structures in
+each subﬁgure, where users of a block are more densely
+connected. Each block actually points to users of the same
+attribute; for example, the right bottom block of Figure 1(a)
+corresponds to users who will graduate in the year of 2009.
+This real-world example lends support to the importance
+of attribute homophily. By jointly considering the attribute
+homophily and the network structure, we believe more
+informative node representations can be learned. Moreover,
+1. This is the Chapel Hill data constructed by [9], which we will detail
+later in Section 5.1.1.
+arXiv:1705.04969v1  [cs.SI]  14 May 2017
+JOURNAL OF LATEX CLASS FILES, VOL. 14, NO. 8, MAY 2017
+2
+since we utilize the auxiliary attribute information, the link
+sparsity and cold-start problem [10] can largely be allevi-
+ated.
+In this paper, we present a neural framework named
+SNE for learning node representations from social network
+data. SNE is a generic machine learner working with real-
+valued feature vectors, where each feature denotes the ID
+or an attribute of a node. Through this, we can easily incor-
+porate any type and number of attributes. Under our SNE
+framework, each feature is associated with an embedding,
+and the ﬁnal embedding for a node is aggregated from its
+ID embedding (which preserves the structural proximity) and
+attribute embedding (which preserves the attribute proxim-
+ity). To capture the complex interactions between features,
+we adopt a multi-layer neural network to take advantage
+of strong representation and generalization ability of deep
+learning.
+In summary, the contributions of this paper are as fol-
+lows.
+•
+We demonstrate the importance of integrating net-
+work structure and attributes for learning more in-
+formative node representations for social networks.
+•
+We propose a generic framework SNE to perform so-
+cial network embedding by preserving the structural
+proximity and attribute proximity of social networks.
+•
+We conduct extensive experiments on four datasets
+with two tasks of link prediction and node classiﬁca-
+tion. Empirical results and case studies demonstrate
+the effectiveness and rationality of SNE.
+The rest of the paper is organized as follows. We ﬁrst
+discuss the related work in Section 2, followed by providing
+some preliminaries in Section 3. We then present the SNE
+framework in Section 4. We show experimental results in
+Section 5, before concluding the whole paper in Section 6.
+2
+RELATED WORK
+In this section, we brieﬂy summarize studies about attribute
+homophily. We then discuss network embedding methods
+that are closely related to our work.
+2.1
+Attribute homophily in Social Networks
+Social networks belong to a special class of networks, in
+which the formation of social ties involves not only the
+self-organizing network process, but also the attribute-based
+process [11]. The motivation for considering attribute prox-
+imity in the embedding procedure is rooted in the large
+impact of attribute homophily, which plays an important
+role in attribute-based process. Therefore, we provide a brief
+summarization of homophily studies here as a background.
+Generally speaking, the “homophily principle”—birds of
+a feather ﬂock together—is one of the most striking and
+robust empirical regularities of social life [12], [13], [14]. The
+hypothesis that people similar to each other tend to become
+friends dates back to at least the 70s in the last century. In
+social science, there is a general expectation that individuals
+develop friendships with others of approximately the same
+age [15]. In [16] the authors studied the inter-connectedness
+between homogeneous composition of groups and the emer-
+gence of homophily. In [17] the authors tried to ﬁnd the
+role of homophily in online dating choices made by users.
+They found that online users of the online dating system
+seek people like them much more often than chance would
+predict, just as in the ofﬂine world. In more recent years,
+[18] investigated the origins of homophily in a large univer-
+sity community, using network data in which interactions,
+attributes and afﬁliations were all recorded over time. Not
+surprisingly, it has been concluded that besides structural
+proximity, preferences for attribute similarity also provides
+an important factor for the social network formation pro-
+cedure. Thus, to get more informative representations for
+social networks, we should take attributes information into
+consideration.
+2.2
+Network Embedding
+Some earlier works such as Local Linear Embedding
+(LLE) [19], IsoMAP [20] and Laplacian Eigenmap [21] ﬁrst
+transform data into an afﬁnity graph based on the feature
+vectors of nodes ( e.g., k-nearest neighbors of nodes) and
+then embed the graph by solving the leading eigenvectors
+of the afﬁnity matrix.
+Recent works focus more on embedding an existing
+network into a low-dimensional vector space to facilitate
+further analysis and achieve better performance than those
+earlier works. In [3] the authors deployed truncated ran-
+dom walks on networks to generate node sequences. The
+generated node sequences are treated as sentences in lan-
+guage models and fed to the Skip-gram model to learn
+the embeddings. In [5] the authors modiﬁed the way of
+generating node sequences by balancing breadth-ﬁrst sam-
+pling and depth-ﬁrst sampling, and achieved performance
+improvements. Instead of performing simulated “walks”
+on the networks, [6] proposed clear objective functions to
+preserve the ﬁrst-order proximity and second-order proximity
+of nodes while [10] introduced deep models with multiple
+layers of non-linear functions to capture the highly non-
+linear network structure. However, all these methods only
+leverage network structure. In social networks, there exists
+large amount of attribute information. Purely structure-
+based methods fail to capture such valuable information,
+thus may result in less informative embeddings. In addition,
+these methods get affected easily when the link sparsity
+problem occurs.
+Some recent efforts have explored the possibility of in-
+tegrating contents to learn better representations [22]. For
+example, TADW [23] proposed text-associated DeepWalk [3]
+to incorporate text features into the matrix factorization
+framework. However, only text attributes can be handled.
+Being with the same problem, TriDNR [24] proposed to
+separately learn embeddings from the structure-based Deep-
+Walk [3] and label-fused Doc2Vec model [25], the embed-
+dings learned were linearly combined together in an itera-
+tive way. Under such a scheme, the knowledge interaction
+between the two separate models only goes through a series
+of weighted sum operations and lacks further convergence
+constrains. On the contrary, our method models the struc-
+ture proximity and attribute proximity in an end-to-end
+neural network that does not have such limitations. Also, by
+incorporating structure and attribute modeling by an early
+fusion, the two parts only need to complement each other,
+resulting in sufﬁcient knowledge interactions [26].
+JOURNAL OF LATEX CLASS FILES, VOL. 14, NO. 8, MAY 2017
+3
+Fig. 2: An illustration of social network embedding. The
+numbered nodes denote users, and users of the same color
+share the referred attribute.
+There have also been efforts explored semi-supervised
+learning
+for
+network
+embedding.
+[27]
+combined
+an
+embedding-based regularizer with a supervised learner to
+incorporate label information. Instead of imposing regu-
+larization, [28] used embeddings to predict the context
+in graph and leveraged label information to build both
+transductive and inductive formulations. In our framework,
+label information can also be incorporated in the same
+way similar to [28] when available. We leave this extension
+as future work, as this work focuses on the modeling of
+attributes for network embedding.
+3
+DEFINITIONS
+Social networks are more than links; in most cases, social
+actors are associated with rich attributes. We denote a social
+network as G = (U, E, A), where U = {u1, ..., uM} denotes
+the social actors, E = {eij} denotes the links between social
+actors, and A = {Ai} denotes the attributes of social actors.
+Each edge eij can be associated with a weight sij denoting
+the strength of connection between ui and uj. Generally,
+our analysis can apply to any (un)directed, (un)weighted
+network. While in this paper, we focus on unweighted
+network, i.e., sij is 1 for all edges, our method can be easily
+applied to weighted network through the neighborhood
+sampling strategy [5].
+The aim of social network embedding is to project the
+social actors into a low-dimensional vector space (a.k.a. em-
+bedding space). Since the network structure and attributes
+offer different sources of information, it is crucial to capture
+both of them to learn a comprehensive representation of
+social actors. To illustrate this point, we show an example in
+Figure 2. Based on the link structure, a common assumption
+of network embedding methods [3], [5], [6] is that closely
+connected users should be close to each other in the embed-
+ding space. For example, (u1, u2, u3, u4, u5) should be close
+to each other, and similarly for (u8, u9, u11, u12). However,
+we argue that purely capturing structural information is
+far from enough. Taking the attribute homophily effect into
+consideration, (u2, u9, u11, u12) should also be close to each
+other. This is because they all major in computer science;
+although u2 is not directly linked to u9, u11 or u12, we could
+expect that some computer science articles popular among
+(u9, u11, u12) might also be of interest to u2. To learn more
+informative representations for social actors, it is essential
+to capture the attribute information.
+In this work, we strive to develop embedding meth-
+ods that preserve both the structural proximity and attribute
+proximity of social network. In what follows, we give the
+deﬁnition of the two notions.
+Deﬁnition 1. (Structural Proximity) denotes the proximity of
+social actors that is evidenced by links. For ui and uj, if there
+exists a link eij between them, it indicates the direct proximity;
+on the other hand, if uj is within the context of ui, it indicates the
+indirect proximity.
+Intuitively, the direct proximity corresponds to the ﬁrst-
+order proximity, while the indirect proximity accounts for
+higher-order proximities [6]. A popular way to generate
+contexts is by performing random walks in the network [3],
+i.e., if two nodes appear in a walking sequence, they are
+treated as in the same context. In our method, we apply the
+walking procedure proposed by node2vec [5], which controls
+the random walk by balancing the breadth-ﬁrst sampling
+(BFS) and depth-ﬁrst sampling (DFS). In the remaining of
+the paper, we use the term “neighbors” to denote both the
+ﬁrst-order neighbors and the nodes in the same context for
+simplicity.
+Deﬁnition 2. (Attribute Proximity) denotes the proximity of
+social actors that is evidenced by attributes. The attribute inter-
+section of Ai and Aj indicates the attribute proximity of ui and
+uj.
+By enforcing the constraint of attribute proximity, we can
+model the attribute homophily effect, as social actors with
+similar attributes will be placed close to each other in the
+embedding space.
+4
+PROPOSED METHOD
+We ﬁrst describe how we model the structural proximity with
+a deep neural network architecture. We then elaborate how
+to model the attribute proximity with a similar architecture
+by casting attributes to a generic feature representation. Our
+ﬁnal SNE model integrates the models of structures and
+attributes by an early fusion on the input layer. Lastly, we
+discuss the relationships of our SNE model to other relevant
+models. Some of the terms and notations are summarized in
+Table 1.
+4.1
+Structure Modeling
+Since the focus of this subsection is on the modeling of
+network structure, we use only the identity (ID) to represent
+a node in the one-hot representation, in which a node ui is
+represented as an M-dimensional sparse vector where only
+the i-th element of the vector is 1. Based on our deﬁnition
+of structural proximity, the key to structure modeling is in
+the estimation of pairwise proximity of nodes. Let f be
+the function that maps two nodes ui, uj to their estimated
+proximity score. We deﬁne the conditional probability of
+node uj on ui using the softmax function as:
+p(uj|ui) =
+exp(f(ui, uj))
+PM
+j′=1 exp(f(ui, uj′))
+,
+(1)
+which measures the likelihood that node uj is connected
+with ui. To account for a node’s structural proximity w.r.t. all
+JOURNAL OF LATEX CLASS FILES, VOL. 14, NO. 8, MAY 2017
+4
+its neighbors, we further deﬁne the conditional probability
+of a node set by assuming conditional independence:
+p(Ni|ui) =
+Y
+j∈Ni
+p(uj|ui),
+(2)
+where Ni denotes the neighbor nodes of ui. By maxi-
+mizing this conditional probability over all nodes, we can
+achieve the goal of preserving the global structural proximity.
+Speciﬁcally, we deﬁne the likelihood function for the global
+structure modeling as:
+l =
+M
+Y
+i=1
+p(Ni|ui) =
+M
+Y
+i=1
+Y
+j∈Ni
+p(uj|ui).
+(3)
+Having established the target of learning from network
+data, we now design an embedding model to estimate the
+pairwise proximity f(ui, uj). Most previous efforts have
+used shallow models for relational modeling, such as matrix
+factorization [29], [30] and neural networks with one hidden
+layer [3], [5], [31]. In these formulations, the proximity of
+two nodes is usually modeled as the inner product of their
+embedding vectors. However, It is known that simply the
+inner product of embedding vectors can limit the model’s
+representation ability and incur large ranking loss [32]. To
+capture the complex non-linearities of real-world networks
+[10], [33], we propose to adopt a deep architecture to model
+the pairwise proximity of nodes:
+fid(ui, uj)
+= ˜uj · δn(W(n)(· · · δ1(W(1)ui + b(1)) · · · ) + b(n)),
+(4)
+where ui denotes the embedding vector of node ui, and
+n denotes the number of hidden layers to transform an
+embedding vector to its ﬁnal representation; W(n), b(n) and
+δn denote the weight matrix, bias vector and activation
+function of the n-th hidden layer, respectively.
+It is worth noting that in our model design, each node
+has two latent vector representations, u that encodes a node
+to its embedding and ˜u that embeds the node as a neighbor.
+To comprehensively represent a node for downstream appli-
+cations, practitioners can add/concatenate the two vectors
+which has empirically shown to have better performance in
+distributed word representations [34], [35].
+4.2
+Encoding Attributes
+Many real-world social networks contain rich attribute in-
+formation, which can be heterogeneous and highly diverse.
+To avoid manual efforts that design speciﬁc model com-
+ponents for speciﬁc attributes, we convert all attributes
+to a generic feature vector representation (see Figure 3 as
+an example) to facilitate designing a general method for
+learning from attributes. Regardless of semantics, we can
+categorize attributes into two types:
+•
+Discrete attributes. A prevalent example is categor-
+ical variables, such as user demographics like gen-
+der and country. We convert a categorical attribute
+to a set of binary features via one-hot encoding.
+For example, the gender attribute has two values
+{male, female}, so we can express a female user as
+the vector v = {0, 1} where the second binary feature
+of value 1 denotes “female”.
+TABLE 1: Terms and Notations
+Symbol
+Deﬁnition
+M
+total number of social actors in the social network
+Ni
+neighbor nodes of social actor ui
+n
+number of hidden layers
+˜U
+the weight matrix connecting to the output layer
+h(n)
+i
+embedding of ui with both structure and attributes
+˜ui
+the row in ˜U refers to ui’s embedding as a neighbor
+ui
+pure structure representation of ui
+u′
+i
+pure attribute representation of ui
+W(k), b(k)
+the k-th hidden layer weight matrix and biases
+Wid, Watt
+the weight matrix for id and attributes input
+•
+Continuous attributes. Continuous attributes natu-
+rally exist on social networks, e.g., raw features of
+images and audios. Or they can be artiﬁcially gener-
+ated from transformation of categorical variables. For
+example, in document modeling, after obtaining bag-
+of-words representation of a document, it is common
+to transform it to real-valued vector via TF-IDF to
+reduce noises. Another example is the historical fea-
+tures, such as users’ purchases on items and check-
+ins on locations, which are always normalized to
+real-valued vector to reduce the impact of variable
+length [36].
+0
+1
+0.8
+…
+0.1
+0.2
+0.1
+0.0
+…
+0.1
+0.0
+…
+0.4
+F
+M
+l1
+…
+lL
+w1 w2 w3
+wW
+…
+t1
+tT
+…
+Gender
+Location
+Text.content
+Transformed
+Fig. 3: A simple example to show the two kinds of social
+network attributes information.
+Suppose there are K feature entries in the attribute
+feature vector v as shown in Figure 3, for each feature entry,
+we associate it with an low-dimensional embedding vector
+ek which corresponds to the k-th column of the weight
+matrix Watt as shown in Figure 4. We then aggregate the
+attribute representation vector u′ for each input social actor
+by u′ = PK
+k=1 vkek.
+Similar to structure modeling, we aim to model the
+attribute proximity by adopting a deep model to approximate
+the complex interactions between attributes and introduce
+non-linearity, which can be fulﬁlled by Equation 4 while
+substituting ui with u′
+i.
+4.3
+The SNE Model
+To combine the strength of both structure and attribute
+modeling, an intuitive way is to concatenate the learned
+embeddings from each part by late fusion as adopted by
+[6]. However, the main drawback of late fusion is that
+individual models are trained separately without knowing
+each other and results are simply combined after training.
+On the contrary, early fusion allows optimizing all parame-
+ters simultaneously. As a result, the attribute modeling can
+complement the learning of structure modeling, allowing
+JOURNAL OF LATEX CLASS FILES, VOL. 14, NO. 8, MAY 2017
+5
+teh two parts closely interact with each other. Essentially,
+the strategy of early fusion is more preferable in recent
+developments of end-to-end deep learning methods, such as
+Deep crossing [37] and Neural Factorization Machines [38].
+Therefore, we propose a generic social network embedding
+framework (SNE) as shown in Figure 4, which integrates the
+structure and attribute modeling parts by an early fusion on
+the input layer. In what follows, we elaborate the design of
+SNE layer by layer.
+Embedding Layer. The embedding layer consists of two
+fully connected components. One component projects the
+one-hot user ID vector to a dense vector u which captures
+structure information. The other component encodes the
+generic feature vector and generates a compact vector u′
+which aggregates attributes information.
+Hidden Layers. Above the embedding layer, u and u′
+are fed into a multi-layer perceptron. The hidden repre-
+sentations for each layer are denoted as h(0), h(1), · · · , h(n),
+which are deﬁned as follows:
+h(0) =
+ u
+λu′
+
+,
+h(k) = δk(W(k)h(k−1) + b(k)), k = 1, 2, · · · , n,
+(5)
+where λ ∈R adjusts the importance of attributes, δk de-
+notes the activation function, n is the number of hidden
+layers. From the last hidden layer, we obtain an abstractive
+representation h(n)
+i
+of the input social actor ui.
+Stacking multiple non-linear layers has been shown to
+help learning better representations of data [39]. Regarding
+the architecture design, a common strategy is to use a
+tower structure, where each successive layer has a smaller
+number of neurons. The premise is that by using a small
+number of hidden units for higher layers, they can learn
+more abstractive features of data [39]. Therefore, as depicted
+in Figure 4, we implement the hidden layers component
+following the tower structure with halved layer size for
+each successive higher layer. Such a design has also been
+shown to be effective by recent work on recommendation
+task [32]. Moreover, u and u′ are concatenated with weight
+adjustments λ before fed into the fully connected layers,
+which can help to learn high-order interactions between also
+has been shown to help learning higher-order interactions
+between u and u′ [32], [37].
+Output Layer. At last, the output vector of the last
+hidden layer h(n)
+i
+is transformed into a probability vector
+o, which contains the predictive link probability of ui to all
+the nodes in U:
+o = [p(u1|ui), p(u2|ui), · · · , p(uM|ui)].
+(6)
+Denoting the abstractive representation of a neighbor uj
+as ˜uj which corresponds to a row in the weight matrix
+˜U between the last hidden layer and the output layer, the
+proximity score between ui and uj can be deﬁned as below:
+f(ui, uj) = ˜uj · h(n)
+i
+,
+(7)
+which can be fed into Equation 1 for further obtaining the
+predictive link probability p(uj|ui) in vector o:
+p(uj|ui) =
+exp(˜uj · h(n)
+i
+)
+PM
+j′=1 exp(˜u′
+j · h(n)
+i
+)
+,
+(8)
+Fig. 4: Social network embedding (SNE) framework.
+where all the parameters Θ = {Θh, Wid, Watt, ˜U} and Θh
+denotes the weight matrices and biases in the hidden layers
+component.
+4.3.1
+Optimization
+To estimate the model parameters of the whole SNE frame-
+work, we need to specify an objective function to optimize.
+As detailed in Equation 3, we aim to maximize the condi-
+tional link probability over all nodes. In this way, the whole
+SNE framework is jointly trained to maximize the likelihood
+with respect to all the parameters Θ,
+Θ⋆= arg max
+Θ
+M
+Y
+i=1
+Y
+j∈Ni
+p(uj|ui)
+= arg max
+Θ
+X
+ui∈M
+X
+uj∈Ni
+log p(uj|ui)
+(9)
+= arg max
+Θ
+X
+ui∈M
+X
+uj∈Ni
+log
+exp(˜uj · h(n)
+i
+)
+P
+j′∈M exp(˜uj′ · h(n)
+i
+)
+. (10)
+Maximizing the softmax scheme in Equation 10 actually
+has two effects: to enhance the similarity between any ui
+and these u ∈Ni as well as to weaken that between any ui
+and these u ̸∈Ni. However, this causes two major problems.
+The ﬁrst one lies in the fact that if two social actors are
+not linked together, it does not necessarily mean they are
+dissimilar. For example, many users in social websites are
+not linked, not because they are dissimilar. Most of the
+times, it is simply because they never had the chance to
+know each other. Thus forcing dissimilarity between ui and
+all the other actors not inside Ni will be inappropriate.
+The second problem arises from the calculation of the nor-
+malization constant in Equation 10. In order to calculate a
+single probability, we need to go through all the actors in
+the whole network, which is computationally inefﬁcient. In
+order to avoid these problems, we apply negative sampling
+procedure [31], [40] where only a very small subset of users
+are sampled from the whole social network.
+The main idea is to do approximation in the gradient
+calculation procedure. When we consider the gradient of
+the log-probability in Equation 9, the gradient is actually
+composed of a positive and a negative part as follows,
+∇log p(uj|ui) = ∇f(ui, uj) −
+X
+j′∈M
+p(uj′|ui)∇f(ui, uj′),
+JOURNAL OF LATEX CLASS FILES, VOL. 14, NO. 8, MAY 2017
+6
+where f(ui, uj) = ˜uj · h(n)
+i
+as deﬁned in Equation 7. Note
+that given the actor ui, the negative part of the gradient is
+in essence the expected gradient of ∇f(ui, uj′), denoting
+as E[∇f(ui, uj′)]. The key idea for sampling a subset of
+social actors is to approximate this expectation, resulting in
+much lower computational complexity as well as avoiding
+too strong constraint on those not linked actors.
+To optimize the aforementioned framework, we ap-
+ply the Adaptive Moment Estimation (Adam) [41], which
+adapts the learning rate for each parameter by performing
+smaller updates for the frequent parameters and larger
+updates for the infrequent parameters. The Adam method
+combines the advantages of two popular optimization meth-
+ods: the ability of AdaGrad [42] to deal with sparse gra-
+dients, and the ability of RMSProp [43] to deal with non-
+stationary objectives. To address internal covariate shift [44]
+which slows down the training by requiring careful settings
+of learning rate and parameter initialization, we adopt batch
+normalization [44] in our multi-layer SNE framework. In
+the embedding layer and each hidden layer, we also add
+dropout component to alleviate overﬁtting. After proper
+optimization, we obtain abstractive representation h(n) and
+˜u for each social actor, similar to [34], [35], we use h(n)+˜u as
+the ﬁnal representation for each social actor, which returns
+us better performance results.
+4.4
+Connections to Other Models
+In this subsection, we discuss the connection of the pro-
+posed SNE framework to other related models. We show
+that SNE subsumes the state-of-the-art network embedding
+method node2vec [5] and the linear latent factor model
+SVD++ [45]. Specially, the two models can be seen as a
+special case of shallow SNE. To facilitate further discussion,
+we ﬁrst give the prediction model of the one-hidden-layer
+SNE as:
+f(ui, uj) = ˜uj · δ1(W(1)
+ ui
+λu′
+i
+
++ b(1)).
+(11)
+4.4.1
+SNE vs. node2vec
+The node2vec applies a shallow neural network model to
+learning node embeddings. Under the context of SNE, the
+essence of node2vec can be seen as estimating the proximity
+of two nodes as:
+fnode2vec(ui, uj) = ˜uj · ui.
+By setting λ to 0.0 (i.e., no attribute modeling), δ1 to an
+identity function (i.e., no nonlinear transformation), W(1) to
+an identity matrix and b(1) to a zero vector (i.e., no trainable
+hidden neurons), we can exactly recover the node2vec model
+from Equation 11.
+4.4.2
+SNE vs. SVD++
+The SVD++ is one of the most effective latent factor models
+for collaborative ﬁltering [45], originally proposed to model
+the ratings of users to items. Given a user u and an item i,
+the prediction model of SVD++ is deﬁned as:
+fSV D++(u, i) = qi ·
+
+pu +
+X
+k∈Ru
+yk
+
+,
+where pu (qi) denotes the embedding vector for user u (item
+i); Ru denotes the set of rated items for u, and yk denotes
+another embedding vector for item k for modeling the item–
+item similarity. By treating the item as a “neighbor” of the
+user for estimating the proximity, we reformulate the model
+using the symbols of our SNE:
+fSV D++(ui, uj) = ˜uj · (ui + u′
+i) ,
+where u′
+i denotes the sum of item embedding vectors of Ru,
+which corresponds to the aggregated attribute representa-
+tion of ui in SNE.
+To see how SNE subsumes the model, we ﬁrst set δ1 to an
+identity function, λ to 1.0, and b(1) to a zero vector, reducing
+Equation 11 to:
+f(ui, uj) = ˜uj · W(1)
+ui
+u′
+i
+
+.
+By further setting W(1) to a concatenation of two identity
+matrices (i.e. W(1) = [I, I]), we can recover the SVD++
+model:
+f(ui, uj) = ˜uj · (ui + u′
+i) .
+Through the connection between SNE and a family of shal-
+low models, we can see the rationality behind our design
+of SNE. Particularly, SNE deepens the shallow models so
+as to capture the underlying interactions between the net-
+work structure and attributes. When modeling real-world
+data that may have complex and non-linear inherent struc-
+ture [10], [33], our SNE is more expressive and can better ﬁt
+on the real-world data.
+5
+EXPERIMENTS
+In this section, we conduct experiments on four publicly
+accessible social network datasets to answer the following
+research questions.
+RQ1
+Can SNE learn better node representations as
+compared to state-of-the-art network embed-
+ding methods?
+RQ2
+What are the key reasons that lead to better
+representations learned by SNE?
+RQ3
+Are deeper layers of hidden units helpful for
+learning better social network embeddings?
+In what follows, we ﬁrst describe the experimental settings.
+We then answer the above three research questions one by
+one.
+5.1
+Experimental Setup
+5.1.1
+Datasets
+We conduct the experiments on four public datasets, which
+are representative of two types of social networks — social
+friendship networks and academic citation networks [46].
+The statistics of the four datasets are summarized in Table 2.
+FRIENDSHIP Networks. We use two Facebook net-
+works constructed by [9], which contain students from
+two American universities: University of Oklahoma (OK-
+LAHOMA) and University of North Carolina at Chapel
+Hill (UNC), respectively. Besides user ID, there are seven
+anonymized attributes: status, gender, major, second major,
+JOURNAL OF LATEX CLASS FILES, VOL. 14, NO. 8, MAY 2017
+7
+dorm/house, high school, class year. Note that not all stu-
+dents have the seven attributes available. For example, for
+the UNC dataset, only 4, 018 of the 18, 163 users contain all
+attributes (as plotted in Figure 1).
+CITATION Networks. For citation networks, we use
+the DBLP and CITESEER2 data used in [24]. Each node
+denotes a paper. The attributes are the title contents for
+each paper after removing stop words and the stemming
+process. The DBLP dataset consists of bibliography data in
+computer science from [47]3. A list of conferences from four
+research areas are selected. The CITESEER dataset consists
+of scientiﬁc publications from ten distinct research areas.
+These research areas are treated as class labels in the node
+classiﬁcation task.
+TABLE 2: Statistics of the datasets
+Dataset
+#(U)
+#(E)
+OKLAHOMA [9]
+17,425
+892,528
+UNC [9]
+18,163
+766,800
+DBLP [24]
+60,744
+52,890
+CITESEER [24]
+29,751
+77,218
+5.1.2
+Evaluation Protocols
+We adopt two tasks — link prediction and node classi-
+ﬁcation — which have been widely used in literature to
+evaluate network embeddings [3], [5]. While the link pre-
+diction task assesses the ability of node representations in
+reconstructing network structure [10], node classiﬁcation
+evaluates whether the representations contain sufﬁcient in-
+formation trainable for downstream applications.
+Link prediction. We follow the widely adopted way
+in [5], [10]: we randomly hold out 10% links as the test
+set, 10% as the validation set for tuning hyper-parameters,
+and train SNE on the remaining 80% links. Since the
+test/validation set contains only positive instances, we ran-
+domly sample the same number of non-existing links as
+negative instances [5], and rank both positive and negative
+instances according to the prediction function. To judge the
+ranking quality, we employ the area under the ROC curve
+(AUROC) [48], which is widely used in IR community
+to evaluate a ranking list. It is a summary measure that
+essentially averages accuracy across the spectrum of test
+values. A higher value indicates a better performance, and
+an ideal model that ranks all positive instances higher than
+negative instances has an AUROC value of 1.
+Node classiﬁcation. We ﬁrst train models on the training
+sets (with links and all attributes but no class labels) to
+obtain node representations; the hyper-parameters for each
+model are chosen based on the performance of link predic-
+tion. We then feed node representations into the LIBLINEAR
+package [49], which is widely adopted in [3], [10], to train
+a classiﬁer. To evaluate the classiﬁer, we randomly sample a
+portion of labeled nodes (ρ ∈{10%, 30%, 50%}) as training,
+using the remaining labeled nodes as test. We repeat this
+process 10 times, and report the mean of the Macro-F1
+and Micro-F1 scores. Note that since only the DBLP and
+2. http://citeseerx.ist.psu.edu/
+3. http://arnetminer.org/citation (V4 version is used)
+TABLE 3: The optimal hyper-parameter settings.
+OKLAHOMA
+UNC
+DBLP
+CITESEER
+SNE
+bs
+128
+256
+128
+64
+lr
+0.0001
+0.0001
+0.001
+0.001
+λ
+0.8
+0.8
+1.0
+1.0
+node2vec
+p
+2.0
+2.0
+1.0
+2.0
+q
+0.25
+1.0
+0.25
+0.125
+LINE
+S
+100
+100
+10
+10
+TriDNR
+tw
+0.6
+0.6
+0.8
+0.8
+CITESEER datasets contain class labels for nodes, the node
+classiﬁcation task is performed on the two datasets only.
+5.1.3
+Comparison Methods
+We compare SNE with several state-of-the-art network
+embedding methods.
+- node2vec [5]: It applies the Skip-Gram model [31]
+on the node sequences generated by biased random walk.
+There are two key hyper-parameters p and q that control the
+random walk, which we tuned them the same way as the
+original paper. Note that when p and q are set to 1, node2vec
+degrades to DeepWalk [3].
+- LINE [6]: It learns two embedding vectors for each
+node by preserving the ﬁrst-order and second-order proxim-
+ity of the network, respectively. Then the embedding vectors
+are concatenated as the ﬁnal representation for a node. We
+followed the hyper-parameter settings of [6] and the number
+of training samples S (millions) is adapted to our data size.
+- TriDNR [24]: It learns node representations by cou-
+pling multiple neural network models to jointly exploit
+the network structure, node–content correlation, and label–
+content correspondence. This is a state-of-the-art network
+embedding method that also uses attribute information.
+We searched the text weight (tw) hyper-parameter among
+[0.0, 0.2, ..., 1.0].
+For all baselines, we used the implementation released
+by the original authors. Note that although node2vec and
+LINE are state-of-the-art methods for embedding networks,
+they are designed to use only the structure information.
+For a fair comparison with SNE that additionally exploits
+attributes, we further extend them to include attributes
+by concatenating the learned node representation with the
+attribute feature vector. We dub the variants node2vec+ and
+LINE+. Moreover, we are aware of a recent network em-
+bedding work [22] also considering attribute information.
+However, due to the unavailability of their codes, we do not
+further compare with it.
+5.1.4
+Parameter Settings
+Our implementation of SNE is based on TensorFlow4, which
+will be made available upon acceptance. Regarding the
+choice of activation function of hidden layers, we have
+tried rectiﬁed linear unit (ReLU), soft sign (softsign) and
+hyperbolic tangent function (tanh), ﬁnding softsign leads
+to the best performance in general. As such, we use soft-
+sign for all experiments. We randomly initialize model
+4. https://www.tensorﬂow.org/
+JOURNAL OF LATEX CLASS FILES, VOL. 14, NO. 8, MAY 2017
+8
+Ratio of links for trainning
+0.4
+0.5
+0.6
+0.7
+0.8
+AUROC value
+0.88
+0.89
+0.9
+0.91
+0.92
+0.93
+0.94
+0.95
+0.96
+0.97
+0.98
+node2vec
+LINE
+TriDNR
+node2vec+attr
+LINE+attr
+SNE
+(a) OKLAHOMA
+Ratio of links for trainning
+0.4
+0.5
+0.6
+0.7
+0.8
+AUROC value
+0.88
+0.89
+0.9
+0.91
+0.92
+0.93
+0.94
+0.95
+0.96
+0.97
+0.98
+node2vec
+LINE
+TriDNR
+node2vec+attr
+LINE+attr
+SNE
+(b) UNC
+Ratio of links for trainning
+0.4
+0.5
+0.6
+0.7
+0.8
+AUROC value
+0.78
+0.8
+0.82
+0.84
+0.86
+0.88
+0.9
+0.92
+0.94
+0.96
+0.98
+node2vec
+LINE
+TriDNR
+node2vec+attr
+LINE+attr
+SNE
+(c) DBLP
+Ratio of links for trainning
+0.4
+0.5
+0.6
+0.7
+0.8
+AUROC value
+0.7
+0.72
+0.74
+0.76
+0.78
+0.8
+0.82
+0.84
+0.86
+0.88
+0.9
+node2vec
+LINE
+TriDNR
+node2vec+attr
+LINE+attr
+SNE
+(d) CITESEER
+Fig. 5: Performance of link prediction on social networks w.r.t. different network sparsity (RQ1).
+parameters with a Gaussian distribution (with a mean
+of 0.0 and standard deviation of 0.01), optimizing the
+model with mini-batch Adam [41]. We test the batch size
+(bs) of [8, 16, 32, 64, 128, 256] and the learning rate (lr) of
+[0.1, 0.01, 0.001, 0.0001]. The search space of the concatena-
+tion hyper-parameter λ is the same as tw of TriDNR, where
+a value of λ = 0.0 degrades to a model that considers only
+the structure (c.f., Section 4.1). The concatenation parameter
+λ is searched in same space as tw. More detailed impact of
+λ is studied in Section 5.2.3. The embedding dimension d is
+set to 128 for all methods in line with node2vec and LINE.
+The hyper-parameter p and q for controlling the walking
+procedure are set to be the same with that of node2vec.
+Without special mention, we use two hidden layers, i.e.,
+n = 2. Table 3 summarizes the optimal hyper-parameters
+of each method tuned on validation sets.
+5.2
+Quantitative Analysis (RQ1)
+5.2.1
+Link Prediction
+Figure 5 shows the AUROC scores of SNE and baseline
+methods on the four datasets. To explore the robustness
+of embedding methods w.r.t. the network sparsity, we vary
+the ratio of training links and investigate the performance
+change. The key observations are as follows:
+1) Our proposed SNE achieves the best performance
+among
+all
+methods.
+Notably,
+compared
+to
+the
+pure
+structure-based methods node2vec and LINE, our SNE per-
+forms signiﬁcantly better with only half links. This demon-
+strates the usefulness of attributes in predicting missing
+links, as well as the rationality of SNE in leveraging at-
+tributes for learning better node representation. Moreover,
+we observe more dramatic performance drop of node2vec
+and LINE on DBLP and CITESEER, as compared to that of
+OKLAHOMA and UNC. The reason is that the DBLP and
+CITESEER datasets contain less link information (as shown
+in Table 2); as such, the link sparsity problem becomes more
+severe when the ratio of training links decreases. On the
+contrary, our SNE exhibits more stability when we use fewer
+links for training, which is credible to its effective modeling
+of attributes.
+2) Focusing on methods that account for attributes, we
+ﬁnd how to incorporate attributes plays a pivotal role for
+the performance. First, node2vec+ (LINE+) slightly improves
+over node2vec (LINE), which reﬂects the value of attributes.
+Nevertheless, the rather modest improvements indicate that
+simply concatenating attributes with the embedding vector
+is insufﬁcient to fully leverage the rich signal in attributes.
+This reveals the necessity of designing a more principled
+approach to incorporate attributes into the network em-
+bedding process. Second, we can see that SNE consistently
+outperforms TriDNR — the most competitive baseline that
+also incorporates attributes into the network embedding
+process. Although TriDNR is a joint model, it separately
+trains the structured-based DeepWalk and attributed-fused
+Doc2Vec during the optimization process, which can be
+sub-optimal to leverage attributes. In contrast, our SNE
+seamlessly incorporates attributes by an early fusion on the
+input layer, which allows the following hidden layers to
+capture complex structure–attribute interactions and learn
+more informative node representations.
+3). Comparing the two structure-based methods, we
+observe that node2vec generally outperforms LINE across all
+the four datasets. This result is in consistent with Grover and
+Leskovec [5]’s ﬁnding. One plausible reason for node2vec’s
+superior performance might be that by performing ran-
+dom walks on the social network, higher-order proxim-
+ity information can be captured. In contrast, LINE only
+models the ﬁrst- and second-order proximities, which fails
+in capturing sufﬁcient information for link prediction. To
+justify this, we have further explored an additional baseline
+that directly utilizes the second-order proximity by ranking
+nodes according to their common neighbors. As expected,
+the performance is weak for all datasets (lower than the
+bottom line of each subﬁgure), which again demonstrates
+the need for learning higher-order proximities via network
+embedding. Since our SNE shares the same walking proce-
+dure as node2vec, it is also capable of learning from higher-
+order proximities, which are further complemented by the
+attribute information.
+5.2.2
+Node Classiﬁcation
+Table 4 shows the macro-F1 and micro-F1 scores obtained
+by each method on the classiﬁcation task. Upon getting
+the node representations, we train the LIBLINEAR classiﬁer
+with different ratios of labeled data (ρ ∈{10%, 30%, 50%}).
+JOURNAL OF LATEX CLASS FILES, VOL. 14, NO. 8, MAY 2017
+9
+The performance trends are generally consistent with that
+of the link prediction task.
+First and foremost, SNE achieves the best performance
+among all the methods for all settings, and the one-sample
+paired t-test veriﬁes that all improvements are statistically
+signiﬁcant for p < 0.05. The performance of SNE is fol-
+lowed by that of TriDNR, and then followed by that of
+the attribute-based methods node2vec+ and LINE+; node2vec
+and LINE which use only the network structure perform
+the worst. This further justiﬁes the usefulness of attributes
+on social networks, and such that properly modeling them
+can lead to better representation learning and beneﬁt down-
+stream applications. Among the four attribute-based meth-
+ods, SNE and TriDNR demonstrate superior performance
+over node2vec+ and LINE+, which points to the positive
+effects of incorporating attributes into the network embed-
+ding process.
+It is worth pointing out that the ground-truth labels of
+the node classiﬁcation task are not involved in the network
+embedding process. Despite this, SNE can learn effective
+representations that support the task well. This is attributed
+to SNE’s modeling of network structure and attributes in a
+sound way, which leads to comprehensive and informative
+representations for nodes.
+5.2.3
+Impact of λ
+We further explore the impact of λ which adjusts the im-
+portance of attributes. Both the link prediction task and
+the node classiﬁcation task are evaluated under the same
+evaluation protocols as Section 5.1.2. For a clear comparison,
+we plot the results in Figure 6. The link prediction results
+are reported under training on 80% of links. The node
+classiﬁcation results are obtained from training on 50% of
+labeled nodes.
+Due to the fact that λ actually can be set to any real
+number under our learning framework, we ﬁrst broadly
+explore the impact of λ on the range [0, 0.01, 0.1, 1, 10, 100].
+Setting λ to 0 returns the pure structure modeling, while
+setting it to a large number approximates the pure attribute
+modeling. We found that good results are generally obtained
+within [0, 1] across datasets. When λ becomes relatively
+large and the attribte part overweights the structure part,
+the performance even becomes worse than pure structure
+modeling. Therefore, we focus our exploration on the range
+[0, 1] at an interval of 0.2.
+Generally, attributes play an important role in SNE as
+evidenced by the improving performance when λ increases.
+We observe similar trends for both the link prediction and
+node classiﬁcation tasks across datasets. If we ignore the
+attribute information by setting λ = 0.0, SNE degrades to
+pure structure modeling as detailed in subsection 4.1. Its
+corresponding performance is the worst for both tasks, as
+compared to the attributes included counterparts. Moreover,
+the performance improvements on DBLP and CITESEER
+are relatively larger. Speciﬁcally, we observe a dramatic im-
+provement of performance on CITESEER when λ increases
+from 0.0 to 0.2. As there is less link information in these two
+datasets as shown in Table 2, the performance improvement
+indicates that attributes help to alleviate the link sparsity
+problem.
+6
+0.0
+0.2
+0.4
+0.6
+0.8
+1.0
+AUROC value
+0.8
+0.82
+0.84
+0.86
+0.88
+0.9
+0.92
+0.94
+0.96
+0.98
+OKLAHOMA
+UNC
+DBLP
+CITESEER
+(a) Link prediction
+(b) Node classiﬁcation
+Fig. 6: Performance results with different λ (RQ1).
+In addition, we observe that the pure structure model
+(λ = 0.0) outperforms node2vec if we further compare the
+results with Figure 5 for link prediction and Table 4 for
+node classiﬁcation. Since the same p, q setting as node2vec
+are leveraged, we attribute the performance improvements
+to the non-linearity introduced by the hidden layers.
+5.3
+Qualitative Analysis (RQ2)
+To understand why SNE can achieve better results than the
+other methods, we carry out a case study on the DBLP
+dataset in this subsection. Given the node representations
+learned by each method, we retrieve the three most similar
+papers w.r.t. a given query paper. Speciﬁcally, we measure
+the similarity using the cosine distance. For a fair compari-
+son with the structure-based methods, the query paper we
+choose is a well-cited paper of KDD 2006 named “Group
+formation in large social networks: membership, growth, and
+evolution”. According to Google Scholar by 15/1/2017, its
+citation number reaches 1510. Based on the content of this
+query paper, we expect that relevant results should be about
+the structure evolution of groups or communities in social
+networks. The top results retrieved by different methods are
+shown in Table 5.
+JOURNAL OF LATEX CLASS FILES, VOL. 14, NO. 8, MAY 2017
+10
+TABLE 4: Averaged Macro-F1, Micro-F1 scores for node classiﬁcation task. ⋆denotes the statistical signiﬁcance for
+p < 0.05. (RQ1)
+Dataset
+CITESEER
+DBLP
+Method
+LINE
+node2vec
+LINE+
+node2vec+
+TriDNR
+SNE
+LINE
+node2vec
+LINE+
+node2vec+
+TriDNR
+SNE
+macro
+10%
+0.548
+0.606
+0.597
+0.613
+0.618
+0.653⋆
+0.565
+0.617
+0.619
+0.631
+0.665
+0.699⋆
+30%
+0.580
+0.625
+0.631
+0.630
+0.692
+0.715⋆
+0.586
+0.632
+0.636
+0.642
+0.702
+0.725⋆
+50%
+0.619
+0.667
+0.670
+0.682
+0.736
+0.752⋆
+0.628
+0.677
+0.692
+0.695
+0.715
+0.761⋆
+micro
+10%
+0.573
+0.623
+0.607
+0.628
+0.644
+0.675⋆
+0.587
+0.647
+0.661
+0.686
+0.750
+0.763⋆
+30%
+0.614
+0.653
+0.667
+0.695
+0.714
+0.732⋆
+0.632
+0.665
+0.678
+0.749
+0.778
+0.786⋆
+50%
+0.661
+0.695
+0.691
+0.717
+0.756
+0.767⋆
+0.678
+0.733
+0.732
+0.753
+0.785
+0.804⋆
+TABLE 5: Top three results returned by each method (RQ2)
+Query: Group formation in large social networks: membership,
+growth, and evolution5
+SNE
+1. Structure and evolution of online social networks
+2. Discovering temporal communities from social network documents
+3. Dynamic social network analysis using latent space models
+TriDNR
+1. Inﬂuence and correlation in social networks
+2. A framework for analysis of dynamic social networks
+3. A framework for community identiﬁcation in dynamic social
+networks
+node2vec
+1. Latent Dirichlet Allocation
+2. Maximizing the spread of inﬂuence through a social network
+3. Mining the network value of customers
+LINE
+1. Graphs over time: densiﬁcation laws, shrinking diameters and
+possible explanations
+2. Maximizing the spread of inﬂuence through a social network
+3. Relational learning via latent social dimensions
+First of all, we see that SNE returns rather relevant re-
+sults: all the three papers are about dynamic social network
+analysis and community structures. For example, the ﬁrst
+one considers the evolution of structures such as communi-
+ties in large online social networks

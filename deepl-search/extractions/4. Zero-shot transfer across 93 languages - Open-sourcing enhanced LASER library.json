@@ -1,0 +1,22 @@
+{
+  "source": "4. Zero-shot transfer across 93 languages - Open-sourcing enhanced LASER library.pdf",
+  "source_group": "Awesome-ML-Papers/Neural Machine Translation",
+  "processed_at": "2026-06-08",
+  "agent": "agent6_remaining",
+  "concepts": [
+    {
+      "finding": "LASER embeds sentences from 93 languages in a single shared space, achieving zero-shot cross-lingual transfer: models trained on English data can predict for 90+ languages without adaptation.",
+      "category": "TargetConstruct",
+      "implication": "Massively multilingual sentence encoders enable language-agnostic query understanding with a single model handling queries in 90+ languages.",
+      "open_question": "Does LASER-style multilingual training generalize to query-level (short text) understanding as well as sentence-level tasks?",
+      "testable_hypothesis": "A LASER-trained multilingual encoder will achieve zero-shot query intent classification within 10% F1 of per-language supervised models for 50+ languages."
+    },
+    {
+      "finding": "LASER sets new SOTA on zero-shot cross-lingual NLI for 13/14 languages in XNLI and achieves strong results on multilingual similarity search.",
+      "category": "Evaluation",
+      "implication": "Shared multilingual embedding spaces can be evaluated on zero-shot transfer tasks, providing a framework for evaluating query embedding quality across languages.",
+      "open_question": "What is the practical upper bound of zero-shot cross-lingual query understanding vs. few-shot adaptation?",
+      "testable_hypothesis": "Zero-shot cross-lingual query intent classification using LASER will achieve >80% of the accuracy of few-shot (100 examples per language) baselines across 20 languages."
+    }
+  ]
+}

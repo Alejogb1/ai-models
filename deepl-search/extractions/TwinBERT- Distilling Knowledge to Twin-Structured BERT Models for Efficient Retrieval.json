@@ -1,0 +1,15 @@
+{
+  "source": "TwinBERT- Distilling Knowledge to Twin-Structured BERT Models for Efficient Retrieval",
+  "source_group": "Awesome-ML-Papers/Ranking",
+  "processed_at": "2026-06-08T12:00:00Z",
+  "agent": "agent_batch_generation",
+  "concepts": [
+    {
+      "finding": "TwinBERT: lightweight dual-encoder with two BERT sub-encoders (query, document) sharing weights. Knowledge distillation from cross-attention BERT teacher. Key techniques: (1) layer reduction (4-6 layers vs 12), (2) shared weights across towers, (3) late interaction after pooling. Achieves 10-50x speedup over cross-attention with <3% accuracy loss.",
+      "category": "ModelCandidate",
+      "implication": "For keyword-intent production systems: lightweight dual-encoder with shared weights is efficient. Knowledge distillation from a more powerful (cross-attention) model improves quality. Late interaction (pooled embeddings) is faster than full cross-attention.",
+      "open_question": "What is the minimum encoder size for effective keyword-intent matching? Is there a practical accuracy-speed tradeoff curve?",
+      "testable_hypothesis": "A TwinBERT-style lightweight keyword encoder (4-layer transformer, dual-tower with shared weights) achieves 95%+ of full BERT keyword-intent accuracy at 10x lower latency."
+    }
+  ]
+}

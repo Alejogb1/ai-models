@@ -1,0 +1,36 @@
+{
+  "source": "Image Style Transfer Using Convolutional Neural Networks.pdf",
+  "source_group": "Awesome-ML-Papers/Other",
+  "processed_at": "2026-06-08",
+  "agent": "agent5_final",
+  "concepts": [
+    {
+      "finding": "Although these algorithms achieve remarkable results,\nthey all suffer from the same fundamental limitation: they\nuse only low-level image features of the target image to in-\nform the texture transfer.",
+      "category": "TargetConstruct",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "How to address the limitation described: Although these algorithms achieve remarkable results,\nthey all suffer from the same fundamental limitation: they\nuse only low-level image features of the target image to in-\nform the texture transfer.",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "This general approach has been used\nbefore in the context of texture synthesis [12, 25, 10] and to\nimprove the understanding of deep image representations\n[27, 24].",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "A strong\nemphasis on style will result in images that match the ap-\npearance of the artwork, effectively giving a texturised ver-\nsion of it, but show hardly any of the photograph’s content\n(α/β = 1 × 10−4, Fig 4, top left).",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "While we\nare able to show results of high perceptual quality, there are\nstill some technical limitations to the algorithm.",
+      "category": "FailureRisk",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "How to address the limitation described: While we\nare able to show results of high perceptual quality, there are\nstill some technical limitations to the algorithm.",
+      "testable_hypothesis": ""
+    }
+  ]
+}

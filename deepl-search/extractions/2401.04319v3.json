@@ -1,0 +1,148 @@
+{
+  "source": "2401.04319v3.pdf",
+  "source_group": "Web-Sources",
+  "processed_at": "2026-06-08",
+  "agent": "agent5_final",
+  "concepts": [
+    {
+      "finding": "As shown\nin Figure 2, given a marketer demand 𝑑𝑝that needs to predict the\ncorresponding SELL expression, we first retrieve similar demands\n𝑑𝑒in R based on their text embedding similarity:\n𝑠𝑖𝑚(𝑑𝑝,𝑑𝑒) = 𝑐𝑜𝑠(E(𝑑𝑝), E(𝑑𝑒)),𝑑𝑒∈R\n(1)\nwhere E is the embedding model in which we use BGE-large-zh\n[27, 31] off",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "The experimental results on GPT-3.5\nshow that our analogical reasoning based prompting significantly\noutperforms other baseline prompting methods in the NL2SELL\ntask.",
+      "category": "Baseline",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Beyond that, we\ndistill knowledge from super LLMs (GPT-3.5) to fine-tune smaller\n∗Equal contributions\n†Corresponding author\nPermission to make digital or hard copies of all or part of this work for personal or\nclassroom use is granted without fee provided that copies are not made or distributed\nfor ",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Since\nthe white-box and smaller model is preferred, we distill knowl-\nedge from teacher LLMs (GPT-3.5) to construct an NL2SELL dataset\nwith over 10,000 pieces of training samples and then propose a\nnovel multi-task training method with reasoning augmentation to\nimprove the reasoning ability of stude",
+      "category": "Experiment",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Inspired by the\nanalogical reasoning [6, 24, 30] in the classic artificial intelligence\nfield and CoT prompting methods in LLMs, we first propose a\nnovel prompting method enhanced by analogical reasoning and\nthen adopt a reasoning-augmented multi-task training strategy to\nfine-tune smaller LLMs.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Annotators who\nreceive good training will score the accuracy of the key, value, and\nlogic between 0 and 10, and finally provide an overall score.",
+      "category": "Experiment",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "The experimental results demon-\nstrate that: (1) ARAP significantly outperforms other prompting\n2https://github.com/hiyouga/LLaMA-Factory\n52\n54\n56\n58\n60\n62\n1\n2\n3\n4\n5\nS-BLEU\nNumber of Examples\n图表标题\n(b)\n54\n55\n56\n57\n58\n59\n25\n50\n75\n100\n125\n150\nS-BLEU\nSize of Reasoning Library\n图表标题\n(a)\nFigure 3: The impa",
+      "category": "Baseline",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Table 5\nshows the effect of the knowledge distilled from answer to demand\n(a2d), it can be found that when removing this part of data during\nthe fine-tuning, the performance on both ARAFT and ARAFT - RS\nsignificantly decreases, although this part of data only accounts\nfor about one-tenth of the trai",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "We conduct online A/B exper-\niments to compare our methods with the traditional rule-based\nmethods and use the direct metrics CTR (Click-Through-Rate) and\nExposure (the number of users who have been exposed by the cam-\npaign) to evaluate them.",
+      "category": "Experiment",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "The model-based methods expand a given seed set by calculating\nthe similarity of all pairs between seed users and candidate users\n[16, 18] or training customized prediction models for each service or\nSearch\nCareer\nValue\nOp\nKey\nBelongs To\nCollege Students\nUser Number：\nxx,xxx,xxx\nPreference\nValue\nOp\nK",
+      "category": "ModelCandidate",
+      "implication": "Can inform intent modeling for recommendation systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "OR\nAND\nExport\nDrama-Lover\nYoungster\nCollege Students\nFirst tier city\nArt-lover\nIntellectual\nEmbedding Recall\nRL Embs\nTag Embs\nPrompt Filling\nTop k\nTop n\n(Instruction):\n(Demonstrations):\n(Input):\nDemand:\nTag list:\nLLM Inference\nParse\n(Age#Between#18,35)…\nKey: xx|Op:xx|Value: xx\n……\nFigure 4: The appli",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Some works also explore solving\nNL2SQL tasks with in-context learning [7, 15], it has been pointed\nout that LLMs show strong few-shot or zero-shot abilities even\nwithout any training data, which start a new direction for future\nresearch on NL2SQL field.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "To stimulate the LLMs’ rea-\nsoning ability, the chain-of-thought (CoT) prompting method is\nwidely used, but existing methods still have some limitations in\nour scenario: (1) Previous methods either use simple “Let’s think\nstep by step” spells or provide fixed examples in demonstrations\nwithout consi",
+      "category": "FailureRisk",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "How to address the limitation described: To stimulate the LLMs’ rea-\nsoning ability, the chain-of-thought (CoT) prompting method is\nwidely used, but existing methods still have some limitations in\nour scenario: (1) Previous methods either us",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "The experimen-\ntal results show that this prompting strategy achieves better per-\nformance than the ordinary prompting method.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Unfortunately, both of the above prior studies have primarily\nemphasized the intricate architectures for effectively and efficiently\ngathering targeted users, while commonly ignoring the natural\nand significant gap between marketers’ demand and the capability\nof current models.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "As shown in Figure 1 (c), the marketers only need\nto input their native demands like “Young people in City A who\nenjoy milk tea or white-collar workers in first-tier cities who en-\njoy listening to audiobooks” and our new approach can instantly\nconduct structured decomposition of marketers’ demands ",
+      "category": "TargetConstruct",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "We name it as SELL, i.e., Structured and Editable Logical Language,\nwhich mainly consists of Keys (e.g., Resident City), Values (e.g., City\nA), Operators (e.g., Belongs To) and Intersection/Union symbols\n(i.e., AND, OR).",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "However, there are still some challenges in using\nLLMs in our scenario: (1) The challenge of reasoning accuracy.",
+      "category": "Experiment",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "How to address the limitation described: However, there are still some challenges in using\nLLMs in our scenario: (1) The challenge of reasoning accuracy.",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "However, the key “Marital\nStatus, User Child Age, and Preferences” do not directly appear in\nthe marketer’s demand, which requires the LLMs to possess a high\nlevel of language comprehension and reasoning abilities.",
+      "category": "ModelCandidate",
+      "implication": "Can inform intent modeling for recommendation systems",
+      "open_question": "How to address the limitation described: However, the key “Marital\nStatus, User Child Age, and Preferences” do not directly appear in\nthe marketer’s demand, which requires the LLMs to possess a high\nlevel of language comprehension and reason",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "To address these challenges, we propose a framework called\nAnalogic Reasoning Augmented Large Language Model (ARALLM)\nto tackle the NL2SELL task, which consists of two modules: Analog-\nical Reasoning based Prompting and Reasoning-Augmented Multi-\nTask Model Distillation.",
+      "category": "FailureRisk",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "How to address the limitation described: To address these challenges, we propose a framework called\nAnalogic Reasoning Augmented Large Language Model (ARALLM)\nto tackle the NL2SELL task, which consists of two modules: Analog-\nical Reasoning ",
+      "testable_hypothesis": ""
+    }
+  ]
+}

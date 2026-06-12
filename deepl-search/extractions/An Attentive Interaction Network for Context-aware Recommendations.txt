@@ -1,0 +1,1267 @@
+See discussions, stats, and author profiles for this publication at: https://www.researchgate.net/publication/328437046
+An Attentive Interaction Network for Context-aware Recommendations
+Conference Paper · October 2018
+DOI: 10.1145/3269206.3271813
+CITATIONS
+7
+READS
+279
+6 authors, including:
+Some of the authors of this publication are also working on these related projects:
+click model View project
+Lei Mei
+Shandong University
+2 PUBLICATIONS   10 CITATIONS   
+SEE PROFILE
+Pengjie Ren
+34 PUBLICATIONS   189 CITATIONS   
+SEE PROFILE
+Jun Ma
+Shandong University
+130 PUBLICATIONS   888 CITATIONS   
+SEE PROFILE
+Jian-yun Nie
+Université de Montréal
+258 PUBLICATIONS   5,636 CITATIONS   
+SEE PROFILE
+All content following this page was uploaded by Lei Mei on 15 April 2019.
+The user has requested enhancement of the downloaded file.
+An A￿entive Interaction Network for Context-aware
+Recommendations
+Lei Mei∗
+Shandong University
+lei.mei@outlook.com
+Pengjie Ren∗
+Shandong University
+jay.ren@outlook.com
+Zhumin Chen
+Shandong University
+chenzhumin@sdu.edu.cn
+Liqiang Nie
+Shandong University
+nieliqiang@gmail.com
+Jun Ma
+Shandong University
+majun@sdu.edu.cn
+Jian-Yun Nie
+Université de Montréal
+nie@iro.umontreal.ca
+ABSTRACT
+Context-aware Recommender Systems (CARS) have attracted a lot
+of attention recently because of the impact of contextual informa-
+tion on user behaviors. Recent state-of-the-art methods represent
+the relations between users/items and contexts as a tensor, with
+which it is di￿cult to distinguish the impacts of di￿erent contex-
+tual factors and to model complex, non-linear interactions between
+contexts and users/items.
+In this paper, we propose a novel neural model, named Attentive
+Interaction Network (AIN), to enhance CARS through adaptively
+capturing the interactions between contexts and users/items. Specif-
+ically, AIN contains an Interaction-Centric Module to capture the
+interaction e￿ects of contexts on users/items; a User-Centric Module
+and an Item-Centric Module to model respectively how the interac-
+tion e￿ects in￿uence the user and item representations. The user
+and item representations under interaction e￿ects are combined to
+predict the recommendation scores. We further employ e￿ect-level
+attention mechanism to aggregate multiple interaction e￿ects.
+Extensive experiments on two rating datasets and one ranking
+dataset show that the proposed AIN outperforms state-of-the-art
+CARS methods. In addition, we also￿nd that AIN provides recom-
+mendations with better explanation ability with respect to contexts
+than the existing approaches.
+CCS CONCEPTS
+• Information systems →Recommender systems;
+KEYWORDS
+Context-aware Recommendations; Interaction Networks; Explain-
+able Recommendations
+∗Co-￿rst author.
+Permission to make digital or hard copies of all or part of this work for personal or
+classroom use is granted without fee provided that copies are not made or distributed
+for pro￿t or commercial advantage and that copies bear this notice and the full citation
+on the￿rst page. Copyrights for components of this work owned by others than ACM
+must be honored. Abstracting with credit is permitted. To copy otherwise, or republish,
+to post on servers or to redistribute to lists, requires prior speci￿c permission and/or a
+fee. Request permissions from permissions@acm.org.
+CIKM ’18, October 22–26, 2018, Torino, Italy
+© 2018 Association for Computing Machinery.
+ACM ISBN 978-1-4503-6014-2/18/10...$15.00
+https://doi.org/10.1145/3269206.3271813
+Home
+Wife
+Evening
+Figure 1: Illustration of context e￿ects on user behaviors.
+The solid arrows represent the e￿ects of contexts, and
+the thickness indicates the importance of context e￿ects.
+Dashed arrow reveals the change of user interest with the
+in￿uence of contexts.
+ACM Reference Format:
+Lei Mei, Pengjie Ren, Zhumin Chen, Liqiang Nie, Jun Ma, and Jian-Yun
+Nie. 2018. An Attentive Interaction Network for Context-aware Recom-
+mendations. In The 27th ACM International Conference on Information and
+Knowledge Management (CIKM ’18), October 22–26, 2018, Torino, Italy. ACM,
+New York, NY, USA, 10 pages. https://doi.org/10.1145/3269206.3271813
+1
+INTRODUCTION
+In Recommender Systems (RS), it is important to build models to
+capture the user’s interests and the interactions with items. Tra-
+ditional RS do not take into account the context such as time and
+location. However, the interest of a user may change depending on
+the context in which (s)he is. As illustrated in Figure 1, a user is
+interested in science￿ctions (e.g., Avatar) intrinsically. However,
+when he is at home with his wife in the evening (here the con-
+texts are “home”, “with his wife”, and “evening”), his interest might
+change, and he might prefer to watching romantic movies (e.g.,
+Titanic) at that moment. This example shows that it is essential
+to consider contexts in RS, since they have subtle but powerful
+e￿ects on user behaviors [32]. Such recommender system is called
+Context-aware Recommender System (CARS).
+The importance of context has been widely recognized in the
+area. Early studies [15, 30, 31] integrate contextual information
+by extending latent factor models, which usually treat contexts as
+Session 1D: Neural Recommendation
+CIKM’18, October 22-26, 2018, Torino, Italy
+157
+some additional dimensions similar to those of users and items,
+and capture relevances between contexts and users/items. A key
+problem with such an approach is the di￿culty to explain some ob-
+servations. For example, the latent factors would induce that a user
+has a stronger relation with “Friday” than with “Monday”, but this
+relation is hard to interpret. To solve this problem, recent studies
+propose to generate context-aware or context-speci￿c representa-
+tions of users and items. Shi et al. [32] present a new formulation
+of latent factor models based on context-aware representations of
+users and items. These representations are learned by including an
+additional layer of latent space for users/items given a context. Liu
+et al. [23] and Wu et al. [38] propose Contextual Operating Tensor
+(COT) model, which represents a context as a latent vector and the
+e￿ects of contexts as a tensor. Despite the fact that these models
+can cope with contexts to some extent, several issues remain. First,
+these approaches put all the contextual factors together, and expect
+that the latent model is capable of sorting out the impact of each
+of them. In other words, there are no explicit models for di￿erent
+types of interaction such as between context and user and between
+context and item. We believe that di￿erent types of interaction
+play di￿erent roles in CARS and they should be modeled in di￿er-
+ent ways explicitly. Second, the existing approaches rely on linear
+operations (e.g., matrix factorization) on the observation data to
+build models. The true in￿uence of the context may be much more
+complex. Therefore, the technical approaches used may be limited
+for this purpose. Third, di￿erent contexts usually have di￿erent
+e￿ects. For example, the context of “his wife’s companionship” is
+more important than “evening” as shown in Figure 1. However,
+the existing approaches only consider the overall context e￿ect,
+and they are unable to distinguish the di￿erent e￿ects of di￿erent
+contexts.
+In this paper, we will address the above problems. We￿rst refor-
+mulate the CARS task by de￿ning distinct objects (users, items, and
+contexts) and interactions (context-user interaction, context-item
+interaction, and user-item interaction), which makes a clear dis-
+tinction between di￿erent types of interaction. Then, inspired by
+recent advance of Interaction Networks (IN) [7], we propose a novel
+neural model, called Attentive Interaction Network (AIN), which
+explores the use of deep neural network to model the interaction
+e￿ects of contexts on user and item representations. IN is initially
+proposed for the physical reasoning task which involves physical
+objects and their relations. Here we treat the physical objects as
+users, items, and contexts and relations as the interactions among
+users, items, and contexts in CARS. Thus we can take advantage
+of IN to explicitly model the e￿ects of di￿erent interactions (i.e.,
+context-user interaction, context-item interaction, and user-item
+interaction) on users and items. This allows us to selectively pro-
+cess di￿erent types of interaction in di￿erent ways. Speci￿cally,
+AIN consists of three modules, namely Interaction-Centric Module,
+User-Centric Module, and Item-Centric Module. Interaction-Centric
+Module is designed to explicitly model the interaction e￿ects of con-
+texts on users/items, which takes users/items and contexts as input,
+and returns the e￿ects of context-user interactions and context-
+item interactions. User-Centric Module models how the e￿ects of
+context-user interactions in￿uence the user representations. It takes
+as input the aggregated interaction e￿ects and the user represen-
+tations, and returns the context-speci￿c representations for the
+users. Similarly, Item-Centric Module models how the e￿ects of
+context-item interactions in￿uence the item representations and
+returns the context-speci￿c representations for the items. Besides,
+we aggregate di￿erent interaction e￿ects with attention mechanism
+[8, 20, 39] to capture the adaptive e￿ects of di￿erent interactions. All
+neural parameters are trained in an end-to-end back-propagation
+paradigm.
+To sum up, the main contributions in this paper are as follows:
+• We enhance CARS by proposing AIN for explicitly modeling
+the high-order and non-linear interactions between contexts
+and users/items.
+• We augment AIN with context-aware attention mechanism
+to enable it capture the adaptive e￿ects of di￿erent contexts
+on users and items. With this mechanism, AIN can provide
+explainable recommendations by recognizing the most in￿u-
+ential contexts.
+• Through extensive experiments conducted on three real-
+world datasets, we show that AIN consistently outperforms
+the state-of-the-art CARS methods on both rating and rank-
+ing tasks.
+2
+RELATED WORK
+2.1
+Conventional methods
+Conventional CARS methods can be grouped into three categories:
+contextual pre-￿ltering, contextual post-￿ltering, and contextual mod-
+eling [1].
+Contextual pre-￿ltering methods use contextual information to
+drive data selection or data construction [2, 3, 27]. One popular
+technique for contextual pre-￿ltering is item splitting [4, 5], where
+each item is split into several￿ctitious items based on the contexts.
+Similarly to item splitting, Baltrunas and Amatriain [3] propose
+user splitting, which splits the user pro￿le into several sub-pro￿les
+and each sub-pro￿le represents the user in a particular context.
+Zheng et al. [41] propose UI splitting, which is a combination of
+item splitting and user splitting. Contextual post-￿ltering methods
+use contexts to adjust the recommendation results [27]. Panniello
+et al. [27] introduce two di￿erent contextual post-￿ltering methods:
+Weight and Filter; the former reorders the recommended items by
+weighting the predicted rating with the probability of relevance in
+the speci￿c context, while the latter￿lters out recommended items
+that have small probability of relevance in the speci￿c context.
+Contextual pre-￿ltering and post-￿ltering methods may work in
+practice, but they require supervision and￿ne-tuning in all steps
+of recommendation [30].
+Contextual modeling methods capture the contextual informa-
+tion directly in model constructions. Some studies are based on
+matrix factorization (MF) [6, 19, 42, 43]. Baltrunas et al. [6] present
+context-aware matrix factorization (CAMF), which extends MF
+by considering di￿erent in￿uences of contextual information on
+the item bias. Li et al. [19] introduce two improved context-aware
+matrix factorization approaches (ICAMF), where context-user and
+context-item interactions are modeled by MF. Moreover, Zheng
+et al. [42, 43] extend a new matrix factorization method called
+sparse linear method (SLIM), and introduce a series of contextual
+SLIM (CSLIM) models for top-N recommendations. Some studies
+are based on tensor factorization (TF) [12, 15, 31, 40]. Karatzoglou
+Session 1D: Neural Recommendation
+CIKM’18, October 22-26, 2018, Torino, Italy
+158
+et al. [15] propose multiverse recommendation, which employs
+the Tucker decomposition [34] on the user-item-context rating
+tensor. To tackle the context-aware recommendation for implicit
+feedbacks, Shi et al. [31] introduce a ranking based TF method
+by directly optimizing mean average precision. Other studies are
+based on factorization machines [25, 30]. Rendle et al. [30] apply
+factorization machines to model the interactions between each pair
+of entities through their latent factors (e.g., user-user, user-item,
+and user-context interactions). However, these methods usually
+treat contexts as certain dimensions similar to those of users and
+items. The relevance between a user and a context (or an item and
+a context) is not intuitive and di￿cult to interpret [32].
+To solve the above issues, recent studies propose to generate
+context-aware or context-speci￿c representations of users and items
+[22, 23, 32, 38]. Shi et al. [32] propose a novel CARS2 model which
+provides each user/item with not only a latent vector but also a
+context-aware representation. Liu et al. [23] and Wu et al. [38]
+represent the common semantic e￿ects of contexts as a contextual
+operating tensor. A contextual operating matrix generated from
+the tensor and context latent vectors is used to model the semantic
+operations of contexts on users and items.
+In summary, all above methods model the interactions between
+contexts and users/items in a linear way, which might be insu￿cient
+to capture the complex e￿ects of contexts on users and items.
+2.2
+Deep learning methods
+Deep learning has recently been applied to context-aware recom-
+mendation tasks and attracted signi￿cant attention.
+Huang et al. [14] and Ebesu and Fang [9] study the task of cita-
+tion recommendation, where context is de￿ned as a sequence of
+words that appear around a particular citation. Rawat and Kankan-
+halli [28] study the problem of multi-label image tagging; they
+present a uni￿ed framework to integrate context information with
+image content for tag prediction. Kim et al. [16] employ convolu-
+tional neural network to capture contextual information such as
+surrounding words and word orders to get a deeper understanding
+of item description documents. Unger et al. [35, 36] utilize an auto-
+encoder to extract latent contexts from a rich set of mobile sensors
+in a unsupervised manner. Liu et al. [24] introduce Context-Aware
+Recurrent Neural Networks (CA-RNN), which take into account the
+contextual information for sequential modeling tasks. He and Chua
+[11] propose Neural Factorization Machines (NFM) for sparse data
+prediction, which enhances FM by modeling high-order and non-
+linear feature interactions. Xiao et al. [39] introduce Attentional
+Factorization Machines (AFM) that enhances FM by learning the im-
+portance of feature interactions with an attention network. Similar
+to FM, NFM and AFM can be applied to the task of context-aware
+recommendations by specifying the input data.
+Although above studies explore the use of deep learning for
+modeling contextual information, they target di￿erent recommen-
+dation tasks from ours. Besides, most of the existing deep learning
+methods (including recently proposed NFM) fail to distinguish the
+di￿erent importance of di￿erent context e￿ects in context-aware
+recommendations, which is one of the major concerns of our work.
+Though AFM can automatically discriminate the importance of fea-
+ture interactions, it still models the feature interactions in a linear
+way. Besides, AFM models all types of interactions in the same
+way. These two limitations will limit the expressiveness of AFM in
+modeling the context e￿ects on users and items (as we show in the
+experiments).
+3
+ATTENTIVE INTERACTION NETWORK
+3.1
+Problem formulation
+The problem we deal with in this paper is item recommendation
+for users in a given context. We assume that there are M contextual
+factors C1, C2, ..., CM, such as location, companion, and time . A
+context value cm is a variable of the contextual factor Cm, where
+m = 1, ..., M. A unique combination (c1, ...,cM) is named context
+combination c. Let u 2 U and v 2 V denote a user and an item
+respectively. The task of CARS is to estimate the user-item prefer-
+ence score under a speci￿c context combination c as expressed in
+Eq. 1.
+ˆru,v,c = f (u,v,c1, ...,cM),
+c = (c1, ...,cM),
+(1)
+where f (·) denotes the predictive model. ˆru,v,c denotes the pre-
+dicted score for the user-item interaction ru,v,c under the context
+combination c.
+In this paper, we will model a user, an item and a context by a
+vector of latent factors. We use pu 2 RD to denote the latent vector
+of user u without any contexts, where D is the dimensionality of
+user latent vector. Similarly, qv 2 RD denotes the latent vector
+of item v without any contexts. We use hcm 2 RDc to denote the
+Dc-dimensional latent vector of context value cm.
+3.2
+General framework
+The overall framework of AIN is illustrated in Figure 2. It employs
+two symmetric pathways to model the e￿ects of contexts on users
+and items respectively. Each pathway is composed of three core
+components: 1) Interaction-Centric Module captures the e￿ects of
+interactions between contexts and users/items; 2) E￿ect-Level At-
+tention aggregates the interaction e￿ects with attention weights;
+3) User/Item-Centric Module models how the aggregated interac-
+tion e￿ects in￿uence users/items. Through the three components,
+AIN learns the context-speci￿c latent vector for user u, denoted
+by pu,c 2 RD, and the context-speci￿c latent vector for item v,
+denoted by qv,c 2 RD. pu,c and qv,c are then used to predict user
+u’s preference score ˆru,v,c for item v under context combination c
+as in Eq. 2.
+ˆru,v,c = µ + bu + bv +
+M
+’
+m=1
+bcm + pu,c T qv,c .
+(2)
+A key element in the above equation is the relation between a
+user and an item through context factors. This is formulated as the
+last element in the equation. The score is also in￿uenced by a set of
+biases: µ is the global bias; bu and bv are the biases of user u and
+item v respectively; and bcm is the bias of context value cm.
+Next, we￿rst present the details of Interaction-Centric Module,
+E￿ect-Level Attention, and User/Item-Centric Module. Note that we
+only elaborate on the user-side pathway, since the item-side path-
+way is implemented in a similar way but with di￿erent parameters.
+Then, we introduce the parameter learning process of AIN.
+Session 1D: Neural Recommendation
+CIKM’18, October 22-26, 2018, Torino, Italy
+159
+Attention 
+Mechanism
+Attention 
+Mechanism
+Interaction-Centric
+Module
+Effect-Level
+Attention
+User/Item-Centric
+Module
+Objects, 
+Interactions
+User
+Item
+Contexts
+Contexts
+Figure 2: The framework of AIN. Two pathways are employed to model the e￿ects of contexts on users and items. Each pathway
+is composed of three components: Interaction-Centric Module, E￿ect-Level A￿ention, and User/Item-Centric Module.
+Layer 1
+Layer 2
+Layer L
+……
+Bilinear Layer
+Hidden Layers
+Figure 3: The architecture of the user-side Interaction-
+Centric Module.
+3.3
+Interaction-Centric Module
+The goal of Interaction-Centric Module is to capture the e￿ects of
+interactions between contexts and users. To achieve this, we employ
+an interaction-centric function as shown in Eq. 3.
+eu,cm = fI(pu, hcm ),
+(3)
+where fI(·) denotes an interaction-centric function of two objects,
+i.e., useru and contextcm. eu,cm 2 RDe denotes the De-dimensional
+latent vector of interaction e￿ect.
+As shown in Figure 3, we use a multi-layer perceptron network
+to model the interaction. Since user and context are di￿erent kinds
+of objects with di￿erent characteristics, we￿rst map user latent
+vector pu and context latent vector hcm to a shared hidden space
+using a bilinear layer, as shown in Eq. 4.
+zφ = σ(Wφ
+uzpu + Wφ
+czhcm + bφ
+z ),
+(4)
+where Wφ
+uz and Wφ
+cz are the mapping matrices for user latent vector
+and context latent vector respectively, and bφ
+z is the bias term. The
+superscript φ refers to model parameters related to Interaction-
+Centric Module. σ(·) is the Recti￿er (ReLU) activation function [10],
+which is more biologically plausible and proven to be non-saturated.
+We then place a stack of fully connected layers above the bilinear
+layer as follows.
+zφ
+1 = σ1(Wφ
+1 zφ + bφ
+1 ),
+zφ
+2 = σ2(Wφ
+2 zφ
+1 + bφ
+2 ),
+· · · · · ·
+zφ
+L = σL(Wφ
+Lzφ
+L−1 + bφ
+L),
+(5)
+where L denotes the number of hidden layers. Wφ
+l , bφ
+l , σl(·), and
+zφ
+l denote the weight matrix, bias vector, ReLU activation function,
+and output vector of the l-th hidden layer respectively. As for the
+structure of hidden layers (i.e., size of each layer), we set all hidden
+layers with the same size.
+Finally, the output vector of the last hidden layer zφ
+L is trans-
+formed to the latent vector of the interaction e￿ect between user u
+and context cm, as shown in Eq. 6.
+eu,cm = Wφ
+zezφ
+L + bφ
+ze,
+(6)
+where Wφ
+ze and bφ
+ze denote the weight matrix and bias vector of
+the output layer respectively.
+3.4
+E￿ect-Level Attention
+To di￿erentiate the importance of interaction e￿ects, we propose
+E￿ect-Level Attention. Speci￿cally, given e￿ect latent vector eu,cm
+Session 1D: Neural Recommendation
+CIKM’18, October 22-26, 2018, Torino, Italy
+160
+and user latent vector pu, we use a single-layer perceptron to com-
+pute the attention score a(u,cm) as in Eq. 7.
+a(u,cm) = σ(Wτ
+1 eu,cm + Wτ
+2 pu + bτ ),
+(7)
+where Wτ
+1 and Wτ
+2 denote the weight matrices, and bτ is bias. The
+superscript τ refers to model parameters related to the attention
+calculation component. Then, the￿nal weights are obtained by nor-
+malizing the above attentive scores using softmax function, which
+can be interpreted as the importance of e￿ect eu,cm in in￿uencing
+user u, as shown in Eq. 8.
+β(u,cm) =
+exp(a(u,cm))
+ÕM
+n=1 exp(a(u,cn))
+.
+(8)
+After we obtain the e￿ect-level attention β(u,cm), the latent
+vector of aggregated e￿ects acting on user u is calculated by Eq. 9.
+Eu,c =
+M
+’
+m=1
+β(u,cm)eu,cm .
+(9)
+3.5
+User/item-Centric Module
+The goal of User-Centric Module is to predict how the e￿ects of
+context-user interactions in￿uence the user representations. Given
+the user latent vector pu and the latent vector of aggregated e￿ects
+Eu,c , we employ a user-centric function to learn the context-speci￿c
+latent vector pu,c for user u under context combination c as in
+Eq. 10.
+pu,c = fU(pu, Eu,c ),
+(10)
+where fU(·) denotes a user-centric function.
+Similar to Interaction-Centric Module, we￿rst use a bilinear layer
+to combine user latent vector pu and the latent vector of aggregated
+context e￿ects Eu,c , as shown in Eq. 11.
+zψ = σ(Wψ
+uzpu + Wψ
+ezEu,c + bψ
+z ),
+(11)
+where Wψ
+uz and Wψ
+ez are the weight matrices. bψ
+z and σ(·) denote
+the bias vector and ReLU function respectively. Note that the super-
+script ψ refers to model parameters related to User-Centric Module.
+To endow non-linearity to learn the complex e￿ects on the user,
+we apply a stack of fully connected layers above the bilinear layer
+as in Eq. 5. Assume that zψ
+L is the output of the last hidden layer.
+The output layer maps zψ
+L into a D-length context-speci￿c latent
+vector for user u, as shown in Eq. 12.
+pu,c = Wψ
+zuzψ
+L + bψ
+zu,
+(12)
+where Wψ
+zu, bψ
+zu denote the weight matrix and bias vector of the
+output layer respectively.
+3.6
+Objective function
+The proposed method can be used for predicting the rating or the
+ranking of an item for a user. We de￿ne the respective objective
+functions for the tasks. For rating task where ru,v,c is a real value,
+we minimize the following squared loss:
+min
+Θ
+’
+(u,v,c)2Rtrain
+(ru,v,c −ˆru,v,c )2,
+(13)
+where Θ denotes parameters to be learned and Rtrain denotes the
+training set.
+Table 1: Statistics of the evaluation datasets.
+Dataset
+Users
+Items
+Contexts
+Interactions
+Scale
+Food
+212
+20
+2
+6,360
+1-5
+Frappe
+953
+4073
+3
+95,889
+Raw frequency
+Yelp
+96,143
+49,482
+4
+2,283,913
+1-5
+For ranking task, we optimize the following pairwise ranking
+loss of BPR [29]:
+arg min
+Θ
+’
+(u,v,v0,c)2RB
+−lnд(ˆru,v,c −ˆru,v0,c ),
+(14)
+where v is an item preferred to item v0 for user u under context
+combination c and д(·) is the logistic function. The training data
+RB is generated as:
+RB =
+#
+(u,v,v0,c)|v 2 Rtrain(u) ^ v0 2 V \ Rtrain(u)
+ 
+,
+(15)
+where Rtrain(u) represents the set of items that are interacted by
+user u in training set Rtrain, and V is the set of all items.
+4
+EXPERIMENTAL SETUPS
+4.1
+Datasets
+We conduct our experiments on three publicly accessible datasets:
+Food [26], Yelp1 and Frappe. The characteristics of the three datasets
+are summarized in Table 1.
+(1) Food. This dataset was used by Ono et al. [26] and provided
+by authors. It contains 6,360 5-scale ratings by 212 users on 20
+menu items, and each rating is associated with 2 contextual
+factors. One factor describes if the situation in which the
+user rates is virtual or real (2 values: real and virtual), and
+the second factor captures how hungry the user is (3 values:
+hungry, normal and full). The dataset is used to test the rating
+task.
+(2) Yelp. To validate the scalability of AIN model, we use Yelp
+dataset in our experiment due to the lack of large-scale con-
+textual datasets. The original data is very large but highly
+sparse. As such, we further process the dataset by retaining
+users and items with at least 10 interactions. This results
+in a subset of data that contains 96,143 users, 49,482 items,
+and 2,283,913 interactions. We use the following contextual
+factors: year, month, day of the week, and city. This dataset
+is used to evaluate the rating task.
+(3) Frappe. This implicit feedback dataset is collected from
+Frappe2, which is a context-aware personalized recommender
+of mobile apps. In our experiments, we use 3 contextual fac-
+tors: daytime (with 7 possible values: e.g., morning or after-
+noon), day of the week (with 2 possible values: weekday and
+weekend), and location (with 3 possible values: work, home,
+and other place). This dataset is used for the ranking task.
+4.2
+Parameter settings
+Our framework is implemented with Tensor￿ow3. During training,
+we randomly initialize model parameters with a Gaussian distribu-
+tion (with a mean of 0 and standard deviation of 0.01), optimizing
+1https://www.yelp.com/dataset/challenge
+2http://frappe.cc/
+3https://www.tensor￿ow.org.
+Session 1D: Neural Recommendation
+CIKM’18, October 22-26, 2018, Torino, Italy
+161
+the model with mini-batch Adam [17]. The learning rate is set to
+0.001 and the batch size is set to 256. To prevent over￿tting, we
+employ dropout [33] with drop ratio 0.4. We set D = Dc = De = 64
+for user/item latent vectors, context latent vectors and e￿ect latent
+vectors. The size of the bilinear layer is set to 128, and the size of
+the hidden layers is set to 128. Without special mention, we em-
+ploy 2 hidden layers for Interaction-Centric Module, and 1 hidden
+layer for User/Item-Centric Module. We￿nd the optimal parameter
+settings for each baseline with grid search.
+5
+EVALUATION OF RATING PREDICTION
+WITH EXPLICIT FEEDBACK
+5.1
+Baselines
+We compare with the following methods on the rating prediction
+task.
+• MF [18]. This is the standard matrix factorization method
+that characterizes both users and items by latent vectors
+inferred from observed ratings. We use MF as a context-
+unaware baseline to show the performance gap between
+context-aware and context-unaware methods.
+• Multiverse Recommendation [15]. This method applies
+the Tucker decomposition to factorize the user-item-context
+n-dimensional tensor.
+• CAMF-C [6]. CAMF extends MF by considering di￿erent
+in￿uences of contextual information on the item bias. CAMF-
+C is a variant of CAMF which assumes that each context
+variable has a global in￿uence on rating, unrelated with the
+speci￿c item.
+• CAMF-CI [6]. Similar to CAMF-C, but CAMF-CI assumes
+that each context variable has di￿erent impacts on the rating
+of each item.
+• FM [30]. Factorization machines are easily applicable to a
+wide variety of context by specifying only the input data.
+We use LibFM4 to implement the method.
+• COT [23]. This method models the semantic operation of
+contexts on users and items using a contextual operating ma-
+trix, which is generated from a contextual operating tensor
+and latent vectors of contexts.
+• AFM [39]. AFM extends FM by utilizing the attention mech-
+anism to learn the importance of each feature interaction.
+• NFM [11]. This is a state-of-the-art neural network model
+for sparse data prediction. It deepens FM under the neural
+framework to learn high-order feature interactions.
+5.2
+Evaluation protocols
+We randomly split each explicit feedback dataset into three por-
+tions: 80% for training, 10% for validation, and 10% for testing. The
+validation set is used for tuning hyper-parameters and the￿nal
+performance comparison is conducted on the test set. For the eval-
+uation of rating prediction, we employ two metrics: root mean
+squared error (RMSE) and mean absolute error (MAE), which are
+conventional metrics for quantifying the rating prediction error.
+The smaller RMSE and MAE, the better the performance.
+4http://www.libfm.org
+Table 2: Performance comparison of AIN and baselines on
+Food and Yelp datasets. * indicates that our model AIN per-
+forms signi￿cantly better than COT as given by paired t-test
+with p < 0.05.
+Food
+Yelp
+RMSE
+MAE
+RMSE
+MAE
+MF
+1.167
+0.950
+1.128
+0.889
+Multiverse
+1.119
+0.901
+1.104
+0.878
+CAMF-C
+1.121
+0.900
+1.120
+0.879
+CAMF-CI
+1.123
+0.902
+1.123
+0.878
+FM
+1.065
+0.882
+1.109
+0.872
+COT
+1.055
+0.828
+1.100
+0.865
+AFM
+1.051
+0.839
+1.102
+0.853
+NFM
+1.013
+0.806
+1.103
+0.854
+AIN
+0.998⇤
+0.791⇤
+1.097⇤
+0.852⇤
+Table 3: Performance comparison of AIN and baselines on
+Frappe dataset. The results of BPR, TFMAP, and CARS2-Pair
+are obtained directly from [32]. * indicates that AIN per-
+forms signi￿cantly better than FM+BPR as given by paired
+t-test with p < 0.05.
+MAP@10
+P@5
+R@5
+P@10
+R@10
+BPR
+0.121
+0.061
+0.160
+0.037
+0.184
+TFMAP
+0.127
+0.061
+0.159
+0.039
+0.195
+CARS2-Pair
+0.140
+0.068
+0.183
+0.044
+0.226
+FM+BPR
+0.112
+0.071
+0.200
+0.053
+0.280
+AFM+BPR
+0.138
+0.081
+0.219
+0.056
+0.283
+NFM+BPR
+0.144
+0.085
+0.227
+0.056
+0.285
+AIN
+0.167⇤
+0.086⇤
+0.230⇤
+0.057⇤
+0.288⇤
+5.3
+Rating prediction results
+Table 2 illustrates the rating prediction performance w.r.t. RMSE
+and MAE on two explicit feedback datasets. It shows that our model
+consistently achieves the best performance on both MAE and RMSE
+metrics on all datasets. From the table, we have four main observa-
+tions. First, context-aware models outperform the context-unaware
+model MF. This con￿rms the importance of utilizing the contextual
+information in recommender systems. Second, our proposed AIN
+consistently outperforms all comparative context-aware methods.
+Generally, AIN obtains improvements over the best baseline NFM
+by 1.5% in RMSE and 1.9% in MAE on Food dataset. On Yelp dataset,
+AIN improves over the best baseline by 0.3% in RMSE and 0.1%
+in MAE. This observation con￿rms that considering the context
+e￿ects on user behavior and item properties and modeling their
+interactions nonlinearly with AIN leads to substantial performance
+in context-aware recommendations. Third, we observe that AIN
+outperforms COT on both datasets. This re￿ects the value of mod-
+eling context-user interactions and context-item interactions in
+a non-linear way, since COT only models higher-order interac-
+tions linearly. At last, we can see that AIN achieves improvements
+over NFM and AFM. This observation indicates the importance of
+modeling di￿erent types of interaction (context-user interaction,
+context-item interaction, and user-item interaction) in di￿erent
+ways, since NFM and AFM still models all types of interaction in
+the same way.
+Session 1D: Neural Recommendation
+CIKM’18, October 22-26, 2018, Torino, Italy
+162
+Table 4: Performance of AIN and AIN variants. AIN-USER refers to AIN without modeling the context e￿ects on items. AIN-
+ITEM refers to AIN without modeling the context e￿ects on users.
+Model
+Food
+Yelp
+Frappe
+RMSE
+MAE
+RMSE
+MAE
+MAP@10
+P@5
+R@5
+P@10
+R@10
+AIN-USER
+1.024
+0.827
+1.098
+0.859
+0.165
+0.091
+0.246
+0.061
+0.307
+AIN-ITEM
+1.034
+0.842
+1.100
+0.858
+0.168
+0.093
+0.251
+0.060
+0.303
+AIN
+0.998
+0.791
+1.097
+0.852
+0.167
+0.086
+0.230
+0.057
+0.288
+6
+EVALUATION OF RANKING WITH
+IMPLICIT FEEDBACK
+6.1
+Baselines
+We compare with the following methods on the ranking task.
+• BPR [29]. This method optimizes the MF model with a pair-
+wise ranking loss, which is tailored to learn from implicit
+feedback. Note that BPR is a context-unaware method.
+• TFMAP [31]. This method uses tensor factorization to model
+implicit feedback data with contextual information, and is
+learned by directly optimizing MAP.
+• CARS2-Pair [32]. It is an extended version of CARS2 method,
+which is adapted to implicit feedback by using a pair-wise
+ranking loss function.
+• FM+BPR. FM [30] is designed for the rating prediction task.
+Here we adapt FM for the ranking task on implicit feedback
+by optimizing it with the pair-wise ranking loss of BPR.
+• AFM+BPR and NFM+BPR. To apply deep learning method
+AFM [39] and NFM [11] to the ranking task on implicit
+feedback, we optimize AFM and NFM with the BPR pair-
+wise learning objective function respectively.
+6.2
+Evaluation protocols
+To evaluate the performance of top-N recommendation, we adopt
+the widely ranking evaluation metrics: recall, precision, and mean
+average precision (MAP). The higher the values of precision, recall
+and MAP, the better the recommendation performance. Note that
+we follow the convention in [32] and randomly sample 1000 items
+that have no feedback as irrelevant ones for each user under each
+context in the test set, and rank the test items among the 1000 items.
+6.3
+Ranking performance
+Table 3 shows the ranking performance of our AIN and comparative
+models on Frappe dataset. We can make the following observations.
+First, context-aware methods generally outperform the context-
+unaware method BPR by integrating contextual information into
+the model. This further con￿rms the usefulness of contextual in-
+formation for better recommendations. Second, AIN consistently
+outperforms the other context-aware methods. This demonstrates
+the e￿ectiveness of AIN in exploiting the context e￿ects on users
+and items. Third, we observe that CARS2-Pair shows improvement
+over TFMAP, which is attributed to its modeling of context-aware
+representations. Meanwhile, the performance gap between CARS2-
+Pair and our AIN indicates that AIN can learn high-quality context-
+speci￿c representations of users and items with contexts, which
+is conducive to estimating the interactions between contexts and
+users/items precisely. At last, AIN outperforms NFM and AFM. This
+further veri￿es the substantial in￿uence of modeling di￿erent types
+Table 5: Performance of AIN and AIN variants on Frappe
+dataset when recommending only new items to users.
+Model
+MAP@10
+P@5
+R@5
+P@10
+R@10
+AIN-USER
+0.0186
+0.0117
+0.0269
+0.0090
+0.0345
+AIN-ITEM
+0.0153
+0.0105
+0.0225
+0.0087
+0.0322
+AIN
+0.0199
+0.0121
+0.0263
+0.0094
+0.0356
+of interactions in di￿erent ways and the advantage of our proposed
+framework.
+7
+ANALYSIS AND CASE STUDY
+7.1
+Impact of context
+To investigate the e￿ects of contexts on users and items, we compare
+the performance of AIN and two variants of AIN. AIN-USER refers
+to AIN without modeling the context e￿ects on items, and AIN-
+ITEM refers to AIN without modeling the context e￿ects on users.
+The empirical results on three datasets are summarized in Table 4.
+We have the following￿ndings.
+First, AIN-USER slightly outperforms AIN-ITEM on Food and
+Yelp datasets. This indicates that considering the e￿ects of contexts
+on users is more e￿ective than considering the e￿ects of contexts on
+items to improve recommendation performance. This is reasonable
+because user interests are more easily in￿uenced by contexts as
+compared to item properties. Second, AIN outperforms both AIN-
+USER and AIN-ITEM on Food and Yelp datasets. This may be due to
+the fact that contexts characterize the situation where users interact
+with items, and are associated with both of them at the same time.
+Therefore, the performance can be further improved by taking into
+account the e￿ects of contexts on both users and items. At last, on
+Frappe dataset, it is interesting to￿nd that AIN-USER and AIN-
+ITEM achieve similar performance, while AIN performs worse. The
+reason behind this observation may be related to the particularity
+of the app usage scenario, where a user might use the same app
+repeatedly under various contexts. Moreover, compared with AIN,
+AIN-USER and AIN-ITEM are more likely to recommend a user the
+items that (s)he has already interacted with under other context
+combinations. To verify this, we restrict AIN to recommending new
+items to users, and conduct the same experiment on Frappe dataset
+in Table 5. From the table, we have two interesting￿ndings: 1) The
+performance of AIN, AIN-USER, and AIN-ITEM is much worse
+than before. This con￿rms the repetitiveness of app usage scenarios
+in Frappe dataset; 2) The performance of AIN is better than that
+of AIN-USER and AIN-ITEM (with the exception of AIN-USER on
+R@5). This indicates that the generalization ability of our AIN is
+better than that of AIN-USER and AIN-ITEM.
+Session 1D: Neural Recommendation
+CIKM’18, October 22-26, 2018, Torino, Italy
+163
+Table 6: Performance of AIN w.r.t. di￿erent context combi-
+nations on Food dataset.
+Model
+Context Combination
+Food
+RMSE
+MAE
+AIN
+Virtuality
+1.151
+0.930
+Hunger
+1.081
+0.877
+Virtuality+Hunger
+0.998
+0.791
+Table 7: Performance of AIN w.r.t. di￿erent context combi-
+nations on Yelp dataset.
+Model
+Context Combination
+Yelp
+RMSE
+MAE
+AIN
+Year
+1.107
+0.869
+Month
+1.107
+0.870
+Year+Month
+1.106
+0.867
+Year+Month+Day of the week
+1.103
+0.860
+Year+Month+Day of the week+City
+1.097
+0.852
+7.2
+Impact of context combinations
+To evaluate the contribution of each contextual factor to the perfor-
+mance, we further conduct experiments based on di￿erent combina-
+tion of these contextual factors on Food and Yelp datasets in Table 6
+and Table 7. We only show the combinations containing both Year
+and Month on Yelp dataset. Similar observations can be obtained
+from other context combinations. The following observations can
+be made:
+First, as can be seen from Table 6, the performance of considering
+Hunger is better than that of considering Virtuality. This indi-
+cates that when the user rates one kind of food, Hunger is more
+relevant to the rating results than Virtuality. Second, as shown
+in Table 7, considering only Year or Month achieve similar per-
+formance, and the performance can be improved by taking into
+account both of them. Besides, when we take more contextual fac-
+tors into account, the performance can be further improved. This
+clearly indicates the necessity of taking more useful contexts into
+consideration. At last, when all contexts are taken into account, AIN
+achieves the best performance on both datasets. This observation
+further helps to reach the same conclusion that accurate prediction
+of user preferences for items undoubtedly depends upon the degree
+to which the recommender system has incorporated the relevant
+contextual information into the model [1].
+7.3
+Impact of attention mechanism
+To demonstrate the utility of attention mechanism for AIN, we com-
+pare the performance of two versions of AIN – with and without
+attention mechanism. For AIN without attention mechanism, we
+use element-wise sum to aggregate the e￿ects of interactions. As
+shown in Table 8, AIN with attention mechanism obtains consid-
+erable improvements over the one without attention. This result
+veri￿es our assumption that di￿erent contextual factors have di￿er-
+ent in￿uence on users and items, and thus their respective impact
+should be properly incorporated in context-aware recommendation
+tasks.
+To con￿rm the necessity of adaptively modeling context weights
+(β(u,cm) in Eq. 8), we show the distribution of learned weights of
+(a) Monday
+(b) February
+Figure 4: Weight distributions of Monday and February on
+Yelp dataset.
+(a) user 0 (ID) (Food)
+(b) user 211 (ID) (Food)
+(c) user 17418 (ID) (Yelp)
+(d) user 32293 (ID) (Yelp)
+Figure 5: Visualization of attention weights learned by AIN.
+context “Monday” and “February” on Yelp dataset in Figure 4(a)
+and 4(b) respectively. The X-axis indicates the weight of a given
+context with interval of 0.01. The Y-axis indicates the number of
+instances with weight falling in an interval. As can be seen from
+Figure 4(a), although for a large number of instances, the weight
+of “Monday” falls in the interval [0.33,0.34], there are also quite
+some number of instances for which the weight scatters into other
+intervals. Similar observation can be noted from Figure 4(b). This
+indicates that the weights of context e￿ects vary with di￿erent
+users and di￿erent context combinations. What’s more, it further
+highlights the necessity of capturing the adaptive e￿ects of contexts.
+Besides the improved performance, the proposed attention mech-
+anism makes the context e￿ects more explainable through inter-
+preting the attention weights. To get a better understanding of this,
+we select some real cases from Food and Yelp datasets, and visu-
+alize the attention weights learned by AIN, as shown in Figure 5.
+Figure 5(a) shows the learned attention weights for user 0 under
+context combinations (real, hungry) and (real, full) respectively.
+5(b) shows the learned attention weights for user 211 under con-
+text combinations (real, hungry) and (real, full) respectively. 5(c)
+and 5(d) show the learned weights for user 17418 and user 32293
+Session 1D: Neural Recommendation
+CIKM’18, October 22-26, 2018, Torino, Italy
+164
+Table 8: Performance of AIN with and without attention mechanism at e￿ect level. EWS represents the element-wise sum and
+ATT represents the attention mechanism.
+Model
+Aggregation Type
+Food
+Yelp
+Frappe
+RMSE
+MAE
+RMSE
+MAE
+MAP@10
+P@5
+R@5
+P@10
+R@10
+AIN
+EWS
+1.010
+0.800
+1.098
+0.858
+0.145
+0.072
+0.197
+0.047
+0.244
+ATT
+0.998
+0.791
+1.097
+0.852
+0.167
+0.086
+0.230
+0.057
+0.288
+(f) Latent vector of item (with ID 10) 
+under (virtual, hungry)
+(e) Latent vector of item (with ID 10) 
+under (virtual, full)
+(c) Latent vector of user (with ID 173) 
+under (virtual, hungry)
+(b) Latent vector of user (with ID 173) 
+under (virtual, full)
+Predicted rating: 4.9
+Ground truth: 5 
+Predicted rating: 1.8
+Ground truth: 1
+(a) Latent vector of !"#$%&with ID 173) 
+ without any contexts
+(d) Latent vector of item &with ID 10) 
+ without any contexts
+Figure 6: Examples of user and item latent vectors under di￿erent context combinations. The di￿erences between latent vec-
+tors of the same user under di￿erent context combinations are marked in red rectangles, and the di￿erences between latent
+vectors of the same item under di￿erent context combinations are marked in blue rectangles.
+under (Year: 2011, May, Monday, Phoenix) respectively. We have
+the following observations.
+First, as shown in Figure 5(a), when user 0 rates one kind of food
+under context combination (real, hungry), the e￿ect of “real” is
+more important than that of “hungry”. Under (real, full), the e￿ect
+of “real” on user 0 becomes less important than the e￿ect of “full” on
+the user. Similar observations can also be obtained from Figure 5(b)
+This re￿ects the bene￿t of attention mechanism in e￿ectively dis-
+criminating the importance of di￿erent context e￿ects. Besides, we
+can obtain another interesting￿nding from Figure 5(c) and 5(d).
+When user 17418 rates a business under context combination (Year:
+2011, May, Monday, Phoenix), the e￿ect of “Monday” has the high-
+est attention weight, while the e￿ect of “Year: 2011” has a much
+smaller weight. However, for user 32293, the attention weight of
+“May” is higher than that of the other three under the same context
+combination. Similar observations can be made by comparing the
+two leftmost (or rightmost) bars in Figure 5(a) and Figure 5(b). This
+demonstrates that E￿ect-Level Attention is able to attribute di￿erent
+weights to contexts depending on users.
+7.4
+Case study
+To analyze the context e￿ects on learned user and item represen-
+tations, we select some real cases from Food dataset, shown in
+Figure 6. Figure 6(a) and 6(d) refer to the learned user and item
+representations without any contexts respectively. Figure 6(b) and
+6(e) refer to the learned user and item representations under con-
+text combination (virtual, hungry). Figure 6(c) and 6(f) refer to the
+learned user and item representations under context combination
+(virtual, hungry). From Figure 6, we can make two observations.
+On the one hand, it is shown that the given user’s rating over the
+same item varies greatly in di￿erent context combinations, as re-
+￿ected by the rating scores under Figure 6(e) and 6(f). The rating
+given by the user under (virtual, full) is the full mark 5. However,
+the user gives the lowest rating of 1 under (virtual, hungry). This
+Session 1D: Neural Recommendation
+CIKM’18, October 22-26, 2018, Torino, Italy
+165
+con￿rms that contexts have greatly in￿uence on user preferences.
+On the other hand, as can be seen from the red rectangles in Figure
+6(a), 6(b) and 6(c), there is a large di￿erence between the user rep-
+resentations under contexts and the user representation without
+any contexts. Besides, the user representation under (virtual, full)
+is also quite di￿erent from the user representation under (virtual,
+full). Similar observations can be made in the examples of the given
+item from Figure 6(d), 6(e), and 6(f) (especially in blue rectangles).
+These observations indicate that AIN can e￿ectively capture the dy-
+namic changes of user interests and item properties under di￿erent
+context combinations.
+8
+CONCLUSION AND FUTURE WORK
+In this paper, we propose AIN, which provides a novel deep learn-
+ing framework for modeling the e￿ects of contextual information.
+AIN explicitly models the adaptive e￿ects of interactions between
+contexts and users/items, and allows these e￿ects to further in-
+￿uence the latent representations of users/items. Experimental re-
+sults on three datasets show that AIN outperforms state-of-the-art
+context-aware methods on both rating prediction tasks and person-
+alized ranking tasks. Besides, we show that AIN can improve the
+interpretability of recommendations through identifying the most
+important contexts.
+We believe our work can be further extended in several direc-
+tions. First, we can incorporate recurrent neural networks into AIN
+for context-aware sequential recommendations, e.g., session-based
+recommendations [13, 37]. Second, we can also improve AIN by
+jointly considering explicit contexts as explored in this paper and
+implicit contexts, such as the contextual information implied in
+user reviews for an item [21].
+ACKNOWLEDGMENTS
+The authors thank the anonymous reviewers for their helpful com-
+ments. This work is supported by the National Natural Science
+Foundation of China (Grant No. 61672322, 61672324).
+REFERENCES
+[1] G. Adomavicius and A. Tuzhilin. Context-aware recommender systems. In
+Recommender Systems Handbook, pages 217–253. Springer, 2011.
+[2] G. Adomavicius, R. Sankaranarayanan, S. Sen, and A. Tuzhilin. Incorporating con-
+textual information in recommender systems using a multidimensional approach.
+ACM Transactions on Information Systems (TOIS), 23(1):103–145, 2005.
+[3] L. Baltrunas and X. Amatriain. Towards time-dependant recommendation based
+on implicit feedback. In RecSys Workshop, 2009.
+[4] L. Baltrunas and F. Ricci. Context-based splitting of item ratings in collaborative
+￿ltering. In RecSys, pages 245–248, 2009.
+[5] L. Baltrunas and F. Ricci. Experimental evaluation of context-dependent collabo-
+rative￿ltering using item splitting. User Modeling and User-Adapted Interaction,
+24(1-2):7–34, 2014.
+[6] L. Baltrunas, B. Ludwig, and F. Ricci. Matrix factorization techniques for context
+aware recommendation. In RecSys, pages 301–304, 2011.
+[7] P. W. Battaglia, R. Pascanu, M. Lai, D. J. Rezende, and K. Kavukcuoglu. Interaction
+networks for learning about objects, relations and physics. In NIPS, pages 4502–
+4510, 2016.
+[8] J. Chen, H. Zhang, X. He, L. Nie, W. Liu, and T.-S. Chua. Attentive collaborative
+￿ltering: Multimedia recommendation with item- and component-level attention.
+In SIGIR, pages 335–344, 2017.
+[9] T. Ebesu and Y. Fang. Neural citation network for context-aware citation recom-
+mendation. In SIGIR, pages 1093–1096, 2017.
+[10] X. Glorot, A. Bordes, and Y. Bengio. Deep sparse recti￿er neural networks. In
+AISTATS, pages 315–323, 2011.
+[11] X. He and T.-S. Chua. Neural factorization machines for sparse predictive analyt-
+ics. In SIGIR, pages 355–364, 2017.
+[12] B. Hidasi and D. Tikk. Fast als-based tensor factorization for context-aware
+recommendation from implicit feedback. In ECML PKDD, pages 67–82, 2012.
+[13] B. Hidasi, M. Quadrana, A. Karatzoglou, and D. Tikk. Parallel recurrent neural
+network architectures for feature-rich session-based recommendations. In RecSys,
+pages 241–248, 2016.
+[14] W. Huang, Z. Wu, C. Liang, P. Mitra, and C. L. Giles. A neural probabilistic model
+for context based citation recommendation. In AAAI, pages 2404–2410, 2015.
+[15] A. Karatzoglou, X. Amatriain, L. Baltrunas, and N. Oliver. Multiverse recom-
+mendation: N-dimensional tensor factorization for context-aware collaborative
+￿ltering. In RecSys, pages 79–86, 2010.
+[16] D. Kim, C. Park, J. Oh, S. Lee, and H. Yu. Convolutional matrix factorization for
+document context-aware recommendation. In RecSys, pages 233–240, 2016.
+[17] D. P. Kingma and J. Ba. Adam: A method for stochastic optimization. In ICLR,
+pages 1–15, 2015.
+[18] Y. Koren, R. Bell, and C. Volinsky. Matrix factorization techniques for recom-
+mender systems. Computer, 42(8):30–37, 2009.
+[19] J. Li, P. Feng, and J. Lv. Icamf: Improved context-aware matrix factorization for
+collaborative￿ltering. In ICTAIN, pages 63–70, 2013.
+[20] J. Li, P. Ren, Z. Chen, Z. Ren, T. Lian, and J. Ma. Neural attentive session-based
+recommendation. In CIKM, pages 1419–1428, 2017.
+[21] Y. Li, J. N

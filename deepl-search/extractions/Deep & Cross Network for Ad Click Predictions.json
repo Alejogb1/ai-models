@@ -1,0 +1,148 @@
+{
+  "source": "Deep & Cross Network for Ad Click Predictions.pdf",
+  "source_group": "Awesome-ML-Papers/CTR-CVR-Prediction",
+  "processed_at": "2026-06-08",
+  "agent": "agent5_final",
+  "concepts": [
+    {
+      "finding": "Te main contributions of the paper include:\n• We propose a novel cross network that explicitly applies feature\ncrossing at each layer, eﬃciently learns predictive cross features\nof boundeddegrees, and requires no manual feature engineering\nor exhaustive searching.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "1\nINTRODUCTION\nClick-through rate (CTR) prediction is a large-scale problem that is\nessential to multi-billion dollar online advertising industry.",
+      "category": "FailureRisk",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "1.2\nMain Contributions\nIn this paper, we propose the Deep & Cross Network (DCN) model\nthat enables Web-scale automaticfeature learning with both sparse\nand dense inputs.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "However, the process is nontrivial and ofen re-\nquires manual feature engineering or exhaustive searching.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "How to address the limitation described: However, the process is nontrivial and ofen re-\nquires manual feature engineering or exhaustive searching.",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "In this paper, we pro-\npose the Deep & Cross Network (DCN) which keeps the beneﬁts of\na DNN model, and beyond that, it introduces a novel cross network\nthat is more eﬃcient in learning certain bounded-degree feature\ninteractions.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Jointly training the cross and DNN compo-\nnents together, however, eﬃciently captures predictive feature in-\nteractions, and delivers state-of-the-art performance on the Criteo\nCTR dataset.",
+      "category": "Baseline",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "How to address the limitation described: Jointly training the cross and DNN compo-\nnents together, however, eﬃciently captures predictive feature in-\nteractions, and delivers state-of-the-art performance on the Criteo\nCTR dataset.",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "1.1\nRelated Work\nDue to the dramatic increase in size and dimensionality of datasets,\na number of methods have been proposed to avoid extensive task-\nspeciﬁc feature engineering, mostly based on embedding techniques\nand neural networks.",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Tere has been research\n[16, 17] showing that DNNs are able to approximate an arbitrary\nfunction under certain smoothness assumptions to an arbitrary\naccuracy, given suﬃciently many hidden units or hidden layers.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "However, the success of wide-and-deep\nhinges on a proper choice of cross features, an exponential problem\nfor which there is yet no clear eﬃcient method.",
+      "category": "FailureRisk",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "How to address the limitation described: However, the success of wide-and-deep\nhinges on a proper choice of cross features, an exponential problem\nfor which there is yet no clear eﬃcient method.",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "• Our experimental results have demonstrated that with a cross\nnetwork, DCN has lower logloss than a DNN with nearly an\norder of magnitude fewer number of parameters.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Section 4 shows the experimental results.",
+      "category": "Experiment",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "2.2\nCross Network\nTe key idea of our novel cross network is to apply explicit feature\ncrossing in an eﬃcient way.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Terefore, a cross network introduces negligible\ncomplexity compared to its deep counterpart, keeping the overall\ncomplexity for DCN at the same level as that of a traditional DNN.",
+      "category": "Baseline",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "To capture highly nonlinear interactions,\nwe introduce a deep network in parallel.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "4.1\nCriteo Display Ads Data\nTe Criteo Display Ads2 dataset is for the purpose of predicting\nads click-through rate.",
+      "category": "Experiment",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "2htps://www.kaggle.com/c/criteo-display-ad-challenge\n3More cross layers did not lead to signiﬁcant improvement, so we restrict ourselves\nin a small range for ﬁner tuning.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "How to address the limitation described: 2htps://www.kaggle.com/c/criteo-display-ad-challenge\n3More cross layers did not lead to signiﬁcant improvement, so we restrict ourselves\nin a small range for ﬁner tuning.",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Diﬀerent than DCN, its wide component takes as input raw\nsparse features, and relies on exhaustive searching and domain\nknowledge to select predictive cross features.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "In the\nlarge-parameter regime, the DNN closes some of the gap; however,\nDCN still outperforms DNN by a large amount, suggesting that it\ncan eﬃciently learn some types of meaningful feature interactions\nthat even a huge DNN model cannot.",
+      "category": "Baseline",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "How to address the limitation described: In the\nlarge-parameter regime, the DNN closes some of the gap; however,\nDCN still outperforms DNN by a large amount, suggesting that it\ncan eﬃciently learn some types of meaningful feature interaction",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "#Layers\n#Nodes\n32\n64\n128\n256\n512\n1024\n2\n-0.28\n-0.10\n-0.16\n-0.06\n-0.05\n-0.08\n3\n-0.19\n-0.10\n-0.13\n-0.18\n-0.07\n-0.05\n4\n-0.12\n-0.10\n-0.06\n-0.09\n-0.09\n-0.21\n5\n-0.21\n-0.11\n-0.13\n-0.00\n-0.06\n-0.02\nFigure 3 shows the improvement as we increase the number\nof cross layers on randomly selected setings.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Our experimental results have demonstrated its superiority over\nthe state-of-art algorithms on both sparse and dense datasets, in\nterms of both model accuracy and memory usage.",
+      "category": "Experiment",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    }
+  ]
+}

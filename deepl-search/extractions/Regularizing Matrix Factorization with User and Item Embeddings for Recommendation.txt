@@ -1,0 +1,1833 @@
+Regularizing Matrix Factorization with User and Item
+Embeddings for Recommendation
+Thanh Tran, Kyumin Lee
+Worcester Polytechnic Institute, USA
+{tdtran,kmlee}@wpi.edu
+Yiming Liao, Dongwon Lee
+Penn State University, USA
+{yiming,dongwon}@psu.edu
+ABSTRACT
+Following recent successes in exploiting both latent factor and word
+embedding models in recommendation, we propose a novel Regu-
+larized Multi-Embedding (RME) based recommendation model that
+simultaneously encapsulates the following ideas via decomposition:
+(1) which items a user likes, (2) which two users co-like the same
+items, (3) which two items users often co-liked, and (4) which two
+items users often co-disliked. In experimental validation, the RME
+outperforms competing state-of-the-art models in both explicit and
+implicit feedback datasets, significantly improving Recall@5 by
+5.9∼7.0%, NDCG@20 by 4.3∼5.6%, and MAP@10 by 7.9∼8.9%.
+In addition, under the cold-start scenario for users with the lowest
+number of interactions, against the competing models, the RME
+outperforms NDCG@5 by 20.2% and 29.4% in MovieLens-10M
+and MovieLens-20M datasets, respectively. Our datasets and source
+code are available at: https://github.com/thanhdtran/RME.git.
+KEYWORDS
+Recommendation; item embeddings; user embeddings; negative
+sampling; collaborative filtering.
+ACM Reference Format:
+Thanh Tran, Kyumin Lee and Yiming Liao, Dongwon Lee. 2018. Regulariz-
+ing Matrix Factorization with User and Item Embeddings for Recommenda-
+tion. In The 27th ACM International Conference on Information and Knowl-
+edge Management (CIKM ’18), October 22–26, 2018, Torino, Italy. ACM,
+New York, NY, USA, 10 pages. https://doi.org/10.1145/3269206.3271730
+1
+INTRODUCTION
+Among popular Collaborative Filtering (CF) methods in recommen-
+dation [14, 17, 29, 33], in recent years, latent factor models (LFM)
+using matrix factorization have been widely used. LFM are known to
+yield relatively high prediction accuracy, are language independent,
+and allow additional side information to be easily incorporated and
+decomposed together [1, 35]. However, most of conventional LFM
+only exploited positive feedback while neglected negative feedback
+and treated them as missing data [8, 14, 27, 34].
+In movie recommender systems, it was observed that many users
+who enjoyed watching Thor: The Dark World, also enjoyed Thor:
+Ragnarok. In this case, Thor: The Dark World and Thor: Ragnarok
+Permission to make digital or hard copies of all or part of this work for personal or
+classroom use is granted without fee provided that copies are not made or distributed
+for profit or commercial advantage and that copies bear this notice and the full citation
+on the first page. Copyrights for components of this work owned by others than ACM
+must be honored. Abstracting with credit is permitted. To copy otherwise, or republish,
+to post on servers or to redistribute to lists, requires prior specific permission and/or a
+fee. Request permissions from permissions@acm.org.
+CIKM ’18, October 22–26, 2018, Torino, Italy
+© 2018 Association for Computing Machinery.
+ACM ISBN 978-1-4503-6014-2/18/10...$15.00
+https://doi.org/10.1145/3269206.3271730
+2
+2
+1
+1
+Users
+Users
+Liked items
+items
+Co-liked items
+Co-liked item co-occurrence matrix
+2
+2
+User co-occurrence matrix
+1
+1
+2
+2
+items
+Co-disliked items
+Co-disliked item co-occurrence matrix
+p1
+p2
+p3
+p4
+p1
+p2
+p3
+p4
+p1
+p2
+p3
+p4
+p1
+p2
+p3
+p4
+p1
+p2
+p3
+p4
+p1
+p2
+p3
+p4
+Figure 1: An overview of our RME Model, which jointly decom-
+poses user-item interaction matrix, co-liked item co-occurrence
+matrix, co-disliked item co-occurrence matrix, and user co-
+occurrence matrix. (V : liked, X: disliked, and ?: unknown)
+can be seen as a pair of co-liked movies. So, if a user preferred Thor:
+The Dark World but never watch Thor: Ragnarok, the system can
+precisely recommend Thor: Ragnarok to her (first observation).
+Similarly, if two users A and B liked the same movies, we can as-
+sume A and B have the same movie interests. If user A likes a movie
+that B has never watched, the system can recommend the movie to
+B (second observation). In the same manner, we ask if co-occurred
+disliked movies can provide any meaningful information. We ob-
+served that most users, who rated Pledge This! poorly (0.8/5.0 on
+average), also gave a low rating to Run for Your Wife (1.3/5.0 on
+average). If the disliked co-occurrence pattern was exploited, Run for
+Your Wife would not be recommended to other users who did not en-
+joy Pledge This! (third observation). This will help reduce the false
+positive rate for the recommender systems. The same phenomena
+would have also occurred in other recommendation domains.
+The first two observations are similar to the basic assumptions of
+item CF and user CF where similar scores between items/users are
+used to infer the next recommended items for users. Unfortunately,
+only the first two observations have been exploited in conventional
+CF. While treating the negative-feedback items differently from
+missing data led to better results [13], to the best of our knowledge,
+no previous works exploited the third observation to enhance the
+recommender systems’ performance.
+Therefore, in this paper, we attempt to exploit all three observa-
+tions in one model to achieve better recommendation results. With
+the recent success of word embedding techniques in natural language
+processing, if we consider pairs of co-occurred liked/disliked items
+or pairs of co-occurred users as pairs of co-occurred words, we can
+apply word embedding to learn latent representations of items (e.g.,
+item embeddings) and users (e.g. user embeddings). Based on this,
+we propose a Regularized Multi-Embedding based recommendation
+model (RME), which jointly decomposes (1) a user-item interaction
+arXiv:1809.00979v1  [cs.IR]  31 Aug 2018
+matrix, (2) a user co-occurrence matrix, (3) a co-liked item co-
+occurrence matrix, and (4) a co-disliked item co-occurrence matrix.
+The RME model concurrently exploits the co-liked co-occurrence
+patterns and co-disliked co-occurrence patterns of items to enrich
+the items’ latent factors. It also augments users’ latent factors by
+incorporating user co-occurrence patterns on their preferred items.
+Figure 1 illustrates an overview of our RME model.
+Both liked and disliked items can be explicitly measured by rating
+scores (e.g., a liked item is ≥4 star-rating and a disliked item is ≤2
+star-rating) in explicit feedback datasets such as 5-star rating datasets
+(e.g., a Movie dataset and an Amazon dataset). However, in implicit
+feedback datasets (e.g., a music listening dataset and a browsing
+history dataset), users do not explicitly express their preferences.
+In implicit feedback datasets, the song plays and URL clicks could
+indicate how much users like the items (i.e., positive samples), but
+inferring the disliked items (i.e., negative samples) is a big challenge
+due to the nature of implicit feedback. In order to deal with this
+challenge, we propose an algorithm which infers a user’s disliked
+items in implicit feedback datasets, so that we can build an RME
+model and recommend items for both explicit and implicit feedback
+datasets. In this paper, we made the following contributions:
+• We proposed a joint RME model, which combined weighted
+matrix factorization, co-liked item embedding, co-disliked item
+embedding, and user embedding, for both explicit and implicit
+feedback datasets.
+• We designed a user-oriented EM-like algorithm to draw negative
+samples (i.e., disliked items) from implicit feedback datasets.
+• We conducted comprehensive experiments and showed that the
+RME model substantially outperformed several baseline models
+in both explicit and implicit feedback datasets.
+2
+PRELIMINARIES
+Item. Items are objects that users interact with or consume. They
+can be interpreted in various ways, depending on the context of a
+dataset. For example, an item is a movie in a movie dataset such as
+MovieLens, whereas it is a song in TasteProfile.
+Liked items and disliked items. In explicit feedback datasets such
+as MovieLens (a 5-star rating dataset), an item ≥4 stars is classified
+to a liked item of the user, and an item ≤2 stars is classified to a
+disliked item of the user [5]. In implicit feedback datasets such as
+TasteProfile, the more a user consumes an item, the more he/she
+likes it (e.g., larger play count in TasteProfile indicates stronger
+preference). But, disliked items are not explicitly observable.
+Top-N recommendation. In this paper, we focus on top-N recom-
+mendation scenario, in which a recommendation model suggests a
+list of top-N most appealing items to users. We represent the inter-
+actions between users and items by a matrix Mm∗n where m is the
+number of users and n is the number of items. If a user u likes an
+item p, Mup will be set to 1. From M, we are interested in extracting
+co-occurrence patterns including liked item co-occurrences, disliked
+item co-occurrences, and user co-occurrences. Our goal is to exploit
+those co-occurrence information to learn the latent representations
+of users and items, then recommend top-N items to the users.
+Table 1: Notations.
+Notation
+Description
+M
+a m × n user-item interaction matrix.
+U
+a m × k latent factor matrix of users.
+P
+a n × k latent factor matrix of items.
+X
+a n × n SPPMI matrix of liked items-item co-occurrences.
+Y
+a n × n SPPMI matrix of disliked item-item co-occurrences.
+Z
+a m × m SPPMI matrix of user-user co-occurrences.
+αu
+a k × 1 latent factor vector of user u.
+βp
+a k × 1 latent factor vector of item p.
+γi
+a k × 1 latent factor vector of co-liked item context i.
+δi′
+a k × 1 latent factor vector of co-disliked item context i′.
+θj
+a k × 1 latent factor vector of user context j.
+λ
+a hyperparameter of regularization terms.
+b, d
+co-liked and co-disliked item bias.
+c, e
+co-liked and co-disliked item context bias.
+f , д
+user bias and user context bias.
+wup
+a weight for an interaction between user u and her liked item p.
+w(u)
+uj
+a weight for two users u and j who co-liked same items.
+w(+p)
+pi
+a weight for two items p and i that are co-liked by users.
+w(−p)
+pi
+a weight for two items p and i that are co-disliked by users.
+Notations. Table 1 shows key notations used in this paper. Note that
+all vectors in the paper are column vectors.
+3
+OUR RME MODEL
+First, we review the Weighted Matrix Factorization (WMF), and co-
+liked item embedding. Then, we propose co-disliked item embedding
+and user embedding. Finally, we describe our RME model and
+present how to compute it.
+3.1
+WMF, Embedding and RME model
+Weighted matrix factorization (WMF). WMF is a widely-used
+collaborative filtering method in recommender systems [14]. Given
+a sparse user-item matrix Mm×n, the basic idea of WMF is to de-
+compose M into a product of 2 low rank matrices U m×k and Pn×k
+(i.e., M = U × PT ), where k is the number of dimensions and
+k < min(m,n). Here, U is interpreted as a latent factor matrix of
+users, and P is interpreted as a latent factor matrix of items.
+We denote UT = (α1,α2, ...,αm) where αu ∈Rk (u ∈1,m) and
+αu represents the latent factor vector of user u. Similarly, we denote
+PT = (β1, β2, ..., βn) where βp ∈Rk (p ∈1,n) and βp represents the
+latent factor vector of item p. The objective of WMF is defined by:
+LW MF = 1
+2
+Õ
+u,p
+wup(Mup −αT
+u βp)2 + 1
+2
+
+λα
+Õ
+u
+||αu ||2 + λβ
+Õ
+p
+||βp ||2
+
+(1)
+where wup is a hyperparameter to compensate the interaction be-
+tween user u and item p, and is used to balance between the number
+of non-zero and zero values in a sparse user-item matrix. The weight
+w of the interaction between user u and item p (denoted as wup) can
+be set as wup = l(1 + ϕMup) [14, 20] where l is a relative scale and
+ϕ is a constant. λα and λβ are used to adjust the importance of two
+quadratic regularization terms Í
+u ||αu ||2 and Í
+p ||βp ||2.
+Word embedding models. Word embedding models have recently
+received a lot of attention from the research community. Given a
+sequence of training words, the embedding models learn a latent
+representation for each word. For example, word2vec [24] is one of
+popular word embedding methods. Especially, the skip-gram model
+in word2vec tries to predict surrounding words (i.e., word context)
+of a given word in the training set.
+According to Levy et al. [19], skip-gram model with negative
+sampling (SGNS) is equivalent to implicitly factorize a word-context
+matrix, whose cells are the Pointwise Mutual Information (PMI) of
+the respective word and context pairs, shifted by a global constant.
+Let D as a collection of observed word and context pairs, the PMI
+between a word i and its word context j is calculated as:
+PMI(i, j) = loд
+P(i, j)
+P(i) ∗P(j)
+where P(i, j) is the joint probability that word i and word j appears
+together within a window size (e.g. P(i, j) = #(i,j)
+|D | , where |D| refers
+to the total number of word and word context pairs in D). Simi-
+larly, P(i) is the probability the word i appears in D, and P(j) is the
+probability word j appears in D (e.g. P(i) = #(i)
+|D | and P(j) = #(j)
+|D | ).
+Obviously, PMI(i, j) can be calculated as:
+PMI(i, j) = loд #(i, j) ∗|D|
+#(i) ∗#(j)
+(2)
+By calculating PMI of all word-context pairs in D, we can form a
+squared n × n matrix MPMI where n is the total number of distinct
+words in D. Next, a Shifted Positive Pointwise Mutual Information
+(SPPMI) of two words i and j is calculated as:
+SPPMI(i, j) = max(PMI(i, j) −loд(s), 0)
+(3)
+where s is a hyperparameter to control the density of PMI matrix
+MPMI and s can be interpreted equivalently as a hyperparameter
+that indicates the number of negative samples in SGNS. When s is
+large, more values in the matrix MPMI are cleared, leading MPMI
+to become sparser. When s is small, matrix MPMI becomes denser.
+Finally, factorizing matrix MSPPMI , where each cell in MSPPMI is
+transformed by Formula (3), is equivalent to performing SGSN.
+Co-liked item embedding (LIE). As mentioned in the previous
+studies [3, 10, 20], when users liked/consumed items in a sequence,
+the items sorted by the ascending interaction time order can be
+inferred as a sequence. Thus, performing co-liked item embeddings
+to learn latent representations of items is equivalent to perform word
+embeddings to learn latent representations of words. Therefore, we
+can apply word embedding methods to learn latent representations
+of items, and perform a joint learning between embedding models
+and traditional factorization methods (e.g. WMF).
+Given each user’s liked item list, we generate co-liked item-item
+co-occurrence pairs without considering liked time. Particularly,
+given a certain item in the item sequence, we consider all other items
+as its contexts. We call this method as a greedy context generation
+method which can be applied to other non-timestamped datasets.
+After generating item and item context pairs, we construct an item co-
+occurrence SPPMI matrix and perform SPPMI matrix factorization.
+In particular, given generated item-item co-occurrence pairs, we
+construct a SPPMI matrix of items by applying Equation (2) to
+calculate the pointwise mutual information of each pair, and then
+by measuring the shifted positive pointwise mutual information
+of the pair based on Equation (3). Once the SPPMI matrix of co-
+liked items is constructed, we incorporate it to the traditional matrix
+factorization method to improve the item latent representations.
+Co-disliked item embedding (DIE). As mentioned in the Introduc-
+tion section, when many users disliked two items p1 and p2 together,
+the two items can form a pair of co-occurred disliked items. If the
+recommender systems learned this disliked co-occurrence pattern,
+it would not recommend item p2 to a user, who disliked p1. This
+will help reduce the false positive rate for the recommender sys-
+tems. Therefore, similar to liked item embeddings, we applied the
+word embedding technique to exploit the disliked co-occurrence
+information to enhance the item’s latent factors.
+User embedding (UE). When two users A and B preferred same
+items, we can assume the two users share similar interests. Therefore,
+if user A enjoyed an item p that has not been observed in user B’s
+transactions, we can recommend the item to user B. Similar to liked
+and disliked item embeddings, we applied the word embedding
+technique to learn user embeddings that explain the co-occurrence
+patterns among users.
+From the user-item interaction matrix Mm×n, where each row
+represents consumed items of a user (e.g. a list of items that the user
+rated or backed), we only keep liked items per user in the matrix
+M′. Then, we construct a n × m reverse matrix M′T of M′, where
+each row represents users that liked a certain item. Then, users,
+who liked the same item, form a sequence, and the sequence of
+users is interpreted as a sequence of words. From this point, word
+embedding techniques are applied to the user sequence to enhance
+latent representations of users.
+Our RME model. It is a joint learning model combining WMF,
+co-liked item embedding, co-disliked item embedding, and user
+embedding. It minimizes the following objective function:
+L =
+L1
+z                            }|                            {
+1
+2
+Õ
+u,p
+wup(Mup −αT
+u βp)2 (WMF)
++
+L2
+z                                            }|                                            {
+1
+2
+Õ
+Xpi,0
+w(+p)
+pi
+(Xpi −βT
+p γi −bp −ci)2 (LIE)
++
+L3
+z                                               }|                                               {
+1
+2
+Õ
+Ypi′,0
+w(−p)
+pi′ (Ypi′ −βT
+p δi′ −dp −ei′)2 (DIE)
++
+L4
+z                                           }|                                           {
+1
+2
+Õ
+Zuj,0
+w(u)
+uj (Zuj −αT
+u θj −fu −дj)2 (UE)
++ 1
+2λ
+ Õ
+u
+||αu ||2 +
+Õ
+p
+||βp ||2 +
+Õ
+i
+||γi ||2 +
+Õ
+i′
+||δi′||2 +
+Õ
+j
+||θj ||2
+
+(4)
+where the item’s latent representation βp is shared among WMF, co-
+liked item embedding and co-disliked item embedding. The user’s
+latent representation αu is shared between WMF and user embed-
+ding. X andY are SPPMI matrices, constructed by co-liked item-item
+co-occurrence patterns and disliked item-item co-occurrence pat-
+terns, respectively. γ and δ are k × 1 latent representation vectors of
+co-liked item context and co-disliked item context, respectively. Z
+is a SPPMI matrix constructed by user-user co-occurrence patterns.
+θ is a k × 1 latent representation vector of a user context. w(+p),
+w(−p) and w(u) are hyperparameters to compensate for item/user
+co-occurrences in X, Y and Z when performing decomposition. b is
+liked item bias, and c is co-liked item context bias. d is disliked item
+bias, and e is co-disliked item-context bias. f and д are user bias
+and user context bias, respectively. Incorporating bias terms were
+originally introduced in [16]. A liked item bias bp and a co-liked
+item context bias ci mean that when the two items pi and pj are
+co-liked by users, each item may have a little bit higher/lower pref-
+erence compared to the average preference. The similar explanation
+is applied to the other biases. The last line show regularization terms
+along with a hyperparameter λ to control their effects.
+3.2
+Optimization
+We can use the stochastic gradient descent to optimize the Equa-
+tion (4). However, it is not stable and sensitive to parameters [38].
+Therefore, we adopt vector-wise ALS algorithm [38, 40] that alter-
+natively optimize each model’s parameter in parallel while fixing
+the other parameters until the model gets converged. Specifically,
+we calculate the partial derivatives of the model’s objective function
+with regard to the model parameters (i.e., {α1:m, β1:n, γ1:n, δ1:n,
+b1:n, c1:n, d1:n, e1:n, θ1:m, f1:m, д1:m}). Then we set them to zero
+and obtain updating rules. Details are given as follows:
+From the objective function in Equation (4), while taking partial
+derivatives of L with regard to each user’s latent representation vec-
+tor αu, we observe that only L1, L4 and the L2 user regularization
+1
+2λ Í
+u ||αu ||2 contain αu. Therefore, we obtain:
+∂L
+∂αu
+= ∂L1
+∂αu
++ ∂L4
+∂αu
++ ∂λ Í
+u ||αu ||2
+2∂αu
+= −
+Õ
+u,p
+wup(Mup −αT
+u βp)βT
+p −
+Õ
+u,j
+w(u)
+uj (Zuj −αT
+u θj −fu −дj)θT
+j + λαT
+u
+Fixing item latent vectors β, user context latent vectors θ, user bias d
+and user context bias e, and solving ∂L
+∂αu = 0, we obtain the updating
+rule of αu as follows:
+αu =
+ Õ
+p
+wupβpβT
+p +
+Õ
+j |Zuj,0
+w(u)
+uj θjθT
+j + λIK
+−1
+ Õ
+p
+wupMupβp +
+Õ
+j |Zuj,0
+w(u)
+uj (Zuj −fu −дj)θj
+
+,∀1 ≤u ≤m, 1 ≤p ≤n, 1 ≤j ≤m
+(5)
+Similarly, taking partial derivatives of L with respect to each
+item latent vector βp needs to consider only L1, L2, L3 and item
+regularization 1
+2λ Í
+p ||βp ||2. By fixing other parameters and solving
+∂L
+∂βp = 0, we obtain:
+βp =
+ Õ
+u
+wupαuαT
+u +
+Õ
+i |Xpi,0
+w(+p)
+pi
+γiγT
+i +
+Õ
+i′|Ypi′,0
+w(−p)
+pi′ δi′δT
+i′ + λIK
+−1
+ Õ
+u
+wupMupαu +
+Õ
+i |Xpi,0
+w(+p)
+pi
+(Xpi −bp −ci)γi+
+Õ
+i′|Ypi′,0
+w(−p)
+pi′ (Ypi′ −dp −ei′)δi′
+
+,∀1 ≤u ≤m, 1 ≤p ≤n, 1 ≤i,i′ ≤n
+(6)
+In the same manner, we obtain the update rules of item contexts
+γ, δ, and user context θ alternatively as follows:
+γi =
+
+Õ
+p |Xip,0
+w(+p)
+ip
+βpβT
+p + λIK
+−1
+Õ
+p |Xip,0
+w(+p)
+ip
+(Xip −bp −ci)βp
+
+δi′ =
+
+Õ
+p |Yi′p,0
+w(−p)
+i′p βpβT
+p + λIK
+−1
+Õ
+p |Yi′p,0
+w(−p)
+i′p (Yi′p −dp −ei′)βp
+
+θj =
+
+Õ
+u |Zju,0
+w(u)
+ju αuαT
+u + λIK
+−1
+Õ
+u |Zju,0
+w(u)
+ju (Zju −du −ej)αu
+
+,∀1 ≤u ≤m, 1 ≤p ≤n, 1 ≤i,i′ ≤n
+(7)
+The item biases and item context biases b, c, d, e, as well as the
+user and user context biases f , д are updated alternatively using the
+following update rules:
+bp =
+1
+|i : Xpi , 0|
+Õ
+i:Xpi,0
+(Xpi −βT
+p γi −ci)
+ci =
+1
+|p : Xip , 0|
+Õ
+p:Xip,0
+(Xip −βT
+p γi −bp)
+dp =
+1
+|i′ : Ypi′ , 0|
+Õ
+i′:Ypi′,0
+(Ypi′ −βT
+p δi′ −ei′)
+ei′ =
+1
+|p : Yi′p , 0|
+Õ
+p:Yi′p,0
+(Yi′p −βT
+p δi′ −dp)
+fu =
+1
+|j : Zuj , 0|
+Õ
+j:Zuj,0
+(Zuj −αT
+u θj −дj)
+дj =
+1
+|u : Zju , 0|
+Õ
+u:Zju,0
+(Zju −αT
+u θj −fu)
+(8)
+In short, the pseudocode of our proposed RME model is presented
+in Algorithm 1.
+Algorithm 1 RME algorithm
+Require:
+M, λ
+1: Build SPPMI matrices of liked item X, disliked item Y and user co-
+occurrences Z using Eq. (2) and Eq. (3)
+2: Initialize U (or α1:m), P (or β1:n), γ1:n, δ1:n, θ1:m.
+3: Initialize b1:n, c1:n, d1:n, e1:n, f1:m, д1:m.
+4: repeat
+5:
+For each user u, update αu by Eq. (5) (1 ≤u ≤m).
+6:
+For each item p, update βp by Eq. (6) (1 ≤p ≤n).
+7:
+Alternatively update each item context γi, δi′ and user context θj
+by Eq. (7) (1 ≤i, i′ ≤n; 1 ≤j ≤m).
+8:
+Alternatively update each bias bp, ci, dp, ei′, fu, дj by Eq. (8) (1 ≤
+p, i, i′ ≤n; 1 ≤u, j ≤m).
+9: until convergence
+10: return U, P
+3.3
+Complexity Analysis
+In this section, we briefly provide time complexity analysis of our
+model. Let ΩM = {(u, p) | Mup , 0} , ΩX = {(p, i) | Xpi ,
+0 }, ΩY = {(p, i′) | Ypi′ , 0}, ΩZ = {(u, j) | Zuj , 0}. Con-
+structing SPPMI matrices X, Y and Z take O(|ΩX |2), O(|ΩY |2)
+and O(|ΩZ |2), respectively. However, the SPPMI matrices are cal-
+culated once and are constructed in parallel using batch process-
+ing, so they are not costly. For learning RME model, computing
+α takes O((|ΩM | + |ΩZ |)k2 + k3) time, and computing β takes
+O((|ΩM | + |ΩX | + |ΩY |)k2 +k3) time. Also, it takes O(|ΩX |k2 +k3)
+for computing co-liked item context γ, and so do other latent con-
+texts δ, θ. It takes O(|ΩZ |k) time to compute all user bias f and
+so do the other biases. Thus, the time complexity for RME is
+O(η(2(|ΩM | + |ΩX | + |ΩY | + |ΩZ |)k2 + (2m + 3n)k3)), where η
+is the number of iterations. Since k << min(m,n) and M, X, Y, Z
+are often sparse, which mean (|ΩM | + |ΩX | + |ΩY | + |ΩZ |) is small,
+the time complexity of RME is shortened as O(η(m + 3
+2n)k3), which
+scales linearly to the conventional ALS algorithm for collaborative
+filtering [38].
+4
+INFERRING DISLIKED ITEMS IN
+IMPLICIT FEEDBACK DATASETS
+Unlike explicit feedback datasets, there is a lack of substantial evi-
+dence, on which items the users disliked in implicit feedback datasets.
+Since our model exploits co-disliked item co-occurrences patterns
+among items, the implicit feedback datasets challenge our model. To
+deal with this problem, we can simply assume that missing values are
+equally likely to be negative feedback, then sample some negative
+instances from missing values with uniform weights [12, 27, 32, 34].
+However, assigning uniform weight is suboptimal because the miss-
+ing values are a mixture of negative and unknown feedbacks. A
+recent work suggests to sample negative instances by assigning
+non-uniform weights based on item popularity [13]. The idea is
+that popular items are highly aware by users, so if they are not ob-
+served in a user’s transactions, it assumes that the user dislikes them.
+However, this sampling method is also not optimal because same
+unobserved popular items can be sampled across multiple users. This
+approach does not reflect each user’s personalized interest.
+Instead, we follow the previous works [22, 25, 39], and propose
+a user-oriented EM-like algorithm to draw negative samples (i.e.,
+inferred disliked items) for users in implicit feedback datasets. Our
+approach is described as follows:
+First, we assume that an item with a low ranking score of being
+liked will have a higher probability to be drawn as a negative sample
+of a user. Given ru is the ranked list of all items of the user u, the
+prior probabilities of items to be drawn as negative samples are
+calculated by using a softmax function as follows:
+Pr(u)
+i
+=
+exp (−ru[i])
+Ín
+j=1 exp (−ru[j])
+(9)
+After negative samples are drawn for each user, we built the RME
+model by using Algorithm 1. The pseudocode of the RME model
+for implicit feedback datasets is presented in Algorithm 2.
+In Algorithm 2, since each user may prefer a different number of
+items, we define a hyper-parameter τ as a negative sample drawing
+ratio to control how many negative samples we will sample for each
+user. In line 6, count(u) returns the number of observed items of a
+user u. Then, the number of drawn negative samples for the user u is
+calculated and assigned to ns. If a user prefers 10 items and τ = 0.8,
+the algorithm will sample 8 disliked items. We note that sampling
+with replacement is used such that different items are drawn indepen-
+dently. The value of τ is selected using the validation data. In line
+8, we set the ranking of observed items to +∞to avoid drawing the
+observed items as negative samples. In line 12, we build the RME
+model based on the negative samples drawn in the Expectation step,
+and temporally store newly learned user latent matrix, item latent
+matrix and corresponding NDCG to U _tmp, P_tmp,ndcд variables,
+respectively (NDCG is a measure to evaluate recommender systems,
+which will be mentioned in Experiment section). If we obtain a better
+ndcд comparing with the previous NDCG prev_ndcд (line 13), we
+will update U, P,prev_ndcд with new values (line 14). Overall, at
+the end of the Expectation step, we obtain the disliked items for each
+user. Then, in the Maximization step, we build our RME model to
+re-learn user and item latent representations U and P. The process
+is repeated until getting converged or the early stopping condition
+(line 13 to 17) is satisfied.
+Algorithm 2 RME model for implicit feedback datasets using user-
+oriented EM-like algorithm to draw negative samples
+Require: M, negative sample drawing ratio τ
+1: max_iter = 10, prev_ndcд = 0, iter = 0
+2: Initialize Step: U , P = W MF(M)
+3: repeat
+4:
+iter += 1
+5:
+▷Expectation Step
+6:
+for u ∈[1,m] do:
+7:
+ns = τ * count(u)
+8:
+Compute ranked item list: ru = P.αu
+9:
+Assign observed items with ranking of +∞.
+10:
+Measure prior probabilities of items to be drawn as nega-
+tive samples by Eq. (9) then randomly draw ns negative samples
+with those prior probabilities.
+11:
+end for
+12:
+▷Maximization Step with early stopping
+13:
+U _tmp, P_tmp,ndcд = RME(train_data, vad_data)
+14:
+if ndcд > prev_ndcд then
+15:
+U , P,prev_ndcд = U _tmp, P_tmp,ndcд
+16:
+else
+17:
+break
+▷Early stopping
+18:
+end if
+19: until iter < max_iter
+20: return U , P
+Time Complexity: In order to construct RME model for implicit
+feedback datasets, we need to re-learn RME model, which includes
+re-building 3 SPPMI matrices in the maximization step in η′ itera-
+tions to get converged. Thus, it takes O(η′((|ΩX |2+|ΩY |2+|ΩZ |2)+
+η(m + 3
+2n)k3)) time where η′ is small.
+5
+EXPERIMENTS
+5.1
+Experimental Settings
+Datasets: To measure the performance of our RME model, we
+evaluate the model on 3 real-world datasets:
+• MovieLens-10M [29]: is an explicit feedback dataset. It consists
+of 69,878 users and 10,677 movies with 10m ratings. Following
+the k-cores preprocessing [11, 12], we only kept users, who
+rated at least 5 movies, and movies, which were rated by at
+least 5 users. This led to 58,057 users and 7,223 items (density=
+0.978%).
+• MovieLens-20M: is an explicit feedback dataset. It consists of
+138,000 users, 27,000 movies, and 20 millions of ratings. We
+filtered with the same condition as for MovieLens-10M. This led
+to 111,146 users and 9,888 items (density= 0.745%).
+• TasteProfile: is an implicit feedback dataset containing a song’s
+play count by a user 1. The play counts are user’s implicit prefer-
+ence and are binarized. Similar to the preprocessing at [20], we
+first subsampled the dataset to 250k users and 25k items. Then
+we kept only users, who listened to at least 20 songs, and songs,
+which were listened by at least 50 users. As a result, 221,011
+users and 22,713 songs were remained (density= 0.291%).
+1http://the.echonest.com/
+Table 2: Performance of the baselines, our RME model, and its two variants. The improvement of our model over the baselines and
+its variants were significant with p-value < 0.05 in the three datasets under the non-directional two-sample t-test.
+Method
+MovieLens-10M
+MovieLens-20M
+TasteProfile
+Recall@5
+NDCG@20
+MAP@10
+Recall@5
+NDCG@20
+MAP@10
+Recall@5
+NDCG@20
+MAP@10
+Item-KNN
+0.0137
+0.0338
+0.0397
+0.0131
+0.0345
+0.0402
+0.0793
+0.0685
+0.0904
+Item2vec
+0.1020
+0.1001
+0.0502
+0.1066
+0.1019
+0.0539
+0.1455
+0.1593
+0.0727
+WMF
+0.1280
+0.1245
+0.0655
+0.1348
+0.1290
+0.0720
+0.1745
+0.1853
+0.0931
+Cofactor
+0.1460
+0.1381
+0.0772
+0.1480
+0.1387
+0.0804
+0.1771
+0.1873
+0.0950
+U_RME
+0.1516
+0.1412
+0.0818
+0.1524
+0.1425
+0.0847
+0.1825
+0.1899
+0.0997
+I_RME
+0.1511
+0.1422
+0.0817
+0.1530
+0.1412
+0.0838
+0.1826
+0.1915
+0.0996
+RME
+0.1562
+0.1458
+0.0841
+0.1570
+0.1461
+0.0869
+0.1876
+0.1954
+0.1025
+Baselines: To illustrate the effectiveness of our RME model, we
+compare it with the following baselines:
+• WMF [14]: It is a weighted matrix factorization with l2-norm
+regularization.
+• Item-KNN [7]: This is an item neighborhood-based collaborative
+filtering method.
+• Item2Vec [3]: This method used Skip-gram with negative sam-
+pling [24] to learn item embeddings, then adopted a similarity
+score between item embeddings to generate user’s recommenda-
+tion lists.
+• Cofactor [20]: This is a method that combines WMF and co-liked
+item embedding.
+We note that we do not compare our models with user collaborative
+filtering method (i.e. User-KNN) because it is not applicable to run
+the method on the large datasets. However, [31] reported that User-
+KNN had worse performance than Item-KNN, especially when there
+are many items but few ratings in a dataset.
+Our models: We not only compare the baselines with our RME,
+but also two variants of our model such as U_RME and I_RME to
+show the effectiveness of incorporating all of the user embeddings,
+liked-item embeddings and disliked-item embeddings:
+• U_RME (i.e., RME - DIE): This is a variant of our model, consid-
+ering only WMF, user embeddings, and liked-item embeddings.
+• I_RME (i.e., RME - UE): This is another variant of our model,
+considering only WMF, liked-item embeddings, and disliked-
+item embeddings.
+• RME: This is our proposed RME model.
+Evaluation metrics. We used three well-known ranking-based met-
+rics – Recall@N, normalized discounted cumulative gain (NDCG@N),
+and mean average precision (MAP@N). Recall@N considers all
+items in top N items equally, whereas NDCG@N and MAP@N
+apply an increasing discount of loд2 to items at lower ranks.
+Training, validation and test sets. Some researchers adopted leave-
+one-out evaluation [12, 37], but it is not a realistic scenario [13].
+Therefore, we follow 70/10/20 proportions for splitting the original
+dataset into training/validation/test sets [21]. MovieLens-10M and
+MovieLens-20M datasets contain timestamp values of user-movie in-
+teractions. To create training/validation/testing sets for these datasets,
+we sorted all user-item interaction pairs in the ascending interaction
+time order in each of MovieLens-10M and MovieLens-20M datasets.
+The first 80% was used for training and validation, and the rest 20%
+data was used as a test set. Out of 80% data extracted for training and
+validation, we randomly took 10% for the validation set. To measure
+the statistical significance of RME over the baselines, we repeated
+the splitting process five times (i.e., generating five pairs of training
+and validation sets). Since TasteProfile dataset did not contain times-
+tamp information of user-song interactions, we randomly split the
+TasteProfile dataset into training/validation/test sets five times with
+70/10/20 proportions. Averaged results are reported in the following
+subsection.
+Stopping criteria and Hyperparameters. To decide when to stop
+training a model, we measured the model’s NDCG@100 by using
+the validation set. We stopped training the model when there was
+no further improvement. Then, we applied the best model to the
+test set to evaluate its performance. This method was applied to the
+baselines and RME.
+All hyper-parameters were tuned on the validation set by a grid
+search. We used the same hyper-parameter setting in all models. The
+grid search of the regularization weight λ was performed in {0.001,
+0.005, 0.01, 0.05, ..., 10}. The size of latent dimensions was in a
+range of {30, 40, 50, ..., 100}. We set weights w(+p) = w(−p) =
+w(u) = w for all user-user and item-item co-occurrence pairs. When
+building our RME model for TasteProfile dataset, we do a grid search
+for the negative sample drawing ratio τ in {0.2, 0.4, 0.6, 0.8, 1.0}.
+5.2
+Experimental Results
+RQ1: Performance of the baselines and RME. Table 2 presents
+recommendation results of RME and compared models at Recall@5,
+NDCG@20, and MAP@10. First, we compared RME with the base-
+lines. We observed that RME outperformed all baselines in the three
+datasets, improving the Recall by 6.3%, NDCG by 5.1%, and MAP
+by 8.3% on average over the best baseline (p-value < 0.001). Second,
+we compared two variants of RME model with the baselines. We see
+that both U_RME and I_RME performed better than the baselines.
+Adding user embeddings improved the Recall by 3.0∼3.5%, NDCG
+by 1.4∼2.2%, and MAP by 4.2∼5.8% (p-value < 0.001), while
+adding disliked item embeddings improved the Recall by 3.1∼3.8%,
+NDCG by 2.2∼3.0%, and MAP by 4.9∼6.0%. Third, we compare
+RME with its two variants. RME also achieved the best result, im-
+proving Recall by 2.6∼3.0%, NDCG by 2.0∼2.5%, and MAP by
+2.6∼2.8% (p-value < 0.05). We further evaluated NDCG@N of our
+model when varying top N in range {5, 10, 20, 50, 100}. Figure
+5
+10
+20
+50
+100
+Varying N
+0.10
+0.11
+0.12
+0.13
+0.14
+0.15
+0.16
+0.17
+0.18
+NDCG@N
+Item2Vec
+WMF
+Cofactor
+U_RME
+I_RME
+RME
+(a) NDCG@N on MovieLens-10M.
+5
+10
+20
+50
+100
+Varying N
+0.13
+0.14
+0.15
+0.16
+0.17
+NDCG@N
+Item2Vec
+WMF
+Cofactor
+U_RME
+I_RME
+RME
+(b) NDCG@N on MovieLens-20M.
+5
+10
+20
+50
+100
+Varying N
+0.16
+0.18
+0.20
+0.22
+0.24
+0.26
+NDCG@N
+Item2Vec
+WMF
+Cofactor
+U_RME
+I_RME
+RME
+(c) NDCG@N on TasteProfile.
+Figure 2: Performance of all models when varying top N.
+30
+40
+50
+60
+70
+80
+90
+100
+Varying K
+0.120
+0.125
+0.130
+0.135
+0.140
+0.145
+0.150
+0.155
+Recall@N
+Item2Vec
+WMF
+Cofactor
+U_RME
+I_RME
+RME
+30
+40
+50
+60
+70
+80
+90
+100
+Varying K
+0.12
+0.13
+0.14
+0.15
+0.16
+NDCG@N
+Item2Vec
+WMF
+Cofactor
+U_RME
+I_RME
+RME
+30
+40
+50
+60
+70
+80
+90
+100
+Varying K
+0.075
+0.080
+0.085
+0.090
+0.095
+0.100
+0.105
+MAP@N
+Item2Vec
+WMF
+Cofactor
+U_RME
+I_RME
+RME
+(a) Recall@5, NDCG@5, MAP@5 on MovieLens-10M. Fix λ = 1, and vary k.
+30
+40
+50
+60
+70
+80
+90
+100
+Varying K
+0.120
+0.125
+0.130
+0.135
+0.140
+0.145
+0.150
+0.155
+Recall@N
+Item2Vec
+WMF
+Cofactor
+U_RME
+I_RME
+RME
+30
+40
+50
+60
+70
+80
+90
+100
+Varying K
+0.125
+0.130
+0.135
+0.140
+0.145
+0.150
+0.155
+0.160
+NDCG@N
+Item2Vec
+WMF
+Cofactor
+U_RME
+I_RME
+RME
+30
+40
+50
+60
+70
+80
+90
+100
+Varying K
+0.075
+0.080
+0.085
+0.090
+0.095
+0.100
+0.105
+0.110
+MAP@N
+Item2Vec
+WMF
+Cofactor
+U_RME
+I_RME
+RME
+(b) Recall@5, NDCG@5, MAP@5 on MovieLens-20M. Fix λ = 0.5, and vary k.
+30
+40
+50
+60
+70
+80
+90
+100
+Varying K
+0.12
+0.13
+0.14
+0.15
+0.16
+0.17
+0.18
+0.19
+Recall@N
+Item2Vec
+WMF
+Cofactor
+U_RME
+I_RME
+RME
+30
+40
+50
+60
+70
+80
+90
+100
+Varying K
+0.13
+0.14
+0.15
+0.16
+0.17
+0.18
+0.19
+0.20
+NDCG@N
+Item2Vec
+WMF
+Cofactor
+U_RME
+I_RME
+RME
+30
+40
+50
+60
+70
+80
+90
+100
+Varying K
+0.08
+0.09
+0.10
+0.11
+0.12
+0.13
+MAP@N
+Item2Vec
+WMF
+Cofactor
+U_RME
+I_RME
+RME
+(c) Recall@5, NDCG@5, MAP@5 on TasteProfile. Fix λ = 10, τ = 0.2, and vary k.
+Figure 3: Performance of models when varying the latent di-
+mension size k with fixing the value of λ.
+2 shows our result (we excluded Item-KNN in the figure and fol-
+lowing figures since it performed extremely worst). Our model still
+performed the best. On average, it improved NDCG@N by 6.2%
+comparing to the baselines, and by 3.3% comparing to its variants.
+These experimental results show that both co-disliked item embed-
+ding and user embedding positively contributed to RME, and also
+confirm our observations addressed in Section 1 are correct.
+The experimental results in TasteProfile in Table 2 showed that
+inferring disliked items in Algorithm 2 worked well since RME
+model incorporating co-disliked item embedding outperformed the
+baselines. To further confirm the effectiveness of the algorithm, we
+also applied it to MovieLens-10M and MovieLens-20M datasets
+after removing the explicit disliking information, pretending them as
+implicit feedback datasets. In the datasets without disliking informa-
+tion, RME under Algorithm 2 still outperformed the best baseline
+with 4.2%, 4.6% and 7.2% improvements on average in Recall,
+NDCG and MAP, respectively (p-value < 0.001). Its performance
+was slightly lower than the original RME (based on explicit disliking
+information) at 0.3%, 0.7% and 1.3% on average in Recall, NDCG,
+0.001
+0.01
+0.1
+1
+10
+Varying K
+0.130
+0.135
+0.140
+0.145
+0.150
+0.155
+Recall@N
+WMF
+Cofactor
+U_RME
+I_RME
+RME
+0.001
+0.01
+0.1
+1
+10
+Varying K
+0.130
+0.135
+0.140
+0.145
+0.150
+0.155
+0.160
+NDCG@N
+WMF
+Cofactor
+U_RME
+I_RME
+RME
+0.001
+0.01
+0.1
+1
+10
+Varying K
+0.085
+0.090
+0.095
+0.100
+0.105
+MAP@N
+WMF
+Cofactor
+U_RME
+I_RME
+RME
+(a) Recall@5, NDCG@5, MAP@5 on MovieLens-10M. Fix k = 40, and vary λ.
+0.001
+0.01
+0.1
+1
+10
+Varying K
+0.135
+0.140
+0.145
+0.150
+0.155
+Recall@N
+WMF
+Cofactor
+U_RME
+I_RME
+RME
+0.001
+0.01
+0.1
+1
+10
+Varying K
+0.140
+0.145
+0.150
+0.155
+0.160
+NDCG@N
+WMF
+Cofactor
+U_RME
+I_RME
+RME
+0.001
+0.01
+0.1
+1
+10
+Varying K
+0.0925
+0.0950
+0.0975
+0.1000
+0.1025
+0.1050
+0.1075
+0.1100
+MAP@N
+WMF
+Cofactor
+U_RME
+I_RME
+RME
+(b) Recall@5, NDCG@5, MAP@5 on MovieLens-20M. Fix k = 40, and vary λ.
+0.001
+0.01
+0.1
+1
+10
+Varying K
+0.172
+0.174
+0.176
+0.178
+0.180
+0.182
+0.184
+0.186
+0.188
+Recall@N
+WMF
+Cofactor
+U_RME
+I_RME
+RME
+0.001
+0.01
+0.1
+1
+10
+Varying K
+0.1825
+0.1850
+0.1875
+0.1900
+0.1925
+0.1950
+0.1975
+0.2000
+NDCG@N
+WMF
+Cofactor
+U_RME
+I_RME
+RME
+0.001
+0.01
+0.1
+1
+10
+Varying K
+0.118
+0.120
+0.122
+0.124
+0.126
+0.128
+0.130
+0.132
+MAP@N
+WMF
+Cofactor
+U_RME
+I_RME
+RME
+(c) Recall@5, NDCG@5, MAP@5 on TasteProfile. Fix k = 100, τ = 0.2, and vary λ.
+Figure 4: Performance of models when varying λ with fixing
+the latent dimension size k. Item2Vec did not contain regular-
+ization, so we excluded it.
+and MAP, respectively. The experimental results confirmed the ef-
+fectiveness of Algorithm 2. We note that Algorithm 2 got converged
+in up to 4 iterations for all three datasets by the early stopping condi-
+tion. Due to the space limitation, we do not include figures which
+show the loss over iterations.
+RQ2:Parameter sensitivity analysis: We analyze the effects of the
+parameters in RME model in order to answer the following research
+questions: (RQ2-1:) How does RME work when varying the latent
+dimension size k?; (RQ2-2:) How does RME model change with
+varying λ?; (RQ2-3:) How sensitive is the RME model on an implicit
+feedback dataset (e.g. TasteProfile) when varying negative sample
+drawing ratio τ?; and (RQ2-4:) Can RME achieve better performance
+with a dynamic setting of regularization hyper-parameters?
+Regarding RQ2-1, Figure 3 shows the sensitivity of all compared
+models when fixing λ and varying the latent dimension size k in
+{30, 40, 50, 60, 70, 80, 90, 100}. It is clearly observed that our
+model outperforms the baselines in all datasets. In MovieLens-10M
+0.2
+0.4
+0.6
+0.8
+1.0
+0.186
+0.187
+0.188
+Recall@5
+0.2
+0.4
+0.6
+0.8
+1.0
+0.1990
+0.1995
+0.2000
+NDCG@5
+0.2
+0.4
+0.6
+0.8
+1.0
+0.1315
+0.1320
+0.1325
+MAP@5
+Figure 5: Performance of RME in TasteProfile when varying
+negative sample drawing ratio τ with fixing k = 100 and λ = 10.
+and MovieLens-20M datasets, all six models downgrade the perfor-
+mance when the latent dimension size k is over 60. In the TastePro-
+file dataset, when increasing k, although all models gain a higher
+performance, our model tends to achieve much higher performance.
+In a RQ2-2 experiment, we exclude Item2Vec because this model
+does not contain the regularization term. We fix k = 40 in MovieLens-
+10M and MovieLens-20M. In TasteProfile dataset, we fix k=100,
+τ=0.2. We vary lambda in range {0.001, 0.005, 0.01, 0.05, 0.1, 0.5, 1,
+5, 10}. Then, we report the average results of Recall@5, NDCG@5,
+and MAP@5. As shown in Figure 4, the performance of our model is
+better than the baselines. In MovieLens-10M and MovieLens-20M
+dataset, RME increases its performance when increasing λ up to
+1, then its performance goes down when λ is increasing more. In
+TasteProfile, RME tends to gain a higher performance and more
+outperformed the baselines when λ is increasing.
+To understand the sensitivity of our model when varying negative
+sample drawing ratio τ in the implicit feedback dataset – TasteProfile
+(RQ2-3), we vary τ in {0.2, 0.4, 0.6, 0.8, 1.0}, and fix k = 100 and
+λ = 10. Figure 5 shows that when τ increases, our model degrades
+with a small amount (e.g. around -0.3% in Recall@5 and NDCG@5,
+and -0.4% in MAP@5). In NDCG@5, our model gains the best
+result when τ = 0.4. We note that our worst case (when τ = 1.0) is
+still better than the best baseline presented in Table 2. This shows
+that the sensitivity of our model with regard to the negative sample
+drawing ratio τ is small/limited.
+In our previous experiments, we used a static setting of regulariza-
+tion hyper-parameters by setting λα = λβ = λγ = λδ = λθ = λ. To
+explore if a dynamic setting of those regularization hyper-parameters
+could lead to better results for RME model (RQ2-4), we set λα =
+λβ = λ1, λγ = λδ = λθ = λ2. Then we both vary λ1 and λ2 in {100,
+50, 10, 5, 1, 0.5, 0.1, 0.05, 0.01, 0.005, 0.001} while fixing the latent
+dimension size k. Next, we report the NDCG@5 for all 3 datasets.
+As shown in Figure 6, our model even get a higher performance with
+the dynamic setting. For example, it gains NDCG@5 = 0.1613 when
+λ1 = 100 and λ2 = 0.005 in MovieLens-10M dataset. Similarly,
+NDCG@5 = 0.1639 when λ1 = 0.5, λ2 = 1 in MovieLens-20M
+dataset. NDCG@5 = 0.2014 when λ1 = 100, λ2 = 10 in TasteProfile
+dataset. The dynamic setting produced 0.3∼2% higher results than
+the static setting presented in Table 2.
+So far, we compared the performance of our model and the base-
+lines while varying values of hyper-parameters. We showed that
+our model outperformed the baselines in all cases, indicating that
+our model was less sensitive with regard to the hyper-parameters.
+We also showed that our model produced better results under the
+dynamic setting.
+RQ3: Performance of models for different types of users. We
+sorted users by the ascending order of their activity level in terms
+of the number of liked items. Then we categorized them into three
+groups: (1) cold-start users who were in the first 20% of the sorted
+100
+10
+1
+61
+0.1
+0.01
+0.001
+0.001
+0.01
+0.1
+62
+1
+10
+0.15
+0.16
+0.155
+100
+NDCG@5
+0.148
+0.15
+0.152
+0.154
+0.156
+0.158
+0.16
+(a) MovieLens-10M
+100
+10
+1
+61
+0.1
+0.01
+0.001
+0.001
+0.01
+0.1
+62
+1
+10
+0.15
+0.16
+0.155
+100
+NDCG@5
+0.15
+0.152
+0.154
+0.156
+0.158
+0.16
+0.162
+(b) MovieLens-20M
+100
+10
+1
+61
+0.1
+0.01
+0.001
+0.001
+0.01
+0.1
+62
+1
+10
+0.2
+0.195
+0.19
+0.185
+100
+NDCG@5
+0.184
+0.186
+0.188
+0.19
+0.192
+0.194
+0.196
+0.198
+0.2
+(c) TasteProfile
+Figure 6: Performance of RME under a dynamic setting of reg-
+ularization hyper-parameters. Set λα = λβ = λ1, and λγ (+) = λγ (−)
+= λθ = λ2.
+user list (i.e., their activity level is the lowest); (2) warm-start users
+who were in between 20% and 80% of the sorted user list; (3) highly
+active users who were in the last 20% of the sorted user list (i.e., the
+most active users). Then, we measured the performance of all the
+compared models for each of the user groups.
+Figure 7 shows the performance of all the compared models
+in MovieLens-10M, MovieLens-20M and TasteProfile datasets. In
+MovieLens-10M (Figure 7(a)), our model significantly outperformed
+the baselines and the two variants in all three user groups, improving
+Recall@5 by 4.7∼6.7%, NDCG@5 by 6.8∼8.8%, and MAP@5 by
+9.2∼11.0% over the best compared method. In MovieLens-20M
+dataset (Figure 7(b)), our model significantly outperformed the base-
+lines and its variants in 2 groups: cold-start users and warm-start
+users. It improved Recall@5 by 16.1%, 4.0%, 0.8%, NDCG@5
+by 15.3%, 4.4%, 0.9%, MAP@5 by 17.3%, 5.1%, 1.1% in cold-
+start users, warm-start users and highly-active users, respectively.
+Specially, in both MovieLens-10M and MovieLens-20M datasets,
+our model on average much improved the baselines in cold-start
+users with Recall@5, NDCG@5 and MAP@5 by 27.9%, 24.8%
+and 23.3%, respectively. It shows the benefit of incorporating dis-
+liked item embeddings and user embeddings. In TasteProfile dataset
+(Figure 7(c)), our model significantly improved baselines in highly-
+active users group, improving Recall@5 by 6.8%, NDCG@5 by
+7.4%, and MAP@5 by 10.0% comparing to the best state-of-the-art
+method, while improving Recall@5 by 5.0%, NDCG@5 by 4.9%,
+and MAP@5 by 5.7% comparing to its best variant. However, in
+cold-start users and warm-start users group, RME got an equal per-
+formance comparing with the baselines (i.e., the difference between
+our model and other methods are not significant).
+RQ4: Joint learning vs separate learning. What if we conduct
+learning separately for each part of our model? Will the separate
+learning model perform better than our joint learning model? To
+answer the questions, we built a separate learning model as fol-
+lows: first, we learned latent representations of items by jointly
+decomposing two SPPMI matrices X (+) and X (−) of liked item-item
+co-occurrences and disliked item-item co-occurrences, respectively.
+Then, we learned user’s latent representations by minimizing the
+Cold start(*) Warm start(*)Highly active(ns)
+user's activeness types
+0.0
+0.1
+0.2
+0.3
+Recall@5
+Item2Vec
+WMF
+Cofactor
+U_RME
+I_RME
+RME
+Cold start(*) Warm start(*)Highly active(ns)
+user's activeness types
+0.0
+0.1
+0.2
+0.3
+NDCG@5
+Item2Vec
+WMF
+Cofactor
+U_RME
+I_RME
+RME
+Cold start(*) Warm start(*)Highly active(ns)
+user's activeness types
+0.00
+0.05
+0.10
+0.15
+0.20
+0.25
+MAP@5
+Item2Vec
+WMF
+Cofactor
+U_RME
+I_RME
+RME
+(a) Dataset: MovieLens-10M. Performance of RME over other models in all three user groups are significant (p-value <
+0.05).
+Cold start(*) Warm start(*)Highly active(ns)
+user's activeness types
+0.0
+0.1
+0.2
+0.3
+Recall@5
+Item2Vec
+WMF
+Cofactor
+U_RME
+I_RME
+RME
+Cold start(*) Warm start(*)Highly active(ns)
+user's activeness types
+0.0
+0.1
+0.2
+0.3
+NDCG@5
+Item2Vec
+WMF
+Cofactor
+U_RME
+I_RME
+RME
+Cold start(*) Warm start(*)Highly active(ns)
+user's activeness types
+0.00
+0.05
+0.10
+0.15
+0.20
+MAP@5
+Item2Vec
+WMF
+Cofactor
+U_RME
+I_RME
+RME
+(b) Dataset: MovieLens-20M. Performance of RME over other models in cold-start and highly-active user groups are
+significant (p-value < 0.05).
+Cold start(*) Warm start(*)Highly active(ns)
+user's activeness types
+0.00
+0.05
+0.10
+0.15
+0.20
+0.25
+Recall@5
+Item2Vec
+WMF
+Cofactor
+U_RME
+I_RME
+RME
+Cold start(*) Warm start(*)Highly active(ns)
+user's activeness types
+0.00
+0.05
+0.10
+0.15
+0.20
+0.25
+NDCG@5
+Item2Vec
+WMF
+Cofactor
+U_RME
+I_RME
+RME
+Cold start(*) Warm start(*)Highly active(ns)
+user's activeness types
+0.00
+0.05
+0.10
+0.15
+MAP@5
+Item2Vec
+WMF
+Cofactor
+U_RME
+I_RME
+RME
+(c) Dataset: TasteProfile. Performance of RME over other models in highly-active user group is significant (p-value < 0.05).
+Figure 7: Performance of models for each of the three user groups. Non-directional two-sample t-test was performed. * indicates
+significant (p-value < 0.05), and ns indicates not significant. The error bars are the average of standard errors in the 5 folds.
+objective function in Equation (4), where the latent representations
+of items and item contexts were already learned and fixed. Next, we
+compared our joint learning model (i.e., RME) with the separate
+learning model in MovieLens-10M, MovieLens-20M, and TastePro-
+file datasets. Our experimental results show that our joint learning
+model outperformed the separate learning model by significantly
+improving Recall@5, NDCG@5 and MAP@5 at least 12.1%, 13.5%
+and 17.1%, respectively (p-value < 0.001).
+6
+RELATED WORK
+Latent factor models (LFM): Some of the first works in recom-
+mendation focused on explicit feedback datasets (name some: [15,
+30, 31]). Our proposed method worked well for both explicit and
+implicit feedback settings with almost equal performances.
+In implicit feedback datasets, which have been trending recently
+due to the difficulty of collecting users’ explicit feedback, properly
+treating/modeling missing data is a difficult problem [4, 21, 27].
+Even though missing values are a mixture of negative feedback and
+unknown feedback, many works treated all missing data as nega-
+tive instances [8, 14, 27, 34], or sampled missing data as negative
+instances with uniform weights [28]. This is suboptimal because
+treating negative instances and missing data differently can further
+improve recommenders’ performance [13]. [25] proposed a bagging
+of ALS learners [14] to sample negative instances. He et al. [13] as-
+sumed that unobserved popular items hav

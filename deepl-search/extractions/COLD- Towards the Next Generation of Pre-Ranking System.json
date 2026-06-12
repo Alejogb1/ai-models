@@ -1,0 +1,148 @@
+{
+  "source": "COLD- Towards the Next Generation of Pre-Ranking System.pdf",
+  "source_group": "Awesome-ML-Papers/Other",
+  "processed_at": "2026-06-08",
+  "agent": "agent5_final",
+  "concepts": [
+    {
+      "finding": "Although vector-product\nbased DNN has significantly boosted the model performance of\nthe first two generations, it still suffers from two challenges which\nleave space for further improvement: (i) Model expression ability.",
+      "category": "Data",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "How to address the limitation described: Although vector-product\nbased DNN has significantly boosted the model performance of\nthe first two generations, it still suffers from two challenges which\nleave space for further improvement: (i) Mode",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "KEYWORDS\nPre-ranking system, algorithm-system co-design,computing power\nPermission to make digital or hard copies of all or part of this work for personal or\nclassroom use is granted without fee provided that copies are not made or distributed\nfor profit or commercial advantage and that copies bear ",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "We\ncan see that COLD maintain a comparable GAUC with our previous\nversion ranking model DIEN, and achieves significant improvement\nboth in GAUC and Recall compared with the vector-product based\nmodel.",
+      "category": "Data",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "There have been numerous papers discussing how to build an\neffective and efficient ranking system [1–5, 10, 13–16].",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "2.1\nVector-Product based DNN Model\nDriven by the success of deep learning, vector-product based DNN\nmodel [2] has been widely used in pre-ranking systems and achieves\nstate-of-the-art performance.",
+      "category": "Data",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "pre-ranking model, the vector-product based DNN model achieves\nsignificant performance improvement.",
+      "category": "Data",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Besides, we introduce a new\nmetric of top-k recall, to measure the alignment degree between\nthe pre-ranking model and subsequent ranking model.",
+      "category": "Experiment",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "5\nCONCLUSION\nIn this paper, we introduce our new generation of pre-ranking\nsystem COLD in detail .",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Experiments show COLD model achieves more than 6% RPM lift\nover vector-product based DNN model, our latest online version\nof the pre-ranking model, which is significant to the business.",
+      "category": "Data",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Real-time Personalization using Em-\nbeddings for Search Ranking at Airbnb.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "In this paper, we rethink the challenge of the pre-ranking system\nfrom an algorithm-system co-design view.",
+      "category": "FailureRisk",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "How to address the limitation described: In this paper, we rethink the challenge of the pre-ranking system\nfrom an algorithm-system co-design view.",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Meanwhile,\nthe fully online pre-ranking system of COLD provides us with a\nflexible infrastructure that supports efficient new model developing\nand online A/B testing.",
+      "category": "BehavioralTests",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Since 2019, COLD has been deployed in\nalmost all products involving the pre-ranking module in the display\nadvertising system in Alibaba, bringing significant improvements.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "However,\nvery few works pay attention to the pre-ranking system [9, 14].",
+      "category": "ModelCandidate",
+      "implication": "Architecture pattern applicable to sequence modeling for user behavior",
+      "open_question": "How to address the limitation described: However,\nvery few works pay attention to the pre-ranking system [9, 14].",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "For a long time, it is believed that pre-ranking is just a simplified\nversion of the ranking system, considering the computing power\ncost challenge of online serving with a larger size of the candidate\nset to be ranked.",
+      "category": "FailureRisk",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "How to address the limitation described: For a long time, it is believed that pre-ranking is just a simplified\nversion of the ranking system, considering the computing power\ncost challenge of online serving with a larger size of the candidat",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "y = σ(✓T x)\nGeneration 3\nVector-Product based DNN\nGeneration 4\nCOLD\nGeneration 2\nLogistic Regression\nGeneration 1\nAd-wise  statistical score\nuser features\nad features\nConcat\nConcat\n0\n1\nx\ny = f(xa)\ny =\n# clicks(ad)\n# impressions(ad)\nσ(x)\nuser features\nad features\ncross features\nSE Block\nConcat\nx = co",
+      "category": "Data",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "LR (Logistic Regression) model is the second generation which is a lightweight version of the large scale ranking\nmodel in the age of shallow machine learning [9].",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Vector-product\nbased deep learning architecture is the third generation and current state-of-the-art pre-ranking model.",
+      "category": "Data",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "COLD is our proposed new generation of the pre-ranking model.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "On the other\nside, both ranking and pre-ranking systems have strict latency limit,\ne.g., 10 ∼20 milliseconds.",
+      "category": "FailureRisk",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    }
+  ]
+}

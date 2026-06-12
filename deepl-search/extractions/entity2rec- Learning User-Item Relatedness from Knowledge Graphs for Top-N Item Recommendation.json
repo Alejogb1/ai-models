@@ -1,0 +1,15 @@
+{
+  "source": "entity2rec- Learning User-Item Relatedness from Knowledge Graphs for Top-N Item Recommendation",
+  "source_group": "Awesome-ML-Papers/Embeddings",
+  "processed_at": "2026-06-08T12:00:00Z",
+  "agent": "agent_batch_generation",
+  "concepts": [
+    {
+      "finding": "Knowledge-graph-based recommendation using entity embeddings. Learns user-item relatedness through graph paths in a knowledge graph (movies linked to actors, genres, directors). Meta-path-based features (count, type, length of paths) combined with learning-to-rank. Outperforms collaborative filtering, especially for cold-start items.",
+      "category": "ModelCandidate",
+      "implication": "Keyword-intent relatedness can be computed via knowledge graph paths (keyword -> category -> intent). Graph path features (length, type, count) provide interpretable evidence for keyword-intent matching.",
+      "open_question": "What knowledge graph entities and relationships are available for computing keyword-intent relatedness? Is a knowledge graph approach feasible without an existing KG?",
+      "testable_hypothesis": "Knowledge graph path features between keywords and intents outperform embedding similarity for keyword-intent assignment accuracy and explainability."
+    }
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "source": "Learning to Match Using Local and Distributed Representations of Text for Web Search",
+  "source_group": "Awesome-ML-Papers/Ranking",
+  "processed_at": "2026-06-08T12:00:00Z",
+  "agent": "agent_batch_generation",
+  "concepts": [
+    {
+      "finding": "Combines local (exact term matching signals like TF-IDF, BM25) and distributed (embedding-based semantic matching) representations for ad-hoc retrieval. Two-layer neural network fuses both signal types. Local features capture precision, distributed features capture recall. Combined model outperforms either alone by 10-15% MAP.",
+      "category": "ModelCandidate",
+      "implication": "Keyword-intent matching benefits from both lexical (exact keyword match to intent labels) and semantic (embedding similarity) signals. Hybrid model: BM25-style lexical overlap between keyword and intent description + embedding similarity. Lexical for precision, semantic for recall.",
+      "open_question": "What is the optimal weighting between lexical and semantic signals for keyword-intent matching? Does it vary by domain?",
+      "testable_hypothesis": "A hybrid keyword-intent matcher (lexical BM25 + semantic embedding similarity) outperforms either pure lexical or pure semantic matching for keyword-to-intent assignment F1."
+    }
+  ]
+}

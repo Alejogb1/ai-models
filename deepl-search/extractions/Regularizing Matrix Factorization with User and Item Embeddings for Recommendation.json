@@ -1,0 +1,15 @@
+{
+  "source": "Regularizing Matrix Factorization with User and Item Embeddings for Recommendation",
+  "source_group": "Awesome-ML-Papers/MF",
+  "processed_at": "2026-06-08T12:00:00Z",
+  "agent": "agent_batch_generation",
+  "concepts": [
+    {
+      "finding": "Regularizes MF with item embeddings learned from item co-occurrence (via word2vec-style SGNS). Additional regularization term brings item MF factors closer to their co-occurrence embeddings. Combines explicit feedback (ratings) with implicit structure (co-occurrence). Outperforms MF and pure co-occurrence embeddings on rating prediction.",
+      "category": "ModelCandidate",
+      "implication": "Regularize keyword-intent MF with keyword co-occurrence embeddings: bring keyword MF factors toward their co-occurrence embedding vectors. Keyword-keyword co-occurrence structure informs keyword-intent MF. Hybrid of explicit (observed keyword-intent pairs) and implicit (keyword-keyword co-occurrence) signals.",
+      "open_question": "What regularization strength between keyword MF factors and co-occurrence embeddings optimizes keyword-intent prediction?",
+      "testable_hypothesis": "A regularized MF model (combining keyword-intent MF loss with keyword embedding similarity regularization) outperforms both pure MF and pure embedding similarity for keyword-intent scoring."
+    }
+  ]
+}

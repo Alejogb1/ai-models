@@ -1,0 +1,148 @@
+{
+  "source": "Practice on Long Sequential User Behavior Modeling for Click-Through Rate Prediction.pdf",
+  "source_group": "Awesome-ML-Papers/CTR-CVR-Prediction",
+  "processed_at": "2026-06-08",
+  "agent": "agent5_final",
+  "concepts": [
+    {
+      "finding": "We introduce our hands-on practice\nwith the novel solution-a decoupled UIC server for real-time infer-\nence of user interest modeling and a memory-based MIMN model\nthat can be implemented incrementally and outperform the other\nstate-of-the-art models.",
+      "category": "Baseline",
+      "implication": "Can inform intent modeling for recommendation systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "The main contributions of this work are summarized as follows:\n• We introduce a hands-on practice with the co-design of\nlearning algorithm and serving system for CTR prediction\ntask.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Practice on Long Sequential User Behavior Modeling for\nClick-Through Rate Prediction\nQi Pi, Weijie Bian, Guorui Zhou, Xiaoqiang Zhu, Kun Gai∗\nAlibaba Group\nBeijing, P.R.China\n{piqi.pq,weijie.bwj,guorui.xgr,xiaoqiang.zxq,jingshi.gk}@alibaba-inc.com\nABSTRACT\nClick-through rate (CTR) prediction is crit",
+      "category": "BehavioralTests",
+      "implication": "Applicable to user/item clustering for personalization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "(ii) From machine learning algorithm\nview, we propose a novel memory-based architecture named MIMN\n(Multi-channel user Interest Memory Network) to capture user\ninterests from long sequential behavior data, achieving superior\nperformance over state-of-the-art models.",
+      "category": "Baseline",
+      "implication": "Can inform intent modeling for recommendation systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "KEYWORDS\nClick-Through Rate Prediction; User Behavior Modeling\nACM Reference Format:\nQi Pi, Weijie Bian, Guorui Zhou, Xiaoqiang Zhu, Kun Gai.",
+      "category": "BehavioralTests",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Technically, capturing user interests from\nthe rich behavior data is critically important since it contributes\nremarkable improvement for typical real-world applications, such\nas recommender system and online advertising [8, 30, 31].",
+      "category": "BehavioralTests",
+      "implication": "Can inform intent modeling for recommendation systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "In this\npaper, we limit ourselves to the task of Click-Through Rate (CTR)\nprediction modeling, which plays a critical role in online services.",
+      "category": "FailureRisk",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "• We propose a novel MIMN model, which improves original\nNTM architecture with two designs of memory utilization\nregularization and memory induction unit, making it more\nsuitable for user interest learning.",
+      "category": "ModelCandidate",
+      "implication": "Can inform intent modeling for recommendation systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "In this paper, we\npropose a new strategy named memory utilization regularization,\nwhich is shown to be effective for user interest modeling.",
+      "category": "ModelCandidate",
+      "implication": "Can inform intent modeling for recommendation systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Figure 6 shows\nthe memory utilization, which validates the effectiveness of the\nproposed regularizer.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Driven by the development of deep learning, deep CTR\nmodels with ingeniously designed architecture for user interest\nmodeling have been proposed, bringing remarkable improvement\nof model performance over offline metric.",
+      "category": "ModelCandidate",
+      "implication": "Can inform intent modeling for recommendation systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "In this paper, we face directly the challenge of long sequential\nuser behavior modeling and introduce our hands-on practice with\nthe co-design of machine learning algorithm and online serving\nsystem for CTR prediction task.",
+      "category": "FailureRisk",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "How to address the limitation described: In this paper, we face directly the challenge of long sequential\nuser behavior modeling and introduce our hands-on practice with\nthe co-design of machine learning algorithm and online serving\nsystem f",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Comparison between model performance\nand system efficiency proves the effectiveness of proposed solution.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Permission to make digital or hard copies of all or part of this work for personal or\nclassroom use is granted without fee provided that copies are not made or distributed\nfor profit or commercial advantage and that copies bear this notice and the full citation\non the first page.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Practice on\nLong Sequential User Behavior Modeling for Click-Through Rate Prediction.",
+      "category": "BehavioralTests",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Driven by the advance of deep learning, deep CTR models with\ningeniously designed architecture for user interest modeling have\nbeen proposed, achieving state-of-the-art.",
+      "category": "Baseline",
+      "implication": "Can inform intent modeling for recommendation systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "In this paper, we introduce our hands-on practice with the co-\ndesign of machine learning algorithm and online serving system.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Here we borrow the idea of memory network\nfrom NTM [11] and propose a novel architecture named MIMN\n(Multi-channel user Interest Memory Network).",
+      "category": "ModelCandidate",
+      "implication": "Can inform intent modeling for recommendation systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Moreover, MIMN\nimproves traditional NTM with two designs of memory utilization\nregularization and memory induction unit, making it more efficient\nfor modeling user behavior sequences under limited storage and\nbringing remarkable gain over model performance.",
+      "category": "FailureRisk",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "[17] argues that long-term interest\nmean general interest, which is back to one’s mind and important\nfor personalization.",
+      "category": "ModelCandidate",
+      "implication": "Can inform intent modeling for recommendation systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    }
+  ]
+}

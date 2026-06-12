@@ -1,0 +1,15 @@
+{
+  "source": "Translating Embeddings for Modeling Multi-relational Data",
+  "source_group": "Awesome-ML-Papers/Embeddings",
+  "processed_at": "2026-06-08T12:00:00Z",
+  "agent": "agent_batch_generation",
+  "concepts": [
+    {
+      "finding": "TransE: knowledge graph embedding where relationships are translations in embedding space: h + r = t for correct triple (head, relation, tail). Margin-based ranking loss with negative sampling. Simple and effective for link prediction on knowledge graphs like WordNet and Freebase. Limitations with 1-N, N-1 relations.",
+      "category": "ModelCandidate",
+      "implication": "Keyword-intent relationship as translation: keyword_embedding + intent_membership_vector = intent_embedding. If a keyword belongs to an intent, the translation distance ||k + r_i - e_i|| is small. Enables computing strength of keyword-intent membership.",
+      "open_question": "Is the additive translation assumption (k + r = i) valid for keyword-intent relationships? Can TransE model multi-label keyword-intent assignments?",
+      "testable_hypothesis": "TransE-style translation embeddings for keyword-intent relationships provide interpretable intent vector arithmetic (e.g., keyword1 - intentA + intentB predicts keywords that differ by intent shift)."
+    }
+  ]
+}

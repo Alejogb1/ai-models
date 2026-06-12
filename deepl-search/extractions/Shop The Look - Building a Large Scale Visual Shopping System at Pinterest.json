@@ -1,0 +1,15 @@
+{
+  "source": "Shop The Look - Building a Large Scale Visual Shopping System at Pinterest.pdf",
+  "source_group": "Awesome-ML-Papers/CV",
+  "processed_at": "2026-06-08",
+  "agent": "agent6_remaining",
+  "concepts": [
+    {
+      "finding": "Pinterest built a multi-modal visual shopping system combining object detection, embedding similarity, and human-curated fashion taxonomies to match user-uploaded photos to shoppable products with 90%+ precision.",
+      "category": "TargetConstruct",
+      "implication": "Multi-modal understanding (visual + text + taxonomy) is essential for complex product search where neither modality alone captures user intent.",
+      "open_question": "How should text and visual modalities be combined for optimal query understanding when one modality is missing or noisy?",
+      "testable_hypothesis": "A multi-modal query understanding system combining text, image, and taxonomy signals will outperform any single-modality baseline by at least 15% on product search relevance."
+    }
+  ]
+}

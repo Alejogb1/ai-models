@@ -1,0 +1,148 @@
+{
+  "source": "Meta-Prod2Vec - Product Embeddings Using Side-Information for Recommendation.pdf",
+  "source_group": "Awesome-ML-Papers/Session-Based-Recommendations",
+  "processed_at": "2026-06-08",
+  "agent": "agent5_final",
+  "concepts": [
+    {
+      "finding": "Meta-Prod2Vec - Product Embeddings Using\nSide-Information for Recommendation\nFlavian Vasile\nCriteo\nParis\nf.vasile@criteo.com\nElena Smirnova\nCriteo\nParis\ne.smirnova@criteo.com\nAlexis Conneau ∗\nFacebook AI Research\nParis\naconneau@fb.com\nABSTRACT\nWe propose Meta-Prod2vec, a novel method to compute\nitem",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "As shown by key\nplayers in the online e-commerce space, such as Amazon,\nNetﬂix and Alibaba, the product recommendation function-\nality is now a key driver of demand, accounting in the case\nof Amazon for roughly 35% [2] of the overall sales.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "The\nnew methods can scale to millions of items and show good\nimprovements on the cold-start problem.",
+      "category": "FailureRisk",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "We show that our approach signiﬁcantly improves recom-\nmendation performance on a subset of the 30Music listening\nand playlists dataset [30] with a low implementation and\nintegration cost.",
+      "category": "Experiment",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Several modiﬁcations have been proposed to better align\nMF methods with the recommendation objective, for in-\nstance, Bayesian Personalized Ranking [24] and Logistic MF\n[11].",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "In [23] the authors show that the Word2Vec objective (and\nsimilarly Prod2Vec’s) can be re-written as the optimization\nproblem of minimizing the weighted cross entropy between\nthe empirical and the modeled conditional distributions of\ncontext products given the target product (more precisely,\nthis re",
+      "category": "Experiment",
+      "implication": "Relevant for similarity-based retrieval and lookalike targeting",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "3.2\nMeta-Prod2Vec\nAs shown in the Related Work section, there has been ex-\ntensive work on using side information for recommendation,\nespecially in the context of hybrid methods that combine\nCF methods and Content-based (CB) methods.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "4.3.1\nImprovements on Cold-Start\nMost of the gains in performance are coming from the\ncold-start traﬃc, where, as shown in Figure 4 and Table 2,\nwe can see that Standalone Meta-Prod2Vec outperforms by a\nlarge margin all other methods when the true pair of (query\nitem, next item) have zero co-occurre",
+      "category": "Baseline",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "CONCLUSIONS\nIn this paper, we introduced Meta-Prod2Vec, a new item\nembedding method that enhances the existing Prod2Vec method\nwith item metadata at training time.",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "This work makes a\nnovel connection between the recent embedding-based meth-\nods and consecrated Matrix Factorization methods by in-\ntroducing learning with side information in the context of\nembeddings.",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Finally, we have shown that\nMeta-Prod2Vec constantly outperforms Prod2Vec on recom-\nmendation tasks both globally and in the cold-start regime,\nand that, when combined with a standard Collaborative\nFiltering approach, outperforms all other tested methods.",
+      "category": "Baseline",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "These results, together with the reduced implementation\ncost and the fact that our method does not aﬀect the online\nrecommendation architecture, makes this solution attractive\nin cases where item embeddings are already in use.",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Such scenarios are frequently encountered in\napplications such as content recommendation, ad targeting\nand web search.",
+      "category": "TargetConstruct",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Our method leverages past user interactions\nwith items and their attributes to compute low-dimensional\nembeddings of items.",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "We show that the new item representa-\ntions lead to better performance on recommendation tasks\non an open music dataset.",
+      "category": "Experiment",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Keywords\nRecommender systems; Embeddings; Neural Networks\n1.",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "As of now, the state-of-the-art recommendation meth-\nods include matrix factorization techniques of the item-item\nand user-item matrices that diﬀer in the choice of weighting\nschemes of the matrix entries, the reconstruction loss func-\ntions and their choice with regards to the use of additional\nite",
+      "category": "Baseline",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "ISBN 978-1-4503-4035-9/16/09...$15.00\nDOI: http://dx.doi.org/10.1145/2959100.2959160\nchanges in recommendation [5] and handling the cold-start\nproblem [29].",
+      "category": "FailureRisk",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "In the context of\nproduct recommendation, they were successfully applied to\nad recommendations in Yahoo!",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "In this paper, we present an extension of the Prod2Vec\nalgorithm initially proposed in [9].",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    }
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "source": "A Semi-Personalized System for User Cold Start Recommendation on Music Streaming Apps",
+  "source_group": "Awesome-ML-Papers/MF",
+  "processed_at": "2026-06-08T12:00:00Z",
+  "agent": "agent_batch_generation",
+  "concepts": [
+    {
+      "finding": "Semi-personalized cold-start recommendation: uses demographic and contextual features (device, time, location) to bootstrap recommendations for new users. Clusters new users into persona groups based on available signals. Once enough interactions collected, transitions to personalized CF.",
+      "category": "ModelCandidate",
+      "implication": "Cold-start keyword handling: cluster keywords into \"persona groups\" based on available signals (text, language, domain). As co-occurrence data accumulates, transition from persona-based to personalized (context-based) embeddings.",
+      "open_question": "What keyword features (length, language, entity type, domain) best predict the \"persona\" of a cold keyword?",
+      "testable_hypothesis": "A semi-personalized keyword intent system (persona-group based for cold keywords, embedding-based for warm) covers 100% of keywords with acceptable accuracy vs 80% for warm-only approaches."
+    }
+  ]
+}

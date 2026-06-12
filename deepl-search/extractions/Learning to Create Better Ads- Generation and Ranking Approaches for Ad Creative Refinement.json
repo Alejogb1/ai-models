@@ -1,0 +1,148 @@
+{
+  "source": "Learning to Create Better Ads- Generation and Ranking Approaches for Ad Creative Refinement.pdf",
+  "source_group": "Awesome-ML-Papers/Other",
+  "processed_at": "2026-06-08",
+  "agent": "agent5_final",
+  "concepts": [
+    {
+      "finding": "For the keyphrase and image tag recommendation task, we\ndemonstrate the efficacy of a deep relevance matching model, as\nwell as the relative robustness of ranking approaches compared to\nad text generation in cold-start scenarios with unseen advertisers.",
+      "category": "Baseline",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "• For keyphrase and image tag recommendation, we demon-\nstrate the efficacy of a deep relevance matching model for\nranking keyphrases and image tags.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "This can be\nmodeled as a query-document relevance ranking problem [9], or as\na collaborative filtering problem where user-item latent representa-\ntions are used for recommendations [10, 14].",
+      "category": "Data",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "However, given the\nrestriction on the number of keyphrases/image tags recommended,\nand their relevance to the advertiser under consideration, we focus\non relevance ranking models (e.g., DRMM [9] and variants [25]) in\nour keyphrase and image tag ranking setups.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "How to address the limitation described: However, given the\nrestriction on the number of keyphrases/image tags recommended,\nand their relevance to the advertiser under consideration, we focus\non relevance ranking models (e.g., DRMM [9] and v",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "5.2\nRanking model for tasks 2 and 3\nWe consider solving the keyphrase (and image tag) recommenda-\ntion problem via a ranking model, where the model outputs a list\nof keyphrases (and image tags) in decreasing order of relevance for\na given ad creative.",
+      "category": "FailureRisk",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "We use the state-of-the-art pairwise\ndeep relevance matching model (DRMM) [9, 25] whose architecture\nfor our recommendation setup is shown in Figure 4.",
+      "category": "Baseline",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "For\ngenerating new ad text, we demonstrate the efficacy of an encoder-\ndecoder architecture with copy mechanism, which allows some\nwords from the (inferior) input text to be copied to the output while\nincorporating new words associated with higher click-through-\nrate.",
+      "category": "ModelCandidate",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "We also show the rel-\native robustness of keyphrase ranking (compared to text\ngeneration) in a cold-start scenario with unseen advertisers.",
+      "category": "Baseline",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Advertis-\ners design one or more creatives with the help of creative strate-\ngists to target relevant online users and measure the effective-\nness of campaigns with metrics such as click-through-rate (CTR\n=\nclicks\nimpressions ) are associated with the ad creative being tested.",
+      "category": "Experiment",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "However, [20] was limited to only text inputs for a\nbrand (e.g., the brand’s Wikipedia page), and the recommendation\nwas limited to single words (keywords).",
+      "category": "FailureRisk",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "How to address the limitation described: However, [20] was limited to only text inputs for a\nbrand (e.g., the brand’s Wikipedia page), and the recommendation\nwas limited to single words (keywords).",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Our approaches are limited to consuming only CTR data across\nadvertisers (and not conversions), since in most cases, it is owned\nby the ad platform, which is typically authorized to use aggregated\ndata across advertisers to make system-wide improvements (not\nbiased towards a particular advertiser).",
+      "category": "FailureRisk",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "We formulate this as a ranking problem, where one\nneeds to rank keyphrases from a given vocabulary, for inclusion in\nthe refined ad text.",
+      "category": "FailureRisk",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "For tasks 2 (Section 3.2) and 3 (Section 3.3), the proposed\nkeyphrase/image tag ranking model is explained in Section 5.2.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "DRMM employs a pair-wise ranking loss function as described\nd1\nd2\ndm\nterm gating\nrelevance score\nsource text and image tags\nlocal interactions\nquery terms\nkeyphrases or image tags\ndocument terms\ntop-k interactions\nfeed forward\nmatching network\nq1\nq2\nqm\nFigure 4: DRMM-(top k) for keyphrase/image tag ",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "We introduce\nmetrics to gauge the presence of matched (target) keyphrases in the\ngenerated sequence: (i) keyphrase-precision (kp-P), (ii) keyphrase-\nrecall (kp-R), and (iii) keyphrase -F (kp-F).",
+      "category": "Experiment",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "6.4\nKeyphrase ranking results\nTable 3 shows the results for keyphrase ranking.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "The baselines\nincluded methods using: (i) cosine similarity (EMB-SIM) based on\nGlove [22] embeddings for keyphrases and input text (average of\nword embeddings), and (ii) TF-IDF representation of source ad text\nand keyphrases is used to compute similarity and keyphrases are\nranked in descending order",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Figure 7: Sample keyphrase ranking results vis-a-vis gen-\nerated ad text (cold-start); the keyphrase recommendations\ncan cover target keyphrases missed by poor generation.",
+      "category": "TargetConstruct",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "As shown for cold-start,\njust adding the top ranked keyphrase (add-1) improves the recall\n(0.43 →0.45) without affecting the precision (0.5).",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "The A/B test was conducted\nfor 2 weeks via Yahoo Gemini, and the refined creative showed an\n87% improvement in CTR, validating the model recommendations.",
+      "category": "BehavioralTests",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    }
+  ]
+}

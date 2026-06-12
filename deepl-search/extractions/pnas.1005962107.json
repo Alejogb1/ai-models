@@ -1,0 +1,148 @@
+{
+  "source": "pnas.1005962107.pdf",
+  "source_group": "Web-Sources",
+  "processed_at": "2026-06-08",
+  "agent": "agent5_final",
+  "concepts": [
+    {
+      "finding": "These results illustrate two points: first,\nalthough search data are indeed predictive of future outcomes,\nalternative information sources often perform equally well or\neven better; second, search appears to be most useful when\nkey indicators (e.g., past sales performance, production budgets,\netc.) ",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Finally, we reexamine previous work on tracking\nflu trends and show that, perhaps surprisingly, the utility of search\ndata relative to a simple autoregressive model is modest.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "However, by studying three classes of outcomes—the opening\nweekend box-office ticket sales for feature films, the first-month\nrevenues of video games, and the weekly ranks of songs on the\nBillboard Hot 100 chart—we reveal some additional insights re-\ngarding variation across domains in how search-ba",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "How to address the limitation described: However, by studying three classes of outcomes—the opening\nweekend box-office ticket sales for feature films, the first-month\nrevenues of video games, and the weekly ranks of songs on the\nBillboard Ho",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "5\nshows, however, there is also wide variability in the predictive\npower of search among the different domains.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "How to address the limitation described: 5\nshows, however, there is also wide variability in the predictive\npower of search among the different domains.",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Specifically we use\nsearch query volume to forecast the opening weekend box-office\nrevenue for feature films, first-month sales of video games, and the\nrank of songs on the Billboard Hot 100 chart, finding in all cases\nthat search counts are highly predictive of future outcomes.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Consumers contemplating buying a new camera may search to\ncompare models; moviegoers may search to determine the open-\ning date of a new film, or to locate cinemas showing it; and\nindividuals planning a vacation may search for places of interest,\nto find airline tickets, or to price hotel rooms.",
+      "category": "ModelCandidate",
+      "implication": "Can inform intent modeling for recommendation systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "(6) found\nthat search activity for specific cancers during 2001–2003 corre-\nlated with their estimated incidence; and Eysenbach (7) found a\nhigh correlation between clicks on sponsored search results for\nflu-related keywords and epidemiological data from the 2004–\n2005 Canadian flu season.",
+      "category": "ModelCandidate",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Going beyond correlation with contempora-\nneous events, therefore, these results show that search can also\npredict the near future—a finding that may apply usefully to a\nwide range of consumer behaviors (e.g., airline travel, hotel\nvacancy rates, and auto sales) and economic indicators (e.g.,\nreal-e",
+      "category": "BehavioralTests",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "3 A–C shows that the baseline models outperform the\nsearch-based predictions for movies (correlation 0.94), music\n(0.70), and sequel video games (0.80).",
+      "category": "Baseline",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Search, therefore, does\nindeed outperform the autoregressive model; however, the differ-\nence in performance is relatively small.",
+      "category": "Baseline",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "How to address the limitation described: Search, therefore, does\nindeed outperform the autoregressive model; however, the differ-\nence in performance is relatively small.",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Second, in certain domains searching may be more closely tied\nto the measured outcomes than in others.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "For movies, search\nis clearly outperformed by the baseline and offers no improve-\nment to it in the combined model.",
+      "category": "Baseline",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Even in domains where baseline models generally perform\nwell, however, search data may still help in some circumstances.",
+      "category": "Baseline",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "How to address the limitation described: Even in domains where baseline models generally perform\nwell, however, search data may still help in some circumstances.",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "In the case of music, for example, although the autoregressive\nmodel in general outperforms search, the model performs parti-\ncularly poorly for highly ranked songs, which have a tendency to\ndrop off rapidly, as can be seen in Fig.",
+      "category": "Baseline",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Second, unlike other data sources that require customized\nand often cumbersome collection strategies, search data can be\ncollected for many domains simultaneously and easily analyzed\nalong geographic and other dimensions, all in real time.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Materials and Methods\nTo identify user intent from queries we applied a simple and effective heur-\nistic that leverages search engine technology.",
+      "category": "TargetConstruct",
+      "implication": "Can inform intent modeling for recommendation systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Although it is likely that our method will conflate\nsearches for movies with common-word names such as “transformers” with\nother unrelated searches (e.g., for transformers of the electrical equipment\nvariety), we expect that these other searches will be uncorrelated with the\nrelease of the movies in",
+      "category": "ModelCandidate",
+      "implication": "Architecture pattern applicable to sequence modeling for user behavior",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Levin, Princeton University, Princeton, NJ, and approved August 10, 2010 (received for review April 29, 2010)\nRecent work has demonstrated that Web search volume can “pre-\ndict the present,” meaning that it can be used to accurately track\noutcomes such as unemployment levels, auto and home sales, an",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Here we show that what\nconsumers are searching for online can also predict their collective\nfuture behavior days or even weeks in advance.",
+      "category": "BehavioralTests",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "We\nalso find that search counts generally boost the performance of\nbaseline models fit on other publicly available data, where the\nboost varies from modest to dramatic, depending on the applica-\ntion in question.",
+      "category": "Baseline",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    }
+  ]
+}

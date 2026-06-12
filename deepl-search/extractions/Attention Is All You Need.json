@@ -1,0 +1,71 @@
+{
+  "source": "Attention Is All You Need.pdf",
+  "source_group": "Awesome-ML-Papers/Other",
+  "processed_at": "2026-06-08",
+  "agent": "agent5_final",
+  "concepts": [
+    {
+      "finding": "The fundamental\nconstraint of sequential computation, however, remains.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "How to address the limitation described: The fundamental\nconstraint of sequential computation, however, remains.",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "On the WMT 2014 English-to-French translation task, our big model achieves a BLEU score of 41.0,\noutperforming all of the previously published single models, at less than 1/4 the training cost of the\nprevious state-of-the-art model.",
+      "category": "Baseline",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Recent work has achieved\nsigniﬁcant improvements in computational efﬁciency through factorization tricks [21] and conditional\ncomputation [32], while also improving model performance in case of the latter.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "The Transformer follows this overall architecture using stacked self-attention and point-wise, fully\nconnected layers for both the encoder and decoder, shown in the left and right halves of Figure 1,\nrespectively.",
+      "category": "ModelCandidate",
+      "implication": "Architecture pattern applicable to sequence modeling for user behavior",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Learning long-range\ndependencies is a key challenge in many sequence transduction tasks.",
+      "category": "FailureRisk",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "How to address the limitation described: Learning long-range\ndependencies is a key challenge in many sequence transduction tasks.",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "7\n\nTable 2: The Transformer achieves better BLEU scores than previous state-of-the-art models on the\nEnglish-to-German and English-to-French newstest2014 tests at a fraction of the training cost.",
+      "category": "Baseline",
+      "implication": "Architecture pattern applicable to sequence modeling for user behavior",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "6\nResults\n6.1\nMachine Translation\nOn the WMT 2014 English-to-German translation task, the big transformer model (Transformer (big)\nin Table 2) outperforms the best previously reported models (including ensembles) by more than 2.0\nBLEU, establishing a new state-of-the-art BLEU score of 28.4.",
+      "category": "Baseline",
+      "implication": "Architecture pattern applicable to sequence modeling for user behavior",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Our results in Table 4 show that despite the lack of task-speciﬁc tuning our model performs sur-\nprisingly well, yielding better results than all previously reported models with the exception of the\nRecurrent Neural Network Grammar [8].",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Using the output embedding to improve language models.",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    }
+  ]
+}

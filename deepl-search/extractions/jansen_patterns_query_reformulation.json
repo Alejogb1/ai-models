@@ -1,0 +1,148 @@
+{
+  "source": "jansen_patterns_query_reformulation.pdf",
+  "source_group": "Web-Sources",
+  "processed_at": "2026-06-08",
+  "agent": "agent5_final",
+  "concepts": [
+    {
+      "finding": "In addition, there may be more sophisti-\ncated methods for detecting session boundaries than we used\nhere, such methods that incorporate multiple tasking and par-\nallel searches; however, our evaluation shows that these more\nsophisticated methods would lead to incremental improve-\nments relative to ",
+      "category": "Experiment",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "How to address the limitation described: In addition, there may be more sophisti-\ncated methods for detecting session boundaries than we used\nhere, such methods that incorporate multiple tasking and par-\nallel searches; however, our evaluati",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "The results show that Reformulation and Assistance\naccount for approximately 45% of all query reformula-\ntions; furthermore, the results demonstrate that the ﬁrst-\nand second-order models provide the best predictability,\nbetween 28 and 40% overall and higher than 70% for some\npatterns.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Prior work has shown\nthat effective query reformulation can improve the out-\ncome of user searches (Gauch & Smith, 1993; Rieh &\nXie, 2006).",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Some researchers have attempted contextual help to assist\nin query reformulation (Meadow, Hewett, & Aversa, 1982b);\nhowever, users can become frustrated with information that is\npushed to them by the system (Adamczyk & Bailey, 2004).",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "How to address the limitation described: Some researchers have attempted contextual help to assist\nin query reformulation (Meadow, Hewett, & Aversa, 1982b);\nhowever, users can become frustrated with information that is\npushed to them by the ",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "The investiga-\ntor showed that a second-order Markov process best modeled\nthe online-searching patterns.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Zhang and Nasraoui (2007) showed\nthat combining implicit search with Markov models was an\neffective design technique for a recommender system.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "The aforementioned research studies focused primarily on\nthe search or browsing actions and system responses and did\nnot focus on query reformulation, which is a key area of\nresearch given that the query is the primary (albeit inexact)\nexpression of the user’s need (Croft & Thompson, 1987).",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Since this cutoff is substantially greater\nthan the reported mean number of queries for human Web\nsearchers (Silverstein et al., 1999), it increased the probabil-\nity that we were not excluding any human searches.Although\nthis cutoff most likely introduced some agent sessions, we\nwanted to be reason",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Second, it shows that searchers are open to system assistance\nin query reformulations, given the rate of implementation of\nsystem assistance.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "The ﬁndings show that using a second-order model pro-\nvides substantial prediction accuracy, good coverage of the\ndata, and reasonable complexity.Although higher order mod-\nels do provide some increases in accuracy of prediction, they\nalso result in decreases in coverage and drastic increases in\ncom",
+      "category": "Experiment",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "For limitations, the detection of session boundaries is a signif-\nicant challenge in Web searching.",
+      "category": "FailureRisk",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "How to address the limitation described: For limitations, the detection of session boundaries is a signif-\nicant challenge in Web searching.",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Concerning strengths, research on the detection of query-\nreformulations patterns during Web searching sessions is\na critical area for designing more advanced searching sys-\ntems, especially in the more multifaceted searching contexts\nof exploratory, successive, and multitasking searching situ-\natio",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Overall, the results presented here are promising for\nthe application of n-grams to query reformulation in Web\nsearching to enhance algorithmic applications of automated\nassistance and contextual help.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Efﬁcient hybrid Web recommendations\nbased on Markov clickstream models and implicit search.",
+      "category": "ModelCandidate",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "E-mail: ah.spink@qut.edu.au\nQuery reformulation is a key user behavior during Web\nsearch.",
+      "category": "BehavioralTests",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Query reformula-\ntion is the process of altering a given query to improve\nsearch or retrieval performance.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "(2003) reported that\nquery-reformulation assistance may be helpful and improve\nsearching performance, and researchers have reported suc-\ncess with query-expansion methods (cf.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "DOI: 10.1002/asi.21071\nMoura, & Ziviani, 2003).When implemented in real systems,\nperhaps unfortunately, users seldom utilize this system sup-\nport, resulting in ineffective and inefﬁcient searches (Anick,\n2003).",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "In the following sections, we ﬁrst review prior work about\nsearching patterns with a focus on query-reformulation liter-\nature, and we present our research questions.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Such stochastic processes are established as effective\nmethods for analyzing users’ searching patterns.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    }
+  ]
+}

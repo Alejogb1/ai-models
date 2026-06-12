@@ -1,0 +1,15 @@
+{
+  "source": "Fast R-CNN.pdf",
+  "source_group": "Awesome-ML-Papers/CV",
+  "processed_at": "2026-06-08",
+  "agent": "agent6_remaining",
+  "concepts": [
+    {
+      "finding": "Fast R-CNN enables single-stage training of detection networks by using RoI pooling to share computation across region proposals, achieving 9x faster training than R-CNN and 213x faster inference.",
+      "category": "Experiment",
+      "implication": "Computation sharing (RoI pooling) across candidates dramatically improves efficiency. For search, this suggests pooling strategies to reuse computation across similar query or document candidates.",
+      "open_question": "What is the search-equivalent of RoI pooling for sharing computation across multiple query interpretations?",
+      "testable_hypothesis": "A computation-sharing approach for evaluating multiple query interpretations simultaneously will reduce total inference cost by 5x."
+    }
+  ]
+}

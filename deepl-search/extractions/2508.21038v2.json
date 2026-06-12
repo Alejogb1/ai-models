@@ -1,0 +1,148 @@
+{
+  "source": "2508.21038v2.pdf",
+  "source_group": "Web-Sources",
+  "processed_at": "2026-06-08",
+  "agent": "agent5_final",
+  "concepts": [
+    {
+      "finding": "Overall, our work contributes: (1) a theoretical basis for the fundamental limitations of embedding\nmodels, (2) a best-case empirical analysis showing that this proof holds for any dataset instantiation\n(by free embedding optimization), and (3) a simple real-world natural language instantiation call",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "How to address the limitation described: Overall, our work contributes: (1) a theoretical basis for the fundamental limitations of embedding\nmodels, (2) a best-case empirical analysis showing that this proof holds for any dataset instantiati",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Our work shows the limits of embedding models under the existing single\nvector paradigm and calls for future research to develop new techniques that can\nresolve this fundamental limitation.",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "How to address the limitation described: Our work shows the limits of embedding models under the existing single\nvector paradigm and calls for future research to develop new techniques that can\nresolve this fundamental limitation.",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "6\nCONCLUSION\nWe introduce the LIMIT dataset, which highlights a fundamental limitation of embedding models.",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "How to address the limitation described: 6\nCONCLUSION\nWe introduce the LIMIT dataset, which highlights a fundamental limitation of embedding models.",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Rather than proposing empirical benchmarks to gauge what embedding models can achieve, we seek\nto understand at a more fundamental level what the limitations are.",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "How to address the limitation described: Rather than proposing empirical benchmarks to gauge what embedding models can achieve, we seek\nto understand at a more fundamental level what the limitations are.",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Overall, these numbers already show that for web-scale search, even the largest\nembedding dimensions with ideal test-set optimization are not enough to model all combinations.",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Figure 5 shows the model trained on the training set cannot solve the problem, although it does see\nvery minor improvement from near zero recall@10 to up to 2.8 recall@10.",
+      "category": "FailureRisk",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Irrespective of the architecture involved, however, our framework can scale\nthe dataset’s difficulty to consistently demonstrate this fundamental limitation.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "How to address the limitation described: Irrespective of the architecture involved, however, our framework can scale\nthe dataset’s difficulty to consistently demonstrate this fundamental limitation.",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Colbert: Efficient and effective passage search via contextualized\nlate interaction over bert.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "We then create a realistic dataset called LIMIT\nthat stress tests embedding models based on these theoretical results, and observe\nthat even state-of-the-art models fail on this dataset despite the simple nature of the\ntask.",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Although models cannot solve these\nbenchmarks yet, the community has proposed these problems in order to push the boundaries of what\ndense retrievers are capable of—which is now implicitly every task that could be defined.",
+      "category": "Baseline",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Specifically, we show that for a given embedding dimension d\nthere exist top-k combinations of documents that cannot be returned—no matter the query—\nhighlighting a theoretical and fundamental limit to embedding models.",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "and\nJon likes Apples, ...), we find it is very difficult for even state-of-the-art embedding\nmodels (Lee et al., 2025; Zhang et al., 2025) on MTEB (Enevoldsen et al., 2025), and practically\nimpossible for models with small embedding dimensions using standard optimization techniques.",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "(2019) showed the empirical limitations of models in the cross-lingual\nsetting and Yin & Shen (2018) showed how embedding dimensions relate to the bias-variance tradeoff.",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "How to address the limitation described: (2019) showed the empirical limitations of models in the cross-lingual\nsetting and Yin & Shen (2018) showed how embedding dimensions relate to the bias-variance tradeoff.",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "In contrast, our work provides a theoretical connection between the embedding dimension and the\ntop-k sets it can retrieve, while also showing empirical limitations.",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "How to address the limitation described: In contrast, our work provides a theoretical connection between the embedding dimension and the\ntop-k sets it can retrieve, while also showing empirical limitations.",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "4\nEMPIRICAL CONNECTION: BEST CASE OPTIMIZATION\nHaving established a theoretical limitation of embedding models based on their embedding dimension\nd, we seek to show that this holds empirically also.",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "How to address the limitation described: 4\nEMPIRICAL CONNECTION: BEST CASE OPTIMIZATION\nHaving established a theoretical limitation of embedding models based on their embedding dimension\nd, we seek to show that this holds empirically also.",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Thus, this shows whether it is feasible for any\nembedding model to solve this problem: if the free embedding optimization cannot solve the\nproblem, real retrieval models will not be able to either.",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "However, as there are no LLMs with an embedding dimension smaller than 384, we include\nMRL for all models to small dimensions (32) to show the impact of embedding dimensionality.",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "How to address the limitation described: However, as there are no LLMs with an embedding dimension smaller than 384, we include\nMRL for all models to small dimensions (32) to show the impact of embedding dimensionality.",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Although our queries look similar\nto standard web search queries, we wondered whether\nthere could be some domain shift causing the low performance.",
+      "category": "ModelCandidate",
+      "implication": "Relevant for similarity-based retrieval and lookalike targeting",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "However, it is notable that the real models with 64 dimensions still cannot completely\nsolve the task, implying real models perform significantly worse than the bounds shown in §4.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "How to address the limitation described: However, it is notable that the real models with 64 dimensions still cannot completely\nsolve the task, implying real models perform significantly worse than the bounds shown in §4.",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Cross-Encoders Although not suitable for first stage retrieval at scale, they are already typically\nused to improve first stage results.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    }
+  ]
+}

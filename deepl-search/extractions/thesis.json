@@ -1,0 +1,148 @@
+{
+  "source": "thesis.pdf",
+  "source_group": "Web-Sources",
+  "processed_at": "2026-06-08",
+  "agent": "agent5_final",
+  "concepts": [
+    {
+      "finding": "Chapter 6 proposes a comple-\n\n1.3 structure and contributions of the thesis\n7\nmentary item-based adaptation of relevance models which we\nuse to solve a novel recommendation problem: how to liquidate\nlong tail items.",
+      "category": "FailureRisk",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "In summary, in this chapter, we studied thoroughly the eﬀectiveness\nof relevance models to address the top-N recommendation task and\nproposed improvements to the original proposal.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "In the next chapter, we\nintroduce a diﬀerent adaptation of relevance models to deal with a novel\nrecommendation problem.",
+      "category": "FailureRisk",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Te results show that penalized cosine outperforms cosine similarity\nin ranking accuracy, diversity and novelty on all the datasets except for\ndiversity and novelty on R3-Yahoo.",
+      "category": "Baseline",
+      "implication": "Relevant for similarity-based retrieval and lookalike targeting",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "However, only JMS can outperform cosine similarity in\nranking accuracy, diversity and novelty on all datasets.",
+      "category": "Baseline",
+      "implication": "Relevant for similarity-based retrieval and lookalike targeting",
+      "open_question": "How to address the limitation described: However, only JMS can outperform cosine similarity in\nranking accuracy, diversity and novelty on all datasets.",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Our experiments showed that a uniform neighbor prior with the\nprobabilistic estimator based on Jelinek-Mercer smoothing for items can\nsigniﬁcantly improve the ranking accuracy, diversity and novelty of the\nrecommendation.",
+      "category": "Experiment",
+      "implication": "Relevant for similarity-based retrieval and lookalike targeting",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "We adjusted co-\nsine similarity with the ﬁndings of these analyses and proposed two\nmodiﬁed versions of the similarity that improves the original formulation\nin terms of ranking accuracy, diversity and novelty.",
+      "category": "Experiment",
+      "implication": "Relevant for similarity-based retrieval and lookalike targeting",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "We investigate the conventional top-N recommendation\ntask, but we also explore the recently formulated user-item group forma-\ntion problem and propose a novel task based on the liquidation of long\ntail items.",
+      "category": "FailureRisk",
+      "implication": "Applicable to user/item clustering for personalization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "In Chapter 6, we\npropose the item-based counterpart of relevance models for CF showing\nthat it is an eﬀective algorithm for tackling a new task: getting rid of\nlong tail items with recommendations.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "64\nrelevance models for user-based recommendation\n5.2\nstudy of smoothing methods\nLanguage models use smoothed probability estimates to achieve high\nSmoothing\nimproves the\neﬀectiveness by\navoiding zeros in\nthe MLE.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "66\nrelevance models for user-based recommendation\n5.2.2.1\nIDF eﬀect and novelty\nIn information retrieval , the inverse document frequency (IDF) is a mea-\nIDF is the\nfundamental term\nspeciﬁcity measure.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Finally, we conduct a series of experiments\nthat show that the use of a linear length prior for the users and a proba-\nbilistic length prior based on Dirichlet smoothing for the items leads to\nsigniﬁcant improvements in terms of ranking accuracy.",
+      "category": "Experiment",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "We propose a diﬀerent adaptation of relevance\nmodels to deal with a novel recommendation task.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "6.2.1\nProblem formulation\nWe propose a novel recommendation problem: instead of generating\nthe best item suggestions for each user, we aim to ﬁnd the best users\nfor each long tail product.",
+      "category": "FailureRisk",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "In the next chapter, we use this item-based adaptation of relevance\nmodels to address another novel recommendation problem.",
+      "category": "FailureRisk",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "We also propose a second\noracle that, although it shows a more modest performance, is more ap-\npropriate for current grouping strategies which are based principally on\nco-occurrences of ratings.",
+      "category": "ModelCandidate",
+      "implication": "Applicable to user/item clustering for personalization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Extensive experimen-\ntation on four datasets conﬁrms that our new formulations of cosine\nsimilarity generate neighborhoods that produce better recommendations\nregarding ranking quality, diversity and novelty.",
+      "category": "Experiment",
+      "implication": "Relevant for similarity-based retrieval and lookalike targeting",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "However, Figure 9.3 shows that this penalty can also\nWe improve the\ncosine similarity\nby introducing the\nIDF eﬀect in its\nformulation.",
+      "category": "ModelCandidate",
+      "implication": "Relevant for similarity-based retrieval and lookalike targeting",
+      "open_question": "How to address the limitation described: However, Figure 9.3 shows that this penalty can also\nWe improve the\ncosine similarity\nby introducing the\nIDF eﬀect in its\nformulation.",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "However, adding the\nIDF heuristic to the cosine formula provides a boost in ranking accuracy,\ndiversity and novelty at no extra cost—we do not need to add any new\nparameter to the similarity measure.",
+      "category": "Experiment",
+      "implication": "Relevant for similarity-based retrieval and lookalike targeting",
+      "open_question": "How to address the limitation described: However, adding the\nIDF heuristic to the cosine formula provides a boost in ranking accuracy,\ndiversity and novelty at no extra cost—we do not need to add any new\nparameter to the similarity measure.",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "George and Merugu (2005)\nproposed a weighted co-clustering algorithm that involves simultane-\nous clustering of users and items; however, the advantages are mainly\ncentered on the eﬃciency of the algorithm.",
+      "category": "ModelCandidate",
+      "implication": "Applicable to user/item clustering for personalization",
+      "open_question": "How to address the limitation described: George and Merugu (2005)\nproposed a weighted co-clustering algorithm that involves simultane-\nous clustering of users and items; however, the advantages are mainly\ncentered on the eﬃciency of the algo",
+      "testable_hypothesis": ""
+    }
+  ]
+}

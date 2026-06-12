@@ -1,0 +1,15 @@
+{
+  "source": "Item2Vec",
+  "source_group": "Awesome-ML-Papers/Embeddings",
+  "processed_at": "2026-06-08T12:00:00Z",
+  "agent": "agent03_embeddings_mf_ranking_search_compiled",
+  "concepts": [
+    {
+      "finding": "Applies Skip-gram with Negative Sampling (SGNS) to item-based collaborative filtering. Treats item sets/baskets as sequences (discarding temporal order). Each pair of items in the same set is a positive example. Window size = set size. Outperforms SVD for item similarity, especially for unpopular items (68% vs 58.4% genre classification accuracy).",
+      "category": "Model Candidate",
+      "implication": "Keyword clustering can use Item2Vec-style co-occurrence within documents/queries as positive signals. The subsampling of frequent words and negative sampling by unigram^0.75 distribution helps with tail queries.",
+      "open_question": "Do keywords in the same search session or document define a 'basket'? What constitutes a meaningful co-occurrence set?",
+      "testable_hypothesis": "Item2Vec on keyword co-occurrence within search sessions produces better intent clusters than matrix factorization (SVD) of keyword-keyword co-occurrence."
+    }
+  ]
+}

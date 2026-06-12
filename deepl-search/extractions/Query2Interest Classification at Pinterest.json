@@ -1,0 +1,148 @@
+{
+  "source": "Query2Interest Classification at Pinterest.pdf",
+  "source_group": "Awesome-ML-Papers/Other",
+  "processed_at": "2026-06-08",
+  "agent": "agent5_final",
+  "concepts": [
+    {
+      "finding": "To attack the short text classification challenge, we con-\nduct a thorough study of deep learning models performance on\nQ2I and propose a novel pin annotation-based query augmentation\nalgorithm which lifts all model performance significantly.",
+      "category": "LabelValidation",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "How to address the limitation described: To attack the short text classification challenge, we con-\nduct a thorough study of deep learning models performance on\nQ2I and propose a novel pin annotation-based query augmentation\nalgorithm which ",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Some key observations\nwe can draw:\nFirst, data augmentation significantly improves Q2I precision\nacross all the algorithms we tried.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "This module is important to applications including query\nunderstanding, search relevance, and ads targeting.",
+      "category": "TargetConstruct",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "CCS CONCEPTS\n• Information systems →Query intent; Query representation;\n• Computing methodologies →Supervised learning by clas-\nsification; Neural networks;\nKEYWORDS\nquery understanding, text classification, NLP models\nPermission to make digital or hard copies of all or part of this work for persona",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Moreover, by comparing this query’s interest to pins’\ninterests, it can also be used as search relevance features for better\nranking purpose.",
+      "category": "TargetConstruct",
+      "implication": "Can inform intent modeling for recommendation systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "However, it is unclear whether\ntransformer still has the power when input is very short, because\nthere is no long enough text context to allow the self-attention\nmechanism in transformer to find out the internal structures of\ninput.",
+      "category": "ModelCandidate",
+      "implication": "Architecture pattern applicable to sequence modeling for user behavior",
+      "open_question": "How to address the limitation described: However, it is unclear whether\ntransformer still has the power when input is very short, because\nthere is no long enough text context to allow the self-attention\nmechanism in transformer to find out t",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "With a robust Query2Interest classifier, it is possible to do interest\nbased search ads targeting, interest based search relevance model\nand guided search term recommendation, etc.",
+      "category": "TargetConstruct",
+      "implication": "Can inform intent modeling for recommendation systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "To summarize, the\ncontribution of this paper includes:\n• A fair model architecture comparison of common deep learn-\ning models for short text classification, which may give hints\nto other ML researchers and practitioners about which mod-\nels to use;\n• A thorough study of modern pre-trained NLP model",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "However, to understand the intent of a search query, it is\nimportant to map them into higher level interest concepts.",
+      "category": "TargetConstruct",
+      "implication": "Can inform intent modeling for recommendation systems",
+      "open_question": "How to address the limitation described: However, to understand the intent of a search query, it is\nimportant to map them into higher level interest concepts.",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "This\nproblem has been actively studied in web search and data min-\ning community, for example, classifying query into informational\nor transactional categories [12], intents mined from logs [8, 36],\nWikipedia keywords [16], etc.",
+      "category": "TargetConstruct",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "In this paper, we\npropose a novel approach to use the top pin of search result to help\nderive augmentation terms.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "To understand the context of the problem, we must explain the\ndefinition of pin first, which plays a central role of the Pinterest\napp.",
+      "category": "FailureRisk",
+      "implication": "Can inform intent modeling for recommendation systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Extract features from annotation candidates (not full list):\n• the frequency of candidate in pins\n• inverse document frequency of candidate\n• candidate source (title is more important than body text)\n• embedding similarity between the candidate and the pin\n• visual embedding projection to text space",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "By appending the top annotation terms to input query, the\naverage length is significantly improved as shown in figure 5.",
+      "category": "LabelValidation",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "It is very important to guarantee pinners’ smooth\n2https://business.pinterest.com/en/pinterest-ad-targeting-capabilities\nexperience when they search or browse something in home feeds by\nshowing ads with the same interests.",
+      "category": "TargetConstruct",
+      "implication": "Can inform intent modeling for recommendation systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "More importantly, by\nmatching queries’ interests to pins’ interests can serve as a good\ndiscriminative feature to improve relevance model.",
+      "category": "ModelCandidate",
+      "implication": "Can inform intent modeling for recommendation systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Apparently, search is an essential surface\nto bring users to their interests.",
+      "category": "ModelCandidate",
+      "implication": "Can inform intent modeling for recommendation systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "In the\ncase of ads targeting, using interest as targeting type can improve\nrecall significantly and simplify advertisers’ data operations.",
+      "category": "TargetConstruct",
+      "implication": "Can inform intent modeling for recommendation systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "In this paper, we set up a fair benchmark for different deep neural\nnetwork (DNN) models, including pre-trained NLP models on large\ncorpus of text data, to better understand how different models\nperform on an important real problem.",
+      "category": "Baseline",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "We propose to expand an\ninput query with text information derived from its top pins in search\nresults, with the motivation of increasing query length to fit DNN\nmodels’ complexity better.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    }
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "source": "Conditional Generative Adversarial Nets.pdf",
+  "source_group": "Awesome-ML-Papers/GANs",
+  "processed_at": "2026-06-08",
+  "agent": "agent6_remaining",
+  "concepts": [
+    {
+      "finding": "CGANs condition both generator and discriminator on auxiliary information (class labels), enabling controlled generation of class-specific samples and improving training stability.",
+      "category": "ModelCandidate",
+      "implication": "Conditioning on auxiliary information (user features, context, session history) can improve both generation and discrimination, applicable to search ranking conditioned on user context.",
+      "open_question": "Which user context signals are most valuable for conditioning search ranking models?",
+      "testable_hypothesis": "A ranking model conditioned on user context (device, location, time, past behavior) will outperform an unconditioned model by 8%+ NDCG on personalized search tasks."
+    }
+  ]
+}

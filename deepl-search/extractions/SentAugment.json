@@ -1,0 +1,148 @@
+{
+  "source": "SentAugment.pdf",
+  "source_group": "Awesome-ML-Papers/Other",
+  "processed_at": "2026-06-08",
+  "agent": "agent5_final",
+  "concepts": [
+    {
+      "finding": "Speciﬁcally, we\nmake the following contributions:\n• We introduce SentAugment, a data augmen-\ntation approach for semi-supervised learn-\ning that retrieves task-speciﬁc in-domain data\nfrom a large bank of web sentences.",
+      "category": "LabelValidation",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "5\nAnalysis of similarity search\nIn this section, we present the results of our Sen-\ntAugment sentence embedding (SASE) method on\nsemantic textual similarity (STS) benchmarks and\npresent examples of retrieved sentence based on\nlarge-scale similarity search.",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "5.2\nExamples of large-scale similarity search\nSentAugment uses large-scale similarity search\ncombined with an embedding space with billions of\nsentences to ﬁnd in-domain sentences.",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Our sentence embedding model\nis optimized for similarity search, trained with a\ntriplet loss on ground-truth paraphrases, parallel\nsentences as well as as hard negatives (Wieting\net al., 2016; Wieting and Gimpel, 2017).",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "The approach is\ngenerally applicable to new problems, leading to\nimprovements on a variety of domains and tasks\nsuch as hate-speech and movie review classiﬁcation\nover a strong RoBERTa (Devlin et al., 2018; Liu\net al., 2019) baseline.",
+      "category": "Baseline",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "4.2\nFew-shot learning experiments\nWe investigate the effectiveness of our approach\nin the context of few-shot learning.",
+      "category": "Experiment",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Finally, using SentAugment leads\nto strong improvements, up to 85.4% average accu-\nracy, only 0.9% average accuracy below the teacher\nmodel with almost ten times less parameters, show-\ning the importance of data augmentation for KD.",
+      "category": "Experiment",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Interestingly, having one query embedding per sen-\ntence in the training set does not improve perfor-\nmance, except for named entity recognition where\n\nthe per-sentence approach leads to the best perfor-\nmance.",
+      "category": "Data",
+      "implication": "Can inform intent modeling for recommendation systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "The sentence embedding method plays\nan essential role as shown in Table 6.",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "We observe that uSIF-ParaNMT and para-\nembeddings - two sentence embedding methods\nthat obtain state-of-the-art results on semantic tex-\ntual similarity benchmarks - lead to stronger perfor-\nmance than the average-word2vec approach.",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "To obtain addi-\ntional data for a speciﬁc task, we introduce\nSentAugment, a data augmentation method\nwhich computes task-speciﬁc query embed-\ndings from labeled data to retrieve sentences\nfrom a bank of billions of unlabeled sentences\ncrawled from the web.",
+      "category": "LabelValidation",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Unlike previous semi-\nsupervised methods, our approach does not re-\nquire in-domain unlabeled data and is there-\nfore more generally applicable.",
+      "category": "LabelValidation",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Finally, we also\nshow strong gains on knowledge-distillation\nand few-shot learning.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "(2020) studied this question in the\ncontext of image recognition, showing that self-\ntraining was helpful, even in addition to pre-\ntraining.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "An important ingredient for self-training, and\nsemi-supervised learning in general, is the unan-\nnotated data and the fact that it comes from the\nsame domain as the downstream task.",
+      "category": "LabelValidation",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "A sec-\nond important question is thus: how can we obtain\nlarge amounts of unannotated data from speciﬁc\ndomains?",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "arXiv:2010.02194v1  [cs.CL]  5 Oct 2020\n\nIn this paper, we propose a data augmentation\nmethod, SentAugment, to build datasets of “in-\ndomain” data for a given task from data crawled\non the web.",
+      "category": "Experiment",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Experiments show that SentAug-\nment is effective for self-training, knowledge dis-\ntillation and few-shot learning.",
+      "category": "Experiment",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "• We show that self-training improves upon\nunsupervised\npretraining:\nwe\nimprove\nRoBERTa-Large by 1.2% accuracy on average\non six standard classiﬁcation benchmarks.",
+      "category": "LabelValidation",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "• We show that self-training improves accuracy\nby 3.5% on average for few-shot learning.",
+      "category": "Experiment",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    }
+  ]
+}

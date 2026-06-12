@@ -1,0 +1,1284 @@
+Pre-trained Language Model for Web-scale Retrieval in Baidu
+Search
+Yiding Liu#, Guan Huang#, Jiaxiang Liu, Weixue Lu, Suqi Cheng, Yukun, Li, Daiting Shi,
+Shuaiqiang Wang, Zhicong Cheng, Dawei Yin∗
+Baidu Inc., China
+{liuyiding.tanh,chengsuqi}@gmail.com
+{huangguan01,liujiaxiang,luweixue,liyukun01,shidaiting01,wangshuaiqiang,chengzhicong01}@baidu.com
+yindawei@acm.org
+ABSTRACT
+Retrieval is a crucial stage in web search that identifies a small set of
+query-relevant candidates from a billion-scale corpus. Discovering
+more semantically-related candidates in the retrieval stage is very
+promising to expose more high-quality results to the end users.
+However, it still remains non-trivial challenges of building and
+deploying effective retrieval models for semantic matching in real
+search engine. In this paper, we describe the retrieval system that
+we developed and deployed in Baidu Search. The system exploits the
+recent state-of-the-art Chinese pretrained language model, namely
+Enhanced Representation through kNowledge IntEgration (ERNIE),
+which facilitates the system with expressive semantic matching. In
+particular, we developed an ERNIE-based retrieval model, which is
+equipped with 1) expressive Transformer-based semantic encoders,
+and 2) a comprehensive multi-stage training paradigm. More im-
+portantly, we present a practical system workflow for deploying
+the model in web-scale retrieval. Eventually, the system is fully
+deployed into production, where rigorous offline and online ex-
+periments were conducted. The results show that the system can
+perform high-quality candidate retrieval, especially for those tail
+queries with uncommon demands. Overall, the new retrieval system
+facilitated by pretrained language model (i.e., ERNIE) can largely
+improve the usability and applicability of our search engine.
+KEYWORDS
+Pretrained Language Models; Information Retrieval; Search
+ACM Reference Format:
+Yiding Liu#, Guan Huang#, Jiaxiang Liu, Weixue Lu, Suqi Cheng, Yukun,
+Li, Daiting Shi, Shuaiqiang Wang, Zhicong Cheng, Dawei Yin∗. 2021. Pre-
+trained Language Model for Web-scale Retrieval in Baidu Search. In Proceed-
+ings of ACM Conference (Conference’17). ACM, New York, NY, USA, 11 pages.
+https://doi.org/10.1145/nnnnnnn.nnnnnnn
+1
+INTRODUCTION
+Search engines (e.g., Google, Baidu, Bing) are critical tools for people
+to find useful information from massive web documents. A modern
+search engine usually employ a multi-stage pipeline that gradually
+narrows down the number of relevant documents (i.e., web pages),
+where retrieval is usually known as the very first stage. It aims at
+identifying a few hundreds or thousands of relevant candidates
+# Co-first authors.
+∗Dawei Yin is the corresponding author.
+Conference’17, July 2017, Washington, DC, USA
+2021. ACM ISBN 978-x-xxxx-xxxx-x/YY/MM...$15.00
+https://doi.org/10.1145/nnnnnnn.nnnnnnn
+from the entire billion-scale corpus, which has significant impact
+to the overall capability of a search engine.
+Nevertheless, the unprecedented scale and diversity of web doc-
+uments impose many challenges to the retrieval system. First (C1),
+semantic matching [20] is one of the most critical concern, while
+conventional methods based on text matching (e.g., BM25 [34]) may
+easily fail at modeling relevant information with different phrasing.
+Worse still, an increasing number of queries are in the style of natu-
+ral language, making the semantic modeling even more challenging.
+Second (C2), both search queries and web contents are highly het-
+erogeneous, following long-tail distributions. For example, a large
+amount of low-frequency queries (i.e., tail queries) have never been
+seen before by the search engine. As such, the semantics of tail
+queries and documents are difficult to be accurately inferred. Third
+(C3), to create significant impact to real-world applications, it also
+calls for practical solutions on deploying the retrieval model to
+serve web-scale data.
+Extensive efforts from both academia and industry have been
+dedicated to tackle these challenges. To conduct semantic retrieval,
+a wealth of studies [8, 14, 33, 45] have explored various bi-encoder
+models (i.e., Siamese networks or two-tower models), where dif-
+ferent representation learning techniques has been employed as
+semantic encoders. Given a query and a document, the semantic
+encoder takes the query text and the document text (e.g., title) as
+inputs, and respectively produces two embeddings for the relevance
+computation. Recently, BERT [4] has made significant progress on
+natural language understanding, and thus has also been applied
+as a more powerful semantic encoder [2, 16, 23]. The BERT-based
+bi-encoder and its variants have achieved the state-of-the-art per-
+formance on retrieval tasks [1, 44], which can be mainly attributed
+to the expressive deep attention-based structure (i.e., Transformer)
+and the pretraining and fine-tuning paradigm. Although consid-
+erable research progress has been made, there is still a lack of
+investigation on how to develop and deploy such retrieval models
+in the online environment of a search engine.
+Present work. In this paper, we introduce a novel retrieval system
+that is fully deployed in Baidu Search1, the dominant search engine
+in China. In particular, the retrieval system is equipped with the
+recent state-of-the-art Chinese pretrained language model (PLM),
+namely Enhanced Representation through kNowledge IntEgration
+(ERNIE) [38], which enables effective semantic matching in the sys-
+tem. More specifically, we design the retrieval system with several
+key insights to tackle the aforementioned challenges:
+1www.baidu.com
+arXiv:2106.03373v3  [cs.IR]  30 Jun 2021
+• To tackle the first challenge (C1), we leverage an ERNIE-based
+(i.e., Transformer-based) bi-encoder to perform expressive seman-
+tic matching. In particular, the Transformer encoders directly
+take the raw texts of queries and web documents as inputs and
+encode their semantics in latent embeddings. The deep structure
+of Transformer encoders allow the complicated semantics to be
+more comprehensively modeled. The dense attention over the
+raw texts can also keep the semantics of fine-grained context,
+such as using different prepositions (e.g., “for” vs. “to”), which is
+more friendly to conversational queries. Moreover, we integrate
+a poly-interaction scheme [16] and effective training data min-
+ing strategies, which further improves the effectiveness of the
+retrieval model.
+• To tackle the second challenge (C2), we further propose a multi-
+stage training paradigm for optimizing the retrieval model. In
+particular, the training stages are designed with different data
+sources and objectives, which allows rich knowledge to be ab-
+sorbed by the model. Compared with training-from-scratch, our
+proposed paradigm can further boost the generalization ability
+of the model, which is especially beneficial for tail queries.
+• To tackle the third challenge (C3), we develop a system archi-
+tecture that serves the proposed model for large-scale web re-
+trieval. In particular, we incorporate the semantic matching with
+conventional text matching to collaboratively generate relevant
+candidates. Moreover, we further introduce a lightweight post-
+retrieval filtering module that provides an unified filtering for
+the retrieval, where more statistical features (e.g., clickthrough
+rate, dwell time) can be introduced to consider the overall quality.
+Overall, the system architecture allows the proposed model to
+work together with conventional text-matching workflow and
+offers flexibility for including other features.
+To the best of our knowledge, this is one of the largest applica-
+tions of pre-trained language models for web-scale retrieval. We
+anticipate this paper to provide our practical experiences and new
+insights for incorporating PLMs in web retrieval. The main contri-
+butions can be summarized as follows:
+• The retrieval model. We leverage Transformers as the semantic
+encoders for web retrieval, and further exploit a poly-interaction
+scheme and several strategies for mining training data. The model
+can capture complicated semantic information underlying query
+and web documents, and is effective for semantic matching.
+• Training paradigm. We introduce a novel multi-stage training
+paradigm that facilitates the retrieval model to learn rich informa-
+tion. This would significantly improve the generalization ability
+of the model, especially for the tail queries.
+• System design. We design an effective and efficient system
+workflow to server the model, allowing it to seamlessly work
+with the conventional workflow to boost the overall performance.
+We also introduce a post-retrieval filtering module, which inte-
+grates statistical features and semantic relatedness that measure
+the overall quality of the candidates in an unified manner.
+• Evaluation. We conduct extensive offline and online experi-
+ments to validate the effectiveness of the retrieval system. The
+results show that the deployment of the system can significantly
+improve the usability and applicability of the search engine.
+2
+RELATED WORK
+2.1
+Semantic Retrieval in Web Search
+Semantic retrieval is essential for a modern retrieval system. Typical
+structures of semantic retrieval models can be viewed as bi-encoders
+or Siamese networks [5], which comprises two encoders that con-
+duct semantic modeling. Most of the existing studies mainly focus
+on designing the encoders with different representation learning
+techniques [8, 13, 14, 21, 33, 45]. A representative work, namely
+Deep Semantic Similarity Model (DSSM) [14], is one of the earli-
+est DNN methods for semantic modeling with clickthrough data.
+The deep fully-connected architectures of the DSSM encoders can
+extract expressive semantic information and achieve superior per-
+formance on web search. Thereafter, other DNN-based retrieval
+methods have thrived over the past years [27], including those
+based on Convolutional Neural Networks (CNNs) [7, 35–37] and
+Recurrent Neural Networks (RNNs) [29, 30].
+The common bi-encoder structure of those models allows a
+large number of document embeddings to be pre-computed and
+cached offline, which is very efficient for online retrieval. There-
+fore, such model structure has also been developed in real-world
+products [11, 13, 47]. For instance, Huang et al. [13] employ DNN-
+based bi-encoder in Facebook Search system, and introduce various
+practical experiences in the end-to-end optimization of the system.
+Zhang et al. [47] introduce embedding learning for the semantic
+retrieval in their E-commerce search service. Besides, Yin et al. [46]
+also adopts deep semantic matching in the core ranking module
+of Yahoo Search. Different from previous studies, we explore pre-
+trained language model with multi-stage training to better perceive
+the semantics behind queries and documents.
+Despite the above-mentioned bi-encoder models, interaction-
+based methods are also widely used in many information retrieval
+systems [9, 10, 44, 48–52]. As such, another line of research for
+semantic matching is to model query-document interaction with
+DNNs [25, 28, 40, 44, 53]. However, they cannot cache the document
+embeddings offline, and thus are inefficient for retrieval. They are
+preferred for ranking stage, which will not be further discussed
+in this paper. In our search engine, interaction-based methods are
+exploited to build the PLM-based ranking system [53].
+2.2
+Pretrained Language Models
+Pretrained Language Models (PLMs), such as ELMo [31], BERT [4]
+and ERNIE [38], have achieved monumental success in natural lan-
+guage understanding. Notably, the recent state-of-the-art PLMs [4,
+22, 43] are usually based on Transformers [39], which exploit a deep
+structure with stacked multi-head attention and fully-connected
+layers. More importantly, they adopted unsupervised pretraining
+with large corpus, and thus can incorporate more useful knowl-
+edge in the models. As BERT and its successors (e.g., XLNet [43],
+RoBERTa [22]) exhibit superior capacity in understanding textual
+data, a handful of studies start to leverage them for semantic re-
+trieval [2, 16, 24]. For instance, Chang et al. [2] propose an early
+attempt that introduces BERT-based bi-encoders for large-scale
+retrieval. It also studies the effects of several new pretraining tasks.
+Humeau et al. [16] advance such bi-encoder with attentive interac-
+tion for the query and document embeddings. Lu et al. [23] explore
+the negative sampling strategies for BERT-based bi-encoders at
+both pretraining and finetuning stages. However, despite the initial
+success achieved by these work, there is still a lack of investigation
+on developing and deploying such model for web-scale retrieval,
+especially in real-world productions. In this paper, we propose to
+leverage the state-of-the-art Chinese pretrained language model,
+namely Enhanced Representation through kNowledge IntEgration
+(ERNIE) [38], for building the retrieval system of our search engine.
+3
+RETRIEVAL MODEL
+In this section, we first present the task definition, and then intro-
+duce the details of our proposed retrieval model.
+3.1
+Task Definition
+Given a query 𝑞, the web retrieval task aims to return a set of
+relevant documents from a large corpus 𝐷, where the size of the
+corpus can be tens of billions or more. We denote by 𝐷+𝑞the set
+of documents relevant to the query. Different from conventional
+retrieval with term matching, semantic retrieval computes the rel-
+evance score 𝑓(·) in a learned embedding space [2, 18, 19, 26, 42],
+using similarity metrics (e.g., dot-product, cosine similarity) as:
+𝑓(𝑞,𝑑) = sim(𝜙(𝑞;𝜃),𝜓(𝑑; 𝛽)),
+(1)
+where 𝜙(or 𝜓) is the representation model (i.e., encoder) parame-
+terized by 𝜃(or 𝛽) that encodes the query (or document) to dense
+embeddings.
+3.2
+Model Architecture
+In this work, we are interested in parameterizing the encoders 𝜙
+and 𝜓as deep Transformer models [39] due to its expressive power
+in modeling natural language.
+The bi-encoder backbone. By implementing 𝜙and 𝜓as deep
+Transformers, we refer the paradigm described in Eq. (1) as bi-
+encoder [16]. More specifically, let T be a multi-layer transformer
+encoder, which is a stack of 𝑛transformer blocks. Each block con-
+sists of a multi-head self-attention (MHA) sublayer followed by
+a feed-forward (FFN) sublayer, where MHA allows the model to
+jointly attend to different subspaces and FFN aggregates the atten-
+tion results of different heads. The encoder takes {[CLS],𝑇1, · · · ,𝑇𝑁}
+(or
+
+[CLS],𝑇′
+1, · · · ,𝑇′
+𝑀
+	), i.e., the tokenzied sequence of the raw
+query (or document) text, as the input and outputs an encoded
+sequence 𝐶, 𝐹1, · · · , 𝐹𝑁(or 𝐶′, 𝐹′
+1, · · · , 𝐹′
+𝑀) as described in Figure 1.
+Note that [CLS] is a pseudo token that aggregates information in the
+encoder for the subsequent matching. For each transformer layer,
+the parameters are shared between query and document encoders
+(i.e., 𝜙and 𝜓), which has multiple potential benefits, such as reduc-
+ing the number of model parameters so as to control model com-
+plexity [6], introducing prior knowledge to regularize models [41],
+and saving the storage space or memory size [17]. The conventional
+bi-encoder computes the relevance score with a simple dot-product
+between the output CLS embeddings, i.e., 𝑓(𝑞,𝑑) = 𝐶· 𝐶′.
+Poly attention. Different from vanilla bi-encoder, we further de-
+velop a poly attention scheme that enables more flexibility for mod-
+eling query semantics. This idea is originated from poly-encoder [16]
+and is slightly customized in our retrieval model, which works dif-
+ferently during training and prediction phases.
+Prediction
+Phase
+...
+!
+"#
+"$
+!′
+...
+"#
+&
+...
+"'
+&
+Encoder
+Training
+Phase
+Encoder
+Attention
+Code 1
+Attention
+Code m
+CLS-pooling
+P1
+Pm
+...
+!′
+score s1 ...
+score sm
+score ( = *+,-.#
+/ (-
+...
+!
+"#
+"$
+!′
+...
+"#
+&
+...
+"'
+&
+Encoder
+Encoder
+Attention
+Code 1
+Attention
+Code m
+CLS-pooling
+P1
+Pm
+...
+!′
+Mean-pooling
+retrieval score (
+[CLS]
+0#
+0$
+...
+1!23
+1#
+1$
+...
+[CLS]
+0#
+&
+0'
+&
+...
+1!23
+1#
+&
+1$
+&
+...
+[CLS]
+0#
+0$
+...
+1!23
+1#
+1$
+...
+[CLS]
+0#
+&
+0'
+&
+...
+1!23
+1#
+&
+1'
+&
+...
+Figure 1: Model architectures and relevance computation.
+In the training phase, as shown in the upper half part of Figure
+1, we introduce a set of 𝑚context codes, i.e., 𝑐0, · · · ,𝑐𝑚−1, where
+each 𝑐𝑖extracts a global representation 𝑃𝑖by attending over all the
+outputs of the query encoder (i.e., 𝐶, 𝐹1, · · · , 𝐹𝑁) as
+𝑃𝑖= 𝑤(𝑖)
+0
+· 𝐶+
+𝑁
+∑︁
+𝑗=1
+𝑤(𝑖)
+𝑗
+· 𝐹𝑗,
+(2)
+where
+
+𝑤(𝑖)
+0 , · · · ,𝑤(𝑖)
+𝑁
+
+= Softmax (𝑐𝑖· 𝐶, · · · ,𝑐𝑖· 𝐹𝑁). These global
+context features 𝑃1, · · · , 𝑃𝑚can be interpreted as different aggre-
+gations of the semantics from all the query terms, which reflects
+fine-grained query demands. Subsequently, each of the 𝑚global
+context features is compared with the document representation
+𝐶′ using dot-product, followed by a max-pooling to finalize the
+relevance score, i.e.,
+𝑓(𝑞,𝑑) = max𝑚
+𝑖=1𝑃𝑖· 𝐶′.
+(3)
+In the retrieval/prediction phase, we employ a slightly different
+strategy due to a practical concern. In real application with massive
+web documents, document representations must be pre-computed
+to build indexes, which enable efficient retrieval with fast nearest
+neighbor search. In such case, relevance computation based on Eq.
+(3) is clearly infeasible, as such metric with max-pooling can hardly
+be supported by existing index schemes. Motivated by this, we
+propose to construct an unified surrogate embedding with mean
+pooling over all 𝑃𝑖, i.e., 1
+𝑚
+Í𝑚
+𝑖=1 𝑃𝑖. As such, the final relevance score
+!"
+!#
+!$
+!%
+&"
+'
+&#
+'
+&$
+'
+&%
+'
+&"
+(
+&#
+(
+&$
+(
+&%
+(
+!)
+query
+&)
+'
+relevant doc
+&)
+(
+strong negative
+relevant (+, -) pair
+irrelevant (+, -) pair
+corresponding to
+strong negative
+irrelevant (+, -) pair
+corresponding to
+random negative
+Figure 2: Illustration of negative sampling during training.
+is defined as
+𝑓(𝑞,𝑑) = 𝑃𝑎𝑣𝑔· 𝐶′ =
+ 
+1
+𝑚
+𝑚
+∑︁
+𝑖=1
+𝑃𝑖
+!
+· 𝐶′.
+(4)
+With such definition, index-based nearest neighbor search can be
+leveraged, which largely improves the applicability of the model.
+Remark. As already mentioned, the relevance score is calculated
+inconsistently between training and predicting phases. In practice,
+we find out that such inconsistency would not undermine the model
+performance for semantic retrieval. Therefore, through bagging
+distinct features learnt by the context codes, we can achieve a better
+and more heterogeneous representation of the query for a more
+powerful semantic matching with that of the document.
+3.3
+Optimization
+We formulate the learning procedure of the retrieval model using
+maximum likelihood estimation: Given a query 𝑞, all of its relevant
+documents 𝐷+𝑞and irrelevant ones 𝐷−𝑞, the optimal parameters
+𝜃∗, 𝛽∗can be defined as:
+𝜃∗, 𝛽∗= arg max
+𝜃,𝛽
+∑︁
+𝑞
+∑︁
+𝑑+∈𝐷+𝑞
+𝑝(𝑑+|𝑞,𝑑+, 𝐷−
+𝑞),
+(5)
+where 𝑝(𝑑+|𝑞,𝑑+, 𝐷−𝑞) is the probability that 𝑓can separate a rele-
+vant document 𝑑+ from all irrelevant ones 𝐷−𝑞. Note that we con-
+sider the context codes 𝑐𝑖are the parameters of the query encoder,
+which are jointly trained.
+We implement 𝑝(𝑑+|𝑞,𝑑+, 𝐷−𝑞) as a contrastive probability, i.e.,
+𝑝(𝑑+|𝑞,𝑑+, 𝐷−
+𝑞) =
+exp  𝑓(𝑞,𝑑+)/𝜏
+exp  𝑓(𝑞,𝑑+)/𝜏 +
+∑︁
+𝑑−∈𝐷−𝑞
+exp (𝑓(𝑞,𝑑−)/𝜏)
+, (6)
+where 𝜏, which is normally set to 1, is the temperature of the soft-
+max operation [12]. Using a higher value for 𝜏produces a softer
+probability distribution over classes (i.e., relevant or irrelevant).
+Furthermore, as it is inapplicable to know and use all the real
+relevant and irrelevant documents in the training, we reformulate
+the optimization problem with sampled relevant and irrelevant
+documents (respectively denoted as ˆ𝐷+𝑞and ˆ𝐷−𝑞) as
+𝜃∗, 𝛽∗= arg max
+𝜃,𝛽
+∑︁
+𝑞
+∑︁
+𝑑+∈ˆ𝐷+𝑞
+𝑝(𝑑+|𝑞,𝑑+, ˆ𝐷−
+𝑞).
+(7)
+3.4
+Training Data Mining
+To solve the optimization problem as Eq. (7), the key of model
+training lies on the construction of ˆ𝐷+𝑞and ˆ𝐷−𝑞, such that a better
+model can be learned for semantic retrieval. In this subsection, we
+elaborate how we mine the positive and negative data for training.
+Positives and negatives in different data sources. For mining
+positive and negative examples, we first consider two kinds of data
+sources that are commonly used in practice:
+• Search log data, where the queries and documents are logged
+with click signal, i.e., whether the document is clicked by the
+user. For each query, we use those clicked results as positives
+and those exposed but non-click results as negatives, as clicks
+can roughly indicate the satisfaction of user’s intent.
+• Manually labeled data is usually collected with fine-grained
+grades (i.e., 0 to 4) assigned by human evaluation. For each
+query, the positive and negative examples are defined in a
+pairwise manner. For a given document that is considered as
+positive, other lower-grade documents under the same query
+can be considered as negatives.
+In-batch negative mining. The goal of online retrieval is to distin-
+guish a tiny fraction of relevant documents from massive irrelevant
+documents (i.e., |𝐷+𝑞| ≪|𝐷−𝑞| ≈|𝐷|). Instead of logging (or label-
+ing) many irrelevant documents, we leverage an in-batch negative
+mining scheme [18], which is a more efficient way to construct
+those completely irrelevant documents. To avoid confusion, we
+refer to the non-click (or lower-grade) samples as strong negatives,
+and the in-batch negatives as random negatives.
+Particularly during the training of our model, we consider ran-
+dom negatives as those documents (i.e., positives and strong nega-
+tives) of other queries in the same mini-batch. As data are shuffled
+before fed to the model, the random negatives are generally quite
+distinct from the query, which helps mimic the online retrieval
+scenario, i.e., identifying positives from massive random negatives.
+In addition, to collect sufficient random negatives from each mini-
+batch, we exploit a simple yet practical solution, i.e., increasing the
+batch size. We apply mix-precision method that allows larger batch
+size during training with a fixed memory consumption. The batch
+size is set to make maximum use of GPU memory.
+Figure 2 shows an example of the overall negative sampling
+strategies in a more intuitive way. In the example, the mini-batch
+of size 4 consists of four triplets {(𝑞𝑖,𝑑+
+𝑖,𝑑−
+𝑖),𝑖= 1, 2, 3, 4}. For the
+query 𝑞1, the positive and strong negative documents are respec-
+tively denoted as 𝑑+
+1 and 𝑑−
+1 , and 𝑑+
+2,𝑑+
+3,𝑑+
+4,𝑑−
+2 ,𝑑−
+3 ,𝑑−
+4 are random
+negatives. For each row (i.e., each query) in Figure 2, there is one
+positive and a set of negatives, which can be used as 𝑑+ and 𝐷−𝑞in
+Eq. (7). Therefore, the training data mined with these strategies can
+be used to optimize the retrieval model based on Eq. (7).
+4
+TRAINING PARADIGM
+The training paradigm of pretraining and finetuning has been
+widely employed for model optimization in many natural language
+processing problems. Representations learned by such paradigm
+usually show competitive performance across many tasks. However,
+such superiority has not yet been fully exploited for web retrieval.
+In this section, we propose a novel multi-stage training paradigm.
+Particularly, as shown in Figure 3, we divide the entire training
+!
+"#
+"$
+"%&'
+"#(
+...
+"%&'
+...
+")(
+[CLS]
+*#
+*$
+[SEP]
+*#(
+...
+[SEP]
+...
+*)(
+&!+%
+&#
+&$
+&%&'
+&#(
+...
+&%&'
+...
+&)
+(
+,%'
+ERNIE
+-+-
+-+-
+Stage 1: pretraining
+Model: n-layer Transformer
+Data: trillion-scale Heterogeneous corpus (Chinese 
+Wikipedia, Baidu news & Baike & Tieba)
+Tasks: entity- and phrase-level MLM; NSP
+Training: unsupervised
+Masked Sentence A
+Masked Sentence B
+!
+"#
+"$
+"%&'
+"#(
+...
+"%&'
+...
+")(
+[CLS]
+*#
+*$
+[SEP]
+*#(
+...
+[SEP]
+...
+*)(
+&!+%
+&#
+&$
+&%&'
+&#(
+...
+&%&'
+...
+&)
+(
+,%'
+ERNIE
+-+-
+-+-
+Stage 2: post-pretraining
+Model: n-layer Transformer
+Data: trillion-scale search logs
+Tasks: : entity- and phrase-level MLM; NSP 
+Training: unsupervised
+Query
+Title
+!
+"#
+"$
+!′
+...
+"#(
+...
+")(
+[CLS]
+*#
+*$
+*#(
+...
+...
+*)(
+&!+%
+&#
+&$
+&#(
+...
+...
+&)
+(
+'/01
+ERNIE
+2
+Stage 4: target fine-tuning
+Model: the retrieval model
+Data: small-scale manually labeled data
+Tasks: semantic matching
+Training: supervised
+Query
+Title
+[CLS]
+&!+%
+ERNIE
+3
+score
+!
+"#
+"$
+!′
+...
+"#(
+...
+")(
+[CLS]
+*#
+*$
+*#(
+...
+...
+*)(
+&!+%
+&#
+&$
+&#(
+...
+...
+&)
+(
+'/01
+ERNIE
+2
+Stage 3: intermediate fine-tuning
+Model: the retrieval model
+Data: trillion-scale search logs
+Tasks: semantic matching
+Training: supervised
+Query
+Title
+[CLS]
+&!+%
+ERNIE
+3
+score
+Figure 3: Training Paradigm of ERNIE-based Retrieval Model.
+process into four stages: (1) pretraining, (2) post-pretraining,
+(3) intermediate fine-tuning, and (4) target fine-tuning. Each
+stage is carefully designed with different training data and objec-
+tives, which boost the generalization ability of the model. The
+overall training pipeline is shown in Figure 3.
+4.1
+Stage 1: Pretraining
+In this stage, we follow the same pretraining process in [38] to train
+an ERNIE encoder (i.e., an 𝑛-layer transformer). It adopts hetero-
+geneous corpus, i.e., Chinese Wikipedia, Baidu Baike (containing
+encyclopedia articles written in formal languages), Baidu news and
+Baidu Tieba (an open discussion forum like Reddits), to learn lan-
+guage representation enhanced by entity- and phrase-level masking
+strategies. The heterogeneous corpus contributes a large propor-
+tion of web documents in our search engine, hence the pretrained
+ERNIE model can effectively transfer knowledge to web retrieval.
+The pretraining is unsupervised, where the tasks include masked
+word prediction (i.e., MLM - Masked Language Modeling) and the
+next sentence prediction (NSP).
+4.2
+Stage 2: Post-pretraining
+Search engine processes billions of various queries with diverse
+goals or intentions every day, such as medical advice, travel guides,
+latest news, etc. Pretraining only on document corpus might be
+limited to tackle all kinds of requests from users. In this stage, we
+transfer previous pretrained model and continue pretaining on both
+query and document corpus of Baidu Search with the same tasks
+(i.e., MLM and NSP) as Stage 1.
+We name Stage 2 as post-pretaining, which keeps the model
+structure (i.e., a 𝑛-layer Transformer) and the training tasks while
+changes the training data. Specifically, we collect one-month (i.e.,
+tens of billions of) user search logs for post-pretraining. The to-
+kenized raw texts of the query and the title of the document are
+concatenated as the input during this stage. Then we apply the same
+masking strategies as ERNIE for MLM and take clicked documents
+as the next sentence of the query for NSP.
+4.3
+Stage 3: Intermediate Fine-tuning
+From this stage, we start to fine-tune the retrieval model. We first
+fine-tune the retrieval model on an intermediate task, before fine-
+tuning again on the target task of interest [32]. In particular, we
+leverage the post-pretrained ERNIE produced by Stage 2, as the
+encoders of our retrieval model, which is subsequently optimized
+using the same training data (i.e., search logs) as Stage 2. The train-
+ing objective is as presented in Eq. (7), and we construct positives
+and negatives for training as introduced in Section 3.4. Using an
+intermediate objective that more closely resembles our target task
+leads to better and faster fine-tuning performance.
+4.4
+Stage 4: Target Fine-tuning
+Finally, we fine-tune our retrieval model produced by Stage 3 on
+a relatively small manually-labeled data, which we consider is the
+most accurate and unbiased data for learning the retrieval model.
+For the data collection, a set of queries are sampled from query
+logs, and a certain number of query-document pairs are labeled
+according to their relevance judged by human editors. A 0-4 grade
+is assigned to each query-document pair based on the degree of
+relevance. The training objective is as presented in Eq. (7), and
+we construct positives and negatives for training as introduced in
+Section 3.4.
+5
+DEPLOYMENT
+In this section, we first introduce the embedding compression and
+quantization, which saves the online cost for retrieval. Then, we
+present the general picture of how the retrieval model works in the
+retrieval system. For the detailed implementation of our deployed
+model, please refer to the Appendix.
+5.1
+Embedding Compression and Quantization
+We apply compression and quantization for the output embeddings
+of the retrieval model. On the document side, it can significantly
+reduce the memory cost for caching the embeddings; On the query
+side, it saves the transmission cost for query embedding, and thus
+improves the system throughput.
+Compression. We jointly train a compression layer with the ERNIE
+encoders. The compression layer is implemented as a fully-connected
+layer that takes the output embeddings of the encoders (i.e., 𝑃𝑖and
+Document
+Encoder (ERNIE)
+Doc Title
+Embedding
+Database
+Embedding
+ANN Indexes
+Offline Database & Index
+Construction
+Text Matching
+Embedding ANN
+Term
+Indexes
+Embedding
+ANN Indexes
+Doc_ID
+Query Text
+Query Processing
+Query Encoder
+(ERNIE)
+Feature
+Database
+Post-Retrieval Filtering
+Embedding
+Database
+Conventional Workflow
+𝑓!
+"
+𝑓#
+"
+𝑓$
+"
+…
+𝑓%&'(%
+"
+ERNIE-Enhanced
+Workflow
+Online ERNIE-
+Enhanced Retrieval
+…
+Doc_ID
+Figure 4: The overall workflow of the ERNIE-enhanced retrieval system.
+𝐶′) as inputs, and produces lower-dimensional embeddings. This
+would largely save the memory cost, with very slight decrease w.r.t.
+accuracy. In practice, we reduce the size of output embeddings from
+768 to 256, which improves the overall efficiency of transmission
+and storage by 3 times.
+Quantization. Quantization is a very promising technique for
+boosting the efficiency and scalability of neural networks [15]. For
+deploying our model to efficiently serving massive search queries,
+we apply a commonly-used int8 quantization to the output em-
+beddings, where the overall efficiency can further be boosted by 4
+times. More details of the embedding quantization can be referred
+to the Appendix.
+5.2
+System Workflow
+An important fact for building an effective retrieval system is
+that, neither explicit text matching nor embedding-based semantic
+matching can handle all the various kinds of queries. Instead, it
+is more promising to integrate the two types of retrieval methods
+together, to provide a better overall performance. Motivated by
+this, we developed a novel system workflow, which is depicted in
+Figure 4. Compared with conventional text matching, the system is
+upgraded with two modules:
+• ERNIE-based retrieval. The system enables the ERNIE-based re-
+trieval model to work in parallel with the conventional retrieval
+workflow (i.e., text matching), which offers high maintainabil-
+ity of the system.
+• ERNIE-enhanced post-retrieval filtering. We further introduce an
+unified post-retrieval filtering module. It takes both retrieved
+documents from text matching and ERNIE-based semantic
+matching, and conduct effective post-retrieval filtering for fur-
+ther discovering high-quality candidates.
+We elaborate the system workflow with the two modules, which
+including both offline and online stages.
+Offline database and index construction. As shown in the left
+part of Figure 4, during the offline stage, we use the trained ERNIE
+encoder to compute the embeddings (with the compression and
+quantization) for all documents in the corpus, based on which
+we build 1) Approximate Nearest Neighbor (ANN) indexes, and
+2) an embedding database for the above-mentioned two modules,
+respectively. In particular, the ANN indexes are deployed for the
+ERNIE-based retrieval stage, to enable efficient embedding-based
+candidate generation via fast nearest neighbor search. The embed-
+ding database is used for the post-retrieval filtering stage. It is a
+key-value database for efficient document embedding lookup with
+given document ids. Next, we introduce the online workflow and
+show how the database and indexes are used online.
+Online integrated retrieval. For the online retrieval, we inte-
+grate conventional retrieval and the novel ERNIE-based semantic
+retrieval. The conventional retrieval first processes the query text
+with several operations (e.g., word segmentation, stop-word filter-
+ing), and then conducts keyword/term matching with term indexes
+(i.e., inverted indexes) to retrieve a set of documents. In parallel,
+semantic retrieval first fetch the query embedding. After online
+embedding compression and quantization, the query embedding is
+applied for semantic retrieval with the ANN indexes. The results
+produced by different retrieval approaches are merged to form a
+candidate pool.
+Online post-retrieval filtering. After the integrated retrieval, we
+further introduce an online post-retrieval filtering stage, which fur-
+ther narrows down the scale of the candidates. To achieve this,
+the filtering module contains a lightweight ranking model (e.g.,
+GBRank or RankSVM) that conducts an unified comparison for the
+retrieval candidates. Particularly for each candidate document, we
+fetch the statistical features (denoted as 𝑓𝑑
+1 , 𝑓𝑑
+2 , 𝑓𝑑
+3 , ... in Figure 4),
+such as click-through rate, from the feature database. Note that
+the semantic matching score is also applied in this stage as an im-
+portant feature (denoted as 𝑓𝑑
+𝐸𝑅𝑁𝐼𝐸), where the scores computed
+in semantic retrieval can be reused. For those candidates retrieved
+by text matching, where the semantic matching scores are missing,
+we fetch their embeddings from the embedding database, and then
+compute the scores with the query embedding. As the candidate
+pool formed by the online retrieval stage is small compared to the
+entire corpus, the online computation of the semantic matching
+scores does not significantly increase the time cost. By doing this,
+we unify the comparison of all candidate documents with several
+statistical features and a semantic feature, where the semantic mod-
+eling capacity of our retrieval model can also benefit the documents
+dug by conventional retrieval paradigm.
+6
+OFFLINE EVALUATION
+We conduct an offline evaluation for the proposed retrieval model.
+The implementation details of the model and more ablation study
+can be found in the Appendix.
+6.1
+Datasets
+We evaluate the retrieval model on the datasets that are collected
+from the real production environment. Note all the data does not
+contain any user-related information for the privacy concern.
+Manually-labeled dataset (Manual). This dataset contains 6,423
+queries and 147,341 query-document pairs. Each query has around
+22 retrieved results on average. For each query, we collect docu-
+ments from each stage of the search pipeline to ensure the diversity
+of the dataset. The dataset is labeled on our crowdsourcing plat-
+form, where a group of experts are required to assign an integer
+score varies from 0 to 4 to each query-document pair. The score
+represents whether the content of the document w.r.t. the query is
+off-topic (0), slightly relevant (1), relevant (2), useful (3) or vital (4).
+Automatic-annotated datasets (Auto). We collect another two
+search log datasets, namely Auto-Rand and Auto-Tail, which con-
+tains random queries and tail queries, respectively. Here, the tail
+queries are identified as those who have no more than 10 searches
+per week. For each query, we use our search engine to collect the
+top-10 results in the final ranking stage as the positive examples (i.e.,
+the relevant documents), and consider the top-10 results of other
+queries as negative examples. After filtering noise and meaningless
+queries, we finalize the two datasets, where Auto-Rand contains
+18,247 queries and 112,091 query-document pairs, and Auto-Tail
+contains 78,910 queries and 750,749 query-document pairs.
+6.2
+Evaluation Metrics
+Positive-Negative Ratio. We report the positive-negative ratio
+(PNR) on Manual dataset. For a given query 𝑞and the associated
+documents 𝐷𝑞, the PNR can be formally defined as
+𝑃𝑁𝑅=
+Í
+𝑑𝑖,𝑑𝑗∈𝐷𝑞1(𝑦𝑖> 𝑦𝑗) · 1(𝑓(𝑞,𝑑𝑖) > 𝑓(𝑞,𝑑𝑗))
+Í
+𝑑𝑖′,𝑑𝑗′ ∈𝐷𝑞1(𝑦𝑖′ > 𝑦𝑗′) · 1(𝑓(𝑞,𝑑𝑖′) < 𝑓(𝑞,𝑑𝑗′)) ,
+(8)
+where 1(·) is an indicator function, i.e., 1(𝑎> 𝑏) = 1 if 𝑎> 𝑏, and
+0 otherwise. PNR measures the consistency between the manual
+labels and the model scores. We report the averaged PNR values
+over all queries in the experiments.
+Recall@10. We report Recall@10 on Auto-Rand and Auto-Tail
+datasets. The metric is defined as 𝑅𝑒𝑐𝑎𝑙𝑙@10 = |𝐷𝑞∩˜𝐷𝑞|/10, where
+˜𝐷𝑞represents the top-10 retrieval w.r.t. 𝑞using the retrieval model
+considering all the documents in a dataset as the corpus, and 𝐷𝑞is
+the set of collected ground truth. We report the averaged Recall@10
+values over all queries in the experiments.
+6.3
+Offline Experimental Results
+In the offline evaluation, we report the experimental results of the
+proposed model during different training stages. Here, the perfor-
+mance of pretraining and post-pretraining are reported when using
+the 𝑛-layer Transformer in a bi-encoder model. Besides, we also
+include a baseline method, i.e., the model that is used in the system
+before deploying the ERNIE-base retrieval model.
+Table 1 shows the results, where some key findings are observed:
+Table 1: Offline experimental results on different stages.
+Dataset
+Manual
+Auto-Rand
+Auto-Tail
+Metric
+PNR
+Recall@10
+Recall@10
+Pretrain
+1.34
+18.92%
+12.10%
+Post-pretrain
+1.43
+35.99%
+19.10%
+Intermediate Fine-tune
+2.00
+83.14%
+60.98%
+Target Fine-tune
+2.48
+87.90%
+71.13%
+Online baseline
+1.77
+85.22%
+65.79%
+• The performance on different stages indicate that our proposed
+training paradigm is able to gradually improve the performance
+of the retrieval model. In particular, we can see that the model
+in the pretrain stage does not contain any domain knowledge
+w.r.t. the retrieval tasks, and thus performs poorly, where the
+Recall@10 is below 20% on both Auto datasets. However, after
+applying the multi-stage training paradigm, the Recall@10 of
+the model finally reaches 87.90% and 71.13% on Auto-Rand and
+Auto-Tail, respectively.
+• By applying the multi-stage training, the retrieval model can
+outperforms our online baseline w.r.t. Recall@10 on both Auto
+datasets. Moreover, we also observe that the relative improve-
+ment of our proposed model over the online base is large on
+Auto-Tail (Δ = 8.1%) than Auto-Rand (Δ = 3.1%), in terms of
+Recall@10. This shows that our proposed method can better
+discover relevant results for tail queries, which is very helpful
+in improving the user experience for the search engine.
+• In addition, we can see that the proposed model can beat the
+online baseline by a large margin w.r.t. PNR, where the value
+is improved from 1.77 to 2.48. This tells us that the proposed
+model not only can retrieval relevant documents, but also
+prefer high-quality results, i.e., the documents with higher
+manually-labeled grades.
+Overall, our proposed model is able to gain superior performance
+on semantic retrieval through the multi-stage training, and beat
+the online baseline by a significant margin.
+7
+ONLINE EVALUATION
+To investigate the impact of our proposed system to the search
+engine, we deploy the new system and conduct online experiments
+to compare it with the old retrieval system.
+7.1
+Interleaved Comparison
+Interleaving [3] is a commonly-used technique for evaluating in-
+dustrial information retrieval systems (e.g., recommender systems,
+search engines). In interleaved comparison, the results of two sys-
+tems are interleaved and exposed together to the end users, whose
+click behaviors would be credited to the system that provides the
+clicked results. The gain of the new system A over the base system
+B can be quantified with Δ𝐴𝐵, which is defined as
+Δ𝐴𝐵=
+𝑤𝑖𝑛𝑠(𝐴) + 0.5 ∗𝑡𝑖𝑒𝑠(𝐴, 𝐵)
+𝑤𝑖𝑛𝑠(𝐴) + 𝑤𝑖𝑛𝑠(𝐵) + 𝑡𝑖𝑒𝑠(𝐴, 𝐵) −0.5,
+(9)
+where 𝑤𝑖𝑛𝑠(𝐴) (or 𝑤𝑖𝑛𝑠(𝐵)) is a counter that would be increased
+by 1 if the results produced by 𝐴(or 𝐵) is preferred by the user,
+and 𝑡𝑖𝑒𝑠(𝐴, 𝐵) is increased by 1 otherwise. Intuitively, Δ𝐴𝐵> 0
+Table 2: Interleaved comparison.
+ENINE-based retrieval
+Post-retreival filtering
+Query type
+Query length
+Query type
+Query length
+Rand
+Tail (freq < 3)
+Short (≤10)
+Long (10 <)
+Rand
+Tail (freq < 3)
+Short (≤10)
+Long (10 <)
+Δ𝐴𝐵
++0.368%
++0.992%
++0.345%
++0.426%
++0.112%
++0.274%
++0.066%
++0.191%
+Δ𝐴𝐵-tw
++0.281%
++0.783%
++0.253%
++0.352%
++0.226%
++0.454%
++0.176%
++0.315%
+*All the values are statistically significant (𝑡-test with 𝑝< 0.05).
+Table 3: Relative improvement on manual evaluation.
+ERNIE-based retrieval
+Post-retrieval filtering
+Rand
+Tail
+Rand
+Tail
+Δ𝐷𝐶𝐺
++0.17%
++0.22%
++0.10%
++0.65%
+Δ𝐺𝑆𝐵
++3.50%
++7.50%
++3.96%
++3.13%
+*All the values are statistically significant (𝑡-test with 𝑝< 0.05).
+means 𝐴is better than 𝐵. To further reduce the bias in the eval-
+uation, we further introduce a time-weighted version of Δ𝐴𝐵, de-
+noted as Δ𝐴𝐵-tw, where the counters are weighted by the post-click
+dwell time (mapped to [0, 1] with a sigmoid function). As such, the
+Δ𝐴𝐵-tw can better reflect the relevance of the results with higher
+confidence, as users would stay in a web page longer if it is relevant.
+We conduct balanced interleaving experiments [3] for comparing
+the ERNIE-enhanced system against the old retrieval system. The
+results are shown in Table 2, which comprise the performance of
+different modules and for different types of queries.
+• First, we observe Δ𝐴𝐵> 0 and Δ𝐴𝐵-tw > 0 in all the experi-
+ments, which indicate that the new system can increase user
+clicks with more relevant web documents.
+• Second, the results also indicate that both the ERNIE-based re-
+trieval and post-retrieval filtering can boost the effectiveness of
+the system, while the ERNIE-based retrieval generally achieves
+larger gain than the post-retrieval filtering, as it is effected
+before the filtering stage.
+• Third, we can see that the new system can achieve better per-
+formance on the queries with low search frequency, i.e., tail
+query. This validates that our proposed retrieval system has
+more significant improvement for the tail queries.
+• Also, the improvements on long queries (e.g., natural language
+queries) is larger than on short queries, which might indicate
+that the system can better handle the natural language queries.
+7.2
+Online A/B Test
+We also conduct online A/B Test that compares the new system
+with the old system for one week. In the online A/B test, We mainly
+focus on the metrics that directly related to user experience. The
+results show that the proposed retrieval system can largely improve
+the overall user experience of the search engine. In particular, the
+number of click behaviors has increased by 0.31%. The number of
+click-and-stay behavior has increased by 0.57%. The average post-
+click dwell time has increased by 0.62%. The click-through rate has
+increased by 0.3%. All the reported values are statistically signifi-
+cant with 𝑝< 0.05. This shows that accurate semantic modeling
+and semantic matching in the retrieval stage is very helpful for
+improving the user engagement for the search engine.
+7.3
+Manual Evaluation for Online Cases
+To more comprehensively show the impact of our proposed system,
+we further conduct a manual evaluation on the final ranking results
+with some real user-generated queries. This directly reflects the
+quality of the results exposed to the end users.
+Data preparation. We log a set of (several hundreds) queries and
+the corresponding final impressions, i.e., the top-ranked web docu-
+ments in the final ranking stage, using the ERNIE-enhanced and
+the old retrieval systems. Note that the data logging is conducted
+by multiple rounds to eliminate randomness. We filter out whose
+queries that have identical impressions between the two systems,
+and then use the rest for the manual evaluation. The relative im-
+provement validated by manual evaluation is given in Table 3.
+Discounted Cumulative Gain (DCG). We first log a dataset and
+manually label the data with 0 to 4 grades, and then report the
+relative improvement w.r.t. the average Discounted Cumulative
+Gain (DCG) over the top-4 final results of all queries). The DCG is a
+widely-used metric and thus we omit its definition here. As shown
+in Figure 3, the results again show that our proposed system is able
+to improve the effectiveness of retrieval, especially for tail queries.
+Side-by-side comparison. Besides, we also conduct a side-by-side
+comparison between the two systems. We log another dataset, and
+require the human experts to judge whether the new system or
+the base system gives better final results. Here, the relative gain is
+measured Good vs. Same vs. Bad (GSB) as
+Δ𝐺𝑆𝐵=
+#Good −#Bad
+#Good + #Same + #Bad,
+(10)
+where #Good (or # Bad) indicates the number of queries that the new
+system provides better (or worse) final results. Table 3 shows that
+for both random queries and tail queries, the new ERNIE-enhanced
+system can significantly outperform the base system.
+8
+CONCLUSION
+In this paper, we described the novel retrieval system that is facili-
+tated by pretrained language model (i.e., ERNIE). We developed and
+deployed the system in Baidu Search, which is highly effective in
+conducting semantic retrieval for web search. The system employs
+1) an ERNIE-based retrieval model, 2) a multi-stage training para-
+digm and 3) a unified workflow for the retrieval system. Extensive
+offline and online experiments has shown that the retrieval system
+can significantly improve the effectiveness and general usability of
+the search engine.
+REFERENCES
+[1] Yinqiong Cai, Yixing Fan, Jiafeng Guo, Fei Sun, Ruqing Zhang, and Xueqi Cheng.
+2021. Semantic Models for the First-stage Retrieval: A Comprehensive Review.
+arXiv preprint arXiv:2103.04831 (2021).
+[2] Wei-Cheng Chang, Felix X Yu, Yin-Wen Chang, Yiming Yang, and Sanjiv Kumar.
+2020. Pre-training tasks for embedding-based large-scale retrieval. arXiv preprint
+arXiv:2002.03932 (2020).
+[3] Aleksandr Chuklin, Anne Schuth, Ke Zhou, and Maarten De Rijke. 2015. A
+comparative analysis of interleaving methods for aggregated search. TOIS 33, 2
+(2015), 1–38.
+[4] Jacob Devlin, Ming-Wei Chang, Kenton Lee, and Kristina Toutanova. 2018. Bert:
+Pre-training of deep bidirectional transformers for language understanding. arXiv
+preprint arXiv:1810.04805 (2018).
+[5] Xingping Dong and Jianbing Shen. 2018. Triplet loss in siamese network for
+object tracking. In ECCV. 459–474.
+[6] Orhan Firat, Baskaran Sankaran, Yaser Al-Onaizan, Fatos T Yarman Vural, and
+Kyunghyun Cho. 2016. Zero-Resource Translation with Multi-Lingual Neural
+Machine Translation. In EMNLP. 268–277.
+[7] Jianfeng Gao, Patrick Pantel, Michael Gamon, Xiaodong He, and Li Deng. 2014.
+Modeling interestingness with deep neural networks. (2014).
+[8] Jianfeng Gao, Kristina Toutanova, and Wen-tau Yih. 2011. Clickthrough-based
+latent semantic models for web search. In SIGIR. 675–684.
+[9] Yulong Gu, Zhuoye Ding, Shuaiqiang Wang, Lixin Zou, Yiding Liu, and Dawei Yin.
+2020. Deep Multifaceted Transformers for Multi-objective Ranking in Large-Scale
+E-commerce Recommender Systems. In CIKM. 2493–2500.
+[10] Jiafeng Guo, Yixing Fan, Qingyao Ai, and W Bruce Croft. 2016. A deep relevance
+matching model for ad-hoc retrieval. In CIKM. 55–64.
+[11] Malay Haldar, Prashant Ramanathan, Tyler Sax, Mustafa Abdool, Lanbo Zhang,
+Aamir Mansawala, Shulin Yang, Bradley Turnbull, and Junshuo Liao. 2020. Im-
+proving Deep Learning For Airbnb Search. In KDD. 2822–2830.
+[12] Geoffrey Hinton, Oriol Vinyals, and Jeff Dean. 2015. Distilling the knowledge in
+a neural network. arXiv preprint arXiv:1503.02531 (2015).
+[13] Jui-Ting Huang, Ashish Sharma, Shuying Sun, Li Xia, David Zhang, Philip Pronin,
+Janani Padmanabhan, Giuseppe Ottaviano, and Linjun Yang. 2020. Embedding-
+based retrieval in facebook search. In KDD. 2553–2561.
+[14] Po-Sen Huang, Xiaodong He, Jianfeng Gao, Li Deng, Alex Acero, and Larry
+Heck. 2013. Learning deep structured semantic models for web search using
+clickthrough data. In CIKM. 2333–2338.
+[15] Itay Hubara, Matthieu Courbariaux, Daniel Soudry, Ran El-Yaniv, and Yoshua
+Bengio. 2017. Quantized neural networks: Training neural networks with low
+precision weights and activations. JMLR 18, 1 (2017), 6869–6898.
+[16] Samuel Humeau, Kurt Shuster, Marie-Anne Lachaux, and Jason Weston. 2019.
+Poly-encoders: Transformer architectures and pre-training strategies for fast and
+accurate multi-sentence scoring. arXiv preprint arXiv:1905.01969 (2019).
+[17] Melvin Johnson, Mike Schuster, Quoc Le, Maxim Krikun, Yonghui Wu, Zhifeng
+Chen, Nikhil Thorat, Fernanda Viégas, Martin Wattenberg, Greg Corrado, et al.
+2017. Google’s Multilingual Neural Machine Translation System: Enabling Zero-
+Shot Translation. TACL 5 (2017), 339–351.
+[18] Vladimir Karpukhin, Barlas Oguz, Sewon Min, Patrick Lewis, Ledell Wu, Sergey
+Edunov, Danqi Chen, and Wen-tau Yih. 2020. Dense Passage Retrieval for Open-
+Domain Question Answering. In Proceedings of the 2020 Conference on Empirical
+Methods in Natural Language Processing (EMNLP). 6769–6781.
+[19] Kenton Lee, Ming-Wei Chang, and Kristina Toutanova. 2019. Latent Retrieval for
+Weakly Supervised Open Domain Question Answering. In ACL. 6086–6096.
+[20] Hang Li and Jun Xu. 2014. Semantic matching in search. Foundations and Trends
+in Information retrieval 7, 5 (2014), 343–469.
+[21] Yiding Liu, Yulong Gu, Zhuoye Ding, Junchao Gao, Ziyi Guo, Yongjun Bao,
+and Weipeng Yan. 2020. Decoupled Graph Convolution Network for Inferring
+Substitutable and Complementary Items. In CIKM. 2621–2628.
+[22] Yinhan Liu, Myle Ott, Naman Goyal, Jingfei Du, Mandar Joshi, Danqi Chen, Omer
+Levy, Mike Lewis, Luke Zettlemoyer, and Veselin Stoyanov. 2019. Roberta: A
+robustly optimized bert pretraining approach. arXiv preprint arXiv:1907.11692
+(2019).
+[23] Jing Lu, Gustavo Hernandez Abrego, Ji Ma, Jianmo Ni, and Yinfei Yang. 2020.
+Neural Passage Retrieval with Improved Negative Contrast.
+arXiv preprint
+arXiv:2010.12523 (2020).
+[24] Wenhao Lu, Jian Jiao, and Ruofei Zhang. 2020. TwinBERT: Distilling Knowledge
+to Twin-Structured Compressed BERT Models for Large-Scale Retrieval. In CIKM.
+2645–2652.
+[25] Zhengdong Lu and Hang Li. 2013. A deep architecture for matching short texts.
+ç 26 (2013), 1367–1375.
+[26] Yi Luan, Jacob Eisenstein, Kristina Toutanova, and Michael Collins. 2020.
+Sparse, dense, and attentional representations for text retrieval. arXiv preprint
+arXiv:2005.00181 (2020).
+[27] Bhaskar Mitra, Nick Craswell, et al. 2018. An introduction to neural information
+retrieval. Now Foundations and Trends.
+[28] Bhaskar 

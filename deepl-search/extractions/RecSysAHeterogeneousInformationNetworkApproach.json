@@ -1,0 +1,15 @@
+{
+  "source": "RecSysAHeterogeneousInformationNetworkApproach",
+  "source_group": "Awesome-ML-Papers/Embeddings",
+  "processed_at": "2026-06-08T12:00:00Z",
+  "agent": "agent_batch_generation",
+  "concepts": [
+    {
+      "finding": "Recommender system based on heterogeneous information networks. Constructs HIN from multiple data sources (users, items, attributes, reviews). Learns node embeddings via meta-path-based similarity measures (PathSim, HeteSim). Recommendation as top-k similar items in HIN embedding space.",
+      "category": "ModelCandidate",
+      "implication": "HIN-based recommendation approach directly applies to keyword-intent: keywords, intents, documents, users, categories as node types. Meta-path similarity measures compute keyword-intent relatedness through multiple graph paths.",
+      "open_question": "What node types beyond keywords and intents (documents, categories, users, domains) should be included in a keyword-intent HIN?",
+      "testable_hypothesis": "A heterogeneous network with keywords, intents, documents, and categories as node types produces better keyword-intent matching than a keyword-only graph."
+    }
+  ]
+}

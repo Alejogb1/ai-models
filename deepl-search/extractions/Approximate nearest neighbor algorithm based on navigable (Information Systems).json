@@ -1,0 +1,15 @@
+{
+  "source": "Approximate nearest neighbor algorithm based on navigable (Information Systems).pdf",
+  "source_group": "Awesome-ML-Papers/Nearest Neighbor Search",
+  "processed_at": "2026-06-08",
+  "agent": "agent6_remaining",
+  "concepts": [
+    {
+      "finding": "Navigable Small World (NSW) graphs provide approximate k-NN search with logarithmic complexity by exploiting the small-world property: short average path length between any two nodes with long-range links.",
+      "category": "ModelCandidate",
+      "implication": "Small-world graph structures enable efficient approximate search in metric spaces, forming the foundation for modern ANN search algorithms like HNSW.",
+      "open_question": "How does NSW graph construction cost scale with dimensionality and dataset size for search embedding spaces?",
+      "testable_hypothesis": "NSW graph-based retrieval will achieve 90% recall with O(log n) search complexity on query embedding datasets up to 10M points."
+    }
+  ]
+}

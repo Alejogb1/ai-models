@@ -1,0 +1,148 @@
+{
+  "source": "1935826.1935921.pdf",
+  "source_group": "Web-Sources",
+  "processed_at": "2026-06-08",
+  "agent": "agent5_final",
+  "concepts": [
+    {
+      "finding": "To overcome the second problem, that large co-occurrence does\nnot necessarily imply that queries are related, we propose two meth-\nods for ﬁnding recommendations, which turn out to be complemen-\ntary.",
+      "category": "FailureRisk",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "EXPERIMENTS\nThe goal of our experiments is two-fold: to demonstrate that our\nmethod can successfully ﬁnd high quality query communities in real\nsearch data, and to show that query communities increase both the\nnumber and the quality of recommendations.",
+      "category": "Experiment",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "An extensive series of\nexperiments on real search logs shows that the query communities\nfound by our algorithm are more interesting and unexpected than a\nbaseline of clustering the query-click graph.",
+      "category": "Baseline",
+      "implication": "Can inform intent modeling for recommendation systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Categories and Subject Descriptors\nH.3.3 [Information Search and Retrieval]: Search Process\nGeneral Terms\nExperimentation, Algorithms\nKeywords\nquery communities, long-range recommendations\n1.",
+      "category": "Experiment",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Thus the performance of an al-\ngorithm that clusters the query-click graph is upper bounded by the\nrelevance of a search engine, we seek to go beyond that.",
+      "category": "ModelCandidate",
+      "implication": "Applicable to user/item clustering for personalization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Recommendations: In the area of query suggestions, there is a\nplethora of methods including random walks on click graphs [6, 19,\n10], snippets of search results [26], query reformulation graphs [13,\n4], and clustering the query-click graph [5].",
+      "category": "ModelCandidate",
+      "implication": "Applicable to user/item clustering for personalization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Finally, there is rich literature in the context of recommendation\nsystems, which includes content-based approaches, collaborative-\nﬁltering based approaches [27, 21, 12, 15, 1], and hybrid approaches\n[28].",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Next, we propose a method that ﬁnds recommendations through a\nnovel way of viewing connections between queries as ‘explanations’\nrather than as co-occurrence counts.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "For the recommendation problem, we begin by showing that an\nexisting query suggestion algorithm [10] is not designed to pro-\nduce commercial recommendations.",
+      "category": "FailureRisk",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "The\nmain reason is that users can only click on what they see, and the\nclusters can only be as good as the search engine.",
+      "category": "ModelCandidate",
+      "implication": "Applicable to user/item clustering for personalization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "What we observe is that longer-range commer-\ncial recommendations are rare, in fact in many cases there does not\nseem to be a path from a search query to a commercial query in the\nquery-click graph.",
+      "category": "ModelCandidate",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "CONCLUSIONS & FUTURE WORK\nWe presented an approach to forecast future commercial intent\nof search users, thereby enabling product recommendation early in\nthe search process.",
+      "category": "TargetConstruct",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "In addition, one may consider the problem of assembling a diver-\nsiﬁed portfolio of product recommendations for each query, so as to\nmaximize the probability that a user clicks on at least one, i.e., min-\nimize the probability the portfolio defaults.",
+      "category": "FailureRisk",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Context-aware\nquery suggestion by mining click-through and session data.",
+      "category": "ModelCandidate",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Shopping for Products You Don’t Know You Need\nSrikanth Jagabathula∗\nEECS, MIT\nCambridge, MA\njskanth@mit.edu\nNina Mishra\nMicrosoft Research\nMountain View, CA\nninam@microsoft.com\nSreenivas Gollapudi\nMicrosoft Research\nMountain View, CA\nsreenig@microsoft.com\nABSTRACT\nRecommendationenginestodaysuggest o",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "However, intent to buy often precedes\na user’s appearance in a commerce vertical: someone interested in\nbuying a skateboard may have earlier searched for {varial heelﬂip},\na trick performed on a skateboard.",
+      "category": "TargetConstruct",
+      "implication": "Can inform intent modeling for recommendation systems",
+      "open_question": "How to address the limitation described: However, intent to buy often precedes\na user’s appearance in a commerce vertical: someone interested in\nbuying a skateboard may have earlier searched for {varial heelﬂip},\na trick performed on a skate",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "We propose two complemen-\ntary approaches for inferring recommendations that utilize query\ncommunities in order to magnify the recommendation signal be-\nyond what an individual query can provide.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Also, whereas existing\nquery suggestion algorithms are not designed for making commer-\ncial recommendations, we show that our algorithms do succeed in\nforecasting commercial intent.",
+      "category": "TargetConstruct",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "At ﬁrst launch, Amazon’s\n∗Work done while author was an intern at MSR Search Labs\nPermission to make digital or hard copies of all or part of this work for\npersonal or classroom use is granted without fee provided that copies are\nnot made or distributed for proﬁt or commercial advantage and that cop",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Looking over the recommendation engines available today, all\nseem to provide suggestions within a particular commerce domain.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    }
+  ]
+}

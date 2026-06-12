@@ -1,0 +1,15 @@
+{
+  "source": "A Note on the Inception Score.pdf",
+  "source_group": "Awesome-ML-Papers/GANs",
+  "processed_at": "2026-06-08",
+  "agent": "agent6_remaining",
+  "concepts": [
+    {
+      "finding": "The Inception Score (IS) measures GAN quality by combining per-sample class confidence with overall class distribution diversity.",
+      "category": "Evaluation",
+      "implication": "Good generative models balance per-sample confidence with overall diversity. Similarly, good search systems return individually relevant results that collectively cover diverse user intents.",
+      "open_question": "Can the Inception Score concept (per-item quality + overall diversity) be adapted as a search result quality metric?",
+      "testable_hypothesis": "A search metric combining per-item relevance with result set diversity will better correlate with user satisfaction than relevance-only metrics."
+    }
+  ]
+}

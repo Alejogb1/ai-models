@@ -1,0 +1,22 @@
+{
+  "source": "Query Intent Detection using Convolutional Neural Networks",
+  "source_group": "Awesome-ML-Papers/Search",
+  "processed_at": "2026-06-08T12:00:00Z",
+  "agent": "agent03_embeddings_mf_ranking_search_compiled",
+  "concepts": [
+    {
+      "finding": "CNN-based query vector representations (trained on word2vec + CNN with filters of size 2,3,4 + max pooling) used as features for multi-class intent classification. Achieved 81.6% accuracy on 125 low-level classes and 90.3% on 14 high-level classes. Query vectors enable semantically similar queries to cluster together via k-Means.",
+      "category": "Model Candidate",
+      "implication": "CNN-based query encoders can produce intent-aware query embeddings suitable for clustering into JTBD categories. The hierarchical taxonomy (3800+ low-level intents, 350 high-level) provides a blueprint for structuring keyword-to-intent taxonomies.",
+      "open_question": "How many intent classes are optimal for a keyword-intent product? Can a flat vs hierarchical clustering approach produce more actionable JTBD clusters?",
+      "testable_hypothesis": "CNN-extracted query embeddings will produce higher NMI (Normalized Mutual Information) clustering than simple word2vec averaging when measured against manually labeled intent categories."
+    },
+    {
+      "finding": "Query clustering case study: k-Means (k=125) on CNN query vectors grouped semantically similar queries together. E.g., queries about 'george selvie wiki', 'james brown biography', 'bob toski bio' clustered together. Some clusters contained mixtures of related intents (e.g., movie cast AND musical band members in same cluster).",
+      "category": "Evaluation",
+      "implication": "k-Means on query embeddings with k equal to number of intent classes provides a validation approach. Cluster purity can indicate embedding quality and taxonomy alignment.",
+      "open_question": "Should k-Means k be set to expected number of intents, or determined via elbow/silhouette methods?",
+      "testable_hypothesis": "Clustering on intent-tuned CNN embeddings will show higher cluster purity than on generic word2vec averaging embeddings."
+    }
+  ]
+}

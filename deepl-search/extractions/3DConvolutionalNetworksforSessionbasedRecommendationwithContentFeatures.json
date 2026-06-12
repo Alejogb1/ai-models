@@ -1,0 +1,148 @@
+{
+  "source": "3DConvolutionalNetworksforSessionbasedRecommendationwithContentFeatures.pdf",
+  "source_group": "Awesome-ML-Papers/Session-Based-Recommendations",
+  "processed_at": "2026-06-08",
+  "agent": "agent5_final",
+  "concepts": [
+    {
+      "finding": "Recent ﬁndings\nshow that explicitly taking into account the sequential nature\nof clicks and considering all past events result in improved\nrecommendations [6, 11].",
+      "category": "ModelCandidate",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "In summary, our contributions are as follows:\n• We propose a 3D CNN model for session-based recommen-\ndation, which allows jointly modeling sequential pattern of\nsession clicks and diﬀerent content features of items.",
+      "category": "ModelCandidate",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Although ID-RNN was originally proposed for next click\nrecommendation, it is straightforward to train ID-RNN to\npredict subsequent add-to-cart items by using such items as\ntraining labels.",
+      "category": "LabelValidation",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Although the 3D CNN model with\nID data achieved lower Recall and MRR scores than ID-RNN on\nthe ﬁrst dataset, it outperformed ID-RNN on the second dataset,\nin terms of most metrics, with only one exception - the Recall@20\nscore.",
+      "category": "Baseline",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "On\ntwo real datasets, our method outperformed several baselines and\na state-of-the-art method based on recurrent neural networks.",
+      "category": "Baseline",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "The\nresults show that our method achieved superior performance, while\nrequiring less feature engineering steps.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Our method also uses CNNs and content features,\nSession-Based Recommender Systems\nRecSys’17, August 27–31, 2017, Como, Italy\n139\n\nbut our CNN model allows capturing both spatial and temporal\npatterns, which is important for sequential nature of session clicks.",
+      "category": "ModelCandidate",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "However, our method uses a totally\ndiﬀerent model (3D CNN) and encoding method, which provide\nimproved accuracy while simplify feature engineering steps.",
+      "category": "Experiment",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "How to address the limitation described: However, our method uses a totally\ndiﬀerent model (3D CNN) and encoding method, which provide\nimproved accuracy while simplify feature engineering steps.",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "3.2\n3D CNN Architecture\nConvolutional neural networks (CNNs) [18] are a type of neural\nnetwork architectures that have achieved state-of-the-art results in\ncomputer vision , speech recognition and have been shown to be\ncompetitive in several NLP tasks [3, 17].",
+      "category": "Baseline",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "4\nEXPERIMENTS AND RESULTS\nIn this section, we evaluate the performance of the proposed method\ncompared to state-of-the-art session based recommendation algo-\nrithms on two datasets.",
+      "category": "Baseline",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "The proposed\nmethod outperformed all baselines including a state-of-the-art RNN\nbased method.",
+      "category": "Baseline",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "In this paper, we describe a method that\ncombines session clicks and content features such as item descrip-\ntions and item categories to generate recommendations.",
+      "category": "ModelCandidate",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "We applied\nthe proposed method to predict add-to-cart events in e-commerce\nwebsites, which is more diﬃcult then predicting next clicks.",
+      "category": "ModelCandidate",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "CCS CONCEPTS\n• Information systems →Recommender systems;\nKEYWORDS\nConvolutional neural networks; session-based recommendation;\nrecommender systems\nACM Reference format:\nTrinh Xuan Tuan and Tu Minh Phuong.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "DOI: http://dx.doi.org/10.1145/3109859.3109900\n1\nINTRODUCTION\nIn order to generate personalized recommendations, traditional\nrecommender systems rely on user proﬁles created from purchase\nhistories, explicit ratings or other kinds of past interactions such as\n∗Also with FPT Software Research Lab.",
+      "category": "ModelCandidate",
+      "implication": "Can inform intent modeling for recommendation systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "First, session clicks are sequen-\ntial in nature and the order of clicks may contain information of user\nintent.",
+      "category": "TargetConstruct",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Second, clicked items are often associated with metadata\nsuch as names, categories, and descriptions, which provide addi-\ntional information about user taste.",
+      "category": "ModelCandidate",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Therefore, a session-based recommendation\nmethod should have the following desired properties:\n• The method should be able to model sequential patterns in\nstreams of clicks.",
+      "category": "ModelCandidate",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "This method\nmakes recommendation based only on item co-occurrences,\ncompletely ignoring click orders.",
+      "category": "ModelCandidate",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "In this work, we propose a session-based recommendation method\nwith these two desired properties.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    }
+  ]
+}

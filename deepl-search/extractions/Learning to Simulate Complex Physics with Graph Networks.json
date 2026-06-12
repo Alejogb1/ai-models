@@ -1,0 +1,15 @@
+{
+  "source": "Learning to Simulate Complex Physics with Graph Networks.pdf",
+  "source_group": "Awesome-ML-Papers/CV",
+  "processed_at": "2026-06-08",
+  "agent": "agent6_remaining",
+  "concepts": [
+    {
+      "finding": "Graph networks that model pairwise interactions between particles can learn to simulate complex physical systems, generalizing to unseen initial conditions and system sizes with 95%+ accuracy.",
+      "category": "ModelCandidate",
+      "implication": "Graph-based relational reasoning (modeling interactions between entities) can transfer to search: modeling query-document, query-query, and document-document relationships as a graph.",
+      "open_question": "Can graph network simulations of user-behavior dynamics predict long-term search session outcomes?",
+      "testable_hypothesis": "A graph network modeling query-document interactions in a session will predict next-click behavior more accurately than sequential models by 10%+ AUC."
+    }
+  ]
+}

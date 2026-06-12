@@ -1,0 +1,148 @@
+{
+  "source": "Semi-Supervised Visual Representation Learning for Fashion Compatibility.pdf",
+  "source_group": "Awesome-ML-Papers/Shopping",
+  "processed_at": "2026-06-08",
+  "agent": "agent5_final",
+  "concepts": [
+    {
+      "finding": "It is evident that\nboth these forms of regularization on unlabeled data have comple-\nmentary benefits and improve the overall performance significantly\nachieving results on par with supervised methods.",
+      "category": "LabelValidation",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "We conduct extensive experiments on Polyvore and Polyvore-\nDisjoint [43] datasets and show that our proposed approach can\nachieve on-par performance with fully supervised methods even\nwith 5% of labeled outfits.",
+      "category": "LabelValidation",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Finally, we create a large scale Fashion Outfits\ndataset consisting of around 700K outfits with more than 3M im-\nages and demonstrate consistent improvement in performance over\nfully-supervised baseline.",
+      "category": "LabelValidation",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "As it is computationally infeasible\nto perform nearest neighbor search on entire unlabeled dataset\nD𝑈, we randomly sample sufficiently large mini-batch of unlabeled\nimages, b𝑢, to generate pseudo-outfits and finally impose margin\nloss (L𝑝𝑠𝑒𝑢𝑑𝑜) on the pseudo-triplets ( ˜𝐴, ˜𝑃, ˜𝑁) as shown in Fig.",
+      "category": "LabelValidation",
+      "implication": "Relevant for similarity-based retrieval and lookalike targeting",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "The representa-\ntions show that our embedding space can effectively capture appearance information (such as color).",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Another interesting point to note is that, at full supervision\n(i.e.𝛼= 100%), our approach achieves 0.89 AUC outperforming\nmany supervised approaches on the compatibility task compared\nin Table 2 due to the added consistency regularization supervision.",
+      "category": "LabelValidation",
+      "implication": "Can inform intent modeling for recommendation systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "First, to learn important attributes such as color, we\nintroduced a self-supervision scheme that enforces consistency in\nthe representation of input and its random transformations.",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Additionally, we\nintroduce consistency regularization to ensure that representation\nof the original images and their transformations are consistent\nto implicitly incorporate colour and other important attributes\nthrough self-supervision.",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "We conduct extensive experiments on\nPolyvore, Polyvore-D and our newly created large-scale Fashion\nOutfits datasets, and show that our approach with only a fraction\nof labeled examples performs on-par with completely supervised\nmethods.",
+      "category": "LabelValidation",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "KEYWORDS\nfashion compatibility, semi-supervised learning, self-supervision,\nproduct recommendation\nACM Reference Format:\nAmbareesh Revanur, Vijay Kumar, and Deepthi Sharma.",
+      "category": "LabelValidation",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Permission to make digital or hard copies of all or part of this work for personal or\nclassroom use is granted without fee provided that copies are not made or distributed\nfor profit or commercial advantage and that copies bear this notice and the full citation\non the first page.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "For each image in the positive/negative training pairs,\nwe find the most visually similar example in the unlabeled set and\ncreate a new pseudo-outfit pairs as shown in Fig.",
+      "category": "LabelValidation",
+      "implication": "Relevant for similarity-based retrieval and lookalike targeting",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "In a fully supervised setting, our ap-\nproach can achieve state-of-the-art performance on compatibility\nprediction task.",
+      "category": "LabelValidation",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "• We introduce consistency regularization and pseudo-labeling\nbased data augmentation techniques to learn different at-\ntributes and generate pseudo-outfits, completely from the\nunlabeled fashion images.",
+      "category": "LabelValidation",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Fashion Compatibility introduced by Han et al.[15] was formu-\nlated as a sequential problem and trained a bi-directional recurrent\nnetwork model that predicts the next compatible item conditioned\non previously observed items in the outfit sequence.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Further, Lin et al.[24]\nintroduce a fashion retrieval problem for images and learn a type-\ndependent attention mechanism.",
+      "category": "ModelCandidate",
+      "implication": "Architecture pattern applicable to sequence modeling for user behavior",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Generative adversarial network (GAN)\n[11] based approaches have also been proposed for semi-supervised\nlearning, however these are challenging to train [38].",
+      "category": "LabelValidation",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "How to address the limitation described: Generative adversarial network (GAN)\n[11] based approaches have also been proposed for semi-supervised\nlearning, however these are challenging to train [38].",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "This is achieved through metric learn-\ning by bringing the embedding of items (from different categories)\nthat go well together in a outfit closer compared to non-compatible\nitems.",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Our proposed approach is a data augmentation technique where\npseudo-positive and negative triplet pairs (Fig 2(b)) are generated\non-the-fly during each training iteration based on visual similarity\nof individual examples in the triplet using the images in the unla-\nbeled set.",
+      "category": "ModelCandidate",
+      "implication": "Relevant for similarity-based retrieval and lookalike targeting",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "We next formulate the problem of semi-supervised fashion com-\npatibility and then describe our proposed data augmentation tech-\nniques in greater detail.",
+      "category": "LabelValidation",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    }
+  ]
+}

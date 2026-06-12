@@ -1,0 +1,1081 @@
+A Multi-View Deep Learning Approach for Cross Domain
+User Modeling in Recommendation Systems
+Ali Elkahky
+∗
+Department of Computer Science
+Columbia University
+New York, NY 10027, USA
+ame2154@columbia.edu
+Yang Song, Xiaodong He
+Microsoft Research
+One Microsoft Way
+Redmond, WA 98052, USA
+{yangsong,xiaohe}@microsoft.com
+ABSTRACT
+Recent online services rely heavily on automatic personal-
+ization to recommend relevant content to a large number of
+users. This requires systems to scale promptly to accommo-
+date the stream of new users visiting the online services for
+the ﬁrst time. In this work, we propose a content-based rec-
+ommendation system to address both the recommendation
+quality and the system scalability. We propose to use a rich
+feature set to represent users, according to their web brows-
+ing history and search queries. We use a Deep Learning ap-
+proach to map users and items to a latent space where the
+similarity between users and their preferred items is maxi-
+mized. We extend the model to jointly learn from features
+of items from diﬀerent domains and user features by intro-
+ducing a multi-view Deep Learning model. We show how
+to make this rich-feature based user representation scalable
+by reducing the dimension of the inputs and the amount of
+training data. The rich user feature representation allows
+the model to learn relevant user behavior patterns and give
+useful recommendations for users who do not have any in-
+teraction with the service, given that they have adequate
+search and browsing history. The combination of diﬀerent
+domains into a single model for learning helps improve the
+recommendation quality across all the domains, as well as
+having a more compact and a semantically richer user latent
+feature vector. We experiment with our approach on three
+real-world recommendation systems acquired from diﬀerent
+sources of Microsoft products: Windows Apps recommen-
+dation, News recommendation, and Movie/TV recommen-
+dation. Results indicate that our approach is signiﬁcantly
+better than the state-of-the-art algorithms (up to 49% en-
+hancement on existing users and 115% enhancement on new
+users).
+In addition, experiments on a publicly open data
+set also indicate the superiority of our method in compar-
+ison with transitional generative topic models, for model-
+∗Work done at Microsoft Research during the author’s sum-
+mer internship.
+Copyright is held by the International World Wide Web Conference Com-
+mittee (IW3C2). IW3C2 reserves the right to provide a hyperlink to the
+author’s site if the Material is used in electronic media.
+WWW 2015, May 18–22, 2015, Florence, Italy.
+ACM 978-1-4503-3469-3/15/05.
+http://dx.doi.org/10.1145/2736277.2741667.
+ing cross-domain recommender systems. Scalability analy-
+sis show that our multi-view DNN model can easily scale
+to encompass millions of users and billions of item entries.
+Experimental results also conﬁrm that combining features
+from all domains produces much better performance than
+building separate models for each domain.
+General Terms
+User Modeling
+Keywords
+User Modeling; Recommendation System; Multi-View Learn-
+ing; Deep Learning
+1.
+INTRODUCTION
+Recommendation systems and content personalization play
+increasingly important role in modern online web services.
+Many recent web services work on ﬁnding the most relevan-
+t content to their users in order to maximize the engage-
+ment with the site and minimize the time for ﬁnding the
+relevant content. A major approach to this task is called
+Collaborative Filtering (CF) [3, 19, 22, 21, 23, 6], which us-
+es user’s previous history of interaction in the web site to
+predict the most relevant content for recommendation. An-
+other common approach is content-based recommendation
+[14, 15], which uses features about items and/or users to
+recommend new items to users based on the similarity be-
+tween features. While both approaches work well in many
+practical applications [6], they usually face certain limita-
+tions and challenges especially with the increasing demand
+of personalization and recommendation quality.
+Speciﬁcally, CF needs a considerable amount of previous
+history of interaction with the site before it can give high
+quality recommendation. This problem is known as user cold
+start problem [24]. In a newly established online service, the
+problem becomes more severe since users have little or no
+history of interaction with the site. Therefore, traditional
+CF methods often fail to produce high quality recommen-
+dation for new users.
+On the other hand, content-based
+recommendation methods extract features from each user
+and/or item and use those features to make recommenda-
+tions. For example, if two News articles Ni and Nj share the
+same topic and a user liked article Ni, the system may rec-
+ommend article Nj to the user. Similarly, if two users Ui and
+Uj share certain similarities like their location, age or gen-
+der, the system may recommend to user Uj the items that
+user Ui liked before. In practice, research has shown that
+content-based approach can handle the cold start problem
+for new items well [32]. However, its eﬀectiveness is ques-
+tionable when applying to recommendations for new users
+since user-level features are usually more diﬃcult to acquire
+and often generated from a limited information in user on-
+line proﬁles, which failed to accurately capture the actual
+user’s interests.
+To address these limitations, we propose a recommenda-
+tion system that leverages both user and item features. To
+build user features, unlike many user proﬁle-based approach-
+es, we propose to extract rich features from user’s browsing
+and search histories to model user’s interests. The under-
+lying assumption is that, users’ historical online activities
+reﬂect a lot about user’s background and preference, and
+therefore provide a precise insight of what items and top-
+ics users might be interested in. For example, a user with
+many infant-related queries and website visits (e.g., toys-
+rus.com) may suggest that she is a mom for a new-born
+baby.
+With these abundantly available user online activ-
+ities, recommending relevant items can be achieved more
+eﬃciently and eﬀectively.
+In our work we propose a novel deep learning approach ex-
+tended from the Deep Structured Semantic Models (DSSM)
+[9] to map users and items to a shared semantic space and
+recommend items that have maximum similarity with users
+in the mapped space. To achieve this, our model projects
+the users and items, each of which is represented by a rich
+feature set, through non-linear transformation layer(s) to a
+compact shared latent semantic space where the similarity
+between the mapping of the user and mappings of items liked
+by the user is maximized. This allows the model to learn in-
+teresting mappings such as people who visited ﬁfa.com will
+like to read News articles about the World Cup and play
+soccer games on PC or Xbox. The rich features in the user
+side enable modeling the user’s behavior and thus overcome
+many limitations in the content-based recommendation. It
+also addresses the user cold start problem eﬀectively since
+the model allows us to capture user interests from queries
+and recommend related items (say music) even if they do not
+have any history on using music services. Our deep learning
+model has a ranking based objective which aims at ranking
+positive examples (items that users like) higher than nega-
+tive examples. This ranking based objective has shown to
+be better for recommendation systems [9].
+Furthermore, we extend the original DSSM model, which
+is referred to as single-view DNN in this paper since it learns
+from user features and items that come from a single domain,
+to jointly learn features of items from diﬀerent domains. We
+name the new model Multi-View Deep Neural Network (MV-
+DNN). In literature, multi-view learning is a well-studied
+area which learns from data that do not share common fea-
+ture space [27]. We consider MV-DNN as a general Deep
+learning approach in the multi-view learning setup. Speciﬁ-
+cally, in our data sets with News, Apps and Movie/TV logs,
+instead of building separate models for each of the domain
+that naively maps the user features to item features within
+the domain, we build a novel multi-view model that discov-
+ers a single mapping for user features in the latent space
+such that it is jointly optimized with features of items from
+all domains. MV-DNN allows us to learn a better user rep-
+resentation that leverages more data across domains and
+tackles the data sparsity problem in a principled way by
+leveraging user preference data from all domains. We show
+in our experiments that this multi-view extension improves
+the recommendation quality across all the domains at the
+same time.
+In addition, it is worth mentioning that the
+non-linear mapping in the deep learning models enables us
+to ﬁnd a compact representation of users in the latent space
+which makes it much easier to store the learnt user mapping
+and share the information among diﬀerent tasks.
+One challenge in using deep learning to model rich user
+features is the high dimension of the feature space which
+makes the learning ineﬃcient and may impact the general-
+ization ability of the model.
+We propose several eﬀective
+and scalable dimensionality reduction techniques that re-
+duce the dimension to a reasonable size without the loss of
+much information.
+To summarize, the contributions in this work are:
+(1)
+use rich user features to build a general-purpose recommen-
+dation system, (2) propose a deep learning approach for
+content-based recommendation systems and study diﬀerent
+techniques to scale-up the system, (3) introduce the novel
+Multi-View Deep learning model to build recommendation
+systems by combining data sets from multiple domains, (4)
+address the user cold start issue which is not well-studied in
+literature by leveraging the semantic feature mapping learn-
+t from the multi-view DNN model, and (5) perform rigor-
+ous experiments using four real-world large-scale data set
+and show the eﬀectiveness of the proposed system over the
+state-of-the-art methods by a signiﬁcantly large margin.
+The rest of this paper is organized as following, ﬁrst we re-
+view major approaches in recommendation systems includ-
+ing papers that focus on the cold start problem in Section
+2; in Section 3, we describe the data sets we work with and
+detail the type of features we use to model the user and
+the items in each domain, respectively. We then review the
+basic DSSM model and discuss how it could be extended
+for our setting in Section 4; in Section 5, we introduce the
+multi-view deep learning model in details and discuss its ad-
+vantages; in Section 6, we discuss the dimension reduction
+methods to scale-up the model; in Section 7, 8, 9 & 10, we
+present a comprehensive empirical study; we ﬁnally conclude
+in Section 11 and suggest several future work.
+2.
+RELATED WORK
+There has been extensive study on recommendation sys-
+tems with a myriad of publications.
+In this section, we
+aim at reviewing a representative set of approaches that are
+mostly related to our proposed approach.
+In general, recommendation systems can be divided in-
+to collaborative recommendation and content based recom-
+mendation. Collaborative Recommendation systems recom-
+mend an item to a user if similar users liked this item. Exam-
+ples of this technique include nearest neighbor modeling [3],
+Matrix Completion [19], Restricted Boltzmann machine [22],
+Bayesian matrix factorization [21] etc. Essentially, these ap-
+proaches are user collaborative ﬁltering, item collaborative
+ﬁltering or both item and user collaborative ﬁltering.
+In
+user collaborative ﬁltering such as [3], the algorithm com-
+putes the similarity between users based on items they liked.
+Then, the scores of user-item pairs are computed by combin-
+ing scores of this item given by similar users. Item based col-
+laborative ﬁltering [23], computes similarity between items
+based on users who like both items, then recommend the
+user items similar to the ones she liked before. User-item
+based collaborative ﬁltering ﬁnds a common space for items
+and users based on user-item matrix and combines the item
+and user representation to ﬁnd a recommendation. All ma-
+trix factorization approaches like [19] and [21] are examples
+of this technique. CF can be extended to large-scale setups
+like in [6]. However, CF is generally unable to handle new
+users and new items, a problem which is often referred to as
+cold-start issue.
+The second approach for recommendation systems is content-
+based recommendation.
+This approach extracts features
+from item’s and/or user’s proﬁle and recommend items to
+users according to these features. The underlying assump-
+tion is that similar users tend to like items similar to the
+items they liked previously. In [14], a method is proposed to
+construct a search query with some features of items the user
+liked before to ﬁnd other relevant items to recommend. An-
+other example is presented in [15] where each user is modeled
+by a distribution over News topics that is constructed from
+articles she liked with a prior distribution of topic preference
+computed using all users who share the same location. This
+approach can handle new items (News articles) but for new
+users the system used location feature only which implies
+that new users are expected to see most frequent topics in
+their location. This might be a good features to recommend
+News but in other domains, for example Apps recommen-
+dation, using only location information may not work as a
+good prior over user’s preferences.
+Recently, researchers have developed approaches that com-
+bine both collaborative recommendation and content based
+recommendation. In [16], the author used item features to
+smooth user data before using collaborative ﬁltering. In [7],
+the authors used Restricted Boltzmann Machine to learn
+similarity between items, and then combined this with col-
+laborative ﬁltering. A Bayesian approach was developed in
+[32] to jointly learn the distribution of items, research pa-
+pers in their case, over diﬀerent components (topics) and
+the factorization of the rating matrix.
+Handling the cold start issue in recommendation systems
+is studied mainly for new items (items that have no rating
+by any user).
+As we mentioned before, all content based
+ﬁltering can handle cold start for item, and there are some
+methods that were developed and evaluated speciﬁcally for
+this issue like in [24] and [7]. The work in [18] studied how
+to learn user preferences for new users incrementally by rec-
+ommending items that give the most information about user
+preferences while minimizing the probability of recommend-
+ing irrelevant content. User modeling via rich features have
+been studied a lot recently. For example, it has been shown
+that user search queries can be used to discover the similari-
+ties between users [25]. Rich features from user search histo-
+ry has also been used for personalized web search [26]. For
+recommendation systems, the authors in [2] leveraged the
+user’s historical search queries to build personalized taxono-
+my for recommending Ads. On the other hand, researchers
+have discovered that a user’s social behaviors can also be
+used to build the proﬁle of the user. In [1], the authors used
+user’s tweets in Twitter data to recommend News articles.
+Most traditional recommendation system research focused
+on data within a single domain. Recently, there has been an
+increasing interest in cross domain recommendation. There
+are diﬀerent approaches for addressing cross domain rec-
+ommendation.
+One approach is to assume that diﬀerent
+domains share similar set of users but not the items, as il-
+lustrated in [20]. In their work, the authors augmented data
+from rating of movies and books from datasets that have
+common users. The augmented data set was then used to
+perform collaborative ﬁltering.
+They showed that this in
+particular helped the cases where users with little proﬁle
+information in one of the domains (cold-start users). The
+second approach addressed the scenarios where the same
+set of items shared diﬀerent types of feedbacks in diﬀerent
+domains like user clicks or user explicit rating. As shown
+in [17], the authors introduced a coordinate system trans-
+fer method for cross domain matrix factorization. In [12],
+the authors studied the cross domain recommendation in
+the case where there existed no shared users or items be-
+tween domains. They developed a generative model to dis-
+cover common clusters between diﬀerent domains. However,
+a challenge in their approach is its ability to scale beyond
+medium datasets due to the computational cost. A diﬀerent
+approach was introduce in [28] for author collaboration rec-
+ommendation where they built a topic model to recommend
+authors to collaborate from diﬀerent research ﬁelds.
+For many approaches in recommendation systems the ob-
+jective function is to minimize the root mean squared error
+on the user-item matrix reconstruction. Recently, ranking
+based objective function has shown to be more eﬀective in
+giving better recommendation as shown in [11].
+Deep learning has recently been proposed for building rec-
+ommendation systems for both collaborative and content
+based approaches.
+In [22], an RBM model was used for
+collaborative ﬁltering. Deep learning for content based rec-
+ommendation has been done for example in [30] where deep
+learning was applied to learn embedding for music features.
+This embedding was then used to regularize matrix factor-
+ization in collaborative ﬁltering.
+3.
+DESCRIPTION OF THE DATA SETS
+In this section introduces the data sets. We describe the
+data collection process and the feature representations for
+each data set, as well as some basic statistics of the data.
+The four data sets used in this study were collected from
+user logs of several Microsoft products, including (1) Search
+engine logs from Bing Web vertical, (2) News article brows-
+ing history from Bing News vertical, (3) App download logs
+from Windows AppStore, and (4) Movie/TV view logs from
+Xbox. All the logs were collected between December 2013
+and June 2014, with primary focus on English-speaking mar-
+kets including United States, Canada and Great Britain.
+(User Features) We collected users’ search queries and
+their clicked URLs from Bing to form user features. Queries
+were ﬁrst normalized, stemmed and then split into unigram
+features and URLs were shorten into domain-level only (e.g.,
+www.linkedin.com) to reduce the feature dimension.
+We
+then used TF-IDF scores to keep only the most popular and
+non-trivial features. Overall, we selected 3 million unigram
+features and 500K domain features, leading to a total length
+of 3.5-million user feature vector.
+(News Features) We collected news article clicks from
+Bing News vertical. Each News item is represented by three
+parts of features. The ﬁrst part is the title features encoded
+using letter tri-gram representation as we will describe in
+the next section. Secondly, the top-level category of each
+News (e.g., Entertainment) is encoded as binary features.
+Finally, the Named Entities in each article, extracted using
+Type
+DataSet
+UserCnt
+Feature
+Size
+Joint
+Users
+User View
+Search
+20M
+3.5M
+/
+News
+5M
+100K
+1.5M
+Item View
+Apps
+1M
+50K
+210K
+Movie/TV
+60K
+50K
+16K
+Table 1: Statistics of the four data sets used in this paper.
+The Joint Users column indicates the number of common
+users between each item view and the user view.
+an internal proprietary NLP parser, is encoded using letter
+tri-gram as well. This results in a 100K feature vector.
+(App Features) Users’ App download histories were col-
+lected from Windows AppStore logs. The title of each App
+is represented using letter tri-gram, combining with its cat-
+egory (e.g., Game) features in the binary format. Do to the
+nature of constant change of App descriptions, we decided
+not to include that as part of the feature space. This results
+in a 50K feature vector for Apps.
+(Movie/TV Features) From Xbox logs, we collected the
+Movie/TV view history for each Xbox user. The title and
+description of each item were combined into text features
+and then encoded using letter tri-gram. The genre is also
+used as binary features. This results in a 50K feature vector
+for Movie/TV.
+In our neural network framework, user features are mapped
+into the user view and the rest is mapped into diﬀerent
+item views. For training purpose, each user view is matched
+with an item view which contains the exact set of users. To
+achieve this, we sub-sampled logged-in users (i.e., users with
+uniquely annonymized and hashed Microsoft User IDs) from
+each user-item view pair and performed inner join based on
+their IDs. This results in diﬀerent number of users for each
+user-item view pair. Table 1 depicts some basic statistics of
+the data used in this paper.
+4.
+DSSM FOR USER MODELING IN REC-
+OMMENDATION SYSTEMS
+A deep structured semantic model (DSSM) is introduced
+in [9] to enhance query document matching in the web search
+context. Given the close relationship to our proposed multi-
+view deep neural network, we brieﬂy review DSSM here.
+The typical architecture of the DSSM is shown in Fig.
+1.The input (raw text features) to the DNN is a high dimen-
+sional term vector, e.g., raw counts of terms in a query or
+a document without normalization. Then the DSSM pass-
+es its input through two neural networks, one for each of
+the two diﬀerent inputs, respectively, and maps them into
+semantic vectors in a shared semantic space. For Web docu-
+ment ranking, DSSM computes the relevance score between
+a query and a document as the cosine similarity of their cor-
+responding semantic vectors, and ranks documents by their
+similarity scores to the query.
+More formally, if we denote x as the input term vector, y
+as the output vector, li, i = 1, ..., N −1, as the intermediate
+hidden layers, Wi as the i-th weight matrix, and bi as the
+i-th bias term, we have
+l1
+=
+W1x
+li
+=
+f(Wili−1 + bi), i = 2, ..., N −1
+y
+=
+f(WNlN−1 + bN)
+(1)
+Figure 1: The illustration of the deep structured semantic
+model (DSSM).
+where we use the tanh function as the activation function at
+the output layer and the hidden layers li, i = 2, ..., N −1 :
+f(x) = 1 −e−2x
+1 + e−2x
+(2)
+The semantic relevance score between a query Q and a
+document D is then measured as:
+R(Q, D) = cosine(yQ, yD) =
+yQ
+T yD
+||yQ|| · ||yD||
+(3)
+where yQ and yD are the semantic vectors of the query
+and the document, respectively. In Web search, given the
+query, the documents are sorted by their semantic relevance
+scores.
+Conventionally, each word w is represented by a one-hot
+word vector where the dimensionality of the vector is the size
+of the vocabulary. However, the vocabulary size is often very
+large in real-world Web search tasks, and the one-hot vector
+word representation makes model learning very expensive.
+Therefore, the DSSM uses a word hashing layer to represent
+a word by a letter-trigram vector.
+For example, given a
+word (e.g. web), after adding word boundary symbols (e.g.
+#web#), the word is segmented into a sequence of letter-n-
+grams (e.g. letter-tri-grams: #-w-e, w-e-b, e-b-#). Then,
+the word is represented as a count vector of letter-tri-grams.
+For example, the letter-trigram representation of web is:
+In Figure 1, the ﬁrst layer matrix W1 denotes the letter-
+trigram matrix transforming from a term-vector to its letter-
+trigram count vector, which requires no learning.
+Even
+though the total number of English words may grow to be ex-
+tremely large, the total number of distinct letter-trigrams in
+English (or other similar languages) is often limited. There-
+fore, it can generalize to new words unseen in the training
+data.
+In training, it is assumed that a query is relevant to the
+documents that are clicked on for that query, and the param-
+eters of the DSSM, i.e., the weight matrix Wi, are trained
+using this signal.
+I.e., ﬁrst the posterior probability of a
+document given a query is estimated from the semantic rel-
+evance score between them through a softmax function
+P(D|Q) =
+exp(γR(Q,D))
+P
+D′∈D exp(γR(Q,D′))
+(4)
+where γ is a smoothing factor in the softmax function,
+which is usually set empirically on a held-out data set in our
+experiment. D denotes the set of candidate documents to
+be ranked. Ideally, D should contain all possible documents.
+In practice, for each (query, clicked-document) pair, denoted
+by (Q, D+) where Q is a query and D+ is the clicked docu-
+ment, we approximate D by including D+ and N randomly
+selected unclicked documents, denote by {D−
+j ; j = 1, , N}.
+In training, the model parameters are estimated to maxi-
+mize the likelihood of the clicked documents given the queries
+across the training set.
+L(Λ) = −log
+Y
+(Q,D+)
+P(D+|Q)
+(5)
+where Λ denotes the parameter set of the neural networks.
+5.
+MULTI-VIEW DEEP NEURAL NETWORK
+The DSSM can be viewed as a multi-learning framework
+where it maps two diﬀerent views of the data into a shared
+view. In that sense, it can be viewed in a more general set-
+ting to learn a shared mapping between two diﬀerent views.
+Figure 2: Multi-view DNN for multiple domain recommen-
+dation.
+It uses a DNN to map high-dimensional sparse
+features (e.g., raw features of users, News, App) into low-
+dimensional dense features in a joint semantic space.. The
+ﬁrst hidden layer, with 50k units, accomplishes word hash-
+ing. The word-hashed features are then projected through
+multiple layers of non-linear projections. The ﬁnal layer’s
+neural activities in this DNN form the feature in the seman-
+tic space. Note that the input feature dimension x (5M and
+3M) in this ﬁgure is hypothetical as in practice each view
+can have arbitrary number of features. See text for details.
+In this work, we propose an extension to the DSSM where
+we have more than two views of the data and we call this
+Multi-view DNN (MV-DNN). In this setting, we have v + 1
+views, one pivot view called Xu and other v auxiliary views
+X1 through Xv and each Xi has its own input domain Xi ∈
+Rdi. Each view also has its own non-linear mapping layer(s)
+fi(Xi, Wi) which transforms Xi into shared semantic space
+Yi. The training data contains a set of samples. The jth
+sample has an instance of the pivot view Xu,j and one active
+auxiliary view Xa,j where a is the index of the active view in
+sample j. All other views input Xi:i̸=a are set to 0 vectors.
+The objective of is ﬁnding a non-linear mapping for each
+view such that the sum of similarities, in the semantic space
+between mapping of the pivot view Yu and mappings of all
+Algorithm 1 Training Multi-View DNN
+1: Input: N = # of view pairs, M = # of training iterations,
+UA = user view architecture,
+IA = {IA1, ...IAN} item view architecture,
+UD = {UD1, ...UDN} user input ﬁles,
+ID = {ID1, ...IDN} item input ﬁles,
+WU = user view weight matrix,
+WI = {WI1, ...WIN} item view weight matrices
+2: Initialization
+3: Initialize WU and WI using UA and IA
+4: for m = 1 to M
+5:
+for v = 1 to N
+6:
+TU ←UDv
+7:
+TI ←IDv
+8:
+train WU and WI using TU and TI
+9:
+end for
+10: end for
+11: Output: WU = ﬁnal user weight matrix,
+WI = ﬁnal set of item view weight matrices
+other views Y1, ...Yv is maximized. Formally, we have:
+p = arg
+max
+Wu,W1,..Wv
+N
+X
+j=1
+eαa cos(Yu,Ya,j )
+P
+X′∈Rda eα cos(Yu,fa(X′,Wa))
+(6)
+The architecture of MV-DNN is shown in ﬁgure 2. In our
+recommendation systems setup, we set the pivot view Xu
+to user features and create auxiliary view for each diﬀerent
+type of items we aim to recommend.
+The intuition for having this objective function is to try
+to ﬁnd a single mapping for user’s features, namely Wu, that
+can transform users features into a space that matches al-
+l diﬀerent items the user liked in diﬀerent views/domains.
+This way of sharing parameters allows the domains that do
+not have enough information to learn good mapping through
+other domains which have more data. It should work well
+if the assumption that users who have similar News articles
+taste also have similar taste in other domains which mean-
+s those domains can beneﬁt from user mapping learned by
+News domain. If this assumption is valid, then samples from
+any domain will help in grouping similar users more accu-
+rately in all domains. The empirical results showed that the
+assumption is reasonable in the domains we experimented
+on, which we elaborate more in the experiment sections.
+5.1
+Training MV-DNN
+MV-DNN can be trained using Stochastic Gradient De-
+cent (SGD). In practice, each training example contains a
+pairs of inputs, one for the user view and one for the data
+views. Therefore, despite the fact that there exists only one
+user view in our model, it is often more convenient to have
+N user feature ﬁles, each of which corresponds to an item
+feature ﬁle, where N is the total number of user-item view
+pairs. In Algorithm 1, we sketch the high-level process of
+training MV-DNN. When taking the derivative with respect
+to all Wi ∈{Wu, W1, ..Wv} we end up with only two non-
+zero derivatives
+∂p
+∂Wu and
+∂p
+∂Wa which allow us to apply the
+same update rules for DSSM as in [9] substituting q by Xu
+and d by Xa.
+5.2
+Advantages of MV-DNN
+Although MV-DNN is extended from the original DSSM
+framework, it has several unique characteristics that makes
+it superior than its predecessor.
+First of all, the original
+DSSM model uses for both the query view and document
+view the same size of feature dimensions, and preprocessed
+using the same representation (letter tri-gram for example).
+This poses a huge restrictions in the feature composition
+step. Due to the heterogeneity nature of recommendation
+systems, it is quite likely that the user view and item view
+pose diﬀerent input features. Also, many types of features
+cannot be optimally represented using letter trigram. For
+example, the URL domain feature often contains preﬁx and
+suﬃx like www, com, org which will be mapping to the same
+feature if letter tri-gram is applied. In practice, we have dis-
+covered that the letter tri-gram representation works ideally
+in the case that the input raw text is short (e.g., query text
+and document title in the original DSSM model), but be-
+comes inappropriate to model user level features which of-
+ten contain a large collection of queries and URL domains.
+By removing this constraint, the new MV-DNN model can
+incorporate categorical features such as movie genre and ap-
+p category, geospatial features such as country and region,
+as well as raw text features represented using uni-grams or
+bi-grams from user inputs.
+Secondly, MV-DNN has the capability of scaling up to
+many diﬀerent domains which the original DSSM framework
+is unable to. By performing pair-wise training between each
+user-item view pair as described in Algorithm 1, our model
+can easily adopt new sets of view pairs which may contain
+completely independent sets of users and items at any stage
+of the training process, e.g., adding a new data set from
+Xbox games.
+By alternating user-view pairs during each
+training iteration, our model can eventually converge to an
+optimal embedding of user view that is trained through all
+item views. Note that although we can have diﬀerent user
+sets in diﬀerent item views in theory, during our experiment,
+we choose to keep the same set of users across all views with
+the consideration of both convenience and the ease of feature
+normalization.
+6.
+DIMENSION AND DATA REDUCTION
+In practice, the proposed deep learning approach often
+needs to handle a huge amount of training examples in high
+dimensional feature spaces for the user view. In order to
+scale the system up, we propose several dimensionality re-
+duction techniques to reduce the number of features in the
+user view. Then, we propose an idea to compact and sum-
+marize user training examples which reduces the number of
+training data to be linear to the number of users.
+6.1
+Top Features
+One simple dimensionality reduction approach for user
+features is to select the top-K most frequent features. We
+select all features that have a probability of 0.001 or greater
+to be picked by a user. The main underlying hypothesis is
+that users can be described well using a relatively small set
+of frequent features that explains the users’ common online
+behavior.
+Note that as described in Section 3, the user’s
+raw features are preprocessed using TF-IDF scores so that
+the top features we select no longer contains common stop
+words in search queries. This resulted in 83K user features.
+6.2
+K-means
+K-means [8] is a well-known clustering technique aims at
+creating a number of clusters such that the sum of distances
+between each point and its nearest cluster is minimized:
+arg min
+C1,..Ck
+N
+X
+i=1
+min
+Cj∈{C1,..Ck} distance(Xi, Cj),
+(7)
+Where Xi is a data point and Cj indicates a cluster centroid.
+K-means has shown good performance as a way to learn un-
+supervised features in vision [5]. The basic idea is to group
+similar features together into one cluster and generate a new
+feature vector Y which has the size equal to number of clus-
+ters K and has number of appearances of features in cluster
+i as value of its ith component. To do this we represent each
+feature using a vector fi of length U where U is the number
+users in the training data and fi(j) equals to the number of
+times user i has feature j. fi are then normalized to have
+length 1. One important aspect in running K-means is that
+the relevant distance here is the angle between diﬀerent fea-
+ture vectors which can be computed using cosine similarity.
+Then the reduced dimensional vector Yi is created for each
+user vector fi as follows: denote 1 ≤Cls(a) ≤K the cluster
+assigned to feature a, we can compute Yi using:
+Yi(j) =
+X
+a:Xi(a)>0&Cls(a)=j
+fi(a)
+(8)
+To be able to extract a reasonable number of features us-
+ing K-means we need to have a relatively large number of
+clusters, since a small number of clusters (say 100) will re-
+sults in large chunk of features to be in the same cluster
+considering the size of user features to be 3.5M. This will
+hence generate features that are diﬃcult to learn useful pat-
+tern from. In order to mitigate this issue, we set the number
+of clusters to be 10k. This means that on average there are
+350 features per cluster. The large size of clusters and raw
+features makes K-means computationally expensive to run.
+In our experiment, we use a cloud-based Map-Reduce im-
+plementation for K-means [4].
+6.3
+Local sensitive Hashing
+Local Sensitive Hashing (LSH) [10] works by projecting
+the data using a random projection matrix into a much lower
+dimensional space such that the pairwise cosine distance in
+the original space is still preserved in the new space. LSH
+requires a transformation matrix A ∈Rd×k, where d is the
+number of features in the original space and k is the number
+of random projections used. This means That A contains k
+diﬀerent projection, indicated by Ai, each of which takes X
+vector and output a single hash value Yi. The output vector
+Y ∈Rk of LSH can be found by concatenating all diﬀerent
+hash values of Yi. Speciﬁcally, to compute each Yi we use
+the following equation:
+Yi =
+(
+1
+if AiX ≥0
+0
+else.
+(9)
+The cosine similarity between two vectors X1, X2 ∈Rd
+can be approximated by cos
+
+H(Y1,Y2)
+k
+π
+
+where H(Y1, Y2)
+is the hamming distance between the LSH of input vectors.
+In order to preserve cosine similarity with higher accura-
+cy we need to increase the number of projections used k.
+We used k = 10, 000, the same as used for K-means clus-
+ters.
+While LSH can be applied to each vector indepen-
+dently and all projection can be computed independently
+which makes the algorithm highly distributable under the
+Map-Reduce framework, the algorithm requires the genera-
+tion of the transformation matrix A which is our case has
+3.5M × 104 entries generated from N(0, 1), requiring about
+300GB storage. Also, A must be stored on each node dur-
+ing the computation of LSH vectors. These issues make LSH
+prohibitively expensive in the Map-Reduce framework.
+Many solutions have been proposed to address this prob-
+lem. A lot of them are based on generating sparse A [13].
+Here, we used the pooling trick introduced in [31]. The idea
+is to keep a pool B of size m of random numbers generated
+from N(0, 1) where m is usually signiﬁcantly smaller than
+the size of a transformation matrix A. To get the entry in
+Aij one simply applies consistent hash function of i, j to get
+an index in B and look up the value. In our experiments
+we set m = 1, 000, 000 which is more than 10, 000 times re-
+duction in memory requirement and can be easily stored in
+each node in during Map-Reduce using only 10M storage.
+6.4
+Reduce the Number of Training Examples
+The training data for each view contains a set of pairs
+(Useri, Itemj) such that Useri liked Itemj. In practice, a
+user may like many items which sometimes cause the train-
+ing data to be very large. For example, in our News recom-
+mendation data set, the number of pairs is well over 1 billion
+and causes the training to be very slow even when using an
+optimized GPU implementation.
+To alleviate this problem, we compress the training data
+so that it includes a single training example per user per
+each view. Speciﬁcally, the compressed training example in-
+cludes the user features paired with the features with an
+average score of all items the user liked in that view. This
+reduces the number of training examples per view to the
+number of users in the training data, which greatly reduce
+the training data size. Note that a concern of this technique
+is that the objective function now becomes maximizing the
+similarity between user features and the average features of
+items the user liked.
+There is a slight diﬀerence when it
+comes to evaluation since during test time each user is given
+only one single item. However, this approximation is neces-
+sary to make the system scale up well. Also, experimental
+results will show that this approximation still generates very
+promising results in practice.
+7.
+EXPERIMENTAL SETUP
+In this section, we explain the process of our empirical
+study and brieﬂy review several recommendation algorithms
+we compared to as baselines.
+For each data set, we aim at evaluating the system perfor-
+mance on users who already have previous interaction in this
+domain (old users) and users who did not have any previous
+interaction but have some search and browsing history that
+can be encoded into user view (new users). For evaluation,
+the data sets were split into training and test sets using the
+following criteria:
+First, each user is randomly assigned a label of either
+“train” or “test” with the probability ratio of 0.9:0.1. Then,
+for each user with a “test” label, we further label them as
+“old” or “new” user with the probability ratio of 0.8:0.2. For
+those labeled as “old” users, 50% of their items are used for
+training and the rest for test. On the other hand, for “new”
+users, their items are only used for testing as the user-item
+pairs are guaranteed to never appear in the training pro-
+cess. This way, these users are indeed completely new to the
+system. The details of the dataset breakdown is in table 2.
+In terms of performance evaluation, for each (useri, itemj)
+pair in the training data we select 9 other random items
+itemr1, ...itemr9, where r1 though r9 are random indices,
+and create 9 testing pairs (useri, itemrk), 1 ≤k ≤9 and
+added to the testing data set.
+The evaluation criteria is
+to measure of how well the system ranks the correct pair
+(useri, itemj) against the other random items for the same
+user (useri, itemrk). Therefore, we employed two metrics
+for this: (1) the Mean Reciprocal Rank (MRR), which com-
+putes the inverse of the rank of the correct item among other
+items and average the score across the whole testing data,
+and (2) Precision@1 (P@1) which computes the percentage
+of times the system ranks the correct item as the top item.
+We compared to several baseline systems described below:
+Standard SVD Matrix decomposition: In this base-
+line, we construct the user/item matrix and perform matrix
+decomposition using SVD. This is a standard baseline for
+collaborative ﬁltering techniques that does not use any fea-
+tures from items or users. In practice, this baseline is com-
+putationally feasible only on relatively small data set (in our
+case, the Apps data). In addition, this approach cannot give
+recommendation on new users since they do not appear in
+the user-item matrix.
+Most Frequent Items: Since SVD is unable to handle
+new user recommendation, this approach is used as trivial
+baseline for new users. It works by ﬁrst computing the fre-
+quency of each item in the training data, and then for each
+testing sample it ranks (useri, itemj) with respect to other
+random items according to their frequency in training set.
+Canonical Correlation Analysis (CCA): CCA [29] is
+a traditional multi-view learning technique aims at ﬁnding
+two pairs of linear transformations, one for each input view,
+such that the correlation between transformed data is maxi-
+mized. It is similar to DSSM with two main diﬀerences: (1)
+CCA often uses linear transformation, despite there exists
+non-linear transformations through kernel versions of CCA,
+which is often computationally prohibited in large-scale ex-
+periments, and (2) CCA maximizes the correlation under
+certain ﬁxed variance constraints while DSSM maximizes
+the rank of the correct pairs.
+The ranking objective has
+shown be to a better objective recommendation systems. In
+our experiment for CCA, we only used top-k users features s-
+ince the other two dimension reduction techniques, K-means
+and LSH, produce a non-sparse feature vectors which make
+the correlation matrix too dense to be eﬃciently computed.
+Collaborative Topic Regression (CTR): CTR [32]
+is a recently-developed recommendation system that com-
+bines both Bayesian matrix factorization and items features
+to create a recommendation for items. It has shown to be
+successful in academic paper recommendations. In the C-
+TR model, two inputs are given: a collaborative matrix and
+items features (represented using bag-of-words). The model
+matches users to items by maximizing the reconstruction er-
+ror of the collaborative matrix and leveraging item features
+as an extra signal. This helps to model new items that did
+not appear before in the training data. For new user rec-
+ommendation in our scenario, we take the transpose of the
+collaborative matrix A as input and supply user features
+instead of items features.
+For our proposed approach, for both Apps and News data
+sets, we ﬁrst run three sets of experiments to train single-
+view DNN models, each of which corresponds to a dimension
+reduction method in Section 6 (SV-TopK,SV-Kmeans and
+SV-LSH). Then we run another three sets of experiments
+for MV-DNN. The ﬁrst two combine Apps and News data
+using TopK and Kmeans user features (MV-TopK and MV-
+Kmeans). The third set of experiments train a joint model
+between Apps, News and Movie/TV features with TopK
+user features (MV-TopK w/Xbox).
+8.
+RESULTS AND DISCUSSION
+Table 3 and 4 shows results obtained from diﬀerent ap-
+proaches in App and News data respectively1. We separate
+the algorithms into three types for clariﬁcation: Type I are
+baseline algorithms; Type II are our single-view models and
+Type III are multi-view DNN models. We see that the naive
+most-frequent-item baseline performs very poorly which con-
+ﬁrms that the simple solutions to new users will not work
+well in our cases. It is also shown that standard SVD ma-
+trix factorization is not good enough in this task even for
+the current users that have entries in the collaborative ﬁl-
+tering matrix. Surprisingly, the CCA model performed no
+better than random guess in Apps data which shows that us-
+ing the non-linear mapping in DSSM plus the ranking based
+objective are important to the system. The CTR model [32]
+performed reasonably well for current users but not as good
+for the new users.
+For the single-view DNN (shown as Type II), the results
+indicated that the performance is dependent on the dimen-
+sionality reduction approach used. It can be seen that the
+best one for both Apps and News data was the top-K fea-
+ture dimension method which outperformed other two by a
+large margin. This can be viewed as a conﬁrmation of the
+hypothesis that users can be model with a relatively small
+set of informative features. It also indicates that K-means
+and LSH are less eﬀective to capture the semantics of the
+user behavior correctly. As a head-to-head comparison be-
+tween our single-view models (Type II) and traditional rec-
+ommendation methods (Type I), our best model (SV-TopK)
+outperformed the best baselines CTR [32], which also lever-
+aged item features for recommendation, by 11% for all users
+(0.497 vs.
+0.448 MRR score), and 36.7 % for new users
+(0.436 vs. 0.319 MRR score), relatively. For P@1, we see
+a much larger improvement: 13% for all users and 88.7%for
+new users, which shows the eﬀectiveness of our system on
+recommending top-rated items.
+Furthermore, for MV-DNN, results showed that adding
+more domains indeed helps to improve all domains at the
+same time. Speciﬁcally, by combining both News view and
+App view for training, we see a signiﬁcant improvement on
+both News and App data sets in both metrics. Speciﬁcally,
+for the App data shown in Table 3, the MRR score increased
+from 0.497 to 0.517 for all users when comparing to the best
+single-view model, which is a 4% relative increase comparing
+to the single-view model. More importantly, we see a much
+bigger improvement on new users where one view’s lack of
+new user data can be compensated by the data from other
+views. This is demonstrated by the 7% MRR (from 0.436
+to 0.466) and 11% P@1 (from 0.268 to 0.297) relative im-
+provement on the new users of App data set. Therefore, we
+1Due to the sensitivity of Xbox data, we are unable to show
+the individual results for Movie/TV recommendation per-
+formance. However, in the tables, we still show how Xbox
+view can be used to enhance the performance of other views.
+are eager to know: can we safely conclude that more views
+can indeed improve the performance of the system? To ﬁnd
+the answer to this hypothesis, we further added the Xbox
+data into the framework and trained a MV-DNN model with
+three user-item view pairs. The results are quite encourag-
+ing: MRR scores are further improved by 6% for all users
+and 8% for new users in App data, relatively. On the other
+hand, by comparing to the state-of-the-art algorithm, our
+best MV-DNN (with Xbox view) with top-K features per-
+formed 25.2% better than the CTR model for all users (from
+0.277 to 0.347) , and 115% better for new users (from 0.142
+to 0.306), for P@1.
+Similar results can also be observed for the News data in
+Table 4, where MV-DNN scored 49% better for all users and
+101% better for new users than the CTR model, relatively.
+Note that in this table, the results for CCA and SVD are
+missing. Due to the extreme size of the training data which
+contains 1.5 Million users with over 1 Billion entries, these
+two traditional algorithms failed miserably to handle such
+big data. We will detail our discussion on the scalability in
+the next section but it is quite evident here that our DNN
+based approach can easily scale up to billion-entry comput-
+ing capacity while yield excellent recommendation results.
+In order to explore the eﬀectiveness of the learned pat-
+tern from the system, we perform the following experiment
+to test the recommendation performance with single-feature
+inputs.
+Speciﬁcally, we took the best performing system
+(MV-DNN with top-k features) and construct user features
+with only one domain feature turned on. The resulting user
+feature thus has only one value which is the ID of the do-
+main. We then run our model for prediction against other
+views in order to ﬁnd the top-matched News and Apps a-
+mong all existing items. Table 5 shows some of those results.
+It can be seen that the learned recommendation system is
+indeed quite eﬀective. In the ﬁrst example, we assume a us-
+er has only visited brackobama.com. The top matched news
+show all related information regarding President Obama and
+Obamacare health, which are all relevant to the website. On
+the other hand, the top matched Apps are also related to
+health in this case. In the second example, we have a user
+who visited www.spiegel.de, a major online German News
+Website, which is not telling a lot about users except they
+can read German. The system matches articles for them on
+FIFA world cup 2014 which seems to be a common inter-
+est for Germans in this time span. In last example where
+the user seems to have interests in baby-related information,
+both the top matched News and Apps are quite relevant to
+baby, pregnancy and etc.
+9.
+EXPERIMENTS ON PUBLIC DATA
+To further show the strength of our approach in modeling
+cross-domain users, we perform a set of experiments on the
+public data2 by the authors in [28]. The data set contain-
+s authors from diﬀerent research ﬁelds and the objective is
+to recommend authors from another ﬁeld for cross-domain
+collaboration. The data contains 33,739 authors from ﬁve
+domains (data mining, theory etc.), where each data en-
+try speciﬁes the name of the research ﬁeld, the title and
+abstract of a paper, the list of authors and the year the pa-
+per got published. We use a single-view DNN to model this
+cross-domain collaboration (e.g., collaboration between data
+2Available at http://arnetminer.org/billboard/collaboration
+Data Set
+Training
+Testing
+Number Of u-
+nique users
+Number of u-
+nique items
+Number
+of
+training pairs
+Number
+of
+new users
+Number
+of
+test pairs for
+old users
+Number
+of
+test pairs for
+new users
+Apps Data
+200K
+55k
+2.5M
+1K
+11K
+2K
+News Data
+1.5M
+5M
+> 1B
+5K
+50K
+10K
+Xbox Data
+16K
+10K
+45K
+1K
+10K
+3K
+Table 2: Details of the Train/Test breakdown for the three data sets used to evaluate our proposed approach.
+User View with
+Single Domain
+ID Feature
+Top Matched News
+Top Matched Apps
+barackobama.com
+Obama to Delay Obamacare Again to Help Democrats
+7 Minutes Fitter
+Froma Harrop: Democrats should not run away 

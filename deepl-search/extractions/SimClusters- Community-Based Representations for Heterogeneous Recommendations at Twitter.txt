@@ -1,0 +1,1032 @@
+SimClusters: Community-Based Representations for
+Heterogeneous Recommendations at Twitter
+Venu Satuluri, Yao Wu
+Twitter, Inc.
+{vsatuluri, yaow}@twitter.com
+Xun Zheng∗
+Carnegie Mellon University
+xunzheng@cs.cmu.edu
+Yilei Qian, Brian Wichers, Qieyun Dai
+Gui Ming Tang, Jerry Jiang
+Twitter, Inc.
+Jimmy Lin
+University of Waterloo
+jimmylin@uwaterloo.ca
+ABSTRACT
+Personalized recommendation products at Twitter target a multi-
+tude of heterogeneous items: Tweets, Events, Topics, Hashtags, and
+users. Each of these targets varies in their cardinality (which affects
+the scale of the problem) and their “shelf life” (which constrains
+the latency of generating the recommendations). Although Twitter
+has built a variety of recommendation systems before dating back
+a decade, solutions to the broader problem were mostly tackled
+piecemeal. In this paper, we present SimClusters, a general-purpose
+representation layer based on overlapping communities into which
+users as well as heterogeneous content can be captured as sparse, in-
+terpretable vectors to support a multitude of recommendation tasks.
+We propose a novel algorithm for community discovery based on
+Metropolis-Hastings sampling, which is both more accurate and sig-
+nificantly faster than off-the-shelf alternatives. SimClusters scales
+to networks with billions of users and has been effective across a
+variety of deployed applications at Twitter.
+ACM Reference Format:
+Venu Satuluri, Yao Wu, Xun Zheng, Yilei Qian, Brian Wichers, Qieyun Dai,
+Gui Ming Tang, Jerry Jiang, and Jimmy Lin. 2020. SimClusters: Community-
+Based Representations for Heterogeneous Recommendations at Twitter. In
+Proceedings of the 26th ACM SIGKDD Conference on Knowledge Discovery and
+Data Mining (KDD ’20), August 23–27, 2020, Virtual Event, CA, USA. ACM,
+New York, NY, USA, 11 pages. https://doi.org/10.1145/3394486.3403370
+1
+INTRODUCTION
+Personalized recommendations lie at the heart of many different
+technology-enabled products, and Twitter is no exception. Our high-
+level goal is to make content discovery effortless and to free the user
+from the need for manual curation. On the Twitter platform, a wide
+variety of content types are displayed in a multitude of contexts,
+requiring a variety of personalization approaches. For example,
+recommendations of interesting Tweets are an essential component
+of not only the Home tab, but also for dissemination via email or
+∗Work was done while interning at Twitter.
+Permission to make digital or hard copies of all or part of this work for personal or
+classroom use is granted without fee provided that copies are not made or distributed
+for profit or commercial advantage and that copies bear this notice and the full citation
+on the first page. Copyrights for components of this work owned by others than the
+author(s) must be honored. Abstracting with credit is permitted. To copy otherwise, or
+republish, to post on servers or to redistribute to lists, requires prior specific permission
+and/or a fee. Request permissions from permissions@acm.org.
+KDD ’20, August 23–27, 2020, Virtual Event, CA, USA
+© 2020 Copyright held by the owner/author(s). Publication rights licensed to ACM.
+ACM ISBN 978-1-4503-7998-4/20/08...$15.00
+https://doi.org/10.1145/3394486.3403370
+Recommendation
+Problem (i.e., target)
+Item
+Cardinality
+Shelf
+Life
+Display
+Location
+User recommendations
+∼109
+Weeks
+Who To Follow
+Topic Tweet
+recommendations
+∼108
+Hours
+Home,
+Explore
+Out of network
+Tweet recommendations
+∼108
+Hours
+Home
+Similar Tweet
+recommendations
+∼108
+Hours
+Tweet
+details page
+Event recommendations
+∼103
+Hours
+Explore
+Trending Hashtags
+∼105
+Hours
+Explore
+Table 1: A partial list of recommendations problems at Twit-
+ter along with the number of possible recommendable items,
+the shelf life of the recommendations, and where they are
+shown on Twitter.
+push notifications. The “Who To Follow” module with user follow
+recommendations is crucial, especially for new users, and was one of
+the first recommendations products to be launched on Twitter [11].
+Trends and Events (previously called Moments) are essential for
+informing the user about currently ongoing news stories and topics
+of conversation on the platform, and the Explore tab shows the user
+a personalized list of these. The recently launched Topics feature1
+lets users follow Topics (such as “Machine Learning” or “K-Pop”)
+and see the algorithmically curated best tweets about those Topics
+in their Home feed.
+A summary of the diversity of personalized recommendation
+problems at Twitter is presented in Table 1. In all cases, we are
+making recommendations to users, but what we’re recommending
+can be heterogeneous. For example, we could be suggesting users,
+Tweets, Events, Topics, or hashtags. There are two main dimensions
+of interest across the different recommendations problems: the
+cardinality of the items being recommended and the shelf life of
+the computed recommendations. The shelf life of our computed
+recommendations is closely related to the churn we observe in
+the recommended content. For example, since the follower graph
+changes relatively slowly, user follow recommendations can remain
+relevant for weeks (and thus can be computed in batch). At the
+other end of the spectrum, Tweet recommendations become stale
+much quicker and must be generated in an online system in close to
+real time; for this case, batch computations would not yield results
+fast enough to meet the product requirements. Naturally, in the
+case of recommendation problems where the item cardinality is
+large, being able to handle the scale of the problem is important.
+1https://blog.twitter.com/en_us/topics/product/2019/introducing-topics.html
+Applied Data Science Track Paper
+KDD '20, August 23–27, 2020, Virtual Event, USA
+3183
+Previously, Twitter built systems to tackle each of these differ-
+ent recommendation problems individually with little re-use or
+commonality. The original example here is the “Who To Follow”
+system that launched a decade ago [11] for user recommendations.
+Subsequently, Gupta et al. [12] described a specialized system to
+generate Tweet recommendations in real time, insights from which
+were later deployed in GraphJet [31]. GraphJet ingested the real-
+time stream of user-Tweet engagements to maintain a user-Tweet
+bipartite graph from which to generate recommendations, but the
+system was expensive to extend to new use cases. These aforemen-
+tioned infrastructures were built mainly to generate candidates
+which got blended and scored subsequently. Twitter also built cus-
+tom infrastructure for feature retrieval and scoring of arbitrarily
+generated candidates - examples include RealGraph [14] and Rec-
+Service [9]. All of these systems were built with the aim of solving
+specific sub-problems in the recommendations landscape at Twitter
+and require separate development and maintenance. The central
+motivating question of this paper is: can we build a general system
+that helps us advance the accuracy of all or most of the Twitter
+products which require personalization and recommendations?
+The solution proposed in this paper is built on the insight that
+we can construct, from the user–user graph, a general-purpose
+representation based on community structure, where each com-
+munity is characterized by a set of influencers that many people
+in that community follow. Each of the different kinds of content
+(i.e., the targets in Table 1) is represented as a vector in the space of
+these communities, with the entry corresponding to the 𝑖-th com-
+munity for item 𝑗indicating how interested the 𝑖-th community is
+in item 𝑗. The end result is that we can represent heterogeneous
+recommendation targets as sparse, interpretable vectors in the same
+space, which enables solutions for a wide variety of recommenda-
+tion and personalization tasks (see details in Section 6). There are
+two notable aspects of our design:
+(1) We avoid conventional matrix factorization methods that typ-
+ically require solving massive numerical optimization prob-
+lems, and instead rely on a combination of similarity search
+and community discovery, both of which are easier to scale.
+A key algorithmic innovation of our work is a new approach
+to community discovery — called Neighborhood-aware MH —
+which is 10×-100× faster, 3×-4× more accurate than off-the-
+shelf baselines, and scales easily to graphs with ∼109 nodes and
+∼1011 edges. It helps us discover ∼105 communities on Twitter
+that are either organized around a common topic (e.g., “K-Pop”
+or “Machine Learning”) or based on social relationships (e.g.,
+those who work together or went to high-school together). We
+have open-sourced the implementation of the new algorithm
+in https://github.com/twitter/sbf.
+(2) Our overall architecture has a modular and extensible design to
+enable the use of whichever computing paradigm is most suited
+to a specific component – batch-distributed, batch-multicore,
+or streaming-distributed. In particular, the ability to dynami-
+cally update representations using streaming-distributed com-
+ponents has proved crucial for accurately modeling Tweets
+which are Twitter’s most important type of content.
+We refer to our overall system as SimClusters (Similarity-based
+Clusters) and have deployed it in production for more than a year.
+SimClusters also has the following features, which correspond to
+our design requirements:
+(1) Universal representations: SimClusters provides representa-
+tions for both users and a variety of content in the same space.
+This removes the need to invest in expensive custom infrastruc-
+ture for each type of content.
+(2) Computational scale: We are able to apply SimClusters at Twit-
+ter scale, with ∼109 users, ∼1011 edges between them, and 108
+new Tweets every day with ∼109 user engagements per day.
+(3) Accuracy beyond the head: SimClusters representations are
+accurate beyond just the most popular content (“head”), pri-
+marily due to the ability to scale SimClusters to a very large
+representational space with ∼105 dimensions.
+(4) Item and graph churn: The modular design of SimClusters
+makes it easy to extend to dynamic items which rapidly rise
+and diminish in popularity. Many of our important recommen-
+dations and engagement prediction problem involve items that
+churn rapidly – most Tweets, Events, and Trends stay relevant
+for no more than a day or two, meaning that it is crucial to
+be able to efficiently learn representations of new items before
+they lose their relevance.
+(5) Interpretability: SimClusters representations are sparse and
+each dimension corresponds to a specific community, making
+them interpretable to a degree that is hard to obtain with alter-
+natives such as matrix factorization or graph embeddings.
+(6) Efficient nearest neighbor search: Identifying nearest neighbors
+is core to many downstream tasks such as generating recom-
+mendations, similar item retrieval, and user targeting. The spar-
+sity of SimClusters representations makes it easy to setup and
+maintain inverted indices for retrieving nearest neighbors, even
+for rapidly churning domains (see details in Section 4).
+SimClusters has been applied to many recommendations and per-
+sonalization problems at Twitter — even for mature products such as
+out-of-network Tweet recommendations and Personalized Trends,
+SimClusters has enabled double digit improvements in the engage-
+ment rates of recommendations. It has also accelerated the building
+of entirely new products, such as Similar Tweets and Topic Tweet
+recommendations. SimClusters continues to be actively developed
+internally and applied to new use cases.
+2
+OVERVIEW OF SIMCLUSTERS
+The SimClusters system (see Figure 1) consists of two stages:
+(1) In the first stage (detailed in Section 3), we discover bipartite
+communities from our user-user graph at scale, resulting in
+learning sparse, non-negative representations for our users. At
+the end of this stage, each user is associated with a list of com-
+munities they participate in, along with the scores quantifying
+the strength of their affiliation to each of those communities.
+We refer to this output as “User Interest Representations” and
+it is made available in both offline data warehouses as well
+as low-latency online stores, indexed by the user id. This first
+stage is run in a batch-distributed setting, typically as a series
+of MapReduce jobs running on Hadoop.
+(2) The second stage (detailed in Section 4) consists of several jobs
+running in parallel, each of which calculates the representations
+Applied Data Science Track Paper
+KDD '20, August 23–27, 2020, Virtual Event, USA
+3184
+Community 
+Discovery 
+(Batch-Distributed)
+User Interest 
+Representations 
+->C1:0.8
+->C2:0.9
+...
+Slow evolving
+graphs e.g. 
+User-User graph
+Offline Calculate Item 
+Representations
+(Batch-Distributed)
+Slow-evolving e.g. User 
+Influence Representations 
+->C1:0.7
+->C2:0.85
+...
+Online Calculate Item 
+Representations
+(Streaming-Distributed)
+Fast evolving 
+graphs e.g.
+User-Tweet graph
+Fast-evolving e.g. 
+Tweet  Representations 
+->C1:0.7
+->C2:0.85
+...
+User-User
+graph
+Applications
+1. Generate Recommendations
+2. Features for ML models
+3. Item similarity 
+4. Adhoc analytics
+....
+Stage 1
+(Section 3)
+Stage 2 
+(Section 4)
+Figure 1: Overview of SimClusters. Stage 1 detects bipartite
+communities from the user-user graph, which is fed to Stage
+2 which runs several item representation jobs in parallel. For
+illustration, the color of the users and items in this figure
+indicates what community they get assigned to. In actuality,
+both users and items can participate in multiple communi-
+ties.
+for a specific recommendation target, using a user–target bipar-
+tite graph formed from interaction logs on the platform. Each
+job in the second stage operates in either a batch-distributed
+setting or a streaming-distributed setting, depending on the
+shelf-life of the recommendation target and the churn in the
+corresponding user–target bipartite graph.
+The most important detail about our design is that it’s based on
+discovering communities from the user–user graph. While the other
+user–target graphs on Twitter evolve rapidly, the user–user graph
+is relatively long-term and stable, and the specific communities
+discovered from the graph often outlive specific edges or nodes in
+the graph. In addition, the user-user graph usually also has more
+coverage, in the sense that there are a lot more users who have a
+minimum number of edges in this graph compared to the other
+user-item graphs.
+The other important aspect of our design is its modularity. The
+different parts of the pipeline depend on each other only via offline
+data sets or online key-value stores, meaning that they are robust
+to delays in the preceding steps. It is also easy to swap out existing
+implementations with new variants, or run multiple implementa-
+tions in parallel, as long as the output is in the format expected
+by the downstream jobs. The system degrades gracefully in the
+presence of bugs and errors - if any one of the item representation
+jobs has an issue, the other item representation jobs can still service
+their applications. Our design also allows for gradually adding more
+modules to the system without needing to build it all in at the start
+— in fact, the first version of the system only output communities
+without any item representations, but this by itself had many useful
+applications.
+3
+STAGE 1: COMMUNITY DISCOVERY
+This stage is about discovering communities from the Twitter user–
+user graph i.e. the directed graph of Follow relationships between
+users. Following seminal work in the analysis of directed graphs
+such as HITS [17] and SALSA [20], we find it convenient to refor-
+mulate the directed graph as a bipartite graph. We now frame our
+task as one of identifying bipartite communities i.e. communities
+consisting of members from left as well as right partitions, and
+where the edge density between the left and right member sets is
+high. The bipartite reformulation lets us more flexibly assign users
+to communities — similar to HITS, we decouple the communities
+a user is influential in from the communities in which a user is
+interested.
+Problem Definition 1. Given a bipartite user–user graph with
+left-partition 𝐿and right-partition 𝑅, find 𝑘(possibly overlapping)
+bipartite communities from the graph, and assign each left-node and
+right-node to the communities with weights to indicate the strength
+of their memberships.
+The other advantage of reformulating the directed graph as a bi-
+partite graph is that we can choose to make 𝑅, the right set of
+nodes, different from 𝐿, the left set of nodes – in particular, since
+the majority of edges in a typical social network is directed towards
+a minority of users, it makes sense to pick a smaller 𝑅than 𝐿. In
+Twitter’s case, we find that we’re able to cover the majority of edges
+(numbering ∼1011) in the full graph by including the top ∼107 most
+followed users in 𝑅, while 𝐿continues to include all users, which
+is ∼109. Our problem definition also asks to assign non-negative
+scores to both the left and the right members indicating the strength
+of association to a community. Therefore, we represent the left and
+right memberships as sparse, non-negative matrices U|𝐿|×𝑘and
+V|𝑅|×𝑘, where 𝑘is the number of communities. Hence, the problem
+of bipartite community discovery bears close similarities to the
+problem of sparse non-negative matrix factorization (NMF). The
+biggest challenge with adapting existing approaches such as NMF
+and their variants [1, 3, 35] is the inability to scale them to graphs
+with ∼109 nodes and ∼1011 edges – all of our attempts internally to
+adapt these approaches (see e.g. [30]) have only worked at smaller
+scales and have been very difficult to debug and maintain.
+With SimClusters, we instead adopt the following 3-step ap-
+proach, illustrated with a toy example in Figure 2.
+(1) Similarity Graph of Right Nodes: We calculate the “right
+projection” of the bipartite graph, i.e., we calculate the simi-
+larity between the nodes in the right partition of the bipartite
+graph based on their incoming edges, and we form a weighted,
+undirected graph consisting only of the nodes in the right par-
+tition. More details in Section 3.1.
+(2) Communities of Right Nodes: We discover communities
+from this similarity graph, using a novel neighborhood-based
+sampling algorithm that is inspired by the work of [33] but is
+much more accurate, faster, and scales to graphs with billions
+of edges. More details in Section 3.2.
+Applied Data Science Track Paper
+KDD '20, August 23–27, 2020, Virtual Event, USA
+3185
+u1
+u2
+u3
+u4
+v1
+v2
+v3
+v4
+v1
+v2
+v3
+v4
+v1
+v2
+v3
+v4
+1.0
+0.5
+0
+0
+c1
+0
+0
+0.5
+1.0
+c2
+v1
+v2
+v3
+v4
+Step 1 (Section 3.1): 
+Compute Undirected, 
+weighted similarity graph 
+(Batch, Distributed)
+Step 2 (Section 3.2): Community 
+discovery and calculation of V
+(Batch, Shared Memory Multi-Core)
+V=
+U5x2 = A5x4 . V4x2  =
+u5
+1.5
+1.5
+0
+0
+c1
+0
+0.5
+1.5
+1.5
+c2
+u1
+u2
+u3
+u4
+u5
+1.5
+0
+Step 3 (Section 3.3): Community 
+assignment to left nodes via 
+calculation of U 
+(Batch, Distributed)
+Adjacency matrix
+Final Output: U, V
+Figure 2: Overview of 3-step approach to discovering bipar-
+tite communities (Stage 1).
+(3) Communities of Left Nodes: We now assign nodes from the
+left partition to the communities discovered in step 2, and this
+is described in Section 3.3.
+We note that the broad outlines of this approach have been in-
+dependently discovered and suggested in the past literature (see
+e.g. [23, 28]), but it has been largely neglected as an option among
+similar deployments in industry. The primary reason we think
+this works is that while the original bipartite graph is massive
+and noisy, the similarity graph of right nodes is much smaller and
+has clearer community structure. From a scalability point of view,
+this approach shifts most of the computational burden to the first
+step of identifying pairs of similar users based on their followers,
+which is a problem that is largely solved at Twitter (see Section 3.1).
+From a matrix-factorization point of view, this 3-step approach
+closely mirrors one way of performing SVD of a matrix A, via the
+eigen-decomposition of A𝑇A.
+Our 3-step approach also isolates the hard-to-parallelize step of
+community discovery into step 2, where it operates on a smaller
+graph that fits into the memory of a single machine, while the
+other two steps operate on much bigger inputs and out of neces-
+sity run in batch-distributed settings such as Hadoop MapReduce.
+This approach is also modular and allows for swapping out imple-
+mentations of each of the above steps independent of the others.
+A possible concern with our 3-step approach is that it may lead
+to reduced accuracy compared to directly learning the communi-
+ties on the input bipartite network – we empirically test this in
+Supplemental Section A.2 and find this not to be an issue.
+3.1
+Step 1: Similarity Graph of Right Nodes
+The goal of this step is to construct a much smaller unipartite,
+undirected graph 𝐺over the nodes of the right partition. We define
+the weight between two users (𝑢, 𝑣) based on the cosine similarity
+of their followers on the left side of the bipartite graph. To elaborate,
+if ®𝑥𝑢and ®𝑥𝑣represent the binary incidence vectors of 𝑢’s and 𝑣’s
+followers, their cosine similarity is defined as ®𝑥𝑢· ®𝑥𝑣/
+p
+∥®𝑥𝑢∥∥®𝑥𝑣∥.
+With this definition, two users would have non-zero similarity,
+or an edge in 𝐺simply by sharing one common neighbor in the
+bipartite graph. In order to avoid generating an extremely dense
+similarity graph, we discard the edges with similarity score lower
+than a certain threshold and additionally keep at most a certain
+number of neighbors with the largest similarity scores for each
+user.
+The difficulty is that solving the similar users problem is very
+challenging at Twitter scale. But because this is a problem with
+important applications – e.g. it is the foundation of applying item-
+based collaborative filtering for the “Who To Follow” module [11] –
+we have invested significant resources to develop a robust solution.
+Our solution, called WHIMP, uses a combination of wedge sampling
+and Locality Sensitive Hashing (LSH) to scale to the Twitter graph
+and lends itself to implementation on Hadoop MapReduce [32].
+WHIMP is able to identify similar users for users with either large or
+small followings, and has been vetted in a variety of ways internally.
+Ultimately, this similarity graph step takes as input a directed/bi-
+partite graph with ∼109 nodes and ∼1011 edges and outputs an undi-
+rected graph with ∼107 nodes and ∼109 edges. In other words, we
+go from shared-nothing cluster-computing scale to shared-memory
+multi-core scale. The transformation wrought by this step is also
+reminiscent of prior research which suggested that keeping only the
+most important edges in a graph can benefit community discovery
+methods [29].
+3.2
+Step 2: Communities of Right Nodes
+In this step, we wish to discover communities of densely connected
+nodes from the undirected, possibly-weighted similarity graph from
+the previous step. In order to accurately preserve the structure of
+the input similarity graph, we have observed that it is important for
+the communities to have hundreds of nodes, rather than thousands
+or tens or thousands. This means that we need algorithms that can
+process input graphs with ∼107 nodes and ∼109 edges to find ∼105
+communities. Despite the long history of community discovery
+algorithms, we were unable to find any existing solution that can
+satisfy these scale requirements. We next describe the algorithm
+we developed, called Neighborhood-aware Metropolis Hastings
+(henceforth Neighborhood-aware MH), to meet our requirements.
+Our algorithm extends a Metropolis-Hastings sampling approach
+presented in [33] for discovering overlapping communities, which
+we first describe as background. Let Z|𝑅|×𝑘be a sparse binary com-
+munity assignments matrix and Z(𝑢) denote the set of communities
+to which the vertex 𝑢has been assigned (in other words, Z(𝑢) gives
+the non-zero column indices from the 𝑢-th row in Z). Equation 1
+specifies an objective function over Z.
+F (Z) def
+= 𝛼
+Õ
+(𝑢,𝑣) ∈𝐸
+1(|Z(𝑢) ∩Z(𝑣)| > 0)+
+Õ
+(𝑢,𝑣)∉𝐸
+1(|Z(𝑢) ∩Z(𝑣)| = 0)
+(1)
+1 is the indicator function. F (Z) is the sum of two terms – the first
+counts how many neighboring pairs of nodes in the graph share
+at least one community, while the second counts how many non-
+neighbor pairs of nodes in the graph do not share a community.2
+Since most real, large-scale networks are very sparse, it is useful
+to upweight the contribution of the first term using the parameter
+𝛼– increasing values of 𝛼means that the objective function is
+2We give details here assuming the input network is unweighted, to simplify the
+exposition, but the method is easy to extend (conceptually at least) to the case where
+the input graph has weights.
+Applied Data Science Track Paper
+KDD '20, August 23–27, 2020, Virtual Event, USA
+3186
+Algorithm 1: Generalization of the Metropolis-Hastings
+approach to community discovery from [33]
+1: Input: Graph G, desired communities 𝑘, hyper-parameter 𝑇
+2:
+Z ←Initialize(𝐺,𝑘)
+3:
+for 𝑡←1 to 𝑇epochs do
+4:
+for 𝑢←randomShuffle(1 . . . |𝑉|) do
+5:
+Z′(𝑢) ←Proposal(𝑢,𝐺, Z,𝑘)
+6:
+𝑝←𝑚𝑖𝑛(1,𝑒𝑓(𝑢,Z′)−𝑓(𝑢,Z)) // 𝑝is 1 iff
+𝑓(𝑢, Z′) > 𝑓(𝑢, Z)
+7:
+With probability 𝑝, accept Z′(𝑢) i.e. set Z(𝑢) ←Z′(𝑢)
+8:
+end for
+9:
+end for
+10: return Z
+Algorithm 2: Initialize and Proposal functions for Random
+MH [33]
+1: Function: Initialize(𝐺,𝑘)
+2: return |𝑉| × 𝑘binary matrix where each row is a uniformly
+random sample from the 2𝑘space of length-𝑘binary vectors
+3:
+4: Function: Proposal(𝑢,𝐺, Z,𝑘)
+5: return uniformly random sample from 2𝑘space of length-𝑘
+binary vectors
+better optimized by Z with more non-zeros. Note also that the
+objective function above is decomposable, in the sense that the
+overall objective function F (Z) can be expressed as a sum of a
+function 𝑓(𝑢, Z) over individual vertices (below, N (𝑢) denotes the
+set of neighbors of vertex 𝑢).
+𝑓(𝑢, Z) def
+= 𝛼
+Õ
+𝑣∈N(𝑢)
+1(|Z(𝑢) ∩Z(𝑣)| > 0)+
+Õ
+𝑣∉N(𝑢)
+1(|Z(𝑢) ∩Z(𝑣)| = 0)
+(2)
+Using the above background, we first describe the approach for
+discovering overlapping communities in a general way in Algo-
+rithm 1. After initializing Z, we run at most 𝑇epochs of optimiza-
+tion, where in each epoch we iterate over all the vertices in the
+graph in a shuffled order. For each vertex 𝑢we sample a new set
+of community assignments Z′(𝑢) using the proposal function, and
+calculate the difference in objective function between the newly
+proposed Z′(𝑢) and the current set of community assignments Z(𝑢).
+If Z′(𝑢) is better, then it is accepted; if not, it may still be accepted
+with a certain probability, indicated in line 6 of Algorithm 1. As
+noted in [33], one reason for preferring a randomized optimization
+procedure as opposed a deterministic optimization procedure is to
+avoid getting stuck in local minima.
+The specific choices for the ‘Initialize’ and ‘Proposal’ functions
+made in [33] are described in Algorithm 2. Because these func-
+tions are implemented using purely random sampling, we refer to
+this approach as ‘Random MH’. The main practical drawback of
+Random MH is that it is extremely slow to obtain a satisfactorily
+accurate solution for even moderate values of 𝑘. This is not surpris-
+ing considering that in each step, the proposal function generates a
+completely random community assignments vector and evaluates
+Algorithm 3: Initialize and Proposal functions for
+Neighborhood-aware MH
+1: Function: Initialize(𝐺,𝑘)
+2:
+for 𝑖←1..𝑘do
+3:
+Set 𝑖𝑡ℎcolumn of Z as neighbors of a randomly picked
+node
+4:
+end for
+5: return Z
+6:
+7: Function: Proposal(𝑢,𝐺, Z,𝑘,𝑙) // 𝑙<< 𝑘
+8:
+𝑆←columns of Z with ≥1 non-zero in rows of 𝑁(𝑢)
+// enumerateSubsets(𝑆,𝑙) returns all subsets of 𝑆of size ≤𝑙
+9:
+for 𝑠←enumerateSubsets(𝑆,𝑙) do
+10:
+fMap(𝑠) ←𝑓(𝑢,𝑠) // Per Eqn 2
+11:
+end for
+12: return Sample 𝑠from 𝑆according to softmax(fMap)
+it w.r.t. the current vector; as 𝑘increases, the space of community
+assignments increases exponentially which makes it very unlikely
+that the proposal will be able to generate an acceptable transition.
+Instead, we propose Neighborhood-aware MH, specified in Algo-
+rithm 3. The proposal function in Neighborhood-aware MH is based
+on two insights or assumptions – the first is that it is extremely
+unlikely that a node should belong to a community that none of its
+neighbors currently belongs to; the second is that for most practical
+applications, it is unnecessary to assign a node to more than a small
+number of communities. We design a two-step proposal function
+that works as follows. In the first step, for a given node 𝑢we iterate
+over all the neighbors of 𝑢, look up their community assignments
+in Z, and identify the set of communities which are represented at
+least once, call it 𝑆. In the second step, we iterate over all subsets of
+size ≤𝑙of 𝑆from the first step, where 𝑙is a user-provided upper
+bound on how many communities a node can be assigned to. For
+each subset 𝑠, we calculate the function 𝑓(𝑢,𝑠) from Eqn 2, and
+finally sample the subset 𝑠with probability proportional to 𝑒𝑓(𝑢,𝑠)
+i.e. we apply the softmax. The result of the sampling is then either
+accepted or rejected, as specified in lines 6 and 7 of Algorithm 1. As
+for initializing Z, we seed each community with the neighborhood
+for a randomly selected node in the graph.
+We discuss a few important implementation details.
+• Most of the complexity comes from evaluating the function
+𝑓(𝑢,𝑠), which requires calculating the intersection between a
+node’s neighbors and the union of the communities in 𝑠. For
+many members of 𝑆(the set computed in line 8 Algorithm 3), we
+can incrementally compute the summary statistics required for
+𝑓(𝑢,𝑠) as we go through a node’s neighborhood when executing
+line 8 of Algorithm 3, so that the subsequent inner loop in line 10
+can execute much faster. Similarly, the acceptance probability for
+line 6 of Algorithm 1 can also reuse the 𝑓(𝑢, Z) computed during
+the proposal process.
+• Sampling from a softmax distribution can be accomplished effi-
+ciently in a single pass using the Gumbel-Max trick.3
+3http://timvieira.github.io/blog/post/2014/07/31/gumbel-max-trick/
+Applied Data Science Track Paper
+KDD '20, August 23–27, 2020, Virtual Event, USA
+3187
+• In the important special case where we assign each node to at
+most one community only, each epoch of Neighborhood-aware
+MH can execute in 𝑂(|𝐸|) time, using both of the above men-
+tioned tricks.
+• The algorithm lends itself well to parallelization. Specifically
+the for loop in line 4 of Algorithm 1 can be distributed among
+several threads which share access to Z, the rows of which can
+optionally be synchronized using read-write locks. In practice,
+we have found that removing synchronization has no effect on
+the accuracy and gives a slight boost in speed (similar to [24]).
+3.3
+Step 3: Communities of Left Nodes
+The output of the previous step is the matrix V|𝑅|×𝑘in which the 𝑖-
+th row specifies the communities to which the right-node 𝑖has been
+assigned. The remaining problem that needs to be solved is coming
+up with the matrix U|𝐿|×𝑘such that the 𝑖-th row specifies the
+communities to which the left-node 𝑖has been assigned. A simple
+way to do this assignment is to assign a left-node to communities
+by looking at the communities that its neighbors (which will all
+be right-nodes, and hence already have assignments) have been
+assigned to. More formally, if A|𝐿|×|𝑅| is the adjacency matrix of
+the input bipartite graph, then we set U = 𝑡𝑟𝑢𝑛𝑐𝑎𝑡𝑒(A · V), where
+the 𝑡𝑟𝑢𝑛𝑐𝑎𝑡𝑒function keeps only up to a certain number of non-
+zeros per row to save on storage. This equation for calculating
+U is motivated by the fact that in the special case when V is an
+orthonormal matrix, i.e. V𝑇V = 𝐼, then U = A · V is the solution to
+A = U · V𝑇. We have experimented with situations both where V
+is orthonormal (this can be achieved by assigning each right-node
+to at most one community) as well as situations where V is not,
+and have found that in each case the resulting U provides accurate
+representations for the left-nodes. We refer to U as User Interest
+Representations, and it forms the main input for subsequent steps.
+The computation in this step can be scaled to our requirements
+easily by implementing in a batch-distributed computing paradigm
+such as Hadoop MapReduce.
+4
+STAGE 2: ITEM REPRESENTATIONS
+In this section, we describe how to compute representations for
+different items, such as Tweets, Hashtags, or users - which can be
+the targets for different recommendation problems. Along with the
+user interest representations U from Stage 1, this stage also relies
+on a user–item bipartite graph that is formed from historical or
+on-going user engagements with those items on the platform.
+Our general framework is to compute an item’s representation
+by aggregating the representations of all the users who engaged
+with it, i.e., the representation for item 𝑗is
+W(𝑗) = 𝑎𝑔𝑔𝑟𝑒𝑔𝑎𝑡𝑒({U(𝑢), ∀𝑢∈N (𝑗)}),
+(3)
+where N (𝑗) denotes all the users who engaged with item 𝑗in the
+corresponding user–item bipartite graph, and W(𝑗) and U(𝑢) are
+both vectors. The 𝑎𝑔𝑔𝑟𝑒𝑔𝑎𝑡𝑒function can be chosen based on differ-
+ent applications, and can also be learned from a specific supervised
+task [13]. In our case, we opt for a relatively simple, interpretable
+𝑎𝑔𝑔𝑟𝑒𝑔𝑎𝑡𝑒function with the goal that W(𝑗,𝑐) can be interpreted as
+the level of interest an average user of the community 𝑐currently
+has in this item 𝑗. We choose to use “exponentially time-decayed
+Algorithm 4: Updating item representations in streaming
+setting
+1: Input:
+• Parameter ℎ𝑎𝑙𝑓_𝑙𝑖𝑓𝑒for the exponential decay,
+• edge (𝑢, 𝑗,𝑡) indicating user 𝑢engaged with item 𝑗at time 𝑡,
+• User Interest representations U
+2: Input and Output:
+• Distributed cache W where keys are pairs of (item,
+community) and values are (last_value, last_time),
+• Distributed cache R where keys are items and values are
+top communities and their scores (with last_time),
+• Distributed cache C where keys are communities and
+values are top items and their scores (with last_time).
+3: for 𝑐←community ids of U(𝑢) with nonzero values do
+4:
+(𝑙𝑎𝑠𝑡_𝑣𝑎𝑙𝑢𝑒,𝑙𝑎𝑠𝑡_𝑡𝑖𝑚𝑒) ←W(𝑗,𝑐)
+5:
+𝑑𝑒𝑐𝑎𝑦_𝑓𝑎𝑐𝑡𝑜𝑟←2−(𝑡−𝑙𝑎𝑠𝑡_𝑡𝑖𝑚𝑒)/ℎ𝑎𝑙𝑓_𝑙𝑖𝑓𝑒
+6:
+𝑛𝑒𝑤_𝑣𝑎𝑙𝑢𝑒←𝑑𝑒𝑐𝑎𝑦_𝑓𝑎𝑐𝑡𝑜𝑟× 𝑙𝑎𝑠𝑡_𝑣𝑎𝑙𝑢𝑒+ 1
+7:
+W(𝑗,𝑐) ←(𝑛𝑒𝑤_𝑣𝑎𝑙𝑢𝑒,𝑡)
+8:
+R(𝑗) ←𝑢𝑝𝑑𝑎𝑡𝑒𝑇𝑜𝑝𝐾(R(𝑗), W(𝑗,𝑐)) // update the top
+communities and their scores (and last_time) based on the
+updated W(𝑗,𝑐)
+9:
+C(𝑐) ←𝑢𝑝𝑑𝑎𝑡𝑒𝑇𝑜𝑝𝐾(C(𝑐), W(𝑗,𝑐)) // update the top items
+and their scores (and last_time) based on the updated W(𝑗,𝑐)
+10: end for
+average” as our 𝑎𝑔𝑔𝑟𝑒𝑔𝑎𝑡𝑒function, which exponentially decays
+the contribution of a user who interacted with the item based on
+how long ago that user engaged with the item. The half-life used
+for the exponential decay is item-dependent – where the shelf-life
+of those items is longer (such as Topics), we set longer half-lives,
+while for shorter shelf life items such as Tweets, we set shorter
+half-lives.
+The resulting matrix W is much denser than U and it is not
+useful to save all its non-zero values at scale. Instead, we maintain
+two additional views or indexes of W, each of which keeps a top-k
+view. The first view is R and R(𝑗) tracks the top communities for
+the item 𝑗. The second view is C and C(𝑐) tracks the top items for
+the community 𝑐. In the case of items with a long shelf life, the
+calculation of W, R, and C is straightforwardly done in a batch
+setting using e.g. Hadoop MapReduce.
+However, handling items with short shelf life is more interest-
+ing. In this case, we realize a major advantage of an exponentially
+time-decayed average (as opposed to e.g. time-windowed average),
+which is that it lends itself to easy incremental updates for W.
+Specifically, we just need to keep two summary statistics for each
+cell in W - the current average itself and the last timestamp when
+it was updated. As detailed in Algorithm 4 lines 4–7, when a new
+user–item engagement arrives, we are able to update W for the
+item by calculating a decay factor based on the time elapsed since
+the last update. In order to exactly track the row-wise and column-
+wise top-k views on W, it is necessary that we track the entirety
+of W - if it turns out that W is too big to be tracked in its entirety,
+then one can use sketches to keep a summary of W at the cost of
+Applied Data Science Track Paper
+KDD '20, August 23–27, 2020, Virtual Event, USA
+3188
+introducing errors [4, 15], although we have found this unneces-
+sary. Another way of reducing the size of W is to reduce 𝑘i.e. the
+dimensionality of the representations computed in Stage 1, or by
+further sparsifying the input user representations U. Calculating
+streaming item representations in this manner can be implemented
+using frameworks such as Apache Storm/Heron/Spark/Flink.
+The two top-k views R and C are stored in low-latency key-value
+stores. Using these two indices, it easy to retrieve nearest neighbors
+for any user or item – we simply look up the top communities
+that a user or item is active in, and for each of those communities,
+identify the top users or items. These candidates can then be ranked
+by fetching their full representations and computing the similarity
+with the representation of the query object (either user or item).
+The upshot is that we neither need to brute-force scan through all
+users/items nor need to build specialized nearest neighbor indices.
+5
+DEPLOYMENT DETAILS
+SimClusters has been deployed in production at Twitter for more
+than an year so far. All the representations output by the Sim-
+Clusters system are also keyed by model-version, so that we can
+operate multiple models in parallel to enable the trying out of new
+parameters or code changes without affecting existing production.
+The main model that is currently running in production has ∼105
+communities in the representations, discovered from the similarity
+graph of the top ∼107 users by follower count. The bipartite com-
+munities discovered by the model contain nearly 70% of the edges
+in the input bipartite graph, suggesting that most of the structure of
+the graph is captured. The right member sets do not vary too much
+in their sizes, while the left member sets vary drastically, reflecting
+the variance in the original follower distribution. Within Stage 1,
+Step 1 (similarity calculation) is the most expensive step, taking
+about 2 days to run end-to-end on Hadoop MapReduce, but note
+that this job was in production before SimClusters and therefore is
+not an additional cost introduced by SimClusters. Step 2 was run
+from scratch for the very first time when SimClusters launched;
+subsequently, we update the V matrix to take into account changes
+to the user–user similarity graph by running an abbreviated version
+of Neighborhood-aware MH initialized with the current V. Step 3
+is also periodically run as batch application on Hadoop MapReduce
+using the latest version of the user–user graph and the latest V
+from Step 2. Once we have the output from Step 3 (the U matrix),
+we do not directly use the V matrix anymore, which is typically too
+sparse for accurate modeling.
+For Stage 2, we currently have four jobs – two batch jobs, one for
+“user influence” representations and one for Topic representations;
+and two streaming jobs, one for Tweet representations and one for
+Trend representations. The purpose of the user influence represen-
+tations is to tell us what communities a user is influential in, as
+opposed to the user interest representations (the output of Stage
+1) which tell us what communities a user is interested in, The user
+influence representations are better than the original original V
+matrix for this purpose as they cover many more users and are also
+denser for the original subset of users. Topic representations tell us
+which communities are the most interested in a Topic, and the input
+to computing these is both the user interest representations as well
+as a user–Topic engagement graph. Tweet and Trend representa-
+tions are computed and updated in a streaming job which takes
+as input user–Tweet engagements happening in real-time. Both
+the user interest and user influence representations are protected
+using authentication to only allow authorized access, and users
+are provided the chance to opt out of unwanted inferences in their
+Privacy dashboard.
+Note that we store only the non-zeros in all our representations,
+and in all cases we truncate entries close to zero. The user interest
+representations cover ∼109 users while the user influence repre-
+sentations cover ∼108 users, with both representations having on
+average 10−100 non-zeros. There are fewer recommendable Tweets
+and Trends at any given point in time (refer Table 1), but their rep-
+resentations are denser, having on average ∼102 non-zeros. Note
+that for the following four representations - user influence, Topic,
+Tweet, and Trend - we also maintain the inverted indices, i.e. given
+a community, what are the top-k users/Topics/Tweets/Trends for
+that community (denoted by C in Section 4). Having C is essential
+to retrieving the items whose representation has the largest dot
+product or cosine similarity with another representation.
+6
+APPLICATIONS
+6.1
+Similar Tweets on Tweet Details page
+For users who visit a Tweet via an email or a push notification,
+Twitter shows a module with other recommended Tweets, along-
+side replies. Prior to SimClusters, this module retrieved Tweets
+solely based on author similarity i.e. Tweets written by users who
+share a lot of followers with the author of the main Tweet on the
+page. We ran an online A/B test where we added similar Tweets
+from SimClusters i.e. we retrieved Tweets whose SimClusters rep-
+resentation has high cosine similarity with the representation of
+the main Tweet on the page. We found that the engagement rate
+on the resulting Tweets was 25% higher.4
+Subsequently, we added a second candidate source for this prod-
+uct based on SimClusters – retrieve Tweets whose SimClusters
+representation have high cosine similarity with the user influence
+representation of the author of the main Tweet on the page. Adding
+this source increases the coverage further, while the overall increase
+in engagement rate is a more modest but still impressive 7%.
+6.2
+Tweet Recommendations in Home Page
+A user’s Home feed on Twitter consists of both Tweets from users
+being directly followed as well as recommended Tweets from users
+not being followed (“Out of Network Tweets”). Prior to SimClus-
+ters, the main algorithm for recommended Tweets was what is
+called “Network Activity” - namely, use GraphJet [31] to identify
+which Tweets are being liked by the viewing user’s followings (i.e.
+network).
+Using SimClusters Tweet representations, we built two candi-
+date sources to supplement Network Activity Tweets. The first
+candidate source identifies Tweets whose real-time representation
+has the highest dot-product with the viewing user’s interest rep-
+resentation. The second candidate source is based on item-based
+collaborative filtering, and uses the same underlying implementa-
+tion as the “Similar Tweets” application described in Section 6.1 to
+identify Tweets similar to those Tweets which have been recently
+4All the reported percentage changes in this section are statistically significant per
+our internal A/B testing tool.
+Applied Data Science Track Paper
+KDD '20, August 23–27, 2020, Virtual Event, USA
+3189
+liked by the user. We ran an online A/B test by replacing existing
+candidates in production (in certain positions on Home) using the
+candidates from these two new candidate sources. The experiment
+showed that the engagement rate of the new candidates is 33%
+higher than that for candidates generated by Network Activity, and
+shown in similar positions. The two candidate sources together
+were able to increase total weighted engagements on the platform
+by close to 1%, which is very large considering the maturity of this
+product and that recommended Tweets only account for a minority
+of the viewed content in Home pages.
+Apart from new candidates, we also use the user interest and
+Tweet representations to improve the ranking of candidates com-
+ing from all sources. The user and item representations are used
+to enrich the set of existing user features, item features, as well as
+user-item interaction features in the input to an engagement predic-
+tion model. A/B testing showed that the model trained with these
+features was able to increase engagement rate of recommended
+content by 4.7% relatively, which is a significant lift for a mature
+model.
+6.3
+Ranking of Personalized Trends
+Showing top trending content (e.g., Hashtags, Events, breaking
+news) is an important way to keep users informed about what is
+happening locally and globally. The implementation for Trends fol-
+lows a two-stage process of Trends detection followed by ranking.
+Prior to SimClusters, the ranking of a Trend primarily depended on
+its volume and a small number of personalization features. We used
+Trends SimClusters representations to score Trends for a given user
+by using the dot-product of the user’s interest representation along
+with the real-time representation for a Trend. A/B testing revealed
+that using these scores led to a 8% increase in user engagement
+with the Trends themselves, as well as a bigger 12% increase in
+engagement on the landing page subsequent to a click. These im-
+provements are large when compared against other experiments
+run on this product.
+6.4
+Topic Tweet Recommendations
+Given a Topic in a pre-defined topic taxonomy such as “Fashion”
+or “Marvel Movies”, how can we identify the best content about it?
+The original implementation here (before the product was launched
+publicly) primarily relied on custom text matching rules curated
+by human experts to identify topical Tweets. Once we realized
+that this approach surfaced a number of false positives (primarily
+due to a Tweet’s text incidentally matching the rules for a Topic),
+we tested a second implementation where we first identify those
+Tweets whose SimClusters representation has high cosine similarity
+with the representation of the query Topic, and then apply the
+textual matching rules. Internal evaluation showed that the second
+approach returned much better results, therefore we launched this
+product publicly using this approach. Since launch, this feature
+has received positive press externally as well as causing higher
+engagement with Tweets from the broader user base.
+6.5
+Ranking Who To Follow Recommendations
+The candidates for Who To Follow recommendations are ranked
+using an engagement prediction model, to which we added new
+features based on the SimClusters representations of the viewing
+user and the candidate user. In A/B tests, we observed an impressive
+increase of 7% in the follow rate by using these new features.
+6.6
+Applications in progress
+6.6.1
+Notifications quality filter. A crucial task on Twitter is to
+protect users from getting abusive or spammy replies or mentions.
+We developed new SimClusters representations for users based on
+the user–user block graph (i.e. when one user blocks another), and
+used these representations as features to train a model for filtering
+out abusive and spammy replies. In offline tests, the model showed
+an impressive 4% lift in PR-AUC5.
+6.6.2
+Supervised embeddings from feature combinations.
+While SimClusters representations mostly capture information
+from various engagement graphs, we are also experimenting ap-
+proaches to combine it with other features about users or items
+(for example, follower counts or geo information). One approach
+where we are obtaining promising early results is to train a deep
+neural network on an ancillary prediction task (such as engage-
+ment prediction) where the input features are both the user and
+item SimClusters representations along with previously developed
+features for the user and item. By choosing the right architecture
+for this neural net, for example, the two-tower DNN model [36], we
+are able to learn dense embeddings separately for users and items.
+6.6.3
+Real-time Event notifications. A major application at
+Twitter is to notify users who may be interested when a major
+news event happens. Using the SimClusters representation of an
+Event (which is in turn derived by aggregating the representations
+of the human-curated Tweets about it), we can identify the com-
+munities of users who will be interested in it, and subsequently
+target users interested in them. We are currently evaluating such
+an approach.
+7
+RELATED WORK
+Traditionally, approaches to recommender systems are categorized
+as either neighborhood-based (which do not involve model-fitting),
+or model-based (which fit a model to the input data).
+In our experience of building recommendations at Twitter, we
+find that neighborhood-based methods are easier to scale, more
+accurate, more interpretable, and also more flexible in terms of ac-
+commodating new users and/or items [9, 11, 12, 31]. Recent research
+has also found that well-tuned neighborhood-based methods are
+not easy to beat in terms of accuracy [6]. However, neighborhood-
+based approaches do not provide a general solution – we needed
+to build and maintain separate systems to solve each recommen-
+dation sub-problems at Twitter in the past (see Section 1 for more
+discussion of our past work).
+Model-based approaches, such as factorized models [18], graph
+embedding [10, 26] or VAE [22], fit separate parameters for each
+user or item. The number of model parameters that need to be
+learned in order to scale to a billion-user social network can easily
+approach 1012, necessitating unprecedentedly large systems for
+solving ML problems at that scale. Hybrid models, such as Factor-
+ization Machine [27] and Deep Neural Networks (DNNs) [5] have
+been introduced to reduce the parameter space by utilizing the side
+information as prior knowledge for users and items. However, they
+5Area Under Curve for Precision-Recall, a metric for classifiers
+Applied Data Science Track Paper
+KDD '20, August 23–27, 2020, Virtual Event, USA
+3190
+require either well-defined feature vectors or pre-trained embed-
+d

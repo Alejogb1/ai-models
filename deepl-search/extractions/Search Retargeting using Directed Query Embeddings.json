@@ -1,0 +1,22 @@
+{
+  "source": "Search Retargeting using Directed Query Embeddings",
+  "source_group": "Awesome-ML-Papers/Embeddings",
+  "processed_at": "2026-06-08T12:00:00Z",
+  "agent": "agent03_embeddings_mf_ranking_search_compiled",
+  "concepts": [
+    {
+      "finding": "query2vec: Two-level hierarchical neural language model. Upper layer models temporal context of query sequences (skip-gram). Bottom layer models word sequences within a query (CBOW). Optimizes joint log-likelihood of: (1) predicting neighboring queries, (2) predicting query from its words, (3) predicting words from context+query. Trained on 12B search sessions, 45M+ query vectors.",
+      "category": "Model Candidate",
+      "implication": "Temporal query sequences (sessions) can be leveraged to learn query embeddings that capture search intent transitions. Joint word+query modeling helps tail queries by relying more on content vs context.",
+      "open_question": "How to define session boundaries for keyword clustering when search history is not available? Can synthetic sequences be generated?",
+      "testable_hypothesis": "Session-trained query embeddings yield better intent clustering than single-query embeddings because they capture reformulation patterns."
+    },
+    {
+      "finding": "Directed ad-query2vec modeled temporal direction (only past queries predict future) and incorporated ad click context. Achieved 0.91% yield rate improvement and 1.12% CTR improvement over standard keyword lists. Increased user coverage by 13%.",
+      "category": "Experiment",
+      "implication": "Directed (causal) embeddings that only use past context can better predict future user intent. Incorporating negative signals (skipped ads) improves embedding quality for intent prediction.",
+      "open_question": "Should keyword-intent clustering use undirected (symmetric) or directed (causal) co-occurrence?",
+      "testable_hypothesis": "Directed embeddings that only use context preceding a keyword in a session will form more predictive intent clusters than undirected embeddings."
+    }
+  ]
+}

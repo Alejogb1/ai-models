@@ -1,0 +1,148 @@
+{
+  "source": "2509.18641v1.pdf",
+  "source_group": "Web-Sources",
+  "processed_at": "2026-06-08",
+  "agent": "agent5_final",
+  "concepts": [
+    {
+      "finding": "However, current methods for search\nevaluation and intent diversification have limitations in effectively\nmeasuring how well the search results satisfy each intent from\na wide spectrum of possible user intents for a given query.",
+      "category": "Experiment",
+      "implication": "Can inform intent modeling for recommendation systems",
+      "open_question": "How to address the limitation described: However, current methods for search\nevaluation and intent diversification have limitations in effectively\nmeasuring how well the search results satisfy each intent from\na wide spectrum of possible use",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "While another thread of\nresearch seeks to incorporate multiple intents to improve ranking\nperformance [40, 46, 54, 83], their intent representations—often in\nthe form of expanded queries or embeddings—lack the granularity\nneeded to capture the fine-grained and contextual user goals, mak-\ning it diff",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "For instance, the search query\n“Hawaii Honeymoon” can be expanded into specific sentence-level\nintents such as “Check promotions for Hawaii honeymoons” or\n“Explore popular shopping destinations and recommended\nitems for a Hawaii honeymoon.” For contextualizing the gen-\nerated user intents in terms o",
+      "category": "Experiment",
+      "implication": "Can inform intent modeling for recommendation systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Here, we\nintroduce several practical challenges of implementing large-scale\nintent-based evaluation in the domain of search and propose our\napproaches for resolving them.",
+      "category": "Experiment",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "How to address the limitation described: Here, we\nintroduce several practical challenges of implementing large-scale\nintent-based evaluation in the domain of search and propose our\napproaches for resolving them.",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "However, human evaluators\ntypically do not provide such specific comments.” Similarly, P1,\nP3, and P4 thought that this fine-grained understanding helped\nthem communicate problems and potential improvements in search\nresults more effectively with other stakeholders (e.g., managers,\ncoworkers), makin",
+      "category": "Experiment",
+      "implication": "Relevant for similarity-based retrieval and lookalike targeting",
+      "open_question": "How to address the limitation described: However, human evaluators\ntypically do not provide such specific comments.” Similarly, P1,\nP3, and P4 thought that this fine-grained understanding helped\nthem communicate problems and potential improv",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "We introduce BloomIntent, a\nuser-centric search evaluation method that uses user intents as the\nevaluation unit.",
+      "category": "Experiment",
+      "implication": "Can inform intent modeling for recommendation systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "We introduce BloomIntent, a multi-intent evaluation\nmethod that simulates a wide spectrum of plausible user intents for\na given query, and automatically evaluates how well each is fulfilled\nby a search engine result page (SERP).",
+      "category": "Experiment",
+      "implication": "Can inform intent modeling for recommendation systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Our contributions are as follows:\n• BloomIntent, a novel LLM-powered evaluation method\nthat generates and contextualizes diverse, fine-grained user\nintents to enable automatic, intent-level evaluation of search\nresults.",
+      "category": "Experiment",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Research has shown that LLMs\ncan predict searcher preferences at levels comparable to human\nannotators [69] and provide nuanced, context-aware evaluations\nfor document ranking [51].",
+      "category": "Experiment",
+      "implication": "Can inform intent modeling for recommendation systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "How-\never, the context of search systems introduces distinct challenges\nfor user-defined evaluation.",
+      "category": "Experiment",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "How to address the limitation described: How-\never, the context of search systems introduces distinct challenges\nfor user-defined evaluation.",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "4\nBloomIntent\nWe propose a two-stage framework, BloomIntent, for a fine-\ngrained, scalable user intent-based evaluation of search results,\nconsisting of: (a) an intent generation pipeline, which produces a\nscalable yet comprehensive set of plausible intents for a given\nsearch query (Figure 2), and (",
+      "category": "Experiment",
+      "implication": "Can inform intent modeling for recommendation systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "While this ground truth was limited mainly to unsatisfied intents,\n\nBloomIntent: Automating Search Evaluation with LLM-Generated Fine-Grained User Intents\nUIST ’25, September 28-October 1, 2025, Busan, Republic of Korea\nwe argue that these cases are particularly important, as they reveal\nunmet infor",
+      "category": "LabelValidation",
+      "implication": "Can inform intent modeling for recommendation systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "We supplemented\ncomputational metrics with human evaluation, particularly focus-\ning on queries that showed low similarity scores, to determine\nwhether these BloomIntent-generated queries still represented\nvalid and meaningful user intentions despite being semantically\ndistant from real-world follow",
+      "category": "Experiment",
+      "implication": "Can inform intent modeling for recommendation systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "If\nthese intents are common, I will propose adding a link for the\ncountry-wise comparison of regulations in the search results page.”\nHowever, participants also emphasized the challenge of prior-\nitization.",
+      "category": "TargetConstruct",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "How to address the limitation described: If\nthese intents are common, I will propose adding a link for the\ncountry-wise comparison of regulations in the search results page.”\nHowever, participants also emphasized the challenge of prior-\nitiz",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "P4\nemphasized this challenge: “Overall balance is most important in\ngeneral (web) search.",
+      "category": "FailureRisk",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "How to address the limitation described: P4\nemphasized this challenge: “Overall balance is most important in\ngeneral (web) search.",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Our approach provides practical\nbenefits for search evaluation and improvement, from discovering\nactionable insights on improving the SERP to concrete discussion\nwith different stakeholders grounded on user needs.",
+      "category": "Experiment",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "8\nConclusion\nIn this paper, we introduce BloomIntent, a search evaluation\nmethod that centers on user intents as the core unit of analysis.",
+      "category": "Experiment",
+      "implication": "Can inform intent modeling for recommendation systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "- **Intent Type:** FS - Finding Specific Information\n#### **Output (Valid User Intent for This Query):**\n**Wants to know which products are currently on sale at the Brandy Melville Seongsu store.**\n---\n#### **Expanded Query:** {expanded_query}\n#### **Intent Type:** {intent_type}\n#### **Search Contex",
+      "category": "TargetConstruct",
+      "implication": "Can inform intent modeling for recommendation systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Overall, we propose intent-based evaluation as a scalable and\nuser-centric method for diagnostic understanding of search quality\nconsidering user needs.",
+      "category": "Experiment",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "2.1\nSearch Intent Representation and Modeling\nUnderstanding user intent is central to the modern search domain.",
+      "category": "Data",
+      "implication": "Can inform intent modeling for recommendation systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    }
+  ]
+}

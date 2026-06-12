@@ -1,0 +1,15 @@
+{
+  "source": "Predicting Twitter Engagement With Deep Language Models",
+  "source_group": "Awesome-ML-Papers/MF",
+  "processed_at": "2026-06-08T12:00:00Z",
+  "agent": "agent_batch_generation",
+  "concepts": [
+    {
+      "finding": "Deep language models for predicting Twitter engagement (likes, retweets, replies). Tweet representation via: (1) BERT for text content, (2) user embeddings (historical engagement patterns), (3) topic embeddings (LDA on tweet corpus). Multi-task learning predicts multiple engagement types simultaneously. Text content is the strongest predictor; user identity adds 15% improvement.",
+      "category": "ModelCandidate",
+      "implication": "Keyword engagement prediction: deep language model for keyword text + frequency/reach features + topic distribution predicts keyword engagement with intents. Multi-task across intent dimensions improves per-dimension accuracy.",
+      "open_question": "Can deep language models predict keyword intent membership from text alone, without co-occurrence data? How good is zero-shot keyword-to-intent assignment?",
+      "testable_hypothesis": "BERT-based zero-shot keyword-to-intent prediction (using only keyword text and intent descriptions) achieves 60%+ accuracy, significantly above random baseline, enabling cold-start keyword handling."
+    }
+  ]
+}

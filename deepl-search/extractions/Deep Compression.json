@@ -1,0 +1,15 @@
+{
+  "source": "Deep Compression.pdf",
+  "source_group": "Awesome-ML-Papers/DNN Compression and Acceleration",
+  "processed_at": "2026-06-08",
+  "agent": "agent6_remaining",
+  "concepts": [
+    {
+      "finding": "Deep compression pipeline (pruning + trained quantization + Huffman coding) reduces neural network storage by 35-49x without accuracy loss: AlexNet 240MB to 6.9MB, VGG-16 552MB to 11.3MB.",
+      "category": "ModelCandidate",
+      "implication": "Aggressive compression enables deploying large ML models in resource-constrained environments, applicable to on-device search models for mobile query understanding.",
+      "open_question": "Can similar compression ratios be achieved for transformer-based ranking models without significant accuracy degradation?",
+      "testable_hypothesis": "A Deep Compression pipeline (pruning + 8-bit quantization + Huffman) will reduce BERT-base ranking model size by 30x while maintaining within 2% of original NDCG@10."
+    }
+  ]
+}

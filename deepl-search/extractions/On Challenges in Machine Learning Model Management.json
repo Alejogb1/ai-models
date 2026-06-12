@@ -1,0 +1,141 @@
+{
+  "source": "On Challenges in Machine Learning Model Management.pdf",
+  "source_group": "Awesome-ML-Papers/Other",
+  "processed_at": "2026-06-08",
+  "agent": "agent5_final",
+  "concepts": [
+    {
+      "finding": "On Challenges in Machine Learning Model Management\nSebastian Schelter, Felix Biessmann, Tim Januschowski,\nDavid Salinas, Stephan Seufert, Gyuri Szarvas\n{sseb,biessman,tjnsch,dsalina,seufert,szarvasg }@amazon.com\nAmazon Research\nAbstract\nThe training, maintenance, deployment, monitoring, organization",
+      "category": "FailureRisk",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "How to address the limitation described: On Challenges in Machine Learning Model Management\nSebastian Schelter, Felix Biessmann, Tim Januschowski,\nDavid Salinas, Stephan Seufert, Gyuri Szarvas\n{sseb,biessman,tjnsch,dsalina,seufert,szarvasg }",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Many of the resulting challenges caught the interest of\nthe data management research community only recently, e.g., the efﬁcient serving of ML models, the validation\nof ML models, or machine learning-speciﬁc problems in data integration.",
+      "category": "FailureRisk",
+      "implication": "Can inform intent modeling for recommendation systems",
+      "open_question": "How to address the limitation described: Many of the resulting challenges caught the interest of\nthe data management research community only recently, e.g., the efﬁcient serving of ML models, the validation\nof ML models, or machine learning-",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "In this paper, we introduce a set of intricate use cases in Section 2, and elaborate on the corresponding\ngeneral challenges with respect to model management.",
+      "category": "FailureRisk",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "How to address the limitation described: In this paper, we introduce a set of intricate use cases in Section 2, and elaborate on the corresponding\ngeneral challenges with respect to model management.",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "However, when\nsuch neural forecasting models are deployed in long-running applications, careful management of the resulting\nmodels is still a major challenge, e.g., in order to maintain backwards compatibility of the produced models.",
+      "category": "FailureRisk",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "How to address the limitation described: However, when\nsuch neural forecasting models are deployed in long-running applications, careful management of the resulting\nmodels is still a major challenge, e.g., in order to maintain backwards comp",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Speciﬁc domains introduce additional challenges.",
+      "category": "FailureRisk",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "How to address the limitation described: Speciﬁc domains introduce additional challenges.",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "4\nConclusion\nWe introduced a set of ML use cases and discussed the resulting general challenges with respect to model\nmanagement.",
+      "category": "FailureRisk",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "How to address the limitation described: 4\nConclusion\nWe introduced a set of ML use cases and discussed the resulting general challenges with respect to model\nmanagement.",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "As both research on infrastructure as well as on algorithms is quickly evolving,\nthere is a lack of understanding of challenges and best practices for ML model management.",
+      "category": "FailureRisk",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "How to address the limitation described: As both research on infrastructure as well as on algorithms is quickly evolving,\nthere is a lack of understanding of challenges and best practices for ML model management.",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "In this paper, we discuss a selection of ML use cases, develop an overview\nover conceptual, engineering, and data-processing related challenges arising in the management of the\ncorresponding ML models, and point out future research directions.",
+      "category": "FailureRisk",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "How to address the limitation described: In this paper, we discuss a selection of ML use cases, develop an overview\nover conceptual, engineering, and data-processing related challenges arising in the management of the\ncorresponding ML models",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Finally, we list a set of engineering-related challenges, which originate from a lack\nof agreed-upon best practices as well as from the difﬁculties of building complex systems based on components\nin different programming languages (Section 3.3).",
+      "category": "FailureRisk",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "How to address the limitation described: Finally, we list a set of engineering-related challenges, which originate from a lack\nof agreed-upon best practices as well as from the difﬁculties of building complex systems based on components\nin d",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Maintaining, managing, and improving the required ML pipelines in such systems is a non-trivial challenge –\nnot only in production environments which may require complex ensembles of many simple models, but espe-\ncially in experimental settings when different individual models are evaluated on diffe",
+      "category": "Experiment",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "How to address the limitation described: Maintaining, managing, and improving the required ML pipelines in such systems is a non-trivial challenge –\nnot only in production environments which may require complex ensembles of many simple model",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Such a system enables regular automated comparisons of models in development to older models, and thereby\nprovides a starting point for quantifying the accuracy improvements that teams achieve over time towards a\nspeciﬁc ML goal.",
+      "category": "Experiment",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Capturing and managing these implicit assumptions is tricky\nhowever, and systematic approaches are in the focus of recent research [3, 16, 28].",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "How to address the limitation described: Capturing and managing these implicit assumptions is tricky\nhowever, and systematic approaches are in the focus of recent research [3, 16, 28].",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "These validations introduce a number of\nchallenges and pitfalls: When we compare the performance of ML models, we must ensure that the models\nhave been trained and evaluated using the same training, test and validation set.",
+      "category": "Experiment",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "How to address the limitation described: These validations introduce a number of\nchallenges and pitfalls: When we compare the performance of ML models, we must ensure that the models\nhave been trained and evaluated using the same training, t",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Furthermore, in long-existing, highly-tuned ML systems, it is unlikely that the\noverall accuracy improves signiﬁcantly.",
+      "category": "Experiment",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Usually, a new model introduces an improvement but this improvement\ncomes at some cost (such as longer prediction times), which makes wrapping-up release candidates challenging.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Furthermore, such cases show that it is important to carefully control evaluation and training sam-\nples, and guaranteeing this in continuously changing data pipelines can be quite challenging.",
+      "category": "Experiment",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "This\nwould prevent opportunities to improve models and may be hard to achieve in systems where execution is not\nfully deterministic (e.g., distributed systems or neural network models when they rely on GPU computation).",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Our experience conﬁrms the need for research on data management challenges for model management and ML\nsystems in general [29, 18].",
+      "category": "FailureRisk",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "How to address the limitation described: Our experience conﬁrms the need for research on data management challenges for model management and ML\nsystems in general [29, 18].",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "A promising research\ndirection here is to tackle the challenges stemming from the lack of a common declarative abstraction for end-\nto-end ML, and to design new languages that support relational algebraic and linear primitives at the same time\n(and can reason about them them holistically [19, 20]).",
+      "category": "FailureRisk",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "How to address the limitation described: A promising research\ndirection here is to tackle the challenges stemming from the lack of a common declarative abstraction for end-\nto-end ML, and to design new languages that support relational algeb",
+      "testable_hypothesis": ""
+    }
+  ]
+}

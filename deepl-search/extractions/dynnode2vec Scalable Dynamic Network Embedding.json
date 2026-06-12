@@ -1,0 +1,15 @@
+{
+  "source": "dynnode2vec Scalable Dynamic Network Embedding",
+  "source_group": "Awesome-ML-Papers/Embeddings",
+  "processed_at": "2026-06-08T12:00:00Z",
+  "agent": "agent_batch_generation",
+  "concepts": [
+    {
+      "finding": "Extends node2vec to dynamic graphs with evolving edges. Efficiently updates embeddings as new edges arrive without recomputing from scratch. Uses a change-detection mechanism to identify affected nodes and only updates their embeddings. Edge appearance and disappearance both handled.",
+      "category": "ModelCandidate",
+      "implication": "Incremental update of keyword embeddings as new co-occurrences arrive (e.g., daily search log updates). Only keywords whose co-occurrence patterns change significantly need embedding updates.",
+      "open_question": "What threshold of co-occurrence change warrants a keyword embedding update? Can embeddings be updated per-batch or per-keyword?",
+      "testable_hypothesis": "Incremental keyword embedding updates (dynnode2vec) achieve similar cluster quality to batch retraining with 10-100x less computation per update cycle."
+    }
+  ]
+}

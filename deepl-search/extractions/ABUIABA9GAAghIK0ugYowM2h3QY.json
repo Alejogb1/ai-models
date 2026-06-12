@@ -1,0 +1,148 @@
+{
+  "source": "ABUIABA9GAAghIK0ugYowM2h3QY.pdf",
+  "source_group": "Web-Sources",
+  "processed_at": "2026-06-08",
+  "agent": "agent5_final",
+  "concepts": [
+    {
+      "finding": "For example, a 0.2% improvement in the\nclick-through-rate for a product recommendation system can result in\nmillions of dollars increase in revenue for an ecommerce site.",
+      "category": "ModelCandidate",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "While it’s essential to stay up-to-date to new technologies and\nbeneficial to evaluate them for your businesses, the most important\nthing to do when solving a problem is finding solutions that can\nsolve that problem.",
+      "category": "Experiment",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Because they are shown first, users click on them more,\nwhich makes the system more confident that these recommendations are good.",
+      "category": "ModelCandidate",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "The AI Algorithm that got you hooked (Catherine Wang, 2020)\n18  Improving Aggregate Recommendation Diversity Using Ranking-Based Techniques (Adomavicius et al., 2011)\n19  Incremental Learning from Noisy Data (Schlimmer and Granger, 1986)\n20  You might wonder what about the case when P(X|Y) changes b",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "However, before\ntalking about how to develop ML systems, it’s important to take a step back\nand ask a fundamental question: when and when not to use machine\nlearning.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "How to address the limitation described: However, before\ntalking about how to develop ML systems, it’s important to take a step back\nand ask a fundamental question: when and when not to use machine\nlearning.",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "With the explosion of information and services, it’d have been very\nchallenging for us to find what we want without the help of ML, manifested\n\nin either a search engine or a recommendation system.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "… Seeking an improvement that makes a\ndifference in the shorter term, researchers seek to leverage their human\nknowledge of the domain, but the only thing that matters in the long run\nis the leveraging of computation.”\n13\n14\n15\n\nWhen asked how Google search was doing so well, Peter Norvig, Google’s\n",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "For example, if being able to return recommendations\nwithin 100 milliseconds is a must-have requirement — the company finds\nthat if your model takes over 100 milliseconds to recommend restaurants,\n10% of users would lose patience and close the app — then neither model\nA and B will work.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "For example, the average latency of Google Translate is the average time it\ntakes from when a user clicks Translate to when the translation is shown,\nand the throughput is how many queries it processes and serves a second.",
+      "category": "ModelCandidate",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Second, it’s important for\ndevelopers to debug and improve a model.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "First, the separation of transactional and analytical databases was due to\nlimitations of technology — it was hard to have databases that could handle both transactional\nand analytical queries efficiently.",
+      "category": "FailureRisk",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "How to address the limitation described: First, the separation of transactional and analytical databases was due to\nlimitations of technology — it was hard to have databases that could handle both transactional\nand analytical queries efficie",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Understanding different sampling methods and how they are being used in our workflow can, first, help us\navoid potential sampling biases, and second, help us choose the methods that improve the efficiency of the data\nwe sample.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "To minimize the disagreement among annotators, it’s important to, first, have a clear problem definition.",
+      "category": "FailureRisk",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "showed that by adding images generated using a CycleGAN to\ntheir original training data, they were able to improve their model’s performance significantly on CT\nsegmentation tasks.",
+      "category": "ModelCandidate",
+      "implication": "Applicable to user/item clustering for personalization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Finding a way to solve this problem turns out to be surprisingly difficult.",
+      "category": "FailureRisk",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Discrete and Continuous Positional Embeddings\nFirst introduced to the deep learning community in the paper Attention Is All You Need (Vaswani et al., 2017),\npositional embedding has become a standard data engineering technique for many applications in both computer\nvision and natural language proces",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "When\nmeasuring feature importance for a click-through rate prediction model, the ads team at Facebook found out that\nthe top 10 features are responsible for about half of the model’s total feature importance, while the last 300\nfeatures contribute less than 1% feature importance, as shown in Figure ",
+      "category": "ModelCandidate",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "However, they are still\ncommon for tasks where a small performance boost can lead to a huge\nfinancial gain such as predicting click-through rate (CTR) for ads.",
+      "category": "ModelCandidate",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "How to address the limitation described: However, they are still\ncommon for tasks where a small performance boost can lead to a huge\nfinancial gain such as predicting click-through rate (CTR) for ads.",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "However, in practice, due to limitations of tooling today,\nit can be overwhelming to track too many things, and tracking less\nimportant things can distract you from tracking really important things.",
+      "category": "FailureRisk",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "How to address the limitation described: However, in practice, due to limitations of tooling today,\nit can be overwhelming to track too many things, and tracking less\nimportant things can distract you from tracking really important things.",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "However, there have been many algorithms that effectively address this\nproblem \n, \n, \n.",
+      "category": "FailureRisk",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "How to address the limitation described: However, there have been many algorithms that effectively address this\nproblem \n, \n, \n.",
+      "testable_hypothesis": ""
+    }
+  ]
+}

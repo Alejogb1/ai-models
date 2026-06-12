@@ -1,0 +1,148 @@
+{
+  "source": "Predicting Different Types of Conversions with Multi-Task Learning in Online Advertising, Camera Ready.pdf",
+  "source_group": "Awesome-ML-Papers/CTR-CVR-Prediction",
+  "processed_at": "2026-06-08",
+  "agent": "agent5_final",
+  "concepts": [
+    {
+      "finding": "Our main contribution is two-fold: First, we formulate conver-\nsion prediction as a multi-task learning problem and propose MT-\nFwFM to solve all tasks jointly.",
+      "category": "FailureRisk",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Our experiment results show that, compared with two\nstate-of-the-art models, MT-FwFM improve the AUC by 0.74% and\n0.84% on two conversion types, and the weighted AUC across all\nconversion types is also improved by 0.50%.",
+      "category": "Baseline",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "To achieve\nsuch objectives, accurate prediction of conversion probability is\nfundamental and has attracted lots of research attention in the past\nfew years [1, 2, 8, 20, 21].",
+      "category": "ModelCandidate",
+      "implication": "Architecture pattern applicable to sequence modeling for user behavior",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "[3] proposes a ranking model that optimize\nthe conversion funnel even for CPC (Cost-per-Click) campaigns.",
+      "category": "ModelCandidate",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "In [22] the authors proposes a multi-task model to\nsolve the tasks of click prediction and click-through conversion\nprediction jointly.",
+      "category": "ModelCandidate",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "However, all 2-way state-of-the-art models,\nsuch as 2-way Factorization Machines (FM) and Field-weighted\nFactorization Machines (FwFM), are not able to fully capture the\ndifferences in field interaction effects among different conversion\ntypes.",
+      "category": "Baseline",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "How to address the limitation described: However, all 2-way state-of-the-art models,\nsuch as 2-way Factorization Machines (FM) and Field-weighted\nFactorization Machines (FwFM), are not able to fully capture the\ndifferences in field interacti",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "3\nMULTI-TASK FIELD-WEIGHTED\nFACTORIZATION MACHINE\nWe formulate the prediction of different types of conversions as a\nmulti-task learning problem, and propose Multi-Task Field-weighted\nFactorization Machine (MT-FwFM) to train these models jointly.",
+      "category": "FailureRisk",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Second, each conversion type has its own\nwt\nF(i) to model the main effect of feature i.",
+      "category": "ModelCandidate",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Mathematically,\nΦMT −FwF M(Θ,x) = wt\n0 +\nM\nÕ\ni=1\nxi ⟨vi,wt\nF(i)⟩\n+\nM\nÕ\ni=1\nM\nÕ\nj=i+1\nxixj ⟨vi,vj⟩rt\nF(i),F(j)\n(4)\nMT-FwFM can be regarded as a 3-layer neural network: each\nsample is first processed by an embedding layer that maps each\nbinary feature xi to an embedding vector vi, then by a main &\nint",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "The number of parameters in MT-\nFwFM is\nT + MK + NTK + N(N −1)\n2\nT ≈MK\n(6)\nwhereT, M, N, K refer to the number of conversion types, features,\nfields, as well as the dimension of the feature embedding vectors\nand main term weight vector, respectively.",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Thus in (6), T represents the number of bias terms wt\n0; MK cal-\nculates the number of parameters for the embedding vectors vi;\nNTK corresponds to wt\nF(i), i.e., the main term weight vectors for all\nconversion types; N (N −1)\n2\nT denotes the number of field interaction\nweights rt\nF(i),F(j).",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "There are 17 fields of features, which fall into 4 categories:\n(1) User-side fields: User_ID, Gender and Age_Bucket\n(2) Publisher-side fields: Page_TLD, Publisher_ID, and Subdo-\nmain\n(3) Advertiser-side fields: Advertiser_ID, Creative_ID, AD_ID,\nCreative_Media_ID, Layout_ID, and Line_ID\n(4) Context ",
+      "category": "ModelCandidate",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "And this improvement mainly come from the conversion\ntypes that get relatively low AUC using the baseline models.",
+      "category": "Baseline",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "[28] provides\ncomprehensive analysis and proposes a new model for post-click\nconversion prediction.",
+      "category": "ModelCandidate",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "7\nCONCLUSION\nIn this paper, we formulate conversion prediction as a Multi-Task\nlearning problem and propose Multi-Task Field-weighted Factoriza-\ntion Machines (MT-FwFM) to learn prediction models for multiple\nconversion types jointly.",
+      "category": "FailureRisk",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Web-scale bayesian click-through rate prediction for sponsored search adver-\ntising in microsoft’s bing search engine.",
+      "category": "ModelCandidate",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Entire Space Multi-Task Model: An Effective Approach for Estimating\nApplied Data Science Track Paper\nKDD ’19, August 4–8, 2019, Anchorage, AK, USA\n2696\n\nPost-Click Conversion Rate.",
+      "category": "ModelCandidate",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Unlike click pre-\ndiction, conversions have different types in nature, and each type\nmay be associated with different decisive factors.",
+      "category": "ModelCandidate",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "In this paper, we\nformulate conversion prediction as a multi-task learning problem,\nso that the prediction models for different types of conversions\ncan be learned together.",
+      "category": "FailureRisk",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "KEYWORDS\nOnline Advertising, Conversion Prediction, Factorization Machines,\nMulti-Task Learning\nACM Reference Format:\nJunwei Pan, Yizhi Mao, Alfonso Lobos Ruiz, Yu Sun, and Aaron Flores.",
+      "category": "ModelCandidate",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    }
+  ]
+}

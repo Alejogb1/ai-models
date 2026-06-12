@@ -1,0 +1,148 @@
+{
+  "source": "Personalization_in_E-commerce_Product_Search_by_User-Centric_Ranking.pdf",
+  "source_group": "Awesome-ML-Papers/Shopping",
+  "processed_at": "2026-06-08",
+  "agent": "agent5_final",
+  "concepts": [
+    {
+      "finding": "Although one might ar-\ngue that personalization is less effective for tail queries (since there\nmight be fewer listings that fit the query), we show that our person-\nalized model with user profile and query representations improves\nconversion rates on this query bin too.",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "In summary, we discuss the\npersonalized search ranking model and analyze the different features\nthat lead to an improved user experience and overall conversion\nrate for purchases.",
+      "category": "ModelCandidate",
+      "implication": "Can inform intent modeling for recommendation systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "In the\nproposed personalized model, we observe offline improvements in\nranking metrics (i.e, purchase NDCG@10) and higher degrees of\npersonalization measured by Kendall Tau coefficients, when com-\npared to a non-personalized ranking model.",
+      "category": "Experiment",
+      "implication": "Can inform intent modeling for recommendation systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "With a large pool of\ncandidate listings, personalized search results are an important tool\nto help users find items that best fit their preference, as demonstrated\nin the search results shown in Figure 1.",
+      "category": "ModelCandidate",
+      "implication": "Can inform intent modeling for recommendation systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Personalization in E-commerce Product Search by User-Centric Ranking\nKMECommerce Workshop Held at WWW ’21, April 16th, 2021, Virtual Event, Slovenia\nType of listing reps\nType of implicit feedback window\nTf-Idf\nclick*\nrecent\nInteraction-based graph vector\ncart-add*\nlifetime\nItem-interaction embedding",
+      "category": "Data",
+      "implication": "Can inform intent modeling for recommendation systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "With the potentially overwhelming number\nof relevant items per query, it becomes increasingly important for\nmarketplaces and platforms to help the user find items that best fit\ntheir preference and interest via a user-centric ranking model that\ngenerates personalized search results.",
+      "category": "ModelCandidate",
+      "implication": "Can inform intent modeling for recommendation systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "KEYWORDS\nPersonalization; E-commerce; Search Ranking\n1\nINTRODUCTION\nE-commerce marketplaces match users with items from sellers that\nare most relevant to their search query.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "We\ngenerate these embeddings from four modes of user implicit\nfeedback (clicks, purchases, favorites, cart adds), combined\nwith various time frames of aggregation (i.e, recent vs life-\ntime) to improve our ranking model relevancy metrics.",
+      "category": "Data",
+      "implication": "Can inform intent modeling for recommendation systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "• We show that this personalization model deployed on live\ntraffic improves user rates of return and conversion rate.",
+      "category": "ModelCandidate",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "We demonstrate that for most queries the personalized model\nwith user and query embeddings improves conversion rates.",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Authors in [3] show that combining content-\nbased features and content-agnostic based item embeddings on users’\nrecent clicks can improve mean reciprocal rank in an e-commerce\nsetting.",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Compared to the first\npersonalized model, the second model (P2) adds query embeddings\nfeatures that are feature engineered to interact with user representa-\ntions to create further personalized features for ranking in P2.",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "In offline experiments cart-\nadd logs were combined with purchase logs to create training data,\nhowever we found that training on purchase logs only improved\nModels\nNDCG @10\nKendall Tau\nWeb\nApp\nWeb\nApp\nP1 (user reps)\n3%\n4.8%\n0.9073 0.8109\nP2 (query + user reps) 6.9% 9.17% 0.8527 0.7783\nTable 2: Offl",
+      "category": "Baseline",
+      "implication": "Can inform intent modeling for recommendation systems",
+      "open_question": "How to address the limitation described: In offline experiments cart-\nadd logs were combined with purchase logs to create training data,\nhowever we found that training on purchase logs only improved\nModels\nNDCG @10\nKendall Tau\nWeb\nApp\nWeb\nAp",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "The overall\nuser conversion rate increases while the mean search clicks per\nsession decreases in the P1 personalized model compared to baseline.",
+      "category": "Baseline",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Fairness and inclusivity is an important component of\nsearch ranking and recommendations.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Real-Time Personalization Using\nEmbeddings for Search Ranking at Airbnb.",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Personalization in E-commerce Product Search by\nUser-Centric Ranking\nLucia Yu*, Ethan Benjamin*, Congzhe Su**, Yinlin Fu**, Jon Eskreis-Winkler**,\nXiaoting Zhao, Diane Hu\nEtsy, Inc\nNew York, U.S.A\n{lyu,ebenjamin,csu,yfu,jeskreiswinkler,xzhao,dhu}@etsy.com\nABSTRACT\nE-commerce platforms offer the conv",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "We successfully deploy\nthe user-centric ranking model across multiple platforms on live\ntraffic to hundreds of millions of users, with thousands of search\nrequests per second.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Personalization has been shown to improve user experience and\nincrease the relevancy of returned results [1].",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Hu\n• We also show that the personalization model benefits users\nwith varying levels of historical activity and implicit feedback.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    }
+  ]
+}

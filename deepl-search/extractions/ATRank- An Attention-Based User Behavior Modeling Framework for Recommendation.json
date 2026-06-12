@@ -1,0 +1,15 @@
+{
+  "source": "ATRank- An Attention-Based User Behavior Modeling Framework for Recommendation",
+  "source_group": "Awesome-ML-Papers/MF",
+  "processed_at": "2026-06-08T12:00:00Z",
+  "agent": "agent_batch_generation",
+  "concepts": [
+    {
+      "finding": "ATRank: attention-based user behavior model for recommendation. Uses self-attention to model user behavior sequences without RNN/CNN. Positional encoding captures temporal order. Multi-head attention captures different user interests from behavior sequence. Outperforms GRU-based models by 5-8%.",
+      "category": "ModelCandidate",
+      "implication": "Self-attention over keyword sequences captures keyword intent transitions. Multi-head attention detects different intent facets (e.g., product research vs price comparison) from a keyword sequence. Attention weights explain which historical keywords influence current intent.",
+      "open_question": "What sequence position encoding works best for keyword sessions? Absolute (order in session) or relative (time between keywords)?",
+      "testable_hypothesis": "Self-attention on keyword search sequences produces better session-level intent prediction than RNN-based sequence models (LSTM, GRU)."
+    }
+  ]
+}

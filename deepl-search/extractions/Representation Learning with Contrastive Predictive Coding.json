@@ -1,0 +1,15 @@
+{
+  "source": "Representation Learning with Contrastive Predictive Coding",
+  "source_group": "Awesome-ML-Papers/Embeddings",
+  "processed_at": "2026-06-08T12:00:00Z",
+  "agent": "agent_batch_generation",
+  "concepts": [
+    {
+      "finding": "CPC: self-supervised representation learning via autoregressive prediction in latent space. Learns to predict future latent representations from past context using contrastive loss (noise-contrastive estimation). Applied to audio, images, text, and RL. Encodes mutual information between context and future observations.",
+      "category": "ModelCandidate",
+      "implication": "Keyword embedding via predictive coding: predict next keyword in a search session from current keyword embedding. Contrastive loss with negative sampling. Self-supervised, no labels needed. Captures temporal intent transitions.",
+      "open_question": "Can contrastive predictive coding on search session sequences produce better keyword embeddings than simple co-occurrence (word2vec)?",
+      "testable_hypothesis": "CPC-trained keyword embeddings (predicting next query in session) capture more predictive intent signals than word2vec embeddings on the same session data."
+    }
+  ]
+}

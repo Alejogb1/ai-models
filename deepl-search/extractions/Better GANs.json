@@ -1,0 +1,22 @@
+{
+  "source": "Better GANs.pdf",
+  "source_group": "Awesome-ML-Papers/GANs",
+  "processed_at": "2026-06-08",
+  "agent": "agent6_remaining",
+  "concepts": [
+    {
+      "finding": "FID (Frechet Inception Distance) compares feature distributions of real and fake images using Frechet distance between multivariate Gaussians in Inception feature space.",
+      "category": "Evaluation",
+      "implication": "Distribution-level comparison metrics (like FID) can evaluate search results holistically, comparing the distribution of retrieved items to the distribution of relevant items.",
+      "open_question": "Can a FID-like distribution comparison metric improve search evaluation beyond pointwise relevance metrics?",
+      "testable_hypothesis": "A distribution-based search evaluation metric will better detect ranking degradation than pointwise NDCG alone."
+    },
+    {
+      "finding": "Progressive Growing of GANs (ProGAN) starts with low-resolution images and progressively increases resolution, leading to faster and more stable training.",
+      "category": "Experiment",
+      "implication": "Progressive training (starting simple, gradually increasing complexity) can improve training stability and speed, applicable to training search models by starting with easy queries and progressing to hard ones.",
+      "open_question": "Does curriculum learning (easy to hard queries) improve final model quality for search ranking?",
+      "testable_hypothesis": "A curriculum training strategy starting with high-CTR queries and progressing to tail queries will produce a ranking model with 3%+ higher NDCG than standard training order."
+    }
+  ]
+}

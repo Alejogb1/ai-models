@@ -1,0 +1,148 @@
+{
+  "source": "[ESMM] Entire Space Multi-Task Model - An Effective Approach for Estimating Post-Click Conversion Rate (Alibaba 2018).pdf",
+  "source_group": "Awesome-ML-Papers/CTR-CVR-Prediction",
+  "processed_at": "2026-06-08",
+  "agent": "agent5_final",
+  "concepts": [
+    {
+      "finding": "KEYWORDS\npost-click conversion rate, multi-task learning, sample selection\nbias, data sparsity, entire-space modeling\n1\nINTRODUCTION\nConversion rate (CVR) prediction is an essential task for ranking\nsystem in industrial applications, such as online advertising and\nrecommendation etc.",
+      "category": "ModelCandidate",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "In ESMM, two auxiliary tasks of predict-\ning the post-view click-through rate (CTR) and post-view click-\nthrough&conversion rate (CTCVR) are introduced.",
+      "category": "ModelCandidate",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "ESMM consistently outperforms competitive models,\nwhich demonstrate the effectiveness of the proposed approach.",
+      "category": "Baseline",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Entire Space Multi-Task Model: An Effective Approach for\nEstimating Post-Click Conversion Rate\nXiao Ma, Liqin Zhao, Guan Huang, Zhi Wang, Zelin Hu, Xiaoqiang Zhu, Kun Gai\nAlibaba Inc.",
+      "category": "ModelCandidate",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "{maxiao.mx, liqin.zlq, bingyi.wz, xiaoqiang.zxq, jingshi.gk}@alibaba-inc.com\nABSTRACT\nEstimating post-click conversion rate (CVR) accurately is crucial\nfor ranking systems in industrial applications such as recommenda-\ntion and advertising.",
+      "category": "ModelCandidate",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Experiments on dataset gathered from traffic logs of Taobao’s recom-\nmender system demonstrate that ESMM significantly outperforms\ncompetitive methods.",
+      "category": "Baseline",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "To the best of our knowledge, this\nis the first public dataset which contains samples with sequential\ndependence of click and conversion labels for CVR modeling.",
+      "category": "LabelValidation",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Given\nrecommended items, users might click interested ones and further\nPermission to make digital or hard copies of part or all of this work for personal or\nclassroom use is granted without fee provided that copies are not made or distributed\nfor profit or commercial advantage and that copies bear t",
+      "category": "ModelCandidate",
+      "implication": "Can inform intent modeling for recommendation systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "In this paper, by making good use of sequential pattern of user\nactions, we propose a novel approach named Entire Space Multi-\ntask Model (ESMM), which is able to eliminate the SSB and DS\nproblems simultaneously.",
+      "category": "FailureRisk",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Two associated probabilities are: post-view\nclick-through rate (CTR) with pCTR = p(z = 1|x) and post-view\nclick&conversion rate (CTCVR) with pCTCVR = p(y = 1,z = 1|x).",
+      "category": "ModelCandidate",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "(1)\n2.2\nCVR Modeling and Challenges\nRecently deep learning based methods have been proposed for CVR\nmodeling, achieving state-of-the-art performance.",
+      "category": "Baseline",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "How to address the limitation described: (1)\n2.2\nCVR Modeling and Challenges\nRecently deep learning based methods have been proposed for CVR\nmodeling, achieving state-of-the-art performance.",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "The first four methods are different variations to model CVR\ndirectly based on state-of-the-art deep network.",
+      "category": "Baseline",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Conventional CVR modeling applies popular\ndeep learning methods and achieves state-of-the-art performance.",
+      "category": "Baseline",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "However it encounters several task-specific problems in practice,\nmaking CVR modeling challenging.",
+      "category": "FailureRisk",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "How to address the limitation described: However it encounters several task-specific problems in practice,\nmaking CVR modeling challenging.",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "In this paper, we model CVR in a brand-new\nperspective by making good use of sequential pattern of user ac-\ntions, i.e., impression →click →conversion.",
+      "category": "ModelCandidate",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "The proposed Entire\nSpace Multi-task Model (ESMM) can eliminate the two problems\nsimultaneously by i) modeling CVR directly over the entire space,\nii) employing a feature representation transfer learning strategy.",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "For example, predicted CVR is used in OCPC\n(optimized cost-per-click) advertising to adjust bid price per click\nto achieve a win-win of both platform and advertisers [4].",
+      "category": "ModelCandidate",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "It is also\nan important factor in recommender systems to balance users’ click\npreference and purchase preference.",
+      "category": "ModelCandidate",
+      "implication": "Can inform intent modeling for recommendation systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "In other words, user actions follow a sequential\npattern of impression →click →conversion.",
+      "category": "ModelCandidate",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "In this way, CVR\nmodeling refers to the task of estimating the post-click conversion\nrate, i.e., pCVR = p(conversion|click,impression).",
+      "category": "ModelCandidate",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    }
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "source": "SimClusters- Community-Based Representations for Heterogeneous Recommendations at Twitter",
+  "source_group": "Awesome-ML-Papers/MF",
+  "processed_at": "2026-06-08T12:00:00Z",
+  "agent": "agent_batch_generation",
+  "concepts": [
+    {
+      "finding": "SimClusters: community detection on Twitter's user-tweet interaction graph. Each tweet/user represented by its community affiliation vector (soft membership across 145K communities). Uses Metropolis-Hastings sampling for scalable community detection at billion-node scale. Cold-start: infer community affiliation from content features. Communities correspond to topics/interests.",
+      "category": "ModelCandidate",
+      "implication": "Community-based keyword representation: cluster keywords via community detection on co-occurrence graph. Each keyword has community affiliation vector across intent communities. Community detection naturally discovers intent clusters from graph structure.",
+      "open_question": "Does community detection on keyword co-occurrence graphs discover intent clusters that align with JTBD categories? How to determine optimal number of communities?",
+      "testable_hypothesis": "SimClusters-style community detection on keyword co-occurrence graphs produces intent clusters with higher internal coherence than k-Means clustering of keyword embeddings."
+    }
+  ]
+}

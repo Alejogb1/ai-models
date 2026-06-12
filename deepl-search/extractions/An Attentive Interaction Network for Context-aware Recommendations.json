@@ -1,0 +1,15 @@
+{
+  "source": "An Attentive Interaction Network for Context-aware Recommendations",
+  "source_group": "Awesome-ML-Papers/MF",
+  "processed_at": "2026-06-08T12:00:00Z",
+  "agent": "agent_batch_generation",
+  "concepts": [
+    {
+      "finding": "Attentive interaction network for context-aware recommendation. Models user-item interactions with: (1) feature-level attention (which features matter for this interaction), (2) instance-level attention (which historical interactions matter). Context (time, location, companion) modulates interaction weights. Outperforms FM and NFM on context-aware tasks.",
+      "category": "ModelCandidate",
+      "implication": "Feature-level attention identifies which keyword features (text, frequency, domain, entity type) matter most for intent prediction. Instance-level attention selects relevant historical keyword-intent examples for the current keyword. Context modulates intent assignment.",
+      "open_question": "What contextual features (time, device, domain, season) most strongly influence keyword intent?",
+      "testable_hypothesis": "An attentive interaction network for keyword-intent matching outperforms flat embedding similarity for context-dependent keywords (e.g., seasonal, domain-specific)."
+    }
+  ]
+}

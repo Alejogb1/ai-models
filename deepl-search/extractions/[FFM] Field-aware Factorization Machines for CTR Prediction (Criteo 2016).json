@@ -1,0 +1,85 @@
+{
+  "source": "[FFM] Field-aware Factorization Machines for CTR Prediction (Criteo 2016).pdf",
+  "source_group": "Awesome-ML-Papers/CTR-CVR-Prediction",
+  "processed_at": "2026-06-08",
+  "agent": "agent5_final",
+  "concepts": [
+    {
+      "finding": "of Computer Science\nNational Taiwan Univ., Taiwan\ncjlin@csie.ntu.edu.tw\nABSTRACT\nClick-through rate (CTR) prediction plays an important role\nin computational advertising.",
+      "category": "ModelCandidate",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Keywords\nMachine learning; Click-through rate prediction; Computa-\ntional advertising; Factorization machines\n1.",
+      "category": "ModelCandidate",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "INTRODUCTION\nClick-through rate (CTR) prediction plays an important\nrole in advertising industry [1, 2, 3].",
+      "category": "ModelCandidate",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "First, we propose eﬃcient implementations for training\nFFMs.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Experiments\nshow that FFMs are very useful for certain classiﬁcation\nproblems.",
+      "category": "Experiment",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "• Though FFM is shown to be eﬀective in [8], this work\nmay be the only published study of applying FFMs on\nCTR prediction problems.",
+      "category": "FailureRisk",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "To further demonstrate the\neﬀectiveness of FFMs on CTR prediction, we present the\nuse of FFM as our major model to win two world-wide\nCTR competitions hosted by Criteo and Avazu.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "However, if many threads are used,\nthe speedup does not improve much.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "How to address the limitation described: However, if many threads are used,\nthe speedup does not improve much.",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "We demonstrate that for certain kinds of data sets, FFMs\noutperform three well-known models, LM, Poly2, and FM,\nin terms of logloss, with a cost of longer training time.",
+      "category": "Baseline",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Ragno,\n“Predicting clicks: estimating the click-through rate\nfor new ADs,” in Proceedings of the 16th international\nconference on World Wide Web, 2007.",
+      "category": "ModelCandidate",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Schmidt-Thieme, “Pairwise\ninteraction tensor factorization for personalized tag\nrecommendation,” in Proceedings of the 3rd ACM\nInternational Conference on Web Search and Data\nMining (WSDM), pp.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    }
+  ]
+}

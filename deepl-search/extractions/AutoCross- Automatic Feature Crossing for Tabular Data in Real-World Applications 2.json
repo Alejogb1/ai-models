@@ -1,0 +1,148 @@
+{
+  "source": "AutoCross- Automatic Feature Crossing for Tabular Data in Real-World Applications 2.pdf",
+  "source_group": "Awesome-ML-Papers/Other",
+  "processed_at": "2026-06-08",
+  "agent": "agent5_final",
+  "concepts": [
+    {
+      "finding": "Experimental results show that\nAutoCross can significantly enhance learning from tabular data,\noutperforming other search-based and deep-learning-based feature\ngeneration methods dedicated to the same topic.",
+      "category": "Baseline",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "The major contributions of\nthis paper are summarized as follows:\n• We propose an efficient AutoML algorithm to explicitly\nsearch for useful cross features in an extensive search space.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "The remaining of this paper is organized as follows: in Section 2,\nwe demonstrate what motivates us to develop our own feature\ncrossing tool; next, in Section 3, the overall system is introduced;\nthe techniques employed in each component, as well as the choices\nmade in designing the system, are deta",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "4.2\nFeature Set Generation\nIn this subsection, we introduce the feature set generation method\nin AutoCross, which also determines the main search strategy.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "First, by comparing AutoCross with several reference\nmethods on both benchmark and real-world business datasets, we\nshow that with feature crossing it can significantly improve the per-\nformance of both linear and deep models, and that high-order cross\nfeatures are useful.",
+      "category": "Baseline",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Additionally, we propose successive mini-batch\ngradient descent and multi-granularity discretization to further\nimprove efficiency and effectiveness, while ensuring simplicity so\nthat no machine learning expertise or tedious hyper-parameter\ntuning is required.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Experimental results on both benchmark\nand real-world business datasets demonstrate the effectiveness and\nefficiency of AutoCross.",
+      "category": "Baseline",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "It is also shown that AutoCross can\naccompany deep models, by which means we can combine\nthe advantage of explicit and implicit feature generation and\nfurther improve the learning performance.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Motivated by the usefulness of high-order cross features and\nthe limitation of existing works, in this paper, we aim to propose a\nnew automatic feature crossing method that is efficient enough to\ngenerate high-order cross features, while satisfying our business\nrequirements, i.e., to be simple, opti",
+      "category": "FailureRisk",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "How to address the limitation described: Motivated by the usefulness of high-order cross features and\nthe limitation of existing works, in this paper, we aim to propose a\nnew automatic feature crossing method that is efficient enough to\ngene",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Finally, we show the advantage of AutoCross\nin real-time inference.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Successive mini-batch gradient descent and multi-\ngranularity discretization are proposed to further improve the ef-\nficiency and effectiveness while keeping high simplicity.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "By performing beam\nsearch in a tree-structured space, AutoCross enables efficient gen-\neration of high-order cross features, which is not yet visited by\nexisting works.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "It is shown that AutoCross can significantly\nenhance the performance of both linear and deep models.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Permission to make digital or hard copies of all or part of this work for personal or\nclassroom use is granted without fee provided that copies are not made or distributed\nfor profit or commercial advantage and that copies bear this notice and the full citation\non the first page.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "However, to enumerate all cross features may lead to degraded\nlearning performance, since they may be irrelevant or redundant,\nintroduce noise, and increase the difficulty of learning.",
+      "category": "FailureRisk",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "How to address the limitation described: However, to enumerate all cross features may lead to degraded\nlearning performance, since they may be irrelevant or redundant,\nintroduce noise, and increase the difficulty of learning.",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "In addition to our main\ntarget, i.e., to automate feature crossing with high effectiveness and\nefficiency, we need to consider several more requirements: 1) sim-\nplicity requirement: a tool with high simplicity is user-friendly and\neasy to use.",
+      "category": "TargetConstruct",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "To address these challenges, we present AutoCross, an\nautomatic feature crossing tool especially designed for tabular data\nwith considerable categorical features.",
+      "category": "FailureRisk",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "How to address the limitation described: To address these challenges, we present AutoCross, an\nautomatic feature crossing tool especially designed for tabular data\nwith considerable categorical features.",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "They\nimprove the efficiency and effectiveness of feature crossing\nwhile avoiding careful hyper-parameter setting.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "• Extensive experimental results on both benchmark and real-\nworld business datasets are reported to verify the effective-\nness and efficiency of AutoCross.",
+      "category": "Baseline",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "It can significantly improve\nthe performance of generalized linear models, while keeping\na low inference latency.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    }
+  ]
+}

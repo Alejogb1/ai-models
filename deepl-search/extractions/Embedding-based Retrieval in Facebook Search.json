@@ -1,0 +1,22 @@
+{
+  "source": "Embedding-based Retrieval in Facebook Search",
+  "source_group": "Awesome-ML-Papers/Embeddings",
+  "processed_at": "2026-06-08T12:00:00Z",
+  "agent": "agent03_embeddings_mf_ranking_search_compiled",
+  "concepts": [
+    {
+      "finding": "Unified embedding model: two-tower architecture with triplet loss (margin m critical - 5-10% recall variance). Query encoder incorporates text (char n-grams + word n-grams), location features (+2.20% recall), social embedding features (+1.77% recall). Searcher context is integral - not just text.",
+      "category": "Target Construct",
+      "implication": "Intent/query understanding must incorporate user context (location, social graph, demographics), not just query text. Embedding-based retrieval is a recall optimization problem first, precision optimization second.",
+      "open_question": "What contextual signals are available and relevant for keyword clustering without user-level data?",
+      "testable_hypothesis": "Adding location and domain-specific features to keyword embeddings improves cluster purity over text-only embeddings."
+    },
+    {
+      "finding": "Training data findings: random negatives outperform non-click impressions as negatives (55% recall regression with non-click impressions). Click as positive and impression as positive perform equally. Hard mining strategies improve model's ability to differentiate similar results.",
+      "category": "Data",
+      "implication": "For pairwise/triplet training, random negatives are often better than impression-based negatives because they better approximate the real retrieval distribution. Hard negatives matter for fine-grained differentiation.",
+      "open_question": "For keyword clustering, should negatives be random keywords or carefully chosen near-neighbor keywords?",
+      "testable_hypothesis": "Using 'hard' negatives (keywords from adjacent intent categories) in triplet loss produces better cluster separation than random negatives."
+    }
+  ]
+}

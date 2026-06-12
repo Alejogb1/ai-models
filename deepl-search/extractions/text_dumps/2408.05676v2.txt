@@ -1,0 +1,1400 @@
+Efficiency Unleashed: Inference Acceleration for LLM-based
+Recommender Systems with Speculative Decoding
+Yunjia Xi∗
+xiyunjia@sjtu.edu.cn
+Shanghai Jiao Tong University
+Shanghai, China
+Hangyu Wang∗
+hangyuwang@sjtu.edu.cn
+Shanghai Jiao Tong University
+Shanghai, China
+Bo Chen
+chenbo116@huawei.com
+Huawei Noah’s Ark Lab
+Shanghai, China
+Jianghao Lin†
+chiangel@sjtu.edu.cn
+Shanghai Jiao Tong University
+Shanghai, China
+Menghui Zhu
+zhumenghui1@huawei.com
+Huawei Noah’s Ark Lab
+Shanghai, China
+Weiwen Liu
+liuweiwen8@huawei.com
+Huawei Noah’s Ark Lab
+Shenzhen, China
+Ruiming Tang
+tangruiming@huawei.com
+Huawei Noah’s Ark Lab
+Shenzhen, China
+Zhewei Wei
+zhewei@ruc.edu.cn
+Renmin University of China
+Beijing, China
+Weinan Zhang
+wnzhang@sjtu.edu.cn
+Shanghai Jiao Tong University
+Shanghai, China
+Yong Yu
+yyu@sjtu.edu.cn
+Shanghai Jiao Tong University
+Shanghai, China
+Abstract
+The past few years have witnessed a growing interest in LLM-based
+recommender systems (RSs), although their industrial deployment
+remains in a preliminary stage. Most existing deployments leverage
+LLMs offline as feature enhancers, generating augmented knowl-
+edge for downstream tasks. However, in recommendation scenarios
+with numerous users and items, even offline knowledge generation
+with LLMs demands significant time and computational resources.
+This inefficiency arises from the autoregressive nature of LLMs. A
+promising solution is speculative decoding, a Draft-Then-Verify ap-
+proach that increases the number of tokens generated per decoding
+step. In this work, we first identify recommendation knowledge
+generation as a highly fitting use case for retrieval-based specula-
+tive decoding. Then, we discern its two characteristics: (1) the vast
+number of items and users in RSs leads to retrieval inefficiency,
+and (2) RSs exhibit high diversity tolerance for LLM-generated
+text. Building on these insights, we introduceLossless Acceleration
+via Speculative Decoding for LLM-based Recommender Systems
+(LASER), which features a Customized Retrieval Pool to enhance
+∗Both authors contributed equally to this research.
+†Corresponding authors.
+Permission to make digital or hard copies of all or part of this work for personal or
+classroom use is granted without fee provided that copies are not made or distributed
+for profit or commercial advantage and that copies bear this notice and the full citation
+on the first page. Copyrights for components of this work owned by others than the
+author(s) must be honored. Abstracting with credit is permitted. To copy otherwise, or
+republish, to post on servers or to redistribute to lists, requires prior specific permission
+and/or a fee. Request permissions from permissions@acm.org.
+SIGIR ’25, Padua, Italy
+© 2025 Copyright held by the owner/author(s). Publication rights licensed to ACM.
+ACM ISBN 979-8-4007-1592-1/2025/07
+https://doi.org/10.1145/3726302.3729961
+retrieval efficiency and Relaxed Verification to improve the accep-
+tance rate of draft tokens. LASER achieves a3-5x speedup on public
+datasets and saves about67% of computational resources during the
+online A/B test on a large-scale advertising scenario with lossless
+downstream recommendation performance. Our code is available
+at https://github.com/YunjiaXi/LASER
+CCS Concepts
+• Information systems→ Recommender systems.
+Keywords
+Recommender Systems; Large Language Models; Acceleration
+ACM Reference Format:
+Yunjia Xi, Hangyu Wang, Bo Chen, Jianghao Lin, Menghui Zhu, Weiwen Liu,
+Ruiming Tang, Zhewei Wei, Weinan Zhang, and Yong Yu. 2025. Efficiency
+Unleashed: Inference Acceleration for LLM-based Recommender Systems
+with Speculative Decoding. In Proceedings of the 48th International ACM
+SIGIR Conference on Research and Development in Information Retrieval (SIGIR
+’25), July 13–18, 2025, Padua, Italy. ACM, New York, NY, USA, 12 pages.
+https://doi.org/10.1145/3726302.3729961
+1 Introduction
+Large language models (LLMs) are revolutionizing numerous do-
+mains through their extensive capabilities [5, 37, 56, 64]. In recom-
+mender systems (RSs), integrating LLMs has emerged as a promi-
+nent research focus [13, 25, 28, 47, 54]. Commercial RSs typically
+need to process data pertaining to billions of users and items, ne-
+cessitating low response latency, often within 100 milliseconds [50].
+However, LLMs’ enormous parameters and considerable inference
+latency hinder their deployment into commercial RSs that demand
+arXiv:2408.05676v2  [cs.IR]  29 Apr 2025
+
+===PAGE BREAK===
+
+SIGIR ’25, July 13–18, 2025, Padua, Italy Yunjia Xi et al.
+rapid response. To handle this challenge, industrial solutions com-
+monly involve deploying LLMs offline as feature enhancers [ 32,
+33, 38, 48]. First, LLMs leverage their reasoning capabilities and
+extensive knowledge to generate augmented knowledge for RSs –
+such as user profiles or tags [ 24] and supplementary knowledge
+or summaries for items [35]. This newly generated knowledge is
+subsequently incorporated as additional features into traditional
+recommendation models via text encoder [34, 48] or converting to
+categorical features [4, 14]. This strategy capitalizes on the exten-
+sive knowledge and sophisticated reasoning capabilities of LLMs
+while satisfying the response latency demands of commercial RSs.
+Even when leveraging LLMs offline for knowledge generation,
+the recommendation scenarios, characterized by a vast number
+of users and items, still face significant time and resource con-
+straints. LLMs inherently have low inference efficiency coupled
+with substantial resource demands. The numerous items and users
+in RSs require frequent invocations of LLMs, leading to consider-
+able resource and time consumption. Taking Qwen-7B-Chat [ 2]
+as an example, it requires 4.88s to generate a piece of user prefer-
+ence knowledge of 250 tokens on an NVIDIA V100, and generating
+knowledge for an industrial-scale quantity of users, say 10 million,
+would take roughly 565 GPU days. Furthermore, this knowledge
+generation is a continual process since user preferences may vary
+with their behaviors, necessitating knowledge updates. Moreover,
+prolonged overall generation times can lead to delays in generating
+knowledge for new items and user behaviors, thereby impairing
+recommendation effectiveness. High resource consumption and
+low inference efficiency have emerged as significant obstacles to
+deploying LLMs in RSs. Thus, improving inference efficiency has
+become critical for the effective deployment of LLMs in RSs.
+One of the bottlenecks in LLM inference stems from autore-
+gressive decoding, which demands forwarding through a billion-
+parameter LLM to produce just a single token at each decoding
+step, and these steps cannot be parallelized. Recently, a promis-
+ing direction for accelerating LLMs is speculative decoding, a
+Draft-then-Verify paradigm that increases the number of generated
+tokens per decoding step [ 19, 52]. At each decoding step, it first
+efficiently drafts multiple future tokens via auxiliary models or
+database retrieval and then verifies all these draft tokens in parallel
+with target LLMs to speed up inference [52]. By allowing multiple
+tokens to be generated in a single decoding step, speculative decod-
+ing diminishes the total number of decoding steps, thus improving
+inference efficiency with lossless generation accuracy.
+The knowledge generation based on LLMs in RSs exhibits specific
+properties that make it suitable for retrieval-based speculative de-
+coding. Firstly, recommendation knowledge generation is a continual
+process. As user behaviors evolve and new items are introduced, we
+need to continuously generate new knowledge for new items and
+users’ new behaviors, while we also possess much old knowledge
+about users’ past behaviors and existing items. Secondly, there is
+often reusable content between new and old knowledge. For instance,
+old and new user profiles may overlap due to user preference conti-
+nuity. Therefore, we can utilize old knowledge as a retrieval pool to
+extract draft texts and then use LLMs to verify, thereby accelerating
+the generation of new knowledge, as shown in Figure 1(a).
+Retrievel
+Pool
+LLM-enhanced
+Knowledge
+Retrieval-based
+SpculativeDecoding
+LLMs
+RecTask
+(a) Pipeline (b) Speedup
+Rec
+Data
+Figure 1: Pipeline of retrieval-based speculative decoding for
+RSs and speedup of autoregressive decoding (Vanilla), naive
+retrieval-based speculative decoding (ReSD), and LASER.
+However, in practice, we find that this straightforward applica-
+tion overlooks some traits of RSs, leading to sub-optimal accelera-
+tion performance. Firstly, extensive items and users in RSs result in
+retrieval inefficiency, which impairs acceleration. A retrieval pool
+constructed with existing knowledge from all the users and items
+would be exceedingly large, which would significantly extend re-
+trieval times. Therefore, it is essential to maintain smaller retrieval
+pools with similar knowledge, ensuring both low retrieval time
+and a high acceptance rate of draft tokens. Secondly, RSs exhibit
+high diversity tolerance for text generated by LLMs. Downstream
+recommendation tasks can achieve similar outcomes with texts that
+are not identical but have semantic proximity. In other words, RSs
+do not require perfectly consistent texts, which provides speculative
+decoding with further room for acceleration.
+Based on the above insights, we propose a Lossless Acceleration
+via Speculative Decoding for LLM-based Recommender Systems
+(dubbed LASER). We introduce two key enhancements to the retrieval-
+based speculative decoding for recommendation.Firstly, Customized
+Retrieval Pool is designed to enhance retrieval efficiency. We in-
+troduce collaborative-based and attribute-based retrieval pool con-
+struction schemes, with a binary router to assign the appropriate
+retrieval pool to users and items. These personalized, compact re-
+trieval pools maintain knowledge similarity, thereby guaranteeing
+low retrieval time and high acceptance rates of draft tokens. Next,
+Relaxed Verification is devised to further enhance the acceptance
+rate of draft tokens. Traditional speculative decoding only accepts
+the token with the highest probability. We relax this restriction to
+top-𝑘 probable tokens, increasing the number of accepted tokens
+while maintaining semantic proximity. Additionally, a probability
+threshold is imposed to prevent divergence during generation. The
+contributions of this work can be summarized as follows:
+• We identify the inefficiency of knowledge generation dur-
+ing deploying LLM-based recommendations and propose
+LASER. To the best of our knowledge, this is the first work
+to introduce speculative decoding into LLM-based rec-
+ommendations, promoting the deployment of LLMs in RSs.
+• We first discover two key traits of speculative decoding in
+RSs and implement two enhancements: Customized Re-
+trieval Pool to improve retrieval efficiency and Relaxed
+Verification to increase accepted draft tokens.
+
+===PAGE BREAK===
+
+Efficiency Unleashed: Inference Acceleration for LLM-based Recommender Systems with Speculative Decoding SIGIR ’25, July 13–18, 2025, Padua, Italy
+• LASER achieves 3-5x speedup and during online A/B test
+on a large-scale advertising scenario, it saves about 67% of
+computational resources with lossless recommendation
+performance.
+2 Preliminary Findings
+2.1 Speculative Decoding for Recommendation
+The mainstream Transformer-based LLMs typically adopt autore-
+gressive decoding. With the input token sequence{𝑥1,...𝑥 𝑡}, the
+language modelM generate next token following:
+𝑥𝑡+1∼𝑞𝑡+1 =M(𝑥|𝑥≤𝑡), (1)
+where𝑞𝑡+1 denotes the conditional probability distribution fromM
+and𝑥𝑡+1 is the next token sampled from𝑞𝑡+1. After this,M follows
+the same process to generate the next token. Despite desirable
+generation quality, autoregressive decoding only produces a single
+token per decoding step, making it inefficient and time-consuming.
+To this end, speculative decoding [6, 19, 57] have been proposed
+to generate a sequence of tokens at each decoding step. It is a
+Draft-then-Verify decoding paradigm in which, at each decoding
+step, it first efficiently drafts multiple future tokens and then ver-
+ifies all these tokens in parallel with the target LLM [ 52]. There
+are many strategy for draft generation, e.g., employing a small
+LM [23], retrieving from database [ 19, 57]. Our work mainly fo-
+cuses on retrieval-based draft models, which retrieve drafts from a
+given retrieval pool, since small LMs might lack recommendation
+knowledge and recommendation knowledge generation can pro-
+vide appropriate retrieval pools naturally. Here, we take it as an
+example and delve into its two substeps – drafting and verification.
+Drafting phase is responsible for efficiently drafting multiple
+future tokens. Formally, given an input sequence {𝑥1,...,𝑥 𝑡}, a
+draft model fM is employed, (e.g., a retriever that retrieves relevant
+text from the database) to generate the next𝐾 draft tokens:
+˜𝑥1,..., ˜𝑥𝐾 = Draft(𝑥≤𝑡, fM), (2)
+where ˜𝑥𝑖,𝑖 = 1,...,𝐾 denotes the drafted token generated by fM
+and Draft(·) represents draft generation strategies.
+Verification phase utilizes the target LLM to verify all these
+draft tokens in parallel. With the input sequence{𝑥1,...,𝑥 𝑡} and
+the draft sequence{ ˜𝑥1,..., ˜𝑥𝐾}, the target LLMM calculates𝐾+ 1
+probability distributions simultaneously,
+𝑞𝑖 =M(𝑥≤𝑡, ˜𝑥<𝑖),𝑖 = 1,...,𝐾 + 1. (3)
+Then, each draft token ˜𝑥𝑖 is sequentially verified by a specific cri-
+terion Verify( ˜𝑥𝑖,𝑞𝑖). Typically, greedy verification is adopted for
+retrieval-based speculative decoding via
+˜𝑥𝑖 = arg max𝑞𝑖. (4)
+Only ˜𝑥𝑖 that meets the criterion in Eq (4) is selected as final output,
+i.e.,𝑥𝑡+𝑖 = ˜𝑥𝑖. If a drafted token ˜𝑥𝑐 at position𝑐 fails the verification,
+it will be corrected by distribution𝑞𝑐 from target LLM, i.e.,𝑥𝑡+𝑐←
+arg max𝑞𝑐. All drafted tokens after position 𝑐 will be discarded,
+ensuring quality consistent with the target LLM’s standards.
+The characteristics of recommendation knowledge generation
+make it highly suitable for applying retrieval-based speculative de-
+coding (REST). REST requires a retrieval pool that overlaps with the
+currently generated text. As user behaviors evolve and new items
+are introduced, we need to continuously generate new knowledge
+for new items and users’ new behaviors, resulting in a constant
+stream of old knowledge about users’ past behaviors and existing
+items. Furthermore, there are notable similarities between this old
+knowledge and new knowledge. For instance, parts of old and new
+user profiles may overlap. Consequently, we can leverage old knowl-
+edge to construct retrieval pools and utilize REST to accelerate the
+generation of new knowledge.
+2.2 Finding 1: Retrieval Inefficiency
+According to the above approach, we conduct preliminary exper-
+iments on the MovieLens-10M dataset, following the setting of
+KAR [48], which first employs LLMs to generate recommendation
+knowledge and then adapts the knowledge to the downstream
+tasks. Here, Vicuna-7b-v1.31 is leveraged to generate fine-grained
+user preferences based on user behaviors. To implement retrieval-
+based speculative decoding, we simulate users’ streaming behaviors
+and divide the behaviors into multiple segments. For simplicity,
+the user’s historical behavior{𝑥1,...,𝑥 𝑛} is divided into two seg-
+ments: old history𝑥1,...,𝑥 𝑚 and new history𝑥𝑛−𝑚,...,𝑥 𝑛, where
+(𝑛
+2 <𝑚 <𝑛). Then, Vicuna-7b-v1.3 generates knowledge for all
+the old history with autoregressive decoding, based on which a
+retrieval pool is constructed. During knowledge generation for new
+history, we adopt speculative decoding, which retrieves drafts from
+the retrieval pool and uses Vicuna-7b-v1.3 to validate.
+Under the above conditions, we explore how the token genera-
+tion speed (Gen. Speed) and the proportion of time spent retrieving
+relevant text to the total time (Retrieval Time Ratio) change when
+constructing the retrieval pool with different numbers of old knowl-
+edge samples (ranging from 10 to the maximum number of users) in
+Figure 2. In this figure, generation speed initially rises and then falls
+as the number of knowledge entries in the retrieval pool increases.
+When the retrieval pool is constructed with all users’ old knowl-
+edge, the retrieval time ratio exceeds 20%, causing generation speed
+to drop from its peak of 134.5 token/s to 94.8 token/s, significantly
+affecting the acceleration. When faced with an industrial-scale num-
+ber of users, such as 10 million, the retrieval pool becomes larger,
+which will exacerbate the retrieval inefficiency.
+10 100 500 1k 2k 5k 10k 20k 40k 70k
+Number of Samples in Retrieval Pool
+0
+5
+10
+15
+20
+25
+30Retrieval Time Ratio (%)
+Retrieval Time Ratio
+90
+100
+110
+120
+130
+140
+150
+Gen. Speed (token/s)
+Gen. Speed
+Figure 2: The impact of retrieval pool size.
+Therefore, a large retrieval pool is not always advantageous.
+Although a larger retrieval pool can provide a greater volume of
+1https://huggingface.co/lmsys/vicuna-7b-v1.3
+
+===PAGE BREAK===
+
+SIGIR ’25, July 13–18, 2025, Padua, Italy Yunjia Xi et al.
+pertinent content, it also brings retrieval inefficiency, thereby im-
+pairing acceleration. It is imperative to construct an optimal re-
+trieval pool that maintains low retrieval time while encompassing
+content similar to the text being generated.
+2.3 Finding 2: Diversity Tolerance
+Furthermore, we also investigate the impact of the diversity of
+LLM-generated texts on downstream tasks. Similar to the previous
+experiment, we leverage Vicuna-7b-v1.3 to generate user prefer-
+ence knowledge on MovieLens-10M. However, during generation,
+we sample from the top-𝑘 most likely tokens to create approximate
+but diverse texts. We then adapt the encoding of knowledge from
+BERT to the CTR prediction task in RSs following [48]. Specifically,
+we generate four different sets of user preference knowledge for
+all the users in the dataset. The knowledge is then applied to two
+well-known CTR models, DIN [61] and DCNv2 [45], with their per-
+formance in terms of AUC and Logloss presented in Table 1. In the
+table, "w/o augment" refers to results without knowledge augmen-
+tation, while "knowledge 1" to "knowledge 4" denotes results
+augmented with knowledge generated under different samplings.
+Table 1: Performance comparison between CTR models aug-
+mented by different knowledge.
+Method DIN DCNv2
+AUC LL AUC LL
+w/o augment 0.8163 0.3619 0.8115 0.3663
+knowledge 1 0.8351 0.3469 0.8319 0.3500
+knowledge 2 0.8353 0.3465 0.8314 0.3503
+knowledge 3 0.8347 0.3466 0.8319 0.3499
+knowledge 4 0.8349 0.3470 0.8323 0.3501
+The results in the table indicate that recommendation tasks ex-
+hibit a high diversity tolerance for LLM-generated knowledge texts.
+Compared to models without augmentation, knowledge augmen-
+tation can result in a significant improvement, ranging from 1.5%
+to 2%. However, the performance difference between the diverse
+knowledge texts (knowledge 1-4) applied to downstream tasks is
+less than 0.1%, showing that recommendation tasks are not sensitive
+to the diversity of LLM-generated texts.
+Previously, retrieval-based speculative decoding typically adopts
+greedy verification, which only accepts the token with the highest
+probability to ensure text consistency with autoregressive decoding.
+However, this strict verification limits the acceptance rate of draft
+tokens. Given that downstream tasks in RSs can tolerate diverse
+LLM texts, we can consider relaxing the verification, allowing spec-
+ulative decoding to accept more draft tokens and generate more
+diverse texts, thereby further enhancing the acceleration.
+3 Methodology
+3.1 Overview
+Based on the findings above, we have devised two enhancements
+for retrieval-based speculative decoding in recommendation knowl-
+edge generation. The Customized Retrieval Pool involves creat-
+ing smaller retrieval pools tailored for similar items or users, thereby
+achieving low retrieval time. Relaxed Verification loosens the
+condition of greedy verification, which only accepts the highest
+probability token, to include the top-𝑘 most likely tokens, thereby
+increasing the acceptance rate of draft tokens.
+The workflow of our proposed LASER, illustrated in Figure 3,
+encompasses three stages: customized retrieval pool construction,
+tree-based drafting, and relaxed verification. Before text generation,
+customized retrieval pool construction stage uses previously
+generated recommendation knowledge to build personalized re-
+trieval pools in the form of trie tree [10]. We first divide the users
+and items into different groups and then construct a retrieval pool
+for each group. The subsequent stage, tree-based drafting, re-
+trieves relevant content from the designated retrieval pool when
+generating new knowledge for a specific user or item. This process
+yields a pseudo-sequence from a trie subtree that encapsulates mul-
+tiple potential successor texts with an associated attention mask,
+subsequently validated in parallel by the target LLM. In the re-
+laxed verification stage, we accept tokens from the top-𝑘 highest-
+probability tokens that exceed a certain probability threshold 𝑝.
+This allows more draft tokens to be accepted and prevents diver-
+gence during generation, further improving the generation speed.
+3.2 Customized Retrieval Pool Construction
+As mentioned in Section 2.3, a customized retrieval pool requires
+moderate capacity and internal knowledge similarity. This necessi-
+tates the partition of users and items, with distinct retrieval pools
+assigned to different groups. To maintain knowledge similarity, we
+can incorporate collaborative signals to group similar users and
+items. A common method involves clustering items or users based
+on their embeddings derived from recommendation models trained
+on user-item interactions. However, newly introduced users and
+items may have limited or no interaction records, making it chal-
+lenging to obtain reliable embeddings. Considering that users or
+items with similar attributes may be more alike, their attributes
+can serve as a basis for constructing similar groups. Therefore, we
+design two retrieval pool construction schemes: one based on col-
+laborative signals and the other on attributes. A binary router is
+devised to choose a retrieval pool for each user and item.
+Collaborative-based retrieval pool groups items or users by
+clustering their embeddings containing collaborative signals. Ini-
+tially, a recommendation model is trained on user-item interactions
+(e.g., LightGCN [18]) and subsequently provides related embeddings,
+such as those of IDs and attributes. Given that RSs continuously
+train models for recommendations, we can re-utilize these embed-
+dings. Then clustering algorithms, such as K-means [22], are applied
+to these embeddings to obtain distinct user or item groups. Users or
+items within the same cluster exhibit similarities, thereby ensuring
+that the knowledge generated by LLMs is more homogeneous. This,
+in turn, increases the probability of retrieving relevant texts.
+Attribute-based retrieval pool partitions items or users by
+similar attributes, when well-trained embeddings are lacking. Items
+or users with similar attributes are more likely to exhibit higher sim-
+ilarity, resulting in more consistent knowledge generation by LLMs.
+Thus, items or users with analogous attributes, such as category,
+can be placed in the same group. If the sizes of groups formed based
+on general attributes like category exceed a certain threshold, we
+
+===PAGE BREAK===
+
+Efficiency Unleashed: Inference Acceleration for LLM-based Recommender Systems with Speculative Decoding SIGIR ’25, July 13–18, 2025, Padua, Italy
+Stage 2: Drafting
+User
+ReSD: Global Branch Drafting
+LASER: Tree-based Drafting
+All Users
+User
+Pool 
+User
+loves thriller films
+loves
+thriller
+films
+User  
+User 
+Stage 3: VerificationStage 1: Retrieval Pool Construction
+All Users
+User loves thriller films
+likes
+User lovesthrillerfilms
+likes thrillerfilms .
+loves movies
+ReSD: Strict Verfication
+LASER: Relaxed Verfication
+Single 
+Forward
+Pass
+Single 
+Forward
+Pass
+Old knowledge of
+user  from LLMs
+collaborative
+grouping
+Group 
+Group 
+User
+Pool 
+User
+Pool 
+LASER: Customized Retrieval Pools
+ReSD: Global Retrieval Pool
+attribute
+grouping
+Global
+Retrieval
+Pool
+Old User
+Knowledge
+Input
+Token
+Draft
+Token
+No Need
+to Verify
+Predicted
+Next Token
+Accepted
+Token
+Verify &
+Accept
+Verify &
+Reject
+No Need
+to Verify
+comedy
+films
+comedyfilms
+Output 1 Tokens
+Output 4 Tokens
+User  
+User 
+User 
+User
+Pool 
+Binary
+Router
+Collaborative
+Retrieval
+Pool
+Attribute
+Retrieval
+Pool
+Figure 3: Comparison between naive retrieval-based speculative decoding ReSD (above), and our LASER (below). Here, we
+take users as examples, and the process is applicable to items. Note that the retrieved tree-structured draft is converted into a
+pseudo-sequence for parallel validation, which will be detailed in Section 3.3.
+further subdivide them with additional attributes, e.g., subcategory,
+which is selected by manually crafted rules or decision trees.
+Subsequently, for each item or user in a group, if there is pre-
+viously generated knowledge from LLMs, this knowledge will be
+used to construct a retrieval pool for this group in the form of a
+trie tree [10]. Trie tree is a data structure widely used for efficient
+retrieval and storage, as it efficiently handles prefix matching with
+each node as individual characters or words. Each group maintains
+its own trie tree, where each node represents a token and a path
+from the root node to a leaf node constitutes a branch [57]. These
+branches built with previously generated knowledge mentioned
+above are all permanent branches that would not be eliminated.
+During the generation of new knowledge, the current prompt and
+newly generated text are also relevant to subsequent generations.
+Therefore, we dynamically add the prompt and new content to
+the trie tree as temporary branch for the generation of each
+knowledge. As these additions may not necessarily enhance the
+acceleration of other knowledge generation, the branch will be
+eliminated once the generation is completed.
+After constructing the collaborative-based and attribute-based
+retrieval pools, abinary router is designed to select the appropriate
+retrieval pool for users and items needing knowledge generation. It
+is highly flexible and can support various selection schemes. Based
+on our motivation, the default scheme is to select the collaborative-
+based retrieval pool for items and users with extensive interaction
+histories, while new users and items with few or no interactions
+are assigned to the attribute-based retrieval pool.
+3.3 Tree-based Drafting
+Before generating new knowledge for a user or item, we identify
+the corresponding retrieval pool𝐷 based on their binary router, IDs,
+and attributes. During the knowledge generation, we first retrieve
+the relevant sub-tree from𝐷 based on the current input text, which
+represents multiple potential successor sequences. Next, the pseudo-
+sequence, attention mask matrix, and position IDs for this sub-tree
+are generated to facilitate parallel validation by the target LLM with
+tree attention. Specifically, assuming the current input sequence is
+{𝑥1,...,𝑥 𝑡}, the last𝑛 tokens of the input sequence are adopted as
+a prefix to extract a sub-tree𝑇𝑡 from𝐷 as follows
+𝑇𝑡 = Retrieve(𝐷,{𝑥𝑡−𝑛,...,𝑥 𝑡},𝐾) (5)
+where Retrieve(·) denotes retrieving a sub-tree from the trie tree
+with a prefix, and𝐾 is the maximum length of draft tokens. The
+sub-tree𝑇𝑖 is also a prefix tree, with each branch representing a
+potential successor draft sequence. Short prefixes yield a lot of
+content but may not be highly relevant, while long prefixes ensure
+high relevance but might fail to retrieve any content. Therefore, we
+will dynamically adjust𝑛 during the retrieval process following [57].
+Initially, a relatively large𝑛, i.e., a long prefix, is used to guarantee
+relevance. If the number of retrieved tokens is significantly fewer
+than the maximum length𝐾, we decrease𝑛 to retry the retrieval
+process further until obtaining a substantial number of tokens.
+Conversely, if the number of retrieved tokens exceeds𝐾, the tokens
+with the highest frequency are selected as draft tokens.
+To reduce the number of decoding steps and increase the possi-
+bility of draft tokens being accepted, we aim to validate multiple
+possible draft sequences from the token tree𝑇𝑡 in a single forward
+pass of the target LLM. Thus, we utilize the tree attention [36, 57]
+commonly employed in speculative decoding to validate multiple
+potential draft sequences in parallel, as illustrated in Figure 4. This
+mechanism constructs a pseudo-sequence 𝑆𝑡 ={ ˜𝑥1,..., ˜𝑥𝐾} for
+token tree𝑇𝑡 with a depth-first search algorithm. Note that the
+length of𝑆𝑡 may not always reach the maximum length 𝐾; here,
+we use𝐾 for simplicity. Concurrently, it adjusts the attention mask
+𝑀𝑡 and position IDs𝑃𝑡 so that each node in the token tree can only
+see the preceding nodes on the current branch, ensuring that draft
+sequences from different branches do not interfere with each other.
+
+===PAGE BREAK===
+
+SIGIR ’25, July 13–18, 2025, Padua, Italy Yunjia Xi et al.
+User loves thrillerfilms comedyfilms
+0 1 2 3 2 3
+Pseudo
+Sequence 
+Position
+IDs 
+Tree
+AttentionMask 
+loves
+thriller
+films
+comedy
+films
+Sub Trie Tree 
+User
+Figure 4: Tree attention.
+3.4 Relaxed Verification
+At this stage, the target LLM will input the original input sequence
+{𝑥1,...,𝑥 𝑡}, the pseudo-sequence𝑆𝑡 ={ ˜𝑥1,..., ˜𝑥𝐾}, tree attention
+mask𝑀𝑡 , and position IDs𝑃𝑡 obtained during the drafting phase.
+It then performs a single forward for parallel validation of all the
+draft sequences, yielding conditional probability at each position:
+𝑞𝑖 =M(𝑥≤𝑡, ˜𝑥<𝑖,𝑃𝑡,𝑀𝑡), 𝑖= 1,...,𝐾 + 1, (6)
+where𝑞𝑖 denotes the probability distribution of all the tokens in the
+vocabulary, andM is the target LLM. In strict/greedy verification,
+we start from the first position and check if the token ˜𝑥𝑖 at the
+current position𝑖 equals the token with the highest probability in
+𝑞𝑖 following Eq (4). If they match, we accept the token˜𝑥𝑖; otherwise,
+we reject it. Similarly, if a predecessor node in the token tree𝑇𝑡 is
+rejected, all of its successor nodes will be skipped. We then proceed
+to validate the next feasible branch, ultimately accepting the verified
+branch with the maximum length.
+Since we find that recommendation tasks exhibit a high diversity
+tolerance of LLM-generated knowledge texts in Section 2.3, the
+strict verification could be relaxed to further enhance the genera-
+tion speed. Therefore, we expand the verification criteria from the
+highest probability token to the top-𝑘 probable tokens, i.e.,
+˜𝑥𝑖∈ TopK(𝑞𝑖,𝑘), (7)
+where the function TopK(·) selects the tokens with the top-𝑘 prob-
+abilities in𝑞𝑖. However, our experiments in Section 4.3.1 indicate
+that merely relaxing this constraint can lead to divergent genera-
+tions, where the text generated in this way is significantly longer
+than that with autoregressive decoding. This may occur because
+tokens amongst top-𝑘 probabilities, e.g.,𝑒∈ TopK(𝑞𝑖,𝑘), might still
+have very low actual probabilities 𝑞𝑖(𝑒). Thus, we also impose a
+probability threshold𝑝 to the actual probability and obtain:
+(
+˜𝑥𝑖∈ TopK(𝑞𝑖,𝑘),
+𝑞𝑖( ˜𝑥𝑖) >𝑝, (8)
+where𝑞𝑖( ˜𝑥𝑖) represents the probability of ˜𝑥𝑖 in distribution𝑞𝑖 and
+the token ˜𝑥𝑖 is accepted only if it meets two conditions in Eq (8).
+This relaxed verification enhances the acceptance rate of draft
+tokens by relaxing the highest probability to the top-𝑘 probabilities
+and effectively prevents divergent generations via the probability
+threshold𝑝, which is validated in Section 4.3.1.
+4 Experiment
+To gain more insights into LASER, we tend to address the following
+research questions (RQs) in this section.
+• RQ1: How does LASER perform in speedup and downstream
+tasks compared to other speculative decoding approaches?
+• RQ2: What roles do LASER’s two modules, customized re-
+trieval pool and relaxed verification, play in its performance?
+• RQ3: How compatible is LASER with different LLMs?
+• RQ4: What do the draft tokens accepted by LASER look like?
+• RQ5: What are the performance and costs of deployment?
+4.1 Setup
+4.1.1 Dataset. Our experiments are conducted on two public datasets,
+MovieLens-10M2 and Amazon-Books3. MovieLens-10M (ML-
+10M for short) contains 10 million movie ratings applied to 10,000
+movies by 72,000 users. The ratings are converted into binary labels
+by labeling ratings 4 and 5 as positive and the rest as negative.
+Amazon-Books is the “Books” category of the Amazon Review
+Dataset. We filter out the less-interacted users and items, remaining
+49,391 users and 78,318 items with 5,002,043 interactions. Ratings
+of 5 are regarded as positive and the rest as negative.
+The preprocessing of datasets, including knowledge generation
+and downstream tasks, mainly follows [48]. Additionally, we simu-
+late streaming behaviors and divide the user’s historical behaviors
+into two segments, old and new histories, as mentioned in Sec-
+tion 2.2. All items are randomly divided into two equally sized
+groups: one group as existing items and the other as newly intro-
+duced items. To construct retrieval pools, we first employ LLMs to
+generate old knowledge for users’ old histories and existing items
+with autoregressive decoding. Then, experiments on acceleration
+and downstream tasks are conducted on new history and new items.
+4.1.2 Backbone Framework and Baselines. As LASER is a model-
+agnostic decoding strategy, it can accelerate a wide range of rec-
+ommendation knowledge generation tasks and frameworks. To
+validate LASER’s acceleration performance across different frame-
+works, we select several typical LLM-based deployable recommen-
+dation frameworks, including KAR [48], TRA WL[34], ONCE [32]
+and RLMRec [38]. These frameworks all extract knowledge from
+LLMs to enhance traditional RSs. In knowledge extraction, they
+roughly encompass two major categories of tasks: user and item
+knowledge generation, despite the specific task instructions may
+vary, such as user and item profiling or knowledge extraction.
+We mainly implement naive retrieval-based speculative decoding
+(ReSD) [19] as a baseline because it aligns well with the recommen-
+dation knowledge generation scenario without additional model or
+fine-tuning, and we also verify in Section 4.2.2 that it is essentially
+the SOTA model in this context. This method uses all historical
+knowledge to construct a prefix tree as a global retrieval pool and
+employs greedy verification to ensure that generated texts are con-
+sistent with autoregressive decoding. It also adopts tree attention to
+remove the impact of this mechanism on acceleration. Besides, We
+also compare other representative speculative decoding baselines,
+such as SpecInfer [36], which uses a small model as the drafter;
+2https://grouplens.org/datasets/movielens/10m/
+3https://cseweb.ucsd.edu/~jmcauley/datasets/amazon_v2/
+
+===PAGE BREAK===
+
+Efficiency Unleashed: Inference Acceleration for LLM-based Recommender Systems with Speculative Decoding SIGIR ’25, July 13–18, 2025, Padua, Italy
+EAGLE [26], which employs additional FFN heads for self-drafting;
+and Lookahead [15], which uses Jacobi Iteration for self-drafting.
+To validate our model’s performance on downstream tasks, we
+select a crucial task in RSs, CTR prediction, as the downstream
+task following [34, 48], and choose two representative CTR mod-
+els, DIN [61] and DCNv2 [45]. The knowledge generated from
+the four frameworks mentioned above is first encoded by BERT
+and then adapted to these two models, and we also compare their
+performance with different speedup strategies, LASER and ReSD.
+4.1.3 Evaluation Metrics . For acceleration, we use Gen. Speed ,
+which measures the number of tokens generated per second, and
+Speedup, the ratio of the generation speed of the acceleration scheme
+to that of autoregressive decoding following [57]. During ablation,
+we adapt AAL (average acceptance length), which indicates the
+average number of draft tokens accepted per decoding step, and
+ART (average retrieval time), representing the average time spent
+retrieving drafts from retrieval pool for each piece of knowledge.
+For the downstream task, we employed two commonly used metrics
+in CTR prediction: AUC and Logloss (LL for short) [45, 48, 61].
+4.1.4 Reproducibility. All the acceleration experiments on public
+datasets are conducted on the same NVIDIA RTX 4090 with 24GB
+memory and 64 CPU cores and all results are averaged over the
+same set of test samples. Unless specified, LLMs in our experiments
+refer to Vicuna-7b-v1.3, whose generation speed is 37.4 tokens/s
+with autoregressive decoding. Our binary router assigns users to a
+collaborative-based retrieval pool and items to an attribute-based re-
+trieval pool. The collaborative-based retrieval pool adopts K-means
+clustering with embeddings from LightGCN [18]. The number of re-
+trieval pools ranges from 3 to 10 for both approaches. Each group’s
+retrieval pool consists of the previously generated knowledge of
+the items or users within the group, with the pool size potentially
+controlled via random sampling. The optimal retrieval pool size
+may vary across datasets and frameworks, and a grid search within
+{500, 1000, 2000, 3000, 4000, 5000} is performed for optimal size. As
+for verification, we typically set𝑘 = 2 and𝑝 = 0.1.
+4.2 Overall Performance (RQ1)
+4.2.1 Acceleration and Downstream Performance. These two per-
+formances are two key aspects we need to investigate. First, we
+compare LASER with naive retrieval-based speculative decoding
+(ReSD) on two tasks (user and item knowledge generation) un-
+der four LLM-based recommendation frameworks (KAR, TRAWL,
+ONCE, and RLMRec). Next, we utilize LASER and ReSD to gener-
+ate knowledge for all new user histories and items, adapting this
+knowledge to DIN and DCNv2 according to different frameworks’
+designs. Note that texts generated by ReSD are utilized as a baseline
+for downstream task comparison because ReSD employs strict veri-
+fication, ensuring that its generated results are identical to those
+of autoregressive generation. Therefore, its performance on down-
+stream tasks is also consistent with autoregressive generation. The
+above results are presented in Table 2.
+From the acceleration results, we draw the following observa-
+tions: (i) LASER consistently outperforms ReSD in terms of accel-
+eration across different frameworks and tasks. For instance, in the
+user knowledge generation task of KAR on Amazon-Books, LASER
+achieves an acceleration of 4.77× compared to ReSD’s 1.71×, show-
+casing an improvement of 178%. This demonstrates that the two op-
+timizations of LASER significantly enhance speedup performance
+in generating recommendation knowledge. (ii) The speedup for
+user knowledge generation is more significant than that for item
+knowledge generation, with LASER showing greater improvement
+over ReSD on the user side. LASER achieves an acceleration of
+3.86x-4.92x for users, compared to 2.14x-3.28x for items. This may
+be due to user preferences continuity, resulting in higher similarity
+between old and new user knowledge.
+From the downstream performance, we make the following ob-
+servations: (i) Knowledge generated by LLMs significantly enhances
+downstream task performance, with the extent of enhancement
+varying across frameworks and datasets. For instance, on ML-10M,
+knowledge from KAR provides a 2.3% improvement in AUC for DIN.
+(ii) Across different frameworks, datasets, and backbone CTR mod-
+els, the performance difference between knowledge generated by
+LASER and ReSD on downstream tasks is negligible. This indicates
+that LASER can maintain the performance of downstream tasks
+while providing significant acceleration of knowledge generation.
+4.2.2 Comparison with Other Speculative Decoding Methods. To
+validate the effectiveness of our LASER in acceleration, we com-
+pare several representative speculative decoding baselines. These
+include SpecInfer [36], which uses a small model as the drafter;
+Lookahead [15], which employs Jacobi Iteration for self-drafting;
+REST (i.e., ReSD) [19], a retrieval-based method. We also include the
+best-performing model in speculative decoding benchmarks [52],
+EAGLE [26], which utilizes additional FFN heads and fine-tuning.
+With KAR as the backbone framework, we evaluate these baselines
+alongside LASER on user and item knowledge generation tasks
+across MovieLens-10M and Amazon-Books datasets (represented
+as ML-item, ML-user, AMZ-item, and AMZ-user on the x-axis),
+with the acceleration performance presented in Figure 5.
+The results show that LASER achieves significantly better ac-
+celeration than other methods. Furthermore, the retrieval-based
+method REST often outperforms the SOTA baseline, EAGLE. This in-
+dicates that the recommendation knowledge generation scenario is
+highly suitable for retrieval-based speculative decoding approaches,
+and LASER’s optimizations tailored to recommendation scenarios
+can further enhance speed and resource efficiency.
+ML-item ML-user AMZ-item AMZ-user
+0
+1
+2
+3
+4
+5Speedup
+Lookahead
+SpecInfer
+EAGLE
+REST
+LASER
+Figure 5: Comparison with speculative decoding methods.
+4.3 In-depth Analysis
+4.3.1 Ablation Study (RQ2). To validate the effectiveness of the
+two modules we designed in LASER, Customized Retrieval Pool
+
+===PAGE BREAK===
+
+SIGIR ’25, July 13–18, 2025, Padua, Italy Yunjia Xi et al.
+Table 2: Speedup and downstream performance of naive retrieval-based speculative decoding (ReSD) and LASER.
+Frame-
+work
+Speedup
+Method
+ML-10M Amazon-Books
+Speedup Performance Downstream Performance Speedup Performance Downstream Performance
+User Task Item Task DIN DCNv2 User Task Item Task DIN DCNv2
+Gen. Speed Speedup Gen. Speed SpeedupAUC LL AUC LL Gen. Speed Speedup Gen. Speed SpeedupAUC LL AUC LL
+base / / / / / 0.8163 0.3619 0.8115 0.3663 / / / / 0.8269 0.5041 0.8241 0.5075
+KAR ReSD 94.8 2.53 × 82.8 2.21 × 0.8351 0.3469 0.8319 0.3500 64.3 1.71 × 75.2 2.01 × 0.8360 0.4962 0.8308 0.5000
+LASER 171.3 4.58 × 107.3 2.87 × 0.8349 0.3474 0.8318 0.3500 178.9 4.77 × 123.0 3.28 × 0.8358 0.4965 0.8306 0.4996
+TRAWL ReSD 70.9 1.90 × 81.4 2.18 × 0.8338 0.3485 0.8314 0.3506 82.2 2.19 × 76.9 2.05 × 0.8311 0.4997 0.8301 0.5005
+LASER 164.9 4.41 × 100.5 2.69 × 0.8336 0.3485 0.8314 0.3506 144.6 3.86 × 120.2 3.21 × 0.8311 0.4998 0.8300 0.5005
+ONCE ReSD 68.9 1.84 × 66.3 1.77 × 0.8321 0.3511 0.8283 0.3537 71.7 1.91 × 60.1 1.60 × 0.8337 0.4952 0.8289 0.5016
+LASER 154.9 4.14 × 80.2 2.14 × 0.8319 0.3511 0.8286 0.3529 184.5 4.92 × 100.1 2.67 × 0.8332 0.4956 0.8285 0.5017
+RLMRec ReSD 62.0 1.66× 85.2 2.28 × 0.8301 0.3516 0.8281 0.3534 61.0 1.63 × 56.3 1.50 × 0.8378 0.4904 0.8325 0.4964
+LASER 152.8 4.09 × 113.7 3.04 × 0.8301 0.3515 0.8282 0.3537 150.5 4.01 × 116.8 3.11 × 0.8380 0.4903 0.8327 0.4962
+and Relaxed Verification, we conduct ablation and further analy-
+sis experiments on them. First, we create several variants for the
+Customized Retrieval Pool: GRP utilizes all the old knowledge
+to generate a global retrieval pool, CRP represents our designed
+Customized Retrieval Pool, and RRP employs random grouping
+to create retrieval pools with the same size of CRP. These vari-
+ants are incorporated with greedy verification, whereas RV+GRP,
+LASER, and RV+RRP are their respective versions enhanced by
+Relaxed Verification (RV). We examine the performance of these
+variants and our LASER on user knowledge generation tasks within
+framework KAR, whose results are presented in Table 3.
+Table 3: Ablation of LASER.
+Variants ML-10M Amazon-Books
+AAL ART Gen. Speed SpeedupAAL ART Gen. Speed Speedup
+GRP 6.2 1.019 94.8 2.53 × 5.64 4.120 64.3 1.71 ×
+RRP 5.41 0.383 128.6 3.44 × 5.12 0.181 128.7 3.43 ×
+CRP 5.51 0.121 136.3 3.64 × 5.29 0.218 139.5 3.72 ×
+RV+GRP8.32 1.976 88.7 2.37 × 7.25 7.235 57.4 1.53 ×
+RV+RRP7.41 0.215 162.2 4.34 × 6.63 0.344 155.6 4.15 ×
+LASER 7.54 0.064 171.3 4.58 × 6.76 0.108 178.9 4.77 ×
+Firstly, our designed Customized Retrieval Pool (CRP) signifi-
+cantly enhances generation speed, attributed to CRP’s ability to
+reduce Average Retrieval Time (ART) while maintaining a relatively
+high Average Acceptance Length (AAL), average number of draft
+tokens accepted per decoding step. Compared to the global retrieval
+pool (GRP), CRP drastically reduces retrieval time from retrieval
+pools, and it achieves higher AAL than random grouping retrieval
+pools (RRP) of the same size. This demonstrates that CRP maintains
+moderate capacity and content similarity. Secondly, Relaxed Verifi-
+cation (RV) boosts token acceptance rates, leading to higher AAL
+when combined with any retrieval pool. Although the global pool
+combined with RV (GRP+RV) yields the highest AAL due to its com-
+prehensive content, its large retrieval pool also extends retrieval
+time, thus hindering overall generation speed. Finally, CRP and RV
+complement each other; their combination results in reduced re-
+trieval time and higher token acceptance rates. This synergy allows
+our method, LASER, to achieve a faster generation speed.
+top-1top-ktop-p
+RV
+(a) ML-10M
+450
+475
+500
+525
+550
+575
+600
+Number of Tokens 100
+120
+140
+160
+180
+200
+220
+Gen. Speed (token/s)
+top-1top-ktop-p
+RV
+(b) Amazon-Books
+550
+600
+650
+700
+750
+800
+Number of Tokens 100
+120
+140
+160
+180
+200
+220
+Gen. Speed (token/s)
+Figure 6: Ablation on Relaxed Verification.
+Next, we delve deeper into relaxed verification by designing
+several variants: top-1 employs greedy verification, top-k satisfies
+only Eq (7) by accepting tokens with the highest top- 𝑘 (𝑘 = 2)
+probabilities, and top-p explores the effect of only meeting the
+probability threshold, that is accepting tokens with highest proba-
+bility or absolute probabilities greater than𝑝 (𝑝 = 0.1). RV is our
+designed Relaxed Verification that meets the condition in Eq (8)
+with𝑘 = 2 and𝑝 = 0.1. We investigate the difference in the number
+of generated tokens and generation speed on the user knowledge
+generation task within the framework KAR, as shown in Figure 6.
+The results show that compared to the original top-1, both top-k,
+top-p, and RV significantly enhance generation speed. However, top-
+k suffers from divergent generation issues, leading to a substantial
+increase in the number of generated tokens. This ultimately length-
+ens the total generation time, sometimes surpassing that of top-1,
+thus failing to achieve practical acceleration. Top-p’s performance
+is inconsistent; it causes divergent generation in Amazon-Books,
+whereas in ML-10M, the length of the generated text is notably
+shortened. By combining these approaches, RV achieves a simi-
+lar length of text generated to that of top-1 while maintaining a
+generation speed similar to top-k.
+4.3.2 Case Study (RQ4). To investigate which draft tokens LASER
+actually accepts, we randomly select a user from the ML-10M
+dataset and employ Vicuna-7b-v1.3 to generate user preference
+knowledge with LASER. We utilize the prompt of KAR [48] to gen-
+erate user knowledge, and the results are as follows, where we use
+| to separate the content generated at each decoding step:
+
+===PAGE BREAK===
+
+Efficiency Unleashed: Inference Acceleration for LLM-based Recommender Systems with Speculative Decoding SIGIR ’25, July 13–18, 2025, Padua, Italy
+Based | on the user’s movie viewing history and other relevant
+factors | , their preferences can be analyzed as follows:
+| 1. Genre: The user seems to enjoy a variety of | genres, including
+action, comedy, drama, and | science fiction | .
+2. Directors/Actors: They have a | preference for movies directed
+by and starring famous directors and | actors such as Quentin
+Tarantino | ,Kevin Spacey, and Morgan | Freeman.
+3. Time Period/Country: The user | enjoys movies from various
+time periods and countries, including | classics from the 1990s
+and newer releases from | the 2000s and 2010s | .
+4. Characters: The user | seems to appreciate movies with | strong,
+memorable | characters, such as those | featuring Ace | Ventura,
+Forrest Gump, and Leon | .
+5. Plot/Theme: The user enjoys movies with | engaging plots and
+themes, | such as those with | elements of mystery, | adventure,
+and drama.
+6 | . Mood/Tone: The user prefers movies | with a variety | of
+moods and tones, including comedies, | dramas | , and thrillers.
+7. Critical Acclaim/A ward: The user seems to appreciate movies
+that | have received critical acclaim and awards, such as | 12
+Monkeys, The Shawshank Redemption, and | The Fugitive. |
+8. Production Quality: The user enjoys movies with | high pro-
+duction quality, as evidenced by their favorites like | Braveheart
+and The Rock. |
+9 | . Soundtrack: The user seems to appreciate movies with mem-
+orable | soundtracks, such as Pulp Fiction | and Speed | .
+It is evident that, in most cases, LASER can generate multiple
+tokens within a single decoding step. Some of these received tokens
+pertain to commonly used phrases, movie titles, and actor/director
+names, while others involve the recombination of key preferences
+related to user interests, e.g., genre and theme.
+4.3.3 Compatibility Study (RQ3). Previous experiments involved
+the compatibility of LASER across different datasets, LLM-based RS
+frameworks, and tasks. This section investigates the compatibility
+of LASER with various backbone LLMs. We select some widely used
+LLMs, e.g., Mistral-7B-instruct-v0.2 [21], ChatGLM2-6B [17],
+Vicuna-7B-v1.5 [59], Qwen-7B-Chat [2], andQwen-1.8B-Chat [2],
+and present LASER’s acceleration performance on user/item knowl-
+edge generation tasks within the framework KAR in Table 4. Note
+that the autoregressive generation speeds of different LLMs vary
+from 30-45 tokens/s; we have omit those speeds due to page limita-
+tions. Firstly, across various backbone LLMs, our proposed LASER
+consistently and significantly outperforms ReSD, demonstrating
+LASER’s strong compatibility with different backbone LLMs. Sec-
+ondly, LASER usually exhibits better acceleration on larger LLMs.
+For instance, on Amazon-Book, LASER achieves accelerations of
+5.10x and 4.69x for Qwen-7B-Chat, while for Qwen-1.8B-Chat, the
+accelerations are 4.77x and 3.98x.
+4.4 Online Deployment (RQ5)
+Our experiments are conducted in Huawei’s commercial advertis-
+ing scenario with tens of millions of users and ads. First, LLMs are
+invoked to analyze ads from diverse aspects, e.g., characteristics,
+Table 4: Speedup comparison between naive retrieval-based
+speculative decoding (ReSD) and LASER with various LLMs.
+Backbone LLM SideSpeedup
+Method
+ML-10M Amazon-Books
+Gen. Speed SpeedupGen. Speed Speedup
+Mistral-7B-Instruct
+user ReSD 66.10 1.60 × 91.4 2.21 ×
+LASER 179.00 4.33× 178.9 4.32 ×
+item ReSD 80.60 1.95 × 59.4 1.43 ×
+LASER 95.30 2.31 × 121.5 2.93 ×
+ChatGLM2-6B
+user ReSD 107.40 2.52 × 89.1 2.10 ×
+LASER 194.70 4.57× 165.0 3.88 ×
+item ReSD 94.30 2.21 × 71.1 1.67 ×
+LASER 106.80 2.51× 117.7 2.77 ×
+Vicuna-7B-v1.5
+user ReSD 101.10 2.67 × 62.4 1.70 ×
+LASER 167.80 4.44× 173.3 4.72 ×
+item ReSD 91.10 2.41 × 83.3 2.27 ×
+LASER 112.20 2.97× 123.9 3.38 ×
+Qwen-7B-Chat
+user ReSD 88.10 2.94 × 69.60 2.33 ×
+LASER 169.00 5.63× 152.40 5.10×
+item ReSD 71.90 2.40 × 68.70 2.30 ×
+LASER 87.10 2.90 × 140.10 4.69×
+Qwen-1.8B-Chat
+user ReSD 78.60 1.92 × 105.90 2.58 ×
+LASER 220.00 5.38× 196.20 4.77×
+item ReSD 112.40 2.75 × 76.20 1.85 ×
+LASER 149.20 3.65× 163.60 3.98×
+potential target audience, and competitive advantages. Then, gener-
+ated knowledge is encoded and applied to a downstream conversion
+rate prediction (CVR) model tailored for this scenario.
+4.4.1 Speedup and Downstream Performance. We first conduct of-
+fline experiments on the industrial dataset from this scenario where
+ReSD and LASER are integrated into the knowledge generation pro-
+cess. With an in-house developed LLM of 7 billion parameters as the
+backbone, ReSD achieves a 1.37x speedup, while LASER achieves
+a 3.23x speedup, with a 135.8% improvement over ReSD. Next,
+we apply knowledge from ReSD and LASER to the downstream
+CVR model, as presented in Table 5. " Base" indicates no knowl-
+edge enhancement, while "LASER-Emb" and "ReSD-Emb" means
+the CVR model directly utilizes the encoding of LLM-generated
+knowledge as features. "LASER-ID" and "ReSD-ID" refer to a com-
+mon optimization approach in the industry, where the encoding
+of generated knowledge is converted into categorical features (ID)
+through clustering and then used in CVR models. Table 5 reveals
+that demonstrates that LASER and RESD exhibit comparable perfor-
+mance on downstream tasks, indicating LASER’s ability to achieve
+lossless speedup and strong potential for industrial deployment.
+Table 5: Downstream performance on industrial scenarios.
+Method Base ReSD-Emb LASER-Emb ReSD-ID LASER-ID
+AUC 0.7354 0.7396 0.7393 0.7409 0.7405
+In a two-week online A/B test in Huawei’s advertising sce-
+nario, 10% users are randomly selected for the experimental group
+and another 10% for the control group, both with LLM knowl-
+edge augmentation. The only difference is that the experimental
+
+===PAGE BREAK===
+
+SIGIR ’25, July 13–18, 2025, Padua, Italy Yunjia Xi et al.
+group is accelerated by LASER, while the control group employs
+the original autoregressive decoding. LASER saves about 67% of
+computational resources per day. The CVR models’ performance
+(such as eCPM) remains consistent, showing no negative impact
+on downstream tasks. Besides, LASER only requires modifying the
+decoding strategy of offline LLMs without affecting online service,
+making it easy to extend to other scenarios.
+4.4.2 Analysis of Additional Overhead. The additional steps of
+LASER is retrieval pool construction, consisting of the grouping
+and Trie construction. In the industrial scenario, the time taken by
+LASER, ReSD, and the original autoregressive decoding (Vanilla)
+for grouping, Trie construction, and knowledge generation on the
+same devices is shown in Table 6.
+This scenario employs attribute-based retrieval pools, so its
+grouping overhead is negligible because it has established groups
+for items and users. Even without them, the grouping cost is also low
+for collaborative-based retrieval pools that require clustering. The
+embeddings for clustering can be sourced from the RS itself without
+additional training. Since recommendation systems continuously
+train new models to generate recommendations, we can simply use
+the embeddings from the most recent model for clustering.
+The cost of Trie construction is also small in relation to the
+knowledge generation time. Since LASER builds smaller parallel re-
+trieval pools, it is much faster than ReSD, which constructs a global
+retrieval pool with the entire dataset. Overall, LASER performs
+significantly better than ReSD in terms of construction time, and
+Trie construction are much faster than knowledge generation. This
+suggests that LASER introduces minimal overhead for deployment.
+Table 6: Overhead comparison.
+Model Grouping Trie construction Knowledge generation
+Vanilla / / 23.17h
+ReSD / 728.93s 16.92h
+LASER <1s 91.31s 7.26h
+5 Related Work
+5.1 LLM-based Recommendation
+In recent years, numerous studies have emerged applying LLMs to
+RSs [8, 13, 25, 28, 31, 47, 54, 64]. Based on how LLMs are utilized,
+LLM-based recommendations can be categorized into two types.
+One type involves employing LLMs directly as recommenders to
+generate recommendations. Generally, zero-shot LLMs underper-
+form compared to traditional models in recommendation tasks [9,
+16, 20, 27, 30, 44, 49]. However, LLMs fine-tuned on recommen-
+dation data often surpass traditional models [ 3, 11, 29, 42, 55, 58,
+60, 63], such as TALLREC [ 3] and ReLLa [ 29]. Despite these ad-
+vancements, deploying LLMs as recommenders poses significant
+challenges due to their high inference latency, which is incompat-
+ible with the low-latency requirements of RSs. The other line of
+work leverages LLMs offline as feature enhancers for traditional
+RSs [12, 32, 34, 35, 38, 39, 43, 46, 48]. Many works [32, 34, 38, 48] rea-
+sons on user and item knowledge and use well-designed adaptor to
+adapt the knowledge to the recommendation tasks. This approach
+avoids LLMs’ high online serving latency, making it the mainstream
+method for integrating LLMs into industrial recommender systems.
+Our work focuses on the latter, a more deployable approach.
+We aim to mitigate the high time and resource consumption when
+using LLMs offline to generate knowledge for large-scale industrial
+RSs, specifically by introducing speculative decoding.
+5.2 Speculative Decoding
+The inference latency of LLMs is a significant obstacle to their
+widespread application. This inefficiency primarily stems from the
+autoregressive nature of LLMs, where only one token is gener-
+ated per decoding step. To accelerate LLMs’ inference, speculative
+decoding has been proposed [ 23, 41, 51]. This method first effi-
+ciently drafts multiple tokens and then utilizes the target LLM
+to verify parallelly, allowing multiple tokens to be generated in a
+single decoding step [52]. Current research focuses on two main
+areas: how to draft and how to verify. The former aims to de-
+sign effective drafters to produce draft tokens meeting the target
+LLMs’ requirements efficiently. This includes retrieving relevant
+text from databases [ 19, 57], generating text with smaller mod-
+els from the same series [ 7, 23], using the target LLM for self-
+drafting [6, 40, 41, 53], and employing knowledge distillation to
+align the target LLM with the drafter [6, 26, 41, 62]. The latter ex-
+plores how to verify more draft sequences to improve the token
+acceptance rate, such as token tree verification [6, 19, 26, 36, 57].
+The above works are primarily focused on accelerating general
+text generation tasks. We find that retrieval-based speculative de-
+coding is particularly suitable for recommendations, and there is
+potential for further improvement in the acceleration of recom-
+mendations. To this end, we have designed two enhancements to
+further improve the performance of speculative decoding.
+6 Conclusion
+In this work, we identify the issue of inference efficiency during
+deploying LLM-based recommendations and introduce specula-
+tive decoding to accelerate recommendation knowledge generation.
+Based on characteristics of speculative decoding in recommenda-
+tions, we design two key optimizations: Customized Retrieval Pool
+to reduce retrieval time and Relaxed Verification to increase the
+number of accepted tokens. Experiments demonstrate that LASER
+achieves a 3-5x speedup with lossless downstream performance.
+LASER can be applied to other domains in information retrieval
+(IR), e.g., knowledge generation in search. Some techniques from
+LASER can also be applied beyond IR, such as relaxed verification
+in cases with high diversity tolerance, e.g., article summarization.
+Acknowledgments
+The Shanghai Jiao Tong University team is supported by National
+Key R&D Program of China (2022ZD0114804), Shanghai Municipal
+Science and Technology Major Project (2021SHZDZX0102) and
+National Natural Science Foundation of China (624B2096, 62322603,
+62177033). The work is also sponsored by Huawei Innovation Re-
+search Program. We thank MindSpore [1] for its partial support.
+The author Yunjia Xi is also supported by Wu Wen Jun Honorary
+Doctoral Scholarship.
+References
+[1] 2020. MindSpore. https://www.mindspore.cn/
+
+===PAGE BREAK===
+
+Efficiency Unleashed: Inference Acceleration for LLM-based Recommender Systems with Speculative Decoding SIGIR ’25, July 13–18, 2025, Padua, Italy
+[2] Jinze Bai, Shuai Bai, Yunfei Chu, Zeyu Cui, Kai Dang, Xiaodong Deng, Yang Fan,
+Wenbin Ge, Yu Han, Fei Huang, et al. 2023. Qwen technical report. arXiv preprint
+arXiv:2309.16609 (2023).
+[3] Keqin Bao, Jizhi Zhang, Yang Zhang, Wenjie Wang, Fuli Feng, and Xiangnan
+He. 2023. Tallrec: An effective and efficient tuning framework to align large
+language model with recommendation. InProceedings of the 17th ACM Conference
+on Recommender Systems. 1007–1014.
+[4] Alexander Brinkmann, Roee Shraga, and Christian Bizer. 2023. Product Attribute
+Value Extraction using Large Language Models. arXiv preprint arXiv:2310.12537
+(2023).
+[5] Sébastien Bubeck, Varun Chandrasekaran, Ronen Eldan, Johannes Gehrke, Eric
+Horvitz, Ece Kamar, Peter Lee, Yin Tat Lee, Yuanzhi Li, Scott Lundberg, et al. 2023.
+Sparks of artificial general intelligence: Early experiments with gpt-4. arXiv
+preprint arXiv:2303.12712 (2023).
+[6] Tianle Cai, Yuhong Li, Zhengyang Geng, Hongwu Peng, Jason D Lee, Deming
+Chen, and Tri Dao. 2024. Medusa: Simple llm inference acceleration framework
+with multiple decoding heads. arXiv preprint arXiv:2401.10774 (2024).
+[7] Charlie Chen, Sebastian Borgeaud, Geoffrey Irving, Jean-Baptiste Lespiau, Lau-
+rent Sifre, and John Jumper. 2023. Accelerating large language model decoding
+with speculative sampling. arXiv preprint arXiv:2302.01318 (2023).
+[8] Jin Chen, Zheng Liu, Xu Huang, Chenwang Wu, Qi Liu, Gangwei Jiang, Yuanhao
+Pu, Yuxuan Lei, Xiaolong Chen, Xingmei Wang, et al. 2023. When large language
+models meet personalization: Perspectives of challenges and opportunities. arXiv
+preprint arXiv:2307.16376 (2023).
+[9] Sunhao Dai, Ninglu Shao, Haiyuan Zhao, Weijie Yu, Zihua Si, Chen Xu, Zhongxi-
+ang Sun, Xiao Zhang, and Jun Xu. 2023. Uncovering ChatGPT’s Capabilities in
+Recommender Systems. arXiv preprint arXiv:2305.02182 (2023).
+[10] Rene De La Briandais. 1959. File searching using variable length keys. In Papers
+presented at the the March 3-5, 1959, western joint computer conference . 295–298.
+[11] Qian Dong, Yiding Liu, Qingyao Ai, Zhijing Wu, Haitao Li, Yiqun Liu, Shuaiqiang
+Wang, Dawei Yin, and Shaoping Ma. 2024. Unsupervised large language model
+alignment for information retrieval via contrastive feedback. In Proceedings of
+the 47th International ACM SIGIR Conference on Research and Development in
+Information Retrieval. 48–58.
+[12] Kounianhua Du, Jizheng Chen, Jianghao Lin, Yunjia Xi, Hangyu Wang, Xinyi Dai,
+Bo Chen, Ruiming Tang, and Weinan Zhang. 2024. DisCo: Towards Harmonious
+Disentanglement and Collaboration between Tabular and Semantic Space for
+Recommendation. arXiv preprint arXiv:2406.00011 (2024).
+[13] Wenqi Fan, Zihuai Zhao, Jiatong Li, Yunqing Liu, Xiaowei Mei, Yiqi Wang, Jiliang
+Tang, and Qing Li. 2023. Recommender systems in the era of large language
+models (llms). arXiv preprint arXiv:2307.02046 (2023).
+[14] Chenhao Fang, Xiaohan Li, Zezhong Fan, Jianpeng Xu, Kaushiki Nag, Evren
+Korpeoglu, Sushant Kumar, and Kannan Achan. 2024. LLM-Ensemble: Optimal
+Large Language Model Ensemble Method for E-commerce Product Attribute
+Value Extraction. In Proceedings of the 47th International ACM SIGIR Conference
+on Research and Development in Information Retrieval . 2910–2914.
+[15] Yichao Fu, Peter Bailis, Ion Stoica, and Hao Zhang. 2024. Break the Sequen-
+tial Dependency of LLM Inference Using Lookahead Decoding. In Forty-first
+International Conference on Machine Learning .
+[16] Yunfan Gao, Tao Sheng, Youlin Xiang, Yun Xiong, Haofen Wang, and Jiawei
+Zhang. 2023. Chat-REC: Towards Interactive and Explainable LLMs-Augmented
+Recommender System. arXiv preprint arXiv:2303.14524 (2023).
+[17] Team GLM, Aohan Zeng, Bin Xu, Bowen Wang, Chenhui Zhang, Da Yin, Dan
+Zhang, Diego Rojas, Guanyu Feng, Hanlin Zhao, et al. 2024. Chatglm: A fam-
+ily of large language models from glm-130b to glm-4 all tools. arXiv preprint
+arXiv:2406.12793 (2024).
+[18] Xiangnan He, Kuan Deng, Xiang Wang, Yan Li, Yongdong Zhang, and Meng
+Wang. 2020. Lightgcn: Simplifying and powering graph convolution network for
+recommendation. In Proceedings of the 43rd International ACM SIGIR conference
+on research and development in Information Retrieval . 639–648.
+[19] Zhenyu He, Zexuan Zhong, Tianle Cai, Jason D Lee, and Di He. 2023. Rest:
+Retrieval-based speculative decoding. arXiv preprint arXiv:2311.08252 (2023).
+[20] Yupeng Hou, Junjie Zhang, Zihan Lin, Hongyu Lu, Ruobing Xie, Julian McAuley,
+and Wayne Xin Zhao. 2024. Large language models are zero-shot rankers for
+recommender systems. In European Conference on Information Retrieval. Springer,
+364–381.
+[21] Albert Q Jiang, Alexandre Sablayrolles, Arthur Mensch, Chris Bamford, De-
+vendra Singh Chaplot, Diego de las Casas, Florian Bressand, Gianna Lengyel,
+Guillaume Lample, Lucile Saulnier, et al . 2023. Mistral 7B. arXiv preprint
+arXiv:2310.06825 (2023).
+[22] K Krishna and M Narasimha Murty. 1999. Genetic K-means algorithm. IEEE
+Transactions on Systems, Man, and Cybernetics, Part B (Cybernetics) 29, 3 (1999),
+433–439.
+[23] Yaniv Leviathan, Matan Kalman, and Yossi Matias. 2023. Fast inference from
+transformers via speculative decoding. In International Conference on Machine
+Learning. PMLR, 19274–19286.
+[24] Chen Li, Yixiao Ge, Jiayong Mao, Dian Li, and Ying Shan. 2023. TagGPT:
+Large Language Models are Zero-shot Multimodal Taggers. arXiv preprint
+arXiv:2304.03022 (2023).
+[25] Lei Li, Yongfeng Zhang, Dugang Liu, and Li Chen. 2023. Large Language Models
+for Generative Recommendation: A Survey and Visionary Discussions. arXiv
+preprint arXiv:2309.01157 (2023).
+[26] Yuhui Li, Fangyun Wei, Chao Zhang, and Hongyang Zhang. 2024. Eagle:
+Speculative sampling requires rethinking feature uncertainty. arXiv preprint
+arXiv:2401.15077 (2024).
+[27] Jianghao Lin, Bo Chen, Hangyu Wang, Yunjia Xi, Yanru Qu, Xinyi Dai, Kangning
+Zhang, Ruiming Tang, Yong Yu, and Weinan Zhang. 2024. ClickPrompt: CTR
+Models are Strong Prompt Generators for Adapting Language Models to CTR
+Prediction. In Proceedings of the ACM on Web Conference 2024 . 3319–3330.
+[28] Jianghao Lin, Xinyi Dai, Yunjia Xi, Weiwen Liu, Bo Chen, Xiangyang Li, Chenxu
+Zhu, Huifeng Guo, Yong Yu, Ruiming Tang, et al . 2023. How Can Recom-
+mender Systems Benefit from Large Language Models: A Survey. arXiv preprint
+arXiv:2306.05817 (2023).
+[29] Jianghao Lin, Rong Shan, Chenxu Zhu, Kounianhua Du, Bo Chen, Shigang Quan,
+Ruiming Tang, Yong Yu, and Weinan Zhang. 2024. Rella: Retrieval-enhanced
+large language models for lifelong sequential behavior comprehension in recom-
+mendation. In Proceedings of the ACM on Web Conference 2024 . 3497–3508.
+[30] Junling Liu, Chao Liu, Renjie Lv, Kang Zhou, and Yan Zhang. 2023. Is ChatGPT
+a Good Recommender? A Preliminary Study. arXiv preprint arXiv:2304.10149
+(2023).
+[31] Peng Liu, Lemei Zhang, and Jon Atle Gulla. 2023. Pre-train, prompt and recom-
+mendation: A comprehensive survey of language modelling paradigm adaptations
+in recommender systems. arXiv preprint arXiv:2302.03735 (2023).
+[32] Qijiong Liu, Nuo Chen, Tetsuya Sakai, and Xiao-Ming Wu. 2024. Once: Boosting
+content-based recommendation with both open-and closed-source large language
+models. In Proceedings of the 17th ACM International Conference on Web Search
+and Data Mining. 452–461.
+[33] Zhenghao Liu, Zulong Chen, Moufeng Zhang, Shaoyang Duan, Hong Wen,
+Liangyue Li, Nan Li, Yu Gu, and Ge Yu. 2024. Modeling User Viewing Flow
+using Large Language Models for Article Recommendation. In Companion Pro-
+ceedings of the ACM on Web Conference 2024 . 83–92.
+[34] Weiqing Luo, Chonggang Song, Lingling Yi, and Gong Cheng. 2024. KELLM-
+Rec: Knowledge-Enhanced Large Language Models for Recommendation. arXiv
+preprint arXiv:2403.06642 (2024).
+[35] Hanjia Lyu, Song Jiang, Hanqing Zeng, Yinglong Xia, and Jiebo Luo. 2023. Llm-
+rec: Personalized recommendation via prompting large language models. arXiv
+preprint arXiv:2307.15780 (2023).
+[36] Xupeng Miao, Gabriele Oliaro, Zhihao Zhang, Xinhao Cheng, Zeyu Wang,
+Zhengxin Zhang, Rae Ying Yee Wong, Alan Zhu, Lijie Yang, Xiaoxiang Shi, et al.
+2024. Specinfer: Accelerating large language model serving with tree-based spec-
+ulative inference and verification. In Proceedings of the 29th ACM International
+Conference on Architectural Support for Programming Languages and Operating
+Systems, Volume 3. 932–949.
+[37] OpenAI. 2023. GPT-4 Technical Report. CoRR abs/2303.08774 (2023). https:
+//doi.org/10.48550/arXiv.2303.08774
+[38] Xubin Ren, Wei Wei, Lianghao Xia, Lixin Su, Suqi Cheng, Junfeng Wang, Dawei
+Yin, and Chao Huang. 2024. Representation learning with large language models
+for recommendation. In Proceedings of the ACM on Web Conference 2024 . 3464–
+3475.
+[39] Yankun Ren, Zhongde Chen, Xinxing Yang, Longfei Li, Cong Jiang, Lei Cheng, Bo
+Zhang, Linjian Mo, and Jun Zhou. 2024. Enhancing Sequential Recommenders
+with Augmented Knowledge from Aligned Large Language Models. InProceedings
+of the 47th International ACM SIGIR Conference on Research and Development in
+Information Retrieval. 345–354.
+[40] Andrea Santilli, Silvio Severino, Emilian Postolache, Valentino Maiorca, Michele
+Mancusi, Riccardo Marin, and Emanuele Rodolà. 2023. Accelerating transformer
+inference for translation via parallel decoding. arXiv preprint arXiv:2305.10427
+(2023).
+[41] Mitchell Stern, Noam Shazeer, and Jakob Uszkoreit. 2018. Blockwise parallel de-
+coding for deep autoregressive models.Advances in Neural Information Processing
+Systems 31 (2018).
+[42] Juntao Tan, Shuyuan Xu, Wenyue Hua, Yingqiang Ge, Zelong Li, and Yongfeng
+Zhang. 2024. Idgenrec: Llm-recsys alignment with textual id learning. In Proceed-
+ings of the 47th International ACM SIGIR Conference on Research and Development
+in Information Retrieval. 355–364.
+[43] Changxin Tian, Binbin Hu, Chunjing Gan, Haoyu Chen, Zhuo Zhang, Li Yu, Ziqi
+Liu, Zhiqiang Zhang, Jun Zhou, and Jiawei Chen. 2024. ReLand: Integrating Large
+Language Models’ Insights into Industrial Recommenders via a Controllable
+Reasoning Pool. In Proceedings of the 18th ACM Conference on Recommender
+Systems. 63–73.
+[44] Hangyu Wang, Jianghao Lin, Xiangyang Li, Bo Chen, Chenxu Zhu, Ruiming
+Tang, Weinan Zhang, and Yong Yu. 2023. FLIP: Towards Fine-grained Alignment
+between ID-based Models and Pretrained Language Models for CTR Prediction.
+arXiv e-prints (2023), arXiv–2310.
+[45] Ruoxi Wang, Rakesh Shivanna, Derek Cheng, Sagar Jain, Dong Lin, Lichan Hong,
+and Ed Chi. 2021. DCN V2: Improved Deep & Cross Network and Practical
+
+===PAGE BREAK===
+
+SIGIR ’25, July 13–18, 2025, Padua, Italy Yunjia Xi et al.
+Lessons for Web-Scale Learning to Rank Systems. In Proceedings of the Web
+Conference 2021. 1785–1797.
+[46] Yuling Wang, Changxin Tian, Binbin Hu, Yanhua Yu, Ziqi Liu, Zhiqiang Zhang,
+Jun Zhou, Liang Pang, and Xiao Wang. 2024. Can Small Language Models be
+Good Reasoners for Sequential Recommendation?. In Proceedings of the ACM on
+Web Conference 2024. 3876–3887.
+[47] Likang Wu, Zhi Zheng, Zhaopeng Qiu, Hao Wang, Hongchao Gu, Tingjia Shen,
+Chuan Qin, Chen Zhu, Hengshu Zhu, Qi Liu, et al . 2023. A Survey on Large
+Language Models for Recommendation. arXiv preprint arXiv:2305.19860 (2023).
+[48] Yunjia Xi, Weiwen Liu, Jianghao Lin, Xiaoling Cai, Hong Zhu, Jieming Zhu, Bo
+Chen, Ruiming Tang, Weinan Zhang, Rui Zhang, et al. 2024. Towards open-world
+recommendation with knowledge augmentation from large language models. In
+Proceedings of the ACM on Recommender Systems .
+[49] Yunjia Xi, Weiwen Liu, Jianghao Lin, Bo Chen, Ruiming Tang, Weinan Zhang, and
+Yong Yu. 2024. MemoCRS: Memory-enhanced Sequential Conversational Recom-
+mender Systems with Large Language Models. arXiv preprint arXiv:2407.04960
+(2024).
+[50] Yunjia Xi, Weiwen Liu, Yang Wang, Ruiming Tang, Weinan Zhang, Yue Zhu,
+Rui Zhang, and Yong Yu. 2023. On-device integrated re-ranking with heteroge-
+neous behavior modeling. In Proceedings of the 29th ACM SIGKDD Conference on
+Knowledge Discovery and Data Mining . 5225–5236.
+[51] Heming Xia, Tao Ge, Peiyi Wang, Si-Qing Chen, Furu Wei, and Zhifang Sui. 2023.
+Speculative decoding: Exploiting speculative execution for accelerating seq2seq
+generation. In Findings of the Association for Computational Linguistics: EMNLP
+2023. 3909–3925.
+[52] Heming Xia, Zhe Yang, Qingxiu Dong, Peiyi Wang, Yongqi Li, Tao Ge, Tianyu
+Liu, Wenjie Li, and Zhifang Sui. 2024. Unlocking efficiency in large language
+model inference: A comprehensive survey of speculative decoding.arXiv preprint
+arXiv:2401.07851 (2024).
+[53] Seongjun Yang, Gibbeum Lee, Jaewoong Cho, Dimitris Papailiopoulos, and Kang-
+wook Lee. 2023. Predictive pipelined decoding: A compute-latency trade-off for
+exact LLM decoding. arXiv preprint arXiv:2307.05908 (2023).
+[54] Junliang Yu, Hongzhi Yin, Xin Xia, Tong Chen, Jundong Li, and Zi Huang. 2023.
+Self-supervised learning for recommender systems: A survey. IEEE Transactions
+on Knowledge and Data Engineering (2023).
+[55] Yang Zhang, Fuli Feng, Jizhi Zhang, Keqin Bao, Qifan Wang, and Xiangnan He.
+2023. Collm: Integrating collaborative embeddings into large language models
+for recommendation. arXiv preprint arXiv:2310.19488 (2023).
+[56] Wayne Xin Zhao, Kun Zhou, Junyi Li, Tianyi Tang, Xiaolei Wang, Yupeng Hou,
+Yingqian Min, Beichen Zhang, Junjie Zhang, Zican Dong, et al. 2023. A survey
+of large language models. arXiv preprint arXiv:2303.18223 (2023).
+[57] Yao Zhao, Zhitian Xie, Chenyi Zhuang, and Jinjie Gu. 2023. Lookahead: An infer-
+ence acceleration framework for large language model with lossless generation
+accuracy. arXiv preprint arXiv:2312.12728 (2023).
+[58] Bowen Zheng, Yupeng Hou, Hongyu Lu, Yu Chen, Wayne Xin Zhao, Ming
+Chen, and Ji-Rong Wen. 2024. Adapting large language models by integrating
+collaborative semantics for recommendation. In 2024 IEEE 40th International
+Conference on Data Engineering (ICDE) . IEEE, 1435–1448.
+[59] Lianmin Zheng, Wei-Lin Chiang, Ying Sheng, Siyuan Zhuang, Zhanghao Wu,
+Yonghao Zhuang, Zi Lin, Zhuohan Li, Dacheng Li, Eric Xing, et al. 2023. Judging
+llm-as-a-judge with mt-bench and chatbot arena. Advances in Neural Information
+Processing Systems 36 (2023), 46595–46623.
+[60] Zhi Zheng, Wenshuo Chao, Zhaopeng Qiu, Hengshu Zhu, and Hui Xiong. 2024.
+Harnessing large language models for text-rich sequential recommendation. In
+Proceedings of the ACM on Web Conference 2024 . 3207–3216.
+[61] Guorui Zhou, Xiaoqiang Zhu, Chenru Song, Ying Fan, Han Zhu, Xiao Ma, Yanghui
+Yan, Junqi Jin, Han Li, and Kun Gai. 2018. Deep Interest Network for Click-
+Through Rate Prediction. In Proceedings of the 24th ACM SIGKDD International
+Conference on Knowledge Discovery and Data Mining . 1059–1068.
+[62] Yongchao Zhou, Kaifeng Lyu, Ankit Singh Rawat, Aditya Krishna Menon, Afshin
+Rostamizadeh, Sanjiv Kumar, Jean-François Kagy, and Rishabh Agarwal. 2023.
+Distillspec: Improving speculative decoding via knowledge distillation. arXiv
+preprint arXiv:2310.08461 (2023).
+[63] Yaochen Zhu, Liang Wu, Qi Guo, Liangjie Hong, and Jundong Li. 2024. Collab-
+orative large language model for recommender systems. In Proceedings of the
+ACM on Web Conference 2024. 3162–3172.
+[64] Yutao Zhu, Huaying Yuan, Shuting Wang, Jiongnan Liu, Wenhan Liu, Chen-
+long Deng, Zhicheng Dou, and Ji-Rong Wen. 2023. Large language models for
+information retrieval: A survey. arXiv preprint arXiv:2308.07107 (2023).

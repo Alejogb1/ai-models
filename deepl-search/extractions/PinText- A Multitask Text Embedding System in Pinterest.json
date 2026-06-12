@@ -1,0 +1,15 @@
+{
+  "source": "PinText- A Multitask Text Embedding System in Pinterest",
+  "source_group": "Awesome-ML-Papers/Embeddings",
+  "processed_at": "2026-06-08T12:00:00Z",
+  "agent": "agent03_embeddings_mf_ranking_search_compiled",
+  "concepts": [
+    {
+      "finding": "Multitask learning framework: joint training of multiple objectives (search ranking, related Pins, board prediction, ads) produces better query/Pin embeddings than single-task. Shared embedding layer with task-specific towers.",
+      "category": "Model Candidate",
+      "implication": "Multitask learning for keyword embeddings can capture multiple facets of intent simultaneously. A keyword might have different intents depending on context (e.g., 'apple' as fruit vs tech).",
+      "open_question": "How to define multiple tasks that jointly improve keyword-intent understanding?",
+      "testable_hypothesis": "Multi-task learned keyword embeddings (e.g., clustering + ranking + classification) outperform single-task embeddings for intent clustering."
+    }
+  ]
+}

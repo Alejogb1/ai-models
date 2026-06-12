@@ -1,0 +1,15 @@
+{
+  "source": "Learning both Weights and Connections for Efficient Neural Networks.pdf",
+  "source_group": "Awesome-ML-Papers/DNN Compression and Acceleration",
+  "processed_at": "2026-06-08",
+  "agent": "agent6_remaining",
+  "concepts": [
+    {
+      "finding": "Network pruning reduces AlexNet parameters by 9x (61M to 6.7M) and VGG-16 by 13x (138M to 10.3M) without accuracy loss via: train to learn important connections, prune unimportant ones, retrain to fine-tune.",
+      "category": "Experiment",
+      "implication": "Most neural network parameters are redundant, suggesting search ranking models can be significantly compressed for deployment.",
+      "open_question": "How does pruning ratio vary across components of a search ranking model (embeddings vs. attention vs. FF layers)?",
+      "testable_hypothesis": "Embedding layers in search ranking models will tolerate higher pruning ratios (>90% sparsity) than attention layers (<70% sparsity) before accuracy degrades."
+    }
+  ]
+}

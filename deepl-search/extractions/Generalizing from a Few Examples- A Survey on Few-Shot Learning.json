@@ -1,0 +1,15 @@
+{
+  "source": "Generalizing from a Few Examples- A Survey on Few-Shot Learning.pdf",
+  "source_group": "Awesome-ML-Papers/Surveys",
+  "processed_at": "2026-06-08",
+  "agent": "agent6_remaining",
+  "concepts": [
+    {
+      "finding": "FSL methods categorized into: data (augment limited supervised experience), model (constrain hypothesis space via parameter sharing, embedding learning), and algorithm (meta-learning, optimization-based).",
+      "category": "Data",
+      "implication": "FSL taxonomy provides a framework for handling new query types with minimal labeled examples, critical for rapidly adapting search to emerging topics.",
+      "open_question": "Which FSL approach is most data-efficient for adapting query intent classifiers to new categories with <10 labeled examples?",
+      "testable_hypothesis": "A meta-learning (MAML) approach for few-shot query intent classification will achieve 85%+ accuracy with only 5 examples per new intent class."
+    }
+  ]
+}

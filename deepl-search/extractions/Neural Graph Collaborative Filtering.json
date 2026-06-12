@@ -1,0 +1,15 @@
+{
+  "source": "Neural Graph Collaborative Filtering",
+  "source_group": "Awesome-ML-Papers/MF",
+  "processed_at": "2026-06-08T12:00:00Z",
+  "agent": "agent_batch_generation",
+  "concepts": [
+    {
+      "finding": "NGCF: collaborative filtering on user-item bipartite graph via GNN. Embedding propagation: user node aggregates features from connected item nodes, and vice versa, through multiple GCN layers. Captures high-order connectivity (3+ hops). Outperforms NCF by 8-15%. Key: explicit modeling of interaction graph structure matters.",
+      "category": "ModelCandidate",
+      "implication": "High-order keyword-intent connectivity via GNN. A keyword connects to an intent via: keyword-document-intent (2-hop) or keyword-keyword-intent (2-hop) or keyword-category-intent (2-hop). Higher hops (keyword1-keyword2-keyword3-intent) capture indirect relationships.",
+      "open_question": "What is the optimal propagation depth (hop count) for keyword-intent graphs? Do higher-order connections improve or dilute intent signal?",
+      "testable_hypothesis": "NGCF-style embedding propagation on keyword-intent bipartite graphs (2-3 layers) captures useful higher-order intent relationships beyond what direct neighbor models capture."
+    }
+  ]
+}

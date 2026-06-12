@@ -1,0 +1,148 @@
+{
+  "source": "neural_oblivious_decision_ensembles_for_deep_learning_on_tabular_data.pdf",
+  "source_group": "Awesome-ML-Papers/CTR-CVR-Prediction",
+  "processed_at": "2026-06-08",
+  "agent": "agent5_final",
+  "concepts": [
+    {
+      "finding": "With an extensive experimental comparison to the leading GBDT\npackages on a large number of tabular datasets, we demonstrate the advantage of\nthe proposed NODE architecture, which outperforms the competitors on most of\nthe tasks.",
+      "category": "Baseline",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "While the importance of deep learning on tabular data is recognized\nby the ML community, and many works address this problem (Zhou & Feng, 2017; Yang et al.,\n2018; Miller et al., 2017; Lay et al., 2018; Feng et al., 2018; Ke et al., 2018), the proposed DNN\napproaches do not consistently outperform t",
+      "category": "Baseline",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Meanwhile, in an important case of heterogenous tabular data, the\nadvantage of DNNs over shallow counterparts remains questionable.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Namely, the state-of-the-art perfor-\nmance in problems with tabular heterogeneous data is often achieved by “shallow” models, such as\ngradient boosted decision trees (GBDT) (Friedman, 2001; Chen & Guestrin, 2016; Ke et al., 2017;\nProkhorenkova et al., 2018).",
+      "category": "Baseline",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "1\n\nPublished as a conference paper at ICLR 2020\nWe introduce Neural Oblivious Decision Ensembles (NODE), a new DNN architecture, designed to\nwork with tabular problems.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "In a large number of experiments, we compare the proposed approach with the lead-\ning GBDT implementations with tuned hyperparameters and demonstrate that NODE outperforms\ncompetitors consistently on most of the datasets.",
+      "category": "Baseline",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Overall, the main contributions of our paper can be summarized as follows:\n1.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Via an extensive experimental evaluation on a large number of datasets, we show that the\nproposed NODE architecture outperforms existing GBDT implementations.",
+      "category": "Baseline",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "As our main experiments, we compare the proposed NODE architecture with two state-of-the-art\nGBDT implementations on a large number of datasets.",
+      "category": "Baseline",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "This ﬁgure shows that deep\nlayers are able to produce important features, even though earlier layers have an advantage because\nof the DenseNet architecture.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Figure 3 (right) clearly shows that there is\nanticorrelation of feature importances and contributions in the ﬁnal response, which implies that the\nmain role of ealier layers is to produce informative features, while the latter layers mostly use them\nfor accurate prediction.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "We treat both ranking problems\nas regression (which corresponds to the pointwise approach to learning-to-rank) (6) Click is a subset\nof data from the 2012 KDD Cup.",
+      "category": "FailureRisk",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "In particular,\nthere is no sufﬁcient evidence that deep learning machinery allows constructing\nmethods that outperform gradient boosting decision trees (GBDT), which are of-\nten the top choice for tabular problems.",
+      "category": "Baseline",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "In this paper, we introduce Neural Obliv-\nious Decision Ensembles (NODE), a new deep learning architecture, designed to\nwork with any tabular data.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "In particular, to the best of our knowledge, there is still no universal DNN approach that was shown\nto systematically outperform the leading GBDT packages (e.g., XGBoost (Chen & Guestrin, 2016)).",
+      "category": "Baseline",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Overall, at the moment, there is no dominant\ndeep learning solution for tabular data problems, and we aim to reduce this gap by our paper.",
+      "category": "FailureRisk",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "The NODE architecture is partially inspired by the recent CatBoost\npackage (Prokhorenkova et al., 2018), which was shown to provide state-of-the-art performance on\na large number of tabular datasets.",
+      "category": "Baseline",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Besides the usage of oblivious decision ta-\nbles, another important design choice is the recent entmax transformation (Peters et al., 2019), which\neffectively performs a ”soft” splitting feature choice in decision trees inside the NODE architecture.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "As discussed in the following sections, these design choices are critical to obtain state-of-the-art\nperformance.",
+      "category": "Baseline",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "We introduce a new DNN architecture for machine learning on tabular data.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    }
+  ]
+}

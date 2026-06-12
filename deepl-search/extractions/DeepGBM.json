@@ -1,0 +1,148 @@
+{
+  "source": "DeepGBM.pdf",
+  "source_group": "Awesome-ML-Papers/CTR-CVR-Prediction",
+  "processed_at": "2026-06-08",
+  "agent": "agent5_final",
+  "concepts": [
+    {
+      "finding": "That is why GBDT has demonstrated its effectiveness in click\nprediction [33], web search ranking [6], and other well-recognized\nprediction tasks [8].",
+      "category": "ModelCandidate",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "In summary, the contributions of this paper are multi-fold:\n• We propose DeepGBM to leverage both categorical and nu-\nmerical features while retaining the ability of efficient online\nupdate, for all kinds of prediction tasks with tabular data, by\ncombining the advantages of GBDT and NN.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "https://doi.org/10.1145/3292500.3330858\n1\nINTRODUCTION\nOnline prediction represents a certain type of tasks playing the\nessential role in many real-world industrial applications, such as\nclick prediction [21, 22, 36, 51] in sponsored search, content ranking\n[1, 6, 7] in Web search, content optimizat",
+      "category": "ModelCandidate",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Research Track Paper\nKDD ’19, August 4–8, 2019, Anchorage, AK, USA\n385\n\n• Extensive experiments show that DeepGBM is an off-the-shelf\nmodel, which can be ready to use in all kinds of prediction\ntasks and achieves state-of-the-art performance.",
+      "category": "Baseline",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "In short, all above experimental results demonstrate that DeepGBM\ncan significantly outperform all kinds of baselines in both offline\nand online scenarios.",
+      "category": "Baseline",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "For example, the feature space\nof the click prediction task in sponsored search usually contains\ncategorical ones like the ad category as well as numerical ones like\nthe textual similarity between the query and the ad.",
+      "category": "Data",
+      "implication": "Relevant for similarity-based retrieval and lookalike targeting",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Therefore, to pursue an effective learning-based model for the\nonline prediction tasks, it becomes a necessity to address two main\nchallenges: (1) how to learn an effective model with tabular input\nspace; and (2) how to adapt the model to the online data generation.",
+      "category": "FailureRisk",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "How to address the limitation described: Therefore, to pursue an effective learning-based model for the\nonline prediction tasks, it becomes a necessity to address two main\nchallenges: (1) how to learn an effective model with tabular input\nsp",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "On one side, GBDT’s main advantage lies in its capability in\nhandling dense numerical features effectively.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "On the other side, NN’s advantages consist of its efficient learning\nover large scale data in online tasks since the batch-mode back-\npropagation algorithm as well as its capability in learning over\nsparse categorical features by the well-recognized embedding struc-\nture [35, 38].",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "To sum up,\ndespite NN can effectively handle sparse categorical features and\nbe adapted to online data generation efficiently, it is still difficult\nto result in an effective model by learning over dense numerical\ntabular features.",
+      "category": "FailureRisk",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "In\na word, while there were continuous efforts in applying GBDT to\nonline prediction tasks, most of them cannot effectively address the\ncritical challenges in terms of how to handle online data generation\nand how to learn over categorical features.",
+      "category": "FailureRisk",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "How to address the limitation described: In\na word, while there were continuous efforts in applying GBDT to\nonline prediction tasks, most of them cannot effectively address the\ncritical challenges in terms of how to handle online data genera",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Although there are many recent works that have employed\nNN into prediction tasks, such as click prediction [22, 36, 51] and\nrecommender systems [9, 10, 32, 47], they all mainly focused on\nthe sparse categorical features, and far less attention has been put\non adopting NN over dense numerical feature",
+      "category": "ModelCandidate",
+      "implication": "Architecture pattern applicable to sequence modeling for user behavior",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "However, since the bucketized outputs will still connect\nto fully connected layers, discretization actually cannot improve\nthe effectiveness in handling numerical features.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "How to address the limitation described: However, since the bucketized outputs will still connect\nto fully connected layers, discretization actually cannot improve\nthe effectiveness in handling numerical features.",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "[50] proposed the soft binning function to simu-\nlate decision trees in NN, which is, however, very inefficient as it\nenumerates all possible decisions.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "How to address the limitation described: [50] proposed the soft binning function to simu-\nlate decision trees in NN, which is, however, very inefficient as it\nenumerates all possible decisions.",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "However, as the online update problem in GBDT is\nnot resolved, these works cannot be efficiently used online.",
+      "category": "FailureRisk",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "How to address the limitation described: However, as the online update problem in GBDT is\nnot resolved, these works cannot be efficiently used online.",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "In fact,\nResearch Track Paper\nKDD ’19, August 4–8, 2019, Anchorage, AK, USA\n386\n\nFacebook also pointed up this problem in their paper [23], for the\nGBDT model in their framework needs to be retrained every day\nto achieve the good online performance.",
+      "category": "FailureRisk",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "As a summary, while there are increasing efforts that explored to\ncombine the advantages of GBDT and NN to build a more effective\nmodel for online prediction tasks, most of them cannot totally\naddress the challenges related to tabular input space and online data\ngeneration.",
+      "category": "FailureRisk",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "How to address the limitation described: As a summary, while there are increasing efforts that explored to\ncombine the advantages of GBDT and NN to build a more effective\nmodel for online prediction tasks, most of them cannot totally\naddress",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "In particular, the same as previous\nworks, CatNN mainly relies on the embedding technology, which\ncan effectively convert the high dimensional sparse vectors into\ndense ones.",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "To improve the efficiency,\nwe propose Leaf Embedding Distillation and Tree Grouping to reduce\n|L| and #NN respectively.",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "(12)\nIn summary, owing to Leaf Embedding Distillation and Tree\nGrouping, GBDT2NN can efficiently distill many trees of GBDT\ninto a compact NN model.",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    }
+  ]
+}

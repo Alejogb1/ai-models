@@ -1,0 +1,646 @@
+entity2rec: Learning User-Item Relatedness from Knowledge
+Graphs for Top-N Item Recommendation
+Enrico Palumbo
+ISMB
+Turin, Italy
+EURECOM
+Sophia Antipolis, France
+palumbo@ismb.it
+Giuseppe Rizzo
+ISMB
+Turin, Italy
+giuseppe.rizzo@ismb.it
+Rapha¨el Troncy
+EURECOM
+Sophia Antipolis, France
+raphael.troncy@eurecom.fr
+ABSTRACT
+Knowledge Graphs have proven to be extremely valuable to rec-
+ommender systems, as they enable hybrid graph-based recommen-
+dation models encompassing both collaborative and content infor-
+mation. Leveraging this wealth of heterogeneous information for
+top-N item recommendation is a challenging task, as it requires the
+ability of eﬀectively encoding a diversity of semantic relations and
+connectivity paterns. In this work, we propose entity2rec, a novel
+approach to learning user-item relatedness from knowledge graphs
+for top-N item recommendation. We start from a knowledge graph
+modeling user-item and item-item relations and we learn property-
+speciﬁc vector representations of users and items applying neural
+language models on the network. Tese representations are used
+to create property-speciﬁc user-item relatedness features, which
+are in turn fed into learning to rank algorithms to learn a global
+relatedness model that optimizes top-N item recommendations. We
+evaluate the proposed approach in terms of ranking quality on
+the MovieLens 1M dataset, outperforming a number of state-of-
+the-art recommender systems, and we assess the importance of
+property-speciﬁc relatedness scores on the overall ranking quality.
+KEYWORDS
+hybrid recommender system, node2vec, knowledge graph embed-
+dings, knowledge graph, neural language models, word2vec, learn-
+ing to rank, linked open data
+1
+INTRODUCTION
+In the last years, research on recommender systems has shown
+that knowledge graphs are beneﬁcial for hybrid recommender sys-
+tems, achieving high ranking quality and eﬀectively tackling typi-
+cal problems of collaborative systems such as data sparsity or new
+items [5, 28]. A line of work focuses on Linked Open Data knowl-
+edge graphs [3], which represent a wealth of freely available multi-
+domain ontological knowledge and have successfully been used in
+the past to build recommender systems [7–9, 13]. Te crucial point
+to leverage knowledge graphs to perform item recommendations
+is to be able to eﬀectively model user-item relatedness from this
+rich heterogeneous network. To this end, it is highly desirable to
+opt for approaches that are able to automatically learn user and
+item representations from an optimization problem on this graph of
+interactions, minimizing the time-consuming endeavour of feature
+engineering and leading to beter performance [2]. At the same
+time, it is also beneﬁcial to use a recommendation model whose
+features have a straight forward interpretation and that can thus
+be easily adapted to a speciﬁc recommendation problem. Last year,
+node2vec, a new approach to eﬀectively perform feature learning
+from networks, which combines a ﬂexible random walk strategy
+with the power of neural language models, has been proposed [11].
+However, this approach is not tailored to knowledge graphs, as
+it does not distinguish among types of entities and of relations,
+and has never been applied to address recommendation problems.
+Starting from this work, in this paper, we introduce entity2rec1, a
+novel approach to measure user-item relatedness for top-N item
+recommendation. Te contributions of the proposed work can be
+summarized as follows: (a) we use a knowledge graph encompass-
+ing both collaborative information from user feedback and item
+information from Linked Open Data; (b) we learn property-speciﬁc
+vector representations of knowledge graph entities in a completely
+unsupervised way via node2vec; (c) we compute property-speciﬁc
+relatedness scores between users and items using the obtained
+vector representations; (d) we combine the property-speciﬁc re-
+latedness scores in a global relatedness score using a supervised
+learning to rank approach optimizing top-N item recommendation;
+(e) we evaluate the eﬀectiveness of the proposed approach with
+respect to four baselines; (f) we remark that, thanks to the explicit
+semantics of the properties of the knowledge graph, the model
+is easily adaptable to speciﬁc recommendation problems, as the
+features have a clear interpretation.
+2
+RELATED WORK
+Recommendations using knowledge graphs: in the past years,
+several works have shown the eﬀectiveness of external knowledge
+resources to enhance the performance of recommender systems.
+In [5, 28] the authors start from a graph-based data model encom-
+passing both user feedback and item relations to generate person-
+alized entity recommendations. In [19, 20] the authors adopt a
+hybrid graph-based data model utilizing Linked Open Data to ex-
+tract metapath-based feature that are fed into a learning to rank
+framework. In [24] the authors propose a content-based recom-
+mender system that automatically learns item representations using
+a feature learning algorithm on a knowledge graph and show the
+eﬀectiveness of the learned representations in an Item-based K-
+Nearest Neighbor method.
+1htps://github.com/MultimediaSemantics/entity2rec
+Feature learning from networks: feature learning from net-
+works is a fundamental step in node and edge classiﬁcation. Re-
+cently, some models have adapted neural language models to net-
+works, resulting in very eﬀective feature learning processes. In gen-
+eral, it has been shown that these methods tend to work beter than
+other dimensionality reduction techniques based on matrix factor-
+ization approaches [11]. In Deep Walk [21], the authors learn node
+representations by simulating random walks on a graph, generat-
+ing sequences that are successively processed by a neural language
+model. In [11], the authors propose node2vec, an improvement over
+Deep Walk, as it adopts a more ﬂexible and sophisticated random
+walk exploration strategy.
+Learning to rank: learning to rank consists in applying machine
+learning algorithms to learn a ranking function from training data.
+In this work, we focus on listwise methods, i.e. learning algo-
+rithms that are able to directly optimize ranking accuracy met-
+rics from training data. More in detail, we use Adarank [27] and
+LambdaMart [4]. Adarank is based on boosting, weak learners are
+iteratively trained to correct the errors of the previous iteration
+and ﬁnally combined together in a linear model. Adarank avoids
+the problem of the discontinuity of ranking accuracy metrics by
+optimizing an upper bound of the actual loss function. LambdaMart
+is the combination of LambdaRank and the boosted tree method
+MART [10]. Te key idea is to optimize the loss function by directly
+modeling its gradients estimates with respect to the model scores.
+3
+APPROACH
+3.1
+Knowledge Graph
+In this work, a knowledge graph is deﬁned as a set K = (E,R,O)
+where E is the set of entities, R ⊂ExΓxE is a set of typed relations
+between entities and O is an ontology. Te ontology O deﬁnes
+the set of relation types (‘properties’) Γ, the set of entity types Λ,
+assigns entities to their type O : e ∈E →Λ and entity types to their
+related properties O : ϵ ∈Λ →Γϵ ⊂Γ. Knowledge graph edges are
+thus triples (i,p, j) ∈R where i ∈E and j ∈E are entities and p ∈Γ
+is a property. In our model, entities include users u ∈U ⊂E and
+items i ∈I ⊂E \ U . An observed positive feedback between a user
+and an item (rating r ≥4 in this work) is described by a property
+not deﬁned by the ontology O, which we name ‘feedback’. Tus,
+p ∈Γ+
+ϵ = Γϵ ∪‘f eedback′. Troughout this work, the ontology O
+is represented by the DBpedia ontology [1] and we deal with items
+of the type ϵ =‘dbo:Film’. Te properties Γdbo:Film related to an
+entity of the type ‘Film’ are available online2.
+3.2
+Property-speciﬁc user-item relatedness
+As mentioned in Sec. 1, node2vec [11] has recently shown to be
+particularly eﬀective at learning vectorial node representations. In
+a nutshell, node2vec works by simulating a random walk on the
+graph, generating sequences of nodes, which are then fed into a neu-
+ral language model (word2vec [18]) as if they were ‘sentences’ of a
+document to learn vector representations of the nodes. From these
+representations, the relatedness between two nodes can easily be
+computed using vector similarity measures. However, in a knowl-
+edge graph diﬀerent properties have diﬀerent semantic values and
+2htp://mappings.dbpedia.org/server/ontology/classes/Film
+feedback
+Kill_Bill_Vol.2
+director
+Quentin_Tarantino
+The_Hateful_Eight
+starring
+Samuel_L._Jackson
+Flubber
+starring
+Robin_Williams
+Mrs._Doubtfire
+Jane
+Mark
+Emma
+Jane
+Mark
+Emma
+Mrs._Doubtfire
+Flubber
+Kill_Bil_Vol.2
+The_Hateful_Eight
+Robin_Williams
+Flubber
+xfeedback
+xstarring
+Samuel_L._Jackson
+ρfeedback(u,i)
+ρstarring(u,i)
+director
+starring
+feedback
+feedback
+feedback
+feedback
+Kill_Bil_Vol.2
+Mrs._Doubtfire
+The_Hateful_Eight
+starring
+feedback
+feedback
+Figure 1: Starting from the knowledge graph K, which con-
+tains users (black), items (orange) and other entities (grey),
+for each property, we generate vector representations xp
+with node2vec. Te vector representations encode the struc-
+ture of the graph. For p = ‘feedback’, we encode collabora-
+tive information, users and items are mapped close together
+in vector space according to their interactions and the relat-
+edness ρf eedback(u,i) can be computed directly. For other
+properties, such asp = ‘starring’, we encode content informa-
+tion, items with similar starring actors are embedded close
+together. Te relatedness ρstarrinд(u,i) has to be computed
+by averaging the distance from itemsi′ liked byu in the past.
+should have diﬀerent weights in judging the relatedness between
+two entities. Films can be related in terms of starring actors and not
+in terms of subject, share the same director but not the same writer,
+and processing the whole knowledge graph altogether neglecting
+the semantics of the properties would not allow to account for this.
+Tus, we start by learning property-speciﬁc vector representation
+of nodes considering one property at the time. For each property
+p ∈Γ+
+ϵ , we deﬁne a subgraph Kp as the set of entities connected by
+the propertyp, i.e. the triples (i,p, j). Note that for properties where
+each entity is connected to more than one entity (e.g. ‘starring’ or
+‘feedback’), Kp can exhibit complex connectivity paterns. Ten,
+for each Kp independently, we learn a mapping xp : e ∈Kp →Rd,
+optimizing the node2vec objective function [11]:
+max
+xp
+Õ
+e ∈Kp
+(−logZe +
+Õ
+ni ∈N (e)
+xp(ni) · xp(e))
+(1)
+where Ze = Í
+v ∈Kp exp(xp(e)·xp(v)) is the per-node partition func-
+tion and is approximated using negative sampling [18], N(e) ∈Kp
+is the neighborhood of the entity e deﬁned by the node2vec random
+walk and the optimization is carried out using stochastic gradient
+ascent over the parameters deﬁning xp. Te optimization atempts
+to maximize the dot product between vectors of the same neigh-
+borhood, i.e. to embed them close together in vector space. Tus,
+from the vector representations xp(e), property-speciﬁc relatedness
+scores can be deﬁned as follows:
+ρp(u,i) =
+(
+s(xp(u),xp(i))
+if p = ‘f eedback′
+1
+|R+(u)|
+Í
+i′∈R+(u) s(xp(i),xp(i′))
+otherwise
+2
+where R+(u) denotes a set of items liked by the user u in the past
+and s denotes a measure of vector similarity (in this work s = cosine
+similarity). Te features include both collaborative and content
+information and have a straight-forward interpretation (Fig. 1).
+When considering p = ‘feedback’, K is reduced to the graph of user-
+item interactions and thus ρf eedback(u,i) models collaborative
+ﬁltering. ρf eedback(u,i) will be high when xf eedback(u) is close
+to the item xf eedback(i) in vector space, i.e. when i has been
+liked by users who have liked the same items of u in the past
+and are thus tightly connected in the Kf eedback graph. On the
+other hand, when p corresponds to other properties of the ontology
+O the features encode content information. For instance, if p is
+‘starring’, ρstarrinд(u,i) will be high if xstarrinд(i) is close to items
+xstarrinд(i′), i.e. when i shares starring actors with items that the
+user u has liked in the past. Te hybrid approach is able to tackle
+the ‘new item’ issue, as for a new item with no feedback from users,
+we are still able to compute all the content-based features. For a
+new user u, the scores ρp(u,i) can be computed by averaging the
+ρp(u′,i) over all the other users u′ ∈U .
+3.3
+Global user-item relatedness
+For each user-item pair, we are now able to compute all property-
+speciﬁc relatedness scores ®ρ(u,i) = {ρp(u,i)}p ∈Γ+
+ϵ . We aim to use
+these scores as features of a global user-item relatedness model
+that can be used to provide item recommendation. To this end, we
+deﬁne the global user-item relatedness ρ(u,i;θ) = f (®ρ(u,i);θ) as
+a function f of the property-speciﬁc scores ®ρ(u,i) and of a set of
+parameters θ. Te key idea is that of ﬁnding the parameters θ that
+optimize top-N item recommendation as a supervised learning to
+rank problem [16].
+Training data: given a set of users U = {u1,u2..uN }, each user uk
+is associated with a set of items from feedback data ®ik = {ik1,ik2..ikn(k)}
+where n(k) denotes the number of feedback released by the user
+uk and a set of labels ®yk = {yk1,yk2..ykn(k)} denoting the ground
+truth relevance of items ®ik (e.g. ratings with explicit feedback or
+boolean values with implicit feedback). Te training set is thus
+represented as T = {(uk, ®ik, ®yk)N
+k=1}.
+Ranking function: ρ(u,i;θ) is a ranking function, meaning that,
+for each user uk, the corresponding items ®ik are sorted according to
+its score. More formally, ρ(u,i;θ) induces a permutation of integers
+π(uk, ®ik,θ), corresponding to sorting the list of items ®ik according
+its score.
+Loss: the agreement M(π(uk, ®ik,θ), ®yk) between the permutation
+π(uk, ®ik,θ) induced by ρ(u,i;θ) and the list of ground truth rele-
+vance of items ®yk can be measured by any information retrieval
+metric that measures ranking accuracy, such as P@N, Mean Aver-
+age Precision (MAP), NDCG [22]. From this score, a loss function
+can be easily derived as:
+C(θ) =
+N
+Õ
+k=1
+(1 −M(π(uk, ®ik,θ))
+(2)
+Optimization: the learning process has thus the objective of ﬁnd-
+ing the set of parameters θ that minimize the loss function C over
+the training data:
+ˆθ = arg min
+θ C(θ)
+(3)
+Te exact form of f , of the loss function C, the set of parameters
+θ to optimize and the approach used to optimize the loss function
+depend on the learning to rank algorithm and on the metrics that are
+optimized. In this work, we use Adarank [27] and LambdaMart [27]
+as ranking algorithms and we measure P@N and MAP [22].
+4
+EXPERIMENTAL SETUP
+Dataset: the dataset used for the evaluation of the proposed ap-
+proach is MovieLens 1M3. MovieLens 1M [12] is a popular dataset
+for the evaluation of recommender systems and it contains 1,000,209
+anonymous ratings of approximately 3,900 movies made by 6,040
+MovieLens users. In a previous work [20], MovieLens 1M items
+have been mapped to the corresponding DBpedia entities. We lever-
+age these publicly available mappings to make use of Linked Open
+Data in building the knowledge graph K. Since not every item in
+the Movielens data has a corresponding DBpedia entity, afer this
+mapping we have 948978 ratings, from 6040 users on 3226 items.
+Conﬁguration: ﬁrst, we deﬁne the set of properties p for which
+the features have to be computed. We start from the properties
+associated to the class ‘Film’ by the DBpedia ontology Γdbo:Film
+and to this set we add ‘dct:subject’, which relates an entity to a
+set of possible categories, such as ‘American Films‘. For each of
+these properties, we obtain the subgraph Kp through SPARQL [23]
+queries. Te properties for which we obtain a suﬃcient number of
+triples (> 15) are those reported in Tab. 3. Te subgraph Kf eedback
+is derived from the positive (r ≥4) ratings of the MovieLens 1M
+dataset. Te second part of the conﬁguration consists in deﬁning
+the hyper-parameters of the model, i.e. internal parameters that
+are not explicitly set by the learning process. For what concerns
+node2vec, we optimize the parameters P,Q on validation data, ex-
+perimenting the pairs (P,Q) ∈{(1, 1), (1, 4), (4, 1)}. P, also called
+return parameter, controls the likelihood of returning to a previ-
+ously visited node. Q, also called in-out parameter, controls the
+probability of moving further away from the source node e. By
+playing with (P,Q), node2vec achieves a random walk strategy able
+to approximate a Breadth-First or a Depth-First search. For other
+parameters, we use the conﬁguration obtained in a previous work,
+i.e. a walk length l = 10, a dimension of the embeddings vector
+d = 500, a number of walks per entity n = 500, a context size k = 10
+and a number of epochs η = 5. Another hyper-parameter of the
+proposed approach is the learning to rank model. We experiment
+two listwise algorithms, AdaRank [27] and LambdaMart [4], on val-
+idation data. Te implementation of these models is that provided
+by the sofware library RankLib4.
+Evaluation protocol: we adopt an evaluation protocol that is sim-
+ilar to RelPlusN [25]. We split the ratings in temporal order, using
+80% of data to create a training set and 20% to create a probe set. In
+the training set, we consider ratings r ≥4 as relevant items and the
+rest as not relevant. From the probe set, we sample a 4% of data to
+create a probe validation set and 16% to create a probe test set. Ten,
+from each of these two datasets, items with rating r = 5 are selected
+and considered as relevant and for each user a number N = 100
+of other items not rated by the user are randomly sampled as non-
+relevant examples, creating the validation and the test set. Tis
+3htps://grouplens.org/datasets/movielens/1m/
+4htps://sourceforge.net/p/lemur/wiki/RankLib/
+3
+P,Q
+Ranking model
+P@5
+P@10
+MAP
+1,4
+LambdaMart
+0.0791
+0.0293
+0.1717
+4,1
+LambdaMart
+0.0182
+0.0193
+0.0570
+1,1
+LambdaMart
+0.0174
+0.0188
+0.0565
+1,4
+AdaRank
+0.0134
+0.0098
+0.0278
+4,1
+AdaRank
+0.0078
+0.0083
+0.0286
+1,1
+AdaRank
+0.0109
+0.0098
+0.0358
+Table 1: Results on the validation set of entity2rec for diﬀer-
+ent combinations of hyper-parameters
+Model
+P@5
+P@10
+MAP
+entity2rec
+0.2814
+0.2127
+0.4232
+MostPop
+0.2154
+0.1815
+0.2907
+NMF
+0.1208
+0.1150
+0.1758
+SVD
+0.0543
+0.0469
+0.0888
+ItemKNN
+0.0463
+0.0232
+0.0990
+Table 2: Results on the test set of entity2rec against the base-
+lines
+evaluation protocol allows to avoid the limitations of the TestItems
+protocol, in which only rated items are ranked [26] and that is thus
+very diﬀerent from the context of a real recommender system. Note
+that the eﬀect of this evaluation protocol is that of underestimating
+the quality of the recommendations, as the assumption that all
+unrated items are not relevant is pessimistic. Te set of elements
+liked by a user R+(u) is deﬁned as the items in the training set with
+ratings r = 5. We measure P@5, P@10 and MAP. As baselines,
+we use state-of-the-art collaborative ﬁltering algorithms based on
+Non-Negative Matrix Factorization (NMF) [17], on Singular Value
+Decomposition [15], ItemKNN with baselines [14] and the Most
+Popular Items recommendation strategy, which is known to be
+quite eﬀective on MovieLens due to the power-law distribution of
+user feedback data [6] (see also Tab. XIV in [19]). Te baselines are
+implemented using the surprise python library5.
+5
+RESULTS
+Comparison with state-of-the-art: the hyper-parameter opti-
+mization on validation data shows that LambdaMart performs beter
+than Adarank and that the pair (P,Q) = (1, 4), which corresponds to
+a walk lingering in the neighborhood of the starting node, approxi-
+mating Breadth-First-Search, works beter than the other pairs. Te
+best score, for every metric, is obtained by the pair (P,Q) = (1, 4)
+and the model LambdaMart (Tab. 16). Tus, we evaluate this conﬁg-
+uration on the test set, comparing it to the NMF, SVD, ItemKNN and
+Most Popular Items baselines (Sec. 4), outperforming all of them
+for all the metrics under consideration (Tab. 2).
+Feature selection: one of the strengths of the proposed approach
+is that of using features that have a clear interpretation. In this ex-
+periment, we try to evaluate the importance of the selected features
+ρp(u,i) on the overall ranking quality. To this end, we select one
+feature at the time and we compute the ranking accuracy (Tab. 3),
+observing that the feature ‘feedback’ is by far the best perform-
+ing one. However, including content-based features improves the
+5htp://surprise.readthedocs.io/en/v1.0.2/matrix factorization.html
+6Note that the scores obtained on the test set tend to be higher than those on the
+validation set because the ratio of relevant/non-relevant items is higher in the later.
+Features
+P@5
+P@10
+MAP
+ρdbo:based on
+0.0529
+0.0247
+0.0925
+ρdbo:cinematoдraphy
+0.0386
+0.0290
+0.0794
+ρf eedback
+0.2317
+0.1708
+0.3550
+ρdbo:director
+0.0219
+0.0211
+0.0949
+ρdbo:editinд
+0.0294
+0.0305
+0.0724
+ρdbo:music composer
+0.0077
+0.0040
+0.0493
+ρdbo:narrator
+0.0572
+0.0389
+0.0834
+ρdbo:producer
+0.0119
+0.0241
+0.0498
+ρdbo:starrinд
+0.0128
+0.0372
+0.0728
+ρdct:subject
+0.0285
+0.0326
+0.0688
+ρdbo:writer
+0.0061
+0.0216
+0.0472
+entity2rec
+0.2814
+0.2127
+0.4232
+Table 3: Performance of the proposed approach considering
+one feature at the time
+overall performance of the system, as can be seen by comparing
+‘feedback’ with ‘entity2rec’, which includes all the features. We
+expect this diﬀerence to be even more relevant on other datasets
+aﬀected by a higher sparsity as observed in similar experiments
+with hybrid recommender systems [19, 28]. It is also worth noting
+that ρf eedback outperforms all the collaborative ﬁltering baselines
+of Tab. 2, showing the eﬀectiveness of the proposed approach in
+learning a measure of user-item relatedness even without content
+information.
+6
+CONCLUSIONS
+In this work, we propose entity2rec, a new measure of user-item
+relatedness for top-N item recommendation. Starting from a knowl-
+edge graph, property-speciﬁc relatedness scores are obtained using
+a feature learning approach based on neural language models on
+property-speciﬁc subgraphs and then combined through a learn-
+ing to rank approach to generate a global user-item relatedness
+measure optimizing top-N item recommendations. Tis two-stage
+approach has two major beneﬁts: it allows to conﬁgure the system
+to take into account a speciﬁc property when providing recom-
+mendations (e.g. recommend movies with similar actors) and it
+allows to let the learning to rank algorithm implicitly weight the
+properties to provide recommendations. Te results on the Movie-
+Lens 1M dataset show that the proposed approach outperforms
+commonly used collaborative ﬁltering techniques based on ma-
+trix factorization, nearest neighbors and the Most Popular items
+strategy. From the data to the ranking, the feature engineering
+eﬀort is minimal and the manual intervention is limited to seting
+and conﬁguring hyper-parameters of the learning process. Future
+work will involve a more comprehensive evaluation, comparing
+the model to other hybrid state-of-the-art recommender systems
+on diﬀerent domains and datasets, and in a general improvement of
+the feasibility of the proposed approach in a real recommendation
+scenario (such as computational time, online updates, context of
+the recommendations).
+REFERENCES
+[1] S¨oren Auer, Christian Bizer, Georgi Kobilarov, Jens Lehmann, Richard Cyganiak,
+and Zachary Ives. 2007. Dbpedia: A nucleus for a web of open data. In Te
+semantic web. Springer, 722–735.
+4
+[2] Yoshua Bengio, Aaron Courville, and Pascal Vincent. 2013. Representation
+learning: A review and new perspectives. IEEE transactions on patern analysis
+and machine intelligence 35, 8 (2013), 1798–1828.
+[3] Christian Bizer, Tom Heath, and Tim Berners-Lee. 2009. Linked data-the story so
+far. Semantic Services, Interoperability and Web Applications: Emerging Concepts
+(2009), 205–227.
+[4] Christopher JC Burges. 2010. From ranknet to lambdarank to lambdamart: An
+overview. Learning 11, 23-581 (2010), 81.
+[5] Rose Catherine and William Cohen. 2016. Personalized Recommendations using
+Knowledge Graphs: A Probabilistic Logic Programming Approach. In Proceedings
+of the 10th ACM Conference on Recommender Systems. ACM, 325–332.
+[6] Paolo Cremonesi, Yehuda Koren, and Roberto Turrin. 2010. Performance of
+recommender algorithms on top-n recommendation tasks. In Proceedings of the
+fourth ACM conference on Recommender systems. ACM, 39–46.
+[7] Tommaso Di Noia. 2016. Recommender Systems Meet Linked Open Data. In
+International Conference on Web Engineering. Springer, 620–623.
+[8] Tommaso Di Noia, Roberto Mirizzi, Vito Claudio Ostuni, Davide Romito, and
+Markus Zanker. 2012. Linked open data to support content-based recommender
+systems. In Proceedings of the 8th International Conference on Semantic Systems.
+ACM, 1–8.
+[9] Cristhian Figueroa, Iacopo Vagliano, Oscar Rodr´ıguez Rocha, and Maurizio
+Morisio. 2015. A systematic literature review of Linked Data-based recommender
+systems. Concurrency and Computation: Practice and Experience 27, 17 (2015),
+4659–4684.
+[10] Jerome H Friedman. 2001. Greedy function approximation: a gradient boosting
+machine. Annals of statistics (2001), 1189–1232.
+[11] Aditya Grover and Jure Leskovec. 2016. node2vec: Scalable feature learning for
+networks. In Proceedings of the 22nd ACM SIGKDD International Conference on
+Knowledge Discovery and Data Mining. ACM, 855–864.
+[12] F Maxwell Harper and Joseph A Konstan. 2016. Te movielens datasets: History
+and context. ACM Transactions on Interactive Intelligent Systems (TiiS) 5, 4 (2016),
+19.
+[13] Houda Khrouf and Rapha¨el Troncy. 2013. Hybrid event recommendation using
+linked data and user diversity. In Proceedings of the 7th ACM conference on
+Recommender systems. ACM, 185–192.
+[14] Yehuda Koren. 2010. Factor in the neighbors: Scalable and accurate collaborative
+ﬁltering. ACM Transactions on Knowledge Discovery from Data (TKDD) 4, 1 (2010),
+1.
+[15] Yehuda Koren, Robert Bell, and Chris Volinsky. 2009. Matrix factorization tech-
+niques for recommender systems. Computer 42, 8 (2009).
+[16] Tie-Yan Liu and others. 2009. Learning to rank for information retrieval. Foun-
+dations and Trends® in Information Retrieval 3, 3 (2009), 225–331.
+[17] Xin Luo, Mengchu Zhou, Yunni Xia, and Qingsheng Zhu. 2014. An eﬃcient
+non-negative matrix-factorization-based approach to collaborative ﬁltering for
+recommender systems. IEEE Transactions on Industrial Informatics 10, 2 (2014),
+1273–1284.
+[18] Tomas Mikolov, Ilya Sutskever, Kai Chen, Greg S Corrado, and JeﬀDean. 2013.
+Distributed representations of words and phrases and their compositionality. In
+Advances in neural information processing systems. 3111–3119.
+[19] Tommaso Di Noia, Vito Claudio Ostuni, Paolo Tomeo, and Eugenio Di Sciascio.
+2016. Sprank: Semantic path-based ranking for top-n recommendations using
+linked open data. ACM Transactions on Intelligent Systems and Technology (TIST)
+8, 1 (2016), 9.
+[20] Vito Claudio Ostuni, Tommaso Di Noia, Eugenio Di Sciascio, and Roberto Mirizzi.
+2013. Top-n recommendations from implicit feedback leveraging linked open
+data. In Proceedings of the 7th ACM conference on Recommender systems. ACM,
+85–92.
+[21] Bryan Perozzi, Rami Al-Rfou, and Steven Skiena. 2014. Deepwalk: Online learn-
+ing of social representations. In Proceedings of the 20th ACM SIGKDD international
+conference on Knowledge discovery and data mining. ACM, 701–710.
+[22] David Martin Powers. 2011. Evaluation: from precision, recall and F-measure to
+ROC, informedness, markedness and correlation. Journal of Machine Learning
+Technologies (2011).
+[23] Bastian Qilitz and Ulf Leser. 2008. Qerying distributed RDF data sources with
+SPARQL. In European Semantic Web Conference. Springer, 524–538.
+[24] Jessica Rosati, Petar Ristoski, Tommaso Di Noia, Renato de Leone, and Heiko
+Paulheim. 2016. RDF graph embeddings for content-based recommender systems.
+In CEUR workshop proceedings, Vol. 1673. RWTH, 23–30.
+[25] Alan Said and Alejandro Bellog´ın. 2014. Comparative recommender system
+evaluation: benchmarking recommendation frameworks. In Proceedings of the
+8th ACM Conference on Recommender systems. ACM, 129–136.
+[26] Harald Steck. 2013. Evaluation of recommendations: rating-prediction and
+ranking. In Proceedings of the 7th ACM conference on Recommender systems. ACM,
+213–220.
+[27] Jun Xu and Hang Li. 2007. Adarank: a boosting algorithm for information
+retrieval. In Proceedings of the 30th annual international ACM SIGIR conference
+on Research and development in information retrieval. ACM, 391–398.
+[28] Xiao Yu, Xiang Ren, Yizhou Sun, Qanquan Gu, Bradley Sturt, Urvashi Khandel-
+wal, Brandon Norick, and Jiawei Han. 2014. Personalized entity recommendation:
+A heterogeneous information network approach. In Proceedings of the 7th ACM
+international conference on Web search and data mining. ACM, 283–292.
+5

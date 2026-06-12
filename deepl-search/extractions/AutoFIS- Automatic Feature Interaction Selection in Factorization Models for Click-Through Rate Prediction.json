@@ -1,0 +1,148 @@
+{
+  "source": "AutoFIS- Automatic Feature Interaction Selection in Factorization Models for Click-Through Rate Prediction.pdf",
+  "source_group": "Awesome-ML-Papers/CTR-CVR-Prediction",
+  "processed_at": "2026-06-08",
+  "agent": "agent5_final",
+  "concepts": [
+    {
+      "finding": "CCS CONCEPTS\n• Information systems →Recommender systems;\nKEYWORDS\nRecommendation; Factorization Machine; Feature Selection; Neural\nArchitecture Search\n∗Co-first authors with equal contributions.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "However, it\nis an NP-Hard problem to find the optimal set of open gates for\nmodel performance, as we face an incredibly huge (2C2\nm, with m\nthe number of feature fields, if we only consider 2nd-order feature\ninteractions) space to search.",
+      "category": "FailureRisk",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "How to address the limitation described: However, it\nis an NP-Hard problem to find the optimal set of open gates for\nmodel performance, as we face an incredibly huge (2C2\nm, with m\nthe number of feature fields, if we only consider 2nd-order ",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Offline experiments\non three large-scale datasets (two public benchmarks, one private)\ndemonstrate that AutoFIS can significantly improve various FM\nbased models.",
+      "category": "Baseline",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "AutoFIS has been deployed onto the training plat-\nform of Huawei App Store recommendation service, where a 10-day\nonline A/B test demonstrated that AutoFIS improved the DeepFM\nmodel by 20.3% and 20.1% in terms of CTR and CVR respectively.",
+      "category": "BehavioralTests",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "To automatically learn which feature interactions are essential,\nwe introduce a gate (in open or closed status) for each feature inter-\naction to control whether its output should be passed to the next\nlayer.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Experimental\nresults demonstrate that AutoFIS can significantly improve the CTR\nprediction performance of factorization models on all datasets.",
+      "category": "Experiment",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Experiments also demonstrate that\nimportant 2nd- and 3rd-order feature interactions, identified by\nAutoFIS in factorization machine, can also greatly boost the per-\nformance of current state-of-the-art models, which means we can\nuse a simple model for interaction selection and apply the selection\nre",
+      "category": "Baseline",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Furthermore, a ten-day online A/B test is performed\nin a Huawei App Store recommendation service, where AutoFIS\nyielding recommendation model achieves improvement of CTR\nby 20.3% and CVR by 20.1% over DeepFM, which contributes a\nsignificant business revenue growth.",
+      "category": "BehavioralTests",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Moreover, AutoFIS can also find a set of important high-order\nfeature interactions to boost the performance of existing models\nwithout much computation cost introduced.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Au-\ntoCross [21] is proposed to search over many subsets of candidate\nfeatures to identify effective interactions.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Compared with AutoCross, our\nproposed AutoFIS only needs to perform the search stage once to\nevaluate the importance of all feature interactions, which is much\nmore efficient.",
+      "category": "Experiment",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Inspired by the recent work\nDARTS for neural architecture search, we formulate the problem of\nsearching the effective feature interactions as a continuous search-\ning problem by incorporating architecture parameters.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "There-\nfore, we propose the AutoFIS algorithm to select important feature\ninteractions efficiently.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "We would show\nin the following subsections and Section 4 that how the proposed\nmethod AutoFIS could improve IPNN.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "The way that BN normalizes\nvalues gives an efficient yet effective way to solve the coupling\nproblem of α(i,j) and ⟨ei, ej⟩.",
+      "category": "FailureRisk",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Meanwhile, the accuracy is\nsignificantly improved by removing unimportant 3rd-order fea-\nture interactions, i.e., the relative performance improvement of\nAutoFM(3rd) over FM(3rd) is 0.22% and that of AutoDeepFM(3rd)\nover DeepFM(3rd) is 0.20% in terms of AUC on Avazu.",
+      "category": "Experiment",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "(3) All such performance boost could be achieved with marginal\ntime cost (for example, it takes 24 minutes and 128 minutes for\nAutoDeepFM(3rd) to search important 2nd- and 3rd-order fea-\nture interactions in Avazu and Criteo with a single GPU card).",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "To guaran-\ntee user experience, the overall latency of the above-mentioned\ncandidate selection and ranking is required to be within a few mil-\nliseconds.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "These\nresults demonstrate the magnificent effectiveness of our proposed\nmodel.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "We observe a sharp drop in the performance of the experi-\nmental group, which once more verifies that the improvement of\nonline performance in the experimental group is indeed introduced\nby our proposed model.",
+      "category": "Experiment",
+      "implication": "Applicable to user/item clustering for personalization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    }
+  ]
+}

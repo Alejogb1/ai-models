@@ -1,0 +1,15 @@
+{
+  "source": "CB2CF- A Neural Multiview Content-to-Collaborative Filtering Model for Completely Cold Item Recommendations",
+  "source_group": "Awesome-ML-Papers/MF",
+  "processed_at": "2026-06-08T12:00:00Z",
+  "agent": "agent_batch_generation",
+  "concepts": [
+    {
+      "finding": "CB2CF: neural content-to-collaborative filtering for completely cold items. Learns mapping from content features (text, image) to collaborative embedding space. Cold-start item projected into CF space using content. Once interactions accumulate, transitions to collaborative embedding. Outperforms pure content-based and pure CF for cold-start.",
+      "category": "ModelCandidate",
+      "implication": "Map keyword text content to co-occurrence embedding space via learned projection. Cold keyword: extract text features (char/word n-grams, BERT), project to space where similar warm keywords reside. As co-occurrence accumulates, refine from graph context.",
+      "open_question": "What content features best predict the co-occurrence neighborhood of a keyword? Can we learn a content-to-embedding mapping from warm keywords?",
+      "testable_hypothesis": "A learned content-to-embedding mapping for cold keywords achieves 70%+ of the intent cluster quality of warm keyword embeddings with full co-occurrence data."
+    }
+  ]
+}

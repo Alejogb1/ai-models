@@ -1,0 +1,15 @@
+{
+  "source": "DropoutNet - Addressing Cold Start in Recommender Systems",
+  "source_group": "Awesome-ML-Papers/MF",
+  "processed_at": "2026-06-08T12:00:00Z",
+  "agent": "agent_batch_generation",
+  "concepts": [
+    {
+      "finding": "DropoutNet: neural collaborative filtering that addresses cold-start via input dropout. During training, randomly drops user/item ID features, forcing network to rely on content features. During cold-start inference, ID features unavailable so network uses content features. Simple technique: during training, with probability p, replace input ID with zeros.",
+      "category": "ModelCandidate",
+      "implication": "Dropout training for cold-start keyword embeddings: randomly drop keyword identifier features during training, forcing the model to rely on content features (text, language, entity). At inference for new keywords (no ID embedding), model gracefully falls back to content-based prediction.",
+      "open_question": "What dropout probability for keyword ID features balances warm (contextual) and cold (content-based) performance?",
+      "testable_hypothesis": "DropoutNet-style training (randomly dropping keyword ID features) produces a single keyword-intent model that handles both warm and cold keywords better than separate content-only and context-only models."
+    }
+  ]
+}

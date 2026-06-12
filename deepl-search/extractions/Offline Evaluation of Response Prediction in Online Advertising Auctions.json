@@ -1,0 +1,78 @@
+{
+  "source": "Offline Evaluation of Response Prediction in Online Advertising Auctions.pdf",
+  "source_group": "Awesome-ML-Papers/CTR-CVR-Prediction",
+  "processed_at": "2026-06-08",
+  "agent": "agent5_final",
+  "concepts": [
+    {
+      "finding": "Ofﬂine Evaluation of Response Prediction\nin Online Advertising Auctions\nOlivier Chapelle\nCriteo\nPalo Alto, CA\no.chapelle@criteo.com\nABSTRACT\nClick-through rates and conversion rates are two core ma-\nchine learning problems in online advertising.",
+      "category": "Experiment",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Performance dependent payment models, such as cost-per-\nclick (CPC) and cost-per-conversion (CPA), were introduced\nCopyright is held by the International World Wide Web Conference Com-\nmittee (IW3C2).",
+      "category": "ModelCandidate",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "We present here an empirical eval-\nuation of a metric that is speciﬁcally tailored for auctions\nin online advertising and show that it correlates better than\nstandard metrics with A/B test results.",
+      "category": "Experiment",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Its main forms are\npaid (or sponsored) search – where text ads appear alongside\nsearch results of a web search engine – or display advertising\nwhere advertisers pay publishers for placing graphical ads on\ntheir web pages.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Estimating these probabilities accurately is thus\ncritical, both for paid search [7] and display advertising [1].",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "It values a cer-\ntain action (such as a click or a conversion) with a value v.",
+      "category": "ModelCandidate",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Criteo acts as an intermediary between publishers\nand advertisers by paying publishers on a CPM basis and\n\ngets paid by advertisers whenever there is a click on an ad\n(CPC) or when there is a conversion following that click\n(CPA).",
+      "category": "ModelCandidate",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Finally a scatter plot of the oﬄine / online diﬀerences\nis shown in ﬁgure 2.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "This paper demonstrated empirically\nthat indeed the expected utility achieves better correlations\nwith online results.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Internet\nadvertising and the generalized second-price auction:\nSelling billions of dollars worth of keywords.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    }
+  ]
+}

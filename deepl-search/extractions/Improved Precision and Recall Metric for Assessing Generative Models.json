@@ -1,0 +1,15 @@
+{
+  "source": "Improved Precision and Recall Metric for Assessing Generative Models.pdf",
+  "source_group": "Awesome-ML-Papers/GANs",
+  "processed_at": "2026-06-08",
+  "agent": "agent6_remaining",
+  "concepts": [
+    {
+      "finding": "Proposes improved precision and recall metrics for GANs that separately measure fidelity (quality) and diversity (coverage) using manifold-based estimation rather than single-number scores.",
+      "category": "Evaluation",
+      "implication": "Separating precision and recall for generative models is crucial for understanding tradeoffs. Similarly, search retrieval systems should separately measure precision (relevance) and recall (coverage).",
+      "open_question": "How should precision-recall tradeoffs be measured in search systems where the relevant set is unknown?",
+      "testable_hypothesis": "A search evaluation framework that separately reports precision@k and recall@k will lead to better system design decisions than one reporting only NDCG or MRR."
+    }
+  ]
+}

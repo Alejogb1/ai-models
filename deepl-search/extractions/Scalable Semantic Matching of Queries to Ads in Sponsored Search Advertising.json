@@ -1,0 +1,22 @@
+{
+  "source": "Scalable Semantic Matching of Queries to Ads in Sponsored Search Advertising",
+  "source_group": "Awesome-ML-Papers/Embeddings",
+  "processed_at": "2026-06-08T12:00:00Z",
+  "agent": "agent03_embeddings_mf_ranking_search_compiled",
+  "concepts": [
+    {
+      "finding": "search2vec: Skip-gram over search sessions (queries, ad clicks, link clicks) learning joint query-ad embeddings in 300-d space. Incorporated implicit negatives (skipped ads above clicked ad) and dwell-time weighting. Trained on 9.1B sessions, 126M unique queries, 42.9M ads, 131.7M links via distributed parameter server. 10x faster than single-machine training.",
+      "category": "Model Candidate",
+      "implication": "Joint embedding of queries, ads, and link clicks creates a unified semantic space. Implicit negatives from user behavior (skipped items) provide training signal. Dwell time weighting distinguishes good clicks from accidental clicks.",
+      "open_question": "For keyword-to-intent clustering, what constitutes a 'positive' vs 'negative' signal when user behavior data is limited?",
+      "testable_hypothesis": "Incorporating implicit negatives (keywords from different user-intent categories that were skipped) improves cluster separation compared to random negatives only."
+    },
+    {
+      "finding": "search2vec achieved oAUC 0.7254 and Macro NDCG 0.8303 on editorial query-ad pairs. With dwell time + implicit negatives: oAUC 0.7392, Macro NDCG 0.8569. Online A/B test: search2vec +6.21% CTR, search2vec_dwell,in +10.64% CTR vs baseline.",
+      "category": "Evaluation",
+      "implication": "Editorial judgments of query-ad relevance are a reliable offline evaluation. Online A/B testing on CTR validates offline metrics. Threshold of 0.65 cosine similarity captures most Good/Excellent/P perfect pairs.",
+      "open_question": "What offline evaluation metrics best predict online performance for keyword clustering?",
+      "testable_hypothesis": "NDCG@K on editorial judgments correlates with downstream task performance in keyword-intent clustering products."
+    }
+  ]
+}

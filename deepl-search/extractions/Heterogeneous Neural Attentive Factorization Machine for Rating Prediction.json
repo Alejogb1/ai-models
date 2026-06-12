@@ -1,0 +1,15 @@
+{
+  "source": "Heterogeneous Neural Attentive Factorization Machine for Rating Prediction",
+  "source_group": "Awesome-ML-Papers/Embeddings",
+  "processed_at": "2026-06-08T12:00:00Z",
+  "agent": "agent_batch_generation",
+  "concepts": [
+    {
+      "finding": "Heterogeneous feature interaction model: separate embedding spaces for different feature types (user features, item features, context features). Neural attention weights feature interaction importance. Outperforms DeepFM and AFM on rating prediction. Feature-type-specific embeddings capture richer feature semantics.",
+      "category": "ModelCandidate",
+      "implication": "Different keyword feature types (text, frequency, entity, language, domain) benefit from separate embedding spaces with learned cross-type interactions. Attention weights identify which feature interactions matter most for intent prediction.",
+      "open_question": "What keyword feature types (lexical, statistical, entity, temporal) should have separate embedding spaces?",
+      "testable_hypothesis": "A heterogeneous factorization machine with separate embeddings per keyword feature type outperforms a single embedding space for keyword-intent classification."
+    }
+  ]
+}

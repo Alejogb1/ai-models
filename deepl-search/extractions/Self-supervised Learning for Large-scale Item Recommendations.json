@@ -1,0 +1,15 @@
+{
+  "source": "Self-supervised Learning for Large-scale Item Recommendations",
+  "source_group": "Awesome-ML-Papers/Embeddings",
+  "processed_at": "2026-06-08T12:00:00Z",
+  "agent": "agent_batch_generation",
+  "concepts": [
+    {
+      "finding": "Self-supervised graph learning for recommendation. Contrastive learning on user-item graph: node dropout, edge dropout, random walk augmentation. Maximizes agreement between differently augmented views of same node. Outperforms supervised baselines on recommendation tasks. Data augmentation provides robustness.",
+      "category": "ModelCandidate",
+      "implication": "Self-supervised keyword embedding via graph contrastive learning: augment keyword graph (drop edges, mask nodes) and maximize agreement between augmented views. No labels needed. Edge dropout prevents overfitting to noisy co-occurrences.",
+      "open_question": "What data augmentations (edge dropout, feature masking, node dropout) work best for keyword co-occurrence graphs?",
+      "testable_hypothesis": "Self-supervised contrastive learning on keyword co-occurrence graphs (without labels) produces intent clusters competitive with supervised methods."
+    }
+  ]
+}

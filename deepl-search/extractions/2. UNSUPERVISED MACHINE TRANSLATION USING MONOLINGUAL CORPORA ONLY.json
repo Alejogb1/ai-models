@@ -1,0 +1,15 @@
+{
+  "source": "2. UNSUPERVISED MACHINE TRANSLATION USING MONOLINGUAL CORPORA ONLY.pdf",
+  "source_group": "Awesome-ML-Papers/Neural Machine Translation",
+  "processed_at": "2026-06-08",
+  "agent": "agent6_remaining",
+  "concepts": [
+    {
+      "finding": "Fully unsupervised MT uses denoising autoencoders, shared encoder, and iterative back-translation to translate using only monolingual corpora, achieving 32.8 BLEU on Multi30k En-Fr without parallel data.",
+      "category": "ModelCandidate",
+      "implication": "Unsupervised cross-lingual transfer is possible with shared latent spaces and denoising, applicable to unsupervised query-to-document matching across languages.",
+      "open_question": "Can unsupervised MT techniques enable cross-lingual search retrieval for low-resource language pairs?",
+      "testable_hypothesis": "An unsupervised cross-lingual retrieval model trained only on monolingual corpora will achieve 70%+ of recall of supervised cross-lingual systems."
+    }
+  ]
+}

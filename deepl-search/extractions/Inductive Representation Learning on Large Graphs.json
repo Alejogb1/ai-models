@@ -1,0 +1,15 @@
+{
+  "source": "Inductive Representation Learning on Large Graphs",
+  "source_group": "Awesome-ML-Papers/MF",
+  "processed_at": "2026-06-08T12:00:00Z",
+  "agent": "agent_batch_generation",
+  "concepts": [
+    {
+      "finding": "GraphSAGE: inductive graph embedding that generates embeddings for unseen nodes using learned aggregator functions. Samples fixed-size neighborhoods, aggregates neighbor features (mean, LSTM, pooling). Outperforms transductive methods (DeepWalk, TransE) by 15-30% for unseen node classification. Enables generalization to graphs that evolve over time.",
+      "category": "ModelCandidate",
+      "implication": "Inductive keyword embedding: new keywords with no co-occurrence history can be embedded using their text features and limited neighbors. Aggregator function (trained on existing keywords) generalizes to new keywords. Essential for production systems where new keywords appear daily.",
+      "open_question": "What neighbor sampling strategy (how many neighbors, random vs. weighted) best captures keyword intent from the co-occurrence graph?",
+      "testable_hypothesis": "GraphSAGE inductive keyword embeddings achieve 75%+ of the intent cluster quality of transductive embeddings for new keywords, enabling real-time keyword-to-intent assignment."
+    }
+  ]
+}

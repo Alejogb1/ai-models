@@ -1,0 +1,148 @@
+{
+  "source": "Fashion Outfit Generation for E-commerce 2.pdf",
+  "source_group": "Awesome-ML-Papers/Shopping",
+  "processed_at": "2026-06-08",
+  "agent": "agent5_final",
+  "concepts": [
+    {
+      "finding": "Although we have four images\nfor each item, in these experiments we only use the first image as\nit consistently shows the entire item, from the front, within the\ncontext of an outfit, whilst the other images can focus on close\nups or different angles, and do not follow consistent rules between\nprodu",
+      "category": "Experiment",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "In summary, our contributions are:\n(1) A novel model that uses multi-modal data to generate outfits\nthat can be trained on images in the wild i.e.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "A\nchallenge with this approach is how to use item embeddings to\nmeasure the overall outfit compatibility.",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "How to address the limitation described: A\nchallenge with this approach is how to use item embeddings to\nmeasure the overall outfit compatibility.",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Our method is similar to these\nas we combine multi-modal item embeddings, however we aim not\nto lose information by pooling or padding.",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "How to address the limitation described: Our method is similar to these\nas we combine multi-modal item embeddings, however we aim not\nto lose information by pooling or padding.",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Finally, a global average pooling (GAP) layer averages each re-weighted feature map to calculate a single\nvalue (shown in same colours) and outputs a 512-dimensional image embedding.",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "The majority of the performance\nbenefit came from the text embeddings with visual embeddings\nadding a small improvement.",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "We\nwere able to further break down our results to find that GORDN\noutperformed the control significantly for all templates.",
+      "category": "Baseline",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "any one time, it is difficult for customers to perform an exhaustive\nsearch to find products that can be worn together.",
+      "category": "FailureRisk",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "A common way for people to compose outfits is to first pick\na seed item, such as a patterned shirt, and then find other com-\npatible items.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "[9] combine text and image\nembeddings to create multi-modal item embeddings which are then\ncombined using pooling to create an overall outfit representation.",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "As we are treating hero products and\nstyling products differently, we learn two embeddings in the same\nspace for each item; one for when the item is the hero product,\nz(h)\ni\nand one for when the item is a styling product, z(s)\ni ; which\nis reminiscent of the context specific representations in langu",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "4.4\nTitle and Description Embeddings\nProduct titles typically contain important information, such as the\nbrand and colour.",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Vector representations for each\nword are passed through a simple 1D convolutional layer, followed\nby a max-over-time pooling layer and finally a dense layer, resulting\nin 1024 dimensional embeddings.",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "second and third row) whereas irrelevant activations are ignored (first row).",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Randomly selecting\nnegative samples in this way is common practice in metric learning\nand ranking problems (e.g.",
+      "category": "Experiment",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "We separately train five different\nversions of GORDN using only the textual title and description\nembeddings as input (text), only the visual embeddings (vis), both\ntext and visual embeddings (text + vis), text, visual and category\nembeddings (text + vis + cat), and finally the full set of inputs (t",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Skirts WW\nTops WW\nShoes WW\nBags WW\n0.96\n0.95\n0.93\n0.98\n0.98\n0.95\n0.99\n0.97\n0.92\n0.99\n0.97\n0.96\n0.97\n0.94\n0.93\n0.99\n0.96\n0.92\n0.98\n0.95\n0.91\nFigure 6: Beam search in the context of outfit generation.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "To achieve this we first represented the ASOS outfits\ndataset as a graph where the nodes are items and edge weights are\ndefined by the number of outfits pairs of items are found together\nin.",
+      "category": "Experiment",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Table 3 shows the AUC scores achieved for different combina-\ntions of features.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "We expected our visual embeddings\nto be of poorer quality than those for Polyvore datasets as our\nimages show whole outfits on people as opposed to a photograph\nof the fashion item in isolation.",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    }
+  ]
+}

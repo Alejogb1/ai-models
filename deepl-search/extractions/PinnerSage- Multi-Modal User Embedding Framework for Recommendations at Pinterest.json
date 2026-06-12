@@ -1,0 +1,15 @@
+{
+  "source": "PinnerSage- Multi-Modal User Embedding Framework for Recommendations at Pinterest",
+  "source_group": "Awesome-ML-Papers/MF",
+  "processed_at": "2026-06-08T12:00:00Z",
+  "agent": "agent_batch_generation",
+  "concepts": [
+    {
+      "finding": "PinnerSage: user embedding as a multi-set of \"pins\" (interaction items) via hierarchical clustering (Ward's method). Represents user by multiple centroids rather than single vector. Each centroid captures a distinct interest cluster. Clustering+aggregation over user interaction history produces rich user representation. 6% engagement improvement online.",
+      "category": "ModelCandidate",
+      "implication": "Keyword multi-representation: each keyword belongs to multiple \"intent clusters\" via soft clustering. Keyword embedding as multi-set of cluster centroids rather than single vector. Each centroid captures different intent facet of the keyword.",
+      "open_question": "Should keywords be represented as single intent or multiple intents with strength scores? How many intent clusters per keyword?",
+      "testable_hypothesis": "Multi-centroid keyword representation (PinnerSage-style, each centroid = one intent) captures multi-intent keywords better than single-vector embedding approaches."
+    }
+  ]
+}

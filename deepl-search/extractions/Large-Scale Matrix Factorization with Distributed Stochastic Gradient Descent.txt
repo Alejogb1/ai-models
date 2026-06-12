@@ -1,0 +1,372 @@
+See discussions, stats, and author profiles for this publication at: https://www.researchgate.net/publication/275522425
+Large-Scale Matrix Factorization with Distributed Stochastic Gradient Descent
+Conference Paper · January 2011
+CITATIONS
+6
+READS
+294
+5 authors, including:
+Some of the authors of this publication are also working on these related projects:
+Open Information Extraction View project
+Rainer Gemulla
+Universität Mannheim
+54 PUBLICATIONS   1,918 CITATIONS   
+SEE PROFILE
+Yannis Sismanis
+Google Inc.
+46 PUBLICATIONS   1,350 CITATIONS   
+SEE PROFILE
+Christina Teflioudi
+SAP, Walldorf, Germany
+8 PUBLICATIONS   423 CITATIONS   
+SEE PROFILE
+All content following this page was uploaded by Christina Teflioudi on 27 April 2015.
+The user has requested enhancement of the downloaded file.
+Large-Scale Matrix Factorization
+with Distributed Stochastic Gradient Descent
+Rainer Gemulla
+Max-Planck-Institut f¨ur Informatik
+rgemulla@mpi-inf.mpg.de
+Peter J. Haas
+IBM Almaden Research
+peterh@us.ibm.com
+Yannis Sismanis
+IBM Almaden Research
+syannis@us.ibm.com
+Christina Teﬂioudi
+Max-Planck-Institut f¨ur Informatik
+chteflio@mpi-inf.mpg.de
+Faraz Makari
+Max-Planck-Institut f¨ur Informatik
+fmakari@mpi-inf.mpg.de
+Abstract
+We provide a novel algorithm to approximately factor large matrices with millions
+of rows, millions of columns, and billions of nonzero elements. Our approach
+rests on stochastic gradient descent (SGD), an iterative stochastic optimization
+algorithm. Based on a novel “stratiﬁed” variant of SGD, we obtain a new matrix-
+factorization algorithm, called DSGD, that can be fully distributed and run on
+web-scale datasets using, e.g., MapReduce. DSGD can handle a wide variety of
+matrix factorizations and has good scalability properties.
+1
+Introduction
+As Web 2.0 and enterprise-cloud applications proliferate, data mining algorithms need to be
+(re)designed to handle web-scale datasets. For this reason, low-rank matrix factorization has re-
+ceived much attention in recent years; it is fundamental to a variety of mining tasks that are increas-
+ingly being applied to massive datasets [1, 2, 3, 4, 5]. Speciﬁcally, low-rank matrix factorizations
+are effective tools for analyzing “dyadic data” in order to discover and quantify the interactions be-
+tween two given entities. Successful applications include topic detection and keyword search (where
+the corresponding entities are documents and terms), news personalization (users and stories), and
+recommendation systems (users and items). In large applications, these problems can involve ma-
+trices with millions of rows (e.g., distinct customers), millions of columns (e.g., distinct items), and
+billions of entries (e.g., transactions between customers and items). At such massive scales, paral-
+lel [6, 7] and distributed [1, 8, 5, 9, 10] algorithms for matrix factorization are essential to achieving
+reasonable performance. In this paper—an extended abstract of [10]—we provide a novel, effective
+distributed factorization algorithm based on stochastic gradient descent. Our algorithm is amenable
+to MapReduce but is also effective in other distributed programming frameworks.
+Given a large m × n matrix V and a small rank r, our goal is to ﬁnd an m × r matrix W and an
+r × n matrix H such that V ≈W H. The quality of such an approximation is described in terms
+of an application-dependent loss function L, i.e., we seek to ﬁnd argminW ,H L(V , W , H). For
+example, matrix factorizations used in the context of recommender systems are based on the nonzero
+squared loss LNZSL = P
+i,j:V ij̸=0(V ij −[W H]ij)2 and usually incorporate regularization terms,
+user and movie biases, time drifts, and implicit feedback. In the following, we restrict attention to
+loss functions that, like LNZSL, can be decomposed into a sum of local losses over (a subset of) the
+entries in V ij. I.e., we require that the loss can be written as
+L =
+X
+(i,j)∈Z
+l(V ij, W i∗, H∗j)
+(1)
+1
+for some training set Z ⊆{ 1, 2, . . . , m } × { 1, 2, . . . , n } and local loss function l, where Ai∗and
+A∗j denote row i and column j of matrix A, respectively. Many loss functions used in practice—
+such as squared loss, generalized Kullback-Leibler divergence (GKL), and Lp regularization—can
+be decomposed in such a manner [11]. Note that a given loss function L can potentially be decom-
+posed in multiple ways. In this paper, we focus primarily on the class of nonzero decompositions, in
+which Z = { (i, j) : V ij ̸= 0 }. Such decompositions naturally arise when zeros represent missing
+data as in the case of recommender systems. Our algorithms can handle other decompositions as
+well; see [10, 12].
+2
+Matrix Factorization with Stochastic Gradient Descent
+The goal of SGD is to ﬁnd the value θ∗∈ℜk (k ≥1) that minimizes a given loss L(θ). The
+algorithm makes use of noisy observations ˆL′(θ) of L′(θ), the function’s gradient with respect to
+θ. Starting with some initial value θ0, SGD reﬁnes the parameter value by iterating the stochastic
+difference equation θn+1 = θn−ϵn ˆL′(θn), where n denotes the step number and {ϵn} is a sequence
+of decreasing step sizes. Since −L′(θn) is the direction of steepest descent, SGD constitutes a
+noisy version of gradient descent. To apply SGD to matrix factorization, we set θ = (W , H) and
+decompose the loss L as in (1) for an appropriate training set Z and local loss function l. Denote by
+Lz(θ) = Lij(θ) = l(V ij, W i∗, H∗j) the local loss at position z = (i, j). Then L′(θ) = P
+z L′
+z(θ)
+by the sum rule for differentiation. We obtain a noisy gradient estimate by scaling up just one of the
+local gradients, i.e., ˆL′(θ) = NL′
+z(θ), where N = |Z| and the training point z is chosen randomly
+from the training set. Algorithm 1 uses SGD to perform matrix factorization. Note that each step
+affects only a single row of W and a single column of H.
+Algorithm 1 SGD for Matrix Factorization
+Require: A training set Z, initial values W 0 and H0
+while not converged do {step}
+Select a training point (i, j) ∈Z uniformly at random.
+W ′
+i∗←W i∗−ϵnN
+∂
+∂W i∗l(V ij, W i∗, H∗j)
+H∗j ←H∗j −ϵnN
+∂
+∂H∗j l(V ij, W i∗, H∗j)
+W i∗←W ′
+i∗
+end while
+3
+Distributed Stochastic Gradient Descent
+In general, distributing SGD is hard because the individual steps depend on each other: The param-
+eter value of θn has to be known before θn+1 can be computed. However, in the case of matrix
+factorization, the SGD process has some structure that we can exploit.
+Deﬁnition 1 Two training points z1, z2 ∈Z are interchangeable with respect to a loss function L
+having summation form (1) if for all θ ∈H, and ϵ > 0,
+L′
+z1(θ) = L′
+z1(θ −ϵL′
+z2(θ))
+and
+L′
+z2(θ) = L′
+z2(θ −ϵL′
+z1(θ)).
+(2)
+Two disjoint sets of training points Z1, Z2 ⊂Z are interchangeable with respect to L if z1 and z2
+are interchangeable for every z1 ∈Z1 and z2 ∈Z2.
+For matrix factorization, two training points z1 = (i1, j1) ∈Z and z2 = (i2, j2) ∈Z are in-
+terchangeable with respect to any loss function L having form (1) if they share neither row nor
+column, i.e., i1 ̸= i2 and j1 ̸= j2. It follows that if two blocks of V share neither rows or columns,
+then the sets of training points contained in these blocks are interchangeable.
+Stratiﬁcation.
+The key idea of DSGD is that we can swap the order of consecutive SGD steps
+that involve interchangeable training points without affecting the ﬁnal outcome. This allows us to
+2
+Z11 Z12 Z13
+Z21 Z22 Z23
+Z31 Z32 Z33
+Z11 Z12 Z13
+Z21 Z22 Z23
+Z31 Z32 Z33
+Z11 Z12 Z13
+Z21 Z22 Z23
+Z31 Z32 Z33
+Z11 Z12 Z13
+Z21 Z22 Z23
+Z31 Z32 Z33
+Z11 Z12 Z13
+Z21 Z22 Z23
+Z31 Z32 Z33
+Z11 Z12 Z13
+Z21 Z22 Z23
+Z31 Z32 Z33
+Z1
+Z2
+Z3
+Z4
+Z5
+Z6
+Figure 1: Strata for a 3 × 3 blocking of matrix V
+run SGD in parallel on any set of interchangeable sets of training points; see the discussion below.
+DSGD thus partitions the training set Z into a set of potentially overlapping “strata” Z1, . . . , Zs,
+where each stratum consists of d interchangeable subsets of Z; see Figure 1 for an example. The
+strata must cover the training set in that Sq
+s=1 Zs = Z, but overlapping strata are allowed. The
+parallelism parameter d is chosen to be greater than or equal to the number of available processing
+tasks.
+There are many ways to stratify the training set into interchangeable strata. In our current work,
+we perform data-independent blocking; more advanced strategies may improve the speed of con-
+vergence further. We ﬁrst randomly permute the rows and columns of V , and then create d × d
+blocks of size (m/d) × (n/d) each; the factor matrices W and H are blocked conformingly. This
+procedure ensures that the expected number of training points in each of the blocks is the same,
+namely, N/d2. Then, for a permutation j1, j2, . . . , jd of 1, 2, . . . , d, we can deﬁne a stratum as
+Zs = Z1j1 ∪Z2j2 ∪· · · ∪Zdjd, where the substratum Zij denotes the set of training points that
+fall within block V ij. In general, the set S of possible strata contains d! elements, one for each
+possible permutation of 1, 2, . . . , d. Note that different strata may overlap when d > 2. Also note
+that there is no need to materialize these strata: They are constructed on-the-ﬂy by processing only
+the respective blocks of V .
+The SSGD algorithm.
+Given the set of strata, we decompose the loss into a weighted sum of per-
+stratum losses: L(W , H) = Pq
+s=1 wsLs(W , H), where ws is a weight associated with stratum
+Zs. This decomposition underlies our stratiﬁed SGD (SSGD) algorithm, a novel variant of SGD
+that chooses training points from only a single stratum instead of the entire matrix V . To establish
+convergence, SSGD switches strata from time to time so that, in the long run, the “time” spent on
+stratum Zs is proportional to the stratum weight ws. Gemulla et al. [10] provide sufﬁcient condi-
+tions for convergence, as well as a proof; the conditions in [10] hold for most matrix factorization
+problems.
+We use per-stratum losses of form Ls(W , H) = cs
+P
+(i,j)∈Zs Lij(W , H) where cs is a stratum-
+speciﬁc constant. When running SGD on a stratum, we use the gradient estimate ˆL′
+s(W , H) =
+NscsL′
+ij(W , H) of L′
+s(W , H) in each step, i.e., we scale up the local loss of an individual training
+point by the size Ns = |Zs| of the stratum. For example, from the d! strata described previously,
+we can select d disjoint strata Z1, Z2, . . . , Zd such that they cover Z; e.g., strata Z1, Z2, and Z3 in
+Fig. 1. Then any given loss function L of form (1) can be represented as a weighted sum over these
+strata by choosing ws and cs subject to wscs = 1. Recall that the weight ws can be interpreted as
+the fraction of time spent on each stratum in the long run. A natural choice is to set ws = Ns/N,
+i.e., proportional to the stratum size. This particular choice leads to cs = N/Ns and we obtain the
+standard SGD gradient estimator ˆL′
+s(W , H) = NL′
+ij(W , H).
+The DSGD algorithm.
+The individual steps in DSGD are grouped into subepochs, each of which
+amounts to (1) selecting one of the strata and (2) running SGD (in parallel) on the selected stratum.
+In more detail, DSGD makes use of a sequence {(ξk, Tk)}, where ξk denotes the stratum selector
+used in the kth subepoch, and Tk the number of steps to run on the selected stratum. The {(ξk, Tk)}
+sequence is chosen such that the DSGD factorization algorithm is guaranteed to converge. For the
+particular choice of stratiﬁcation described above, we set Tk = |Nξk|; see [10] for details. Once
+a stratum ξk has been selected, we perform Tk SGD steps on Zξk; this is done in a parallel and
+distributed way. DSGD is shown as Algorithm 2, where we deﬁne an epoch as a sequence of d
+subepochs. An epoch roughly corresponds to processing the entire training set once. Since, by
+construction, parallel processing within the kth selected stratum leads to the same update terms as
+for the corresponding sequential SGD algorithm on Zξk, we have established the connection between
+DSGD and SSGD. Thus the convergence of DSGD is implied by the convergence of the underlying
+SSGD algorithm.
+3
+Implementation.
+When executing DSGD on d nodes in a shared-nothing environment such as
+MapReduce, we only distribute the input matrix once. Then the only data that are transmitted
+between nodes during subsequent processing are (small) blocks of factor matrices. In our im-
+plementation, node i stores blocks W i, V i1, V i2, . . . , V id for 1 ≤i ≤d; thus only matrices
+H1, H2, . . . , Hd need be transmitted. (If the W i matrices are smaller, then we transmit these
+instead.)
+Algorithm 2 DSGD for Matrix Factorization
+Require: V , W 0, H0, cluster size d
+Block V / W / H into d × d / d × 1 / 1 × d blocks
+while not converged do {epoch}
+Pick step size ϵ
+for s = 1, . . . , d do {subepoch}
+Pick d blocks {V 1j1, . . . , V djd} to form a stratum
+for b = 1, . . . , d do {in parallel}
+Read blocks V bjb, W b and Hjb
+Run SGD on the training points in V bjb (step size = ϵ)
+Write blocks W b and Hjb
+end for
+end for
+end while
+4
+Experimental Results
+In Table 1, we report results of the performance of DSGD on the KDDCup 2011 dataset, which
+consists of 252M music ratings (1M users, 624k items) along with the time of rating; matrix factor-
+ization is used to predict missing ratings. The winning team [13] integrated more than 80 different
+matrix factorizations on this dataset. Here we show results for a “biased matrix factorization”,
+in which user (ui) and movie (mj) preferences are integrated into the model, with weighted L2-
+regularization (see [3]; λW = λH = 1, λu = 2, λm = 0.1). We used rank r = 60 and run 200
+epochs. Each node in our cluster is equipped with an Intel Xeon 2.40GHz processor and 48GB of
+RAM. We implemented DSGD in C++ and used MPI for communication. Table 1 shows the time
+per DSGD epoch (excluding loss computations) as well as the achieved loss after 60 and 30 minutes
+of wall-clock time. Note that plain SGD performs slightly better than DSGD in terms of achieved
+loss after a ﬁxed number of epochs; this is a result of the differences in training point selection. In
+terms of wall-clock time, however, DSGD signiﬁcantly outperforms SGD. See [10] for experiments
+on other datasets, other distributed architectures (including Hadoop), and a comparison to alternative
+algorithms.
+Table 1: Experimental results on the KDDCup 2011 dataset
+Nodes x
+Method
+Avg. Time
+Training loss (×1011)
+Validation RMSE
+Threads
+per Epoch
+200 ep.
+60min
+30min
+200 ep.
+60min
+30min
+1x1
+SGD
+335.9s
+1.417
+1.683
+1.803
+21.89
+22.76
+23.04
+1x7
+DSGD
+47.2s
+1.430
+1.461
+1.516
+22.04
+22.43
+22.91
+2x7
+DSGD
+22.9s
+1.430
+1.432
+1.468
+22.06
+22.07
+22.53
+4x7
+DSGD
+12.7s
+1.427
+1.428
+1.437
+22.08
+22.09
+22.20
+5
+Conclusion
+We have developed DSGD, a distributed version of the classic SGD algorithm for matrix factoriza-
+tion. DSGD can efﬁciently handle web-scale matrices; our experiments indicate fast convergence
+and good scalability.
+4
+References
+[1] Abhinandan S. Das, Mayur Datar, Ashutosh Garg, and Shyam Rajaram. Google news person-
+alization: scalable online collaborative ﬁltering. In WWW, pages 271–280, 2007.
+[2] Thomas Hofmann. Probabilistic latent semantic indexing. In SIGIR, pages 50–57, 1999.
+[3] Yehuda Koren, Robert Bell, and Chris Volinsky. Matrix factorization techniques for recom-
+mender systems. IEEE Computer, 42(8):30–37, 2009.
+[4] Daniel D. Lee and H. Sebastian Seung. Learning the parts of objects by non-negative matrix
+factorization. Nature, 401(6755):788–791, 1999.
+[5] Chao Liu, Hung-chih Yang, Jinliang Fan, Li-Wei He, and Yi-Min Wang. Distributed nonneg-
+ative matrix factorization for web-scale dyadic data analysis on mapreduce. In WWW, pages
+681–690, 2010.
+[6] Benjamin Recht and Christopher R´e. Parallel stochastic gradient algorithms for large-scale
+matrix completion. Optimization Online, 2011.
+[7] Feng Niu, Benajami Recht, Christopher R´e, and Stephen J. Wright. Hogwild!: A lock-free
+approach to parallelizing stochastic gradient descent. In NIPS, 2011.
+[8] Sudipto Das, Yannis Sismanis, Kevin S. Beyer, Rainer Gemulla, Peter J. Haas, and John
+McPherson. Ricardo: Integrating R and Hadoop. In SIGMOD, pages 987–998, 2010.
+[9] Yunhong Zhou, Dennis Wilkinson, Robert Schreiber, and Rong Pan. Large-scale parallel col-
+laborative ﬁltering for the Netﬂix Prize. In AAIM, pages 337–348, 2008.
+[10] Rainer Gemulla, Erik Nijkamp, Peter J. Haas, and Yannis Sismanis. Large-scale matrix factor-
+ization with distributed stochastic gradient descent. In Proc. of SIGKDD, pages 69–77, 2011.
+[11] Ajit P. Singh and Geoffrey J. Gordon. A uniﬁed view of matrix factorization models. In ECML
+PKDD, pages 358–373, 2008.
+[12] Rainer
+Gemulla,
+Peter
+J.
+Haas,
+Erik
+Nijkamp,
+and
+Yannis
+Sismanis.
+Large-
+scale matrix factorization with distributed stochastic gradient descent.
+Technical Re-
+port RJ10481, IBM Almaden Research Center, San Jose, CA, 2011.
+Available at
+www.almaden.ibm.com/cs/people/peterh/dsgdTechRep.pdf.
+[13] Po-Lung Chen, Chen-Tse Tsai, Yao-Nan Chen, Ku-Chun Chou, Chun-Liang Li, Cheng-Hao
+Tsai, Kuan-Wei Wu, Yu-Cheng Chou, Chung-Yi Li, Wei-Shih Lin, Shu-Hao Yu, Rong-Bing
+Chiu, Chieh-Yen Lin, Chien-Chih Wang, Po-Wei Wang, Wei-Lun Su, Chen-Hung Wu, Tsung-
+Ting Kuo, Todd G. McKenzie, Ya-Hsuan Chang, Chun-Sung Ferng, Chia-Mau Ni, Hsuan-Tien
+Lin, Chih-Jen Lin, and Shou-De Lin. A linear ensemble of individual and blended models for
+music rating prediction. In KDDCup 2011 Workshop, 2011.
+5
+View publication stats
+View publication stats

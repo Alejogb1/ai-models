@@ -1,0 +1,15 @@
+{
+  "source": "Fast Matrix Factorization for Online Recommendation with Implicit Feedback",
+  "source_group": "Awesome-ML-Papers/MF",
+  "processed_at": "2026-06-08T12:00:00Z",
+  "agent": "agent_batch_generation",
+  "concepts": [
+    {
+      "finding": "Fast incremental MF for implicit feedback. ALS with confidence weighting (observed=high confidence, unobserved=low confidence). Efficient incremental update: when new interaction arrives, closed-form update for affected user and item factors. O(k^2) per update instead of full O(n*k^2). Supports real-time recommendation updates.",
+      "category": "ModelCandidate",
+      "implication": "Fast incremental keyword-embedding updates for new keyword-intent observations. When a new keyword-intent pair is observed (e.g., from editorial labeling), keyword and intent factors updated incrementally in O(k^2). Enables real-time keyword model updates.",
+      "open_question": "How many concurrent keyword embedding updates can a production system handle per second? Is incremental update latency acceptable for real-time applications?",
+      "testable_hypothesis": "Incremental keyword embedding updates process new keyword-intent observations in <10ms, enabling real-time keyword model updates as new labeled data arrives."
+    }
+  ]
+}

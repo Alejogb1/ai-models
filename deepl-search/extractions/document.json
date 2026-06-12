@@ -1,0 +1,148 @@
+{
+  "source": "document.pdf",
+  "source_group": "Web-Sources",
+  "processed_at": "2026-06-08",
+  "agent": "agent5_final",
+  "concepts": [
+    {
+      "finding": "Although \nwe have a few task dimensions being thoroughly examined and measured in a variety of contexts (e.g., task difficulty, task complexity), \nmany other task dimensions that may significantly affect search interaction and evaluation still remain insufficiently studied or even \nunexplored.",
+      "category": "Experiment",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "These measures are argued to be effective in providing more direct evidence on users’ cognitive processes \ncompared to the behavioral features extracted from search logs (Mostafa & Gwizdka, 2016); 3) Non-search situational measures that go \nbeyond search sessions and characterize the problematic sit",
+      "category": "Baseline",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Existing systematic reviews in IIR have covered three main types of focuses: 1) Empirical studies on core research problems of IIR (e.g., IR \nsystem evaluation, Kelly & Sugimoto, 2013; personalization in text retrieval, Liu et al., 2019; usefulness of search results, Vakkari, \n2020), 2) IIR study me",
+      "category": "Experiment",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "(2019) went beyond the traditional features of search interactions and examined the overall task \nrelevance to the evolving information search scenarios and problematic situations.",
+      "category": "FailureRisk",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "No clicks, no problem: Using cursor movements to understand and improve search.",
+      "category": "FailureRisk",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "The effects of persuasion knowledge on click-through of keyword search ads: Moderating role of search task and perceived fairness.",
+      "category": "ModelCandidate",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "With the support of existing IR models, search systems and technologies have achieved \nphenomenal success in addressing simple fact-finding and navigational search tasks (White, 2018).",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "However, we still face plenty of \nchallenges and obstacles when seeking to support users engaging in complex tasks that involve multi-round, multidimensional search \niterations (e.g., writing a research proposal, planning a conference trip, preparing useful information for a job interview) (Awadalla",
+      "category": "FailureRisk",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "How to address the limitation described: However, we still face plenty of \nchallenges and obstacles when seeking to support users engaging in complex tasks that involve multi-round, multidimensional search \niterations (e.g., writing a resear",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "We conclude by discussing the contributions and limitations of our study and suggesting possible directions for \nfuture research.",
+      "category": "FailureRisk",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "How to address the limitation described: We conclude by discussing the contributions and limitations of our study and suggesting possible directions for \nfuture research.",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "A deep look into the observable features or task \npredictors proposed in prior IIR research allows researchers to 1) embrace a more comprehensive understanding of the connections \nbetween predictors of varying types and search task dimensions, and 2) identify useful measures as well as understudied ",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Given the contributions and advantages of system reviews, we seek to utilize the method in synthesizing the knowledge of search \ntask dimensions and associated predictors reported in existing studies and addressing the research gaps identified in the Introduction \nsection.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Also, these task types are broad in scope and thus provide limited practical \ncontributions to accurate task modeling and task-based search personalization.",
+      "category": "FailureRisk",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "These limitations also exist \nin other scenarios where researchers use self-reported indicators to measure TUDs, such as perceived task difficulty, domain knowl-\nedge and self-rated task interest.",
+      "category": "FailureRisk",
+      "implication": "Can inform intent modeling for recommendation systems",
+      "open_question": "How to address the limitation described: These limitations also exist \nin other scenarios where researchers use self-reported indicators to measure TUDs, such as perceived task difficulty, domain knowl-\nedge and self-rated task interest.",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "To overcome the limitations associated with the \nsubjectivity and biases in self assessments, researchers have also proposed various objective measures, such as search behavioral \nmetrics, eye movement metrics, as well as other physiological features (e.g.",
+      "category": "Experiment",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "How to address the limitation described: To overcome the limitations associated with the \nsubjectivity and biases in self assessments, researchers have also proposed various objective measures, such as search behavioral \nmetrics, eye movemen",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "However, neuro-physiological measures as more \naccurate, fine-grained measures could better capture the small but critical variations in users’ search interactions and detect the \nnuances between similar cognitive and emotional states.",
+      "category": "ModelCandidate",
+      "implication": "Relevant for similarity-based retrieval and lookalike targeting",
+      "open_question": "How to address the limitation described: However, neuro-physiological measures as more \naccurate, fine-grained measures could better capture the small but critical variations in users’ search interactions and detect the \nnuances between simi",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Besides the features discussed above, researchers have also explored features outside search activities and investigated different \naspects of users’ overall search experience and the relevance of search tasks in broader environments (e.g., Aliannejadi et al., 2019; \nO’Brien et al., 2020).",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Despite the limitations in scalability and accuracy, these measures offer researchers a direct access to users’ \nperceptions and memories of search experiences and thus can inform the research on broader impacts of task characteristics.",
+      "category": "Experiment",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "How to address the limitation described: Despite the limitations in scalability and accuracy, these measures offer researchers a direct access to users’ \nperceptions and memories of search experiences and thus can inform the research on broa",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "It is worth noting that when users are familiar with \nthe domain(s), they tend to issue longer, more specific queries, bookmark more useful documents, open more SERPs, and click lower \nranked search results.",
+      "category": "FailureRisk",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "These findings enhance our understanding of user characteristics as \nwell as the broader contexts of search.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "As it is shown in Table 6, in most cases, researchers turned task prediction problem into ML classification problem based on either \nresearchers’ annotations of facet values (e.g., task product, task goal) or participants’ post-search self-ratings.",
+      "category": "LabelValidation",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    }
+  ]
+}

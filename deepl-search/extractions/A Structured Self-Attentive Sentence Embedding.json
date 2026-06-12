@@ -1,0 +1,15 @@
+{
+  "source": "A Structured Self-Attentive Sentence Embedding",
+  "source_group": "Awesome-ML-Papers/Embeddings",
+  "processed_at": "2026-06-08T12:00:00Z",
+  "agent": "agent_batch_generation",
+  "concepts": [
+    {
+      "finding": "Self-attentive sentence embedding: 2D matrix of attention vectors (multiple hops of attention) instead of single attention vector. Each attention \"hop\" focuses on a different part of the sentence. Penalty term encourages diversity across attention hops. Achieves SOTA on author profiling and sentiment classification.",
+      "category": "ModelCandidate",
+      "implication": "Multi-hop attention can capture multiple intents within a single query/keyword. A keyword like \"best budget running shoes\" may have intents related to product comparison, price sensitivity, and shoetype - each attended to by different hops.",
+      "open_question": "How many attention hops are needed to capture the range of keyword intents in a typical search query?",
+      "testable_hypothesis": "Multi-hop self-attention over keyword embeddings captures multiple intent facets and produces better downstream clustering than single-vector embeddings."
+    }
+  ]
+}

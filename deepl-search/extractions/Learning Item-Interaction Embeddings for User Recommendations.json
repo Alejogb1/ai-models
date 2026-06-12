@@ -1,0 +1,15 @@
+{
+  "source": "Learning Item-Interaction Embeddings for User Recommendations",
+  "source_group": "Awesome-ML-Papers/Embeddings",
+  "processed_at": "2026-06-08T12:00:00Z",
+  "agent": "agent_batch_generation",
+  "concepts": [
+    {
+      "finding": "Learns item embeddings from user interaction sequences (not just co-occurrence). Models temporal dynamics of user-item interactions using RNNs. Key insight: interaction sequences capture user intent transitions better than co-occurrence statistics alone.",
+      "category": "ModelCandidate",
+      "implication": "Keyword sequences from search sessions capture intent transitions. A keyword following \"best budget\" is intent-constrained differently than one following \"how to fix.\" Sequence-aware keyword embeddings capture context-dependent intent.",
+      "open_question": "How long of a keyword sequence is needed to capture intent? Should the model use unidirectional (left-to-right) or bidirectional context?",
+      "testable_hypothesis": "Sequence-aware keyword embeddings (from search session sequences) produce more context-relevant intent clusters than bag-of-co-occurrence embeddings."
+    }
+  ]
+}

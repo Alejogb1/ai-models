@@ -1,0 +1,15 @@
+{
+  "source": "Deep Supervised Hashing for Fast Image Retrieval .pdf",
+  "source_group": "Awesome-ML-Papers/Nearest Neighbor Search",
+  "processed_at": "2026-06-08",
+  "agent": "agent6_remaining",
+  "concepts": [
+    {
+      "finding": "Deep Supervised Hashing (DSH) jointly learns image representations and hash functions in an end-to-end manner, achieving compact binary codes preserving semantic similarity from labeled data.",
+      "category": "ModelCandidate",
+      "implication": "End-to-end learning of binary hash codes produces more compact and accurate representations, applicable to learning efficient query-document matching codes.",
+      "open_question": "Can end-to-end learned hash codes for query-document matching match the accuracy of full-precision embeddings at 1/10th storage cost?",
+      "testable_hypothesis": "End-to-end learned 64-bit hash codes for query-document matching will achieve within 3% recall of 768-dim full-precision BERT embeddings while using 96x less storage."
+    }
+  ]
+}

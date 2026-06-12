@@ -1,0 +1,148 @@
+{
+  "source": "Word2vec applied to Recommendation- Hyperparameters Matter.pdf",
+  "source_group": "Awesome-ML-Papers/Session-Based-Recommendations",
+  "processed_at": "2026-06-08",
+  "agent": "agent5_final",
+  "concepts": [
+    {
+      "finding": "For\nexample, Meta-Prod2vec [26], improves upon Prod2vec by using\nthe item meta-data side information to regularize the final item\nembedding, and authors show that they outperforms Prod2vec on\nNEP for music, globally and especially in a cold-start regime.",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "To demonstrate the benefit of performing a hyperparame-\nter search, we present the results obtained when SGNS is used with\ndefault values as defined in Gensim [21] implementation in the\n\"Out-of-the-box SGNS\" row.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "While\nperforming a hyperparameter search for each different types of\ndata and tasks in a real-life recommendation setting can be time\nconsuming and computationally costly, we stress out the benefits\nof having better item embeddings to better distinguish, cluster and\nclassify content, which can lead ",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Importantly, we find that optimal hyper-\nparameters configurations for Natural Language Processing tasks\nand Recommendation tasks are noticeably different.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "We perform large hyperparameter grid\nsearches on four different types of recommendation datasets (two of\nmusic, one of e-commerce and one of click-stream).",
+      "category": "Experiment",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "[8] proposed\nthe use of SGNS on sequences of items to form item embeddings\nemployed in recommendation applications.",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Interestingly, for all datasets, the marginal benefit of including\nα in the hyperparameter search is significant in terms of final per-\nformance.",
+      "category": "Experiment",
+      "implication": "Can inform intent modeling for recommendation systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "5\nCONCLUSION\nDeveloped first for NLP, SNGS generate words embeddings that\nhelp achieving state of the art performance in semantic similarity\nand analogy tasks.",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Previous work shows that it can be directly\napplied to sequences of items to generate item embeddings useful\nfor recommendations.",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "We show that us-\ning different values for some hyperparameters, namely negative\nsampling distribution, number of epochs, subsampling parameter\nand window-size, leads to significantly better performances on\nclassical evaluation tasks on 4 recommendation datasets.",
+      "category": "Experiment",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Results reveal that optimizing neglected hy-\nperparameters, namely negative sampling distribution, number of\nepochs, subsampling parameter and window-size, significantly im-\nproves performance on a recommendation task, and can increase it\nby an order of magnitude.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "KEYWORDS\nRecommender System Evaluation; Embeddings; Neural Networks\nACM Reference Format:\nHugo Caselles-Dupré12, Florian Lesaint, and Jimena Royo-Letelier.",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "They\nwere successfully applied to recommendation [8] to generate user\nand product embeddings as they can scale to millions of items.",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Text data has a particular linguistic structure [5],\n∗Work done while interning at Deezer\nPermission to make digital or hard copies of all or part of this work for personal or\nclassroom use is granted without fee provided that copies are not made or distributed\nfor profit or commercial advantage and",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Intuitively, having accurate embeddings for\npopular items is crucial to perform on recommendation related\ntasks [24], where top items often represent most of the content\nusers interacted with.",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "This allows us\nto identify four hyperparameters, namely negative sampling distri-\nbution, number of epochs, subsampling parameter and window-size,\nwhich can significantly improve performance on the NEP task.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "2\nWORD2VEC\n2.1\nMethods\nW2V [16, 17] is a group of word embedding algorithms that pro-\nvides state-of-the-art results on various linguistic tasks [15].",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "(3)\nIn recommendation settings, such as music consumption or on-\nline shopping, a revised version of the Distributional Hypothesis is\nadopted to justify the use of SGNS, stating that items that appear\nin the same contexts share similarities.",
+      "category": "ModelCandidate",
+      "implication": "Relevant for similarity-based retrieval and lookalike targeting",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Since then, this method has\nbeen derived to handle problems specific to recommendation.",
+      "category": "FailureRisk",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "2.2\nHyperparameters\nIn the following, we describe the role and classically used values of\nthe hyperparameters in the investigated literature [1, 8, 18–20, 26],\nfor which simultaneous optimization significantly improved NEP\nperformance.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    }
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "source": "On Sampled Metrics for Item Recommendation",
+  "source_group": "Awesome-ML-Papers/MF",
+  "processed_at": "2026-06-08T12:00:00Z",
+  "agent": "agent_batch_generation",
+  "concepts": [
+    {
+      "finding": "Critical analysis of sampled metrics for recommendation evaluation. Full ranking (all items) vs sampled ranking (subset of items) give very different results. Sampled metrics overestimate performance, especially for popular items. Recommendation: report full ranking Recall/NDCG with efficient computation, or use unbiased estimators. Popularity-stratified metrics provide better evaluation.",
+      "category": "Evaluation",
+      "implication": "Keyword-intent evaluation: full ranking over all intents vs sampled intents (negative sampling) gives different accuracy estimates. Sampled evaluation overestimates intent matching accuracy. Use full ranking for reliable evaluation or report both full and sampled. Stratify by keyword frequency.",
+      "open_question": "What is the reliable evaluation protocol for keyword-intent matching? Should negatives be sampled uniformly or by frequency?",
+      "testable_hypothesis": "Full-ranking evaluation of keyword-intent assignment reveals that reported sampled-metric accuracy overestimates true accuracy by 10-20%, especially for tail keywords."
+    }
+  ]
+}

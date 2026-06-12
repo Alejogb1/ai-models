@@ -1,0 +1,15 @@
+{
+  "source": "node2vec-kdd16",
+  "source_group": "Awesome-ML-Papers/Embeddings",
+  "processed_at": "2026-06-08T12:00:00Z",
+  "agent": "agent03_embeddings_mf_ranking_search_compiled",
+  "concepts": [
+    {
+      "finding": "Biased random walk with two parameters: p (return parameter - likelihood of revisiting a node) and q (in-out parameter - BFS vs DFS exploration). p and q can be learned from labeled data. BFS captures structural equivalence, DFS captures homophily. Outperforms DeepWalk by 26.7% on multi-label classification and 12.6% on link prediction.",
+      "category": "Model Candidate",
+      "implication": "If keyword-intent clustering requires capturing both lexical similarity (homophily - keywords co-occurring together) and functional similarity (structural equivalence - keywords playing similar roles), node2vec's tunable p and q parameters can balance these.",
+      "open_question": "What is the optimal node2vec p/q tradeoff for keyword-intent clustering? Is BFS-like or DFS-like exploration more important?",
+      "testable_hypothesis": "node2vec embeddings (with tuned p, q) will outperform DeepWalk at recovering known intent categories from keyword co-occurrence graphs."
+    }
+  ]
+}

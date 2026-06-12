@@ -1,0 +1,15 @@
+{
+  "source": "Deep Matrix Factorization Models for Recommender Systems",
+  "source_group": "Awesome-ML-Papers/MF",
+  "processed_at": "2026-06-08T12:00:00Z",
+  "agent": "agent_batch_generation",
+  "concepts": [
+    {
+      "finding": "Deep MF: extends PMF with deep neural network to learn nonlinear user-item interactions. Unlike linear MF, deep architecture captures complex interaction patterns. Three architectures compared: (1) deep user network + deep item network, (2) deep user + linear item, (3) deep on combined features. Deep+Deep performs best but requires most data.",
+      "category": "ModelCandidate",
+      "implication": "Nonlinear keyword-intent interactions captured by deep MF. Linear embedding (MF) provides good baseline; deep network captures non-obvious patterns (e.g., keyword combinations that signal specific intents). Deep network needs sufficient training data.",
+      "open_question": "Are keyword-intent interactions predominantly linear (captured by dot product) or nonlinear (requiring deep networks)?",
+      "testable_hypothesis": "A deep MF model for keyword-intent scoring captures nonlinear patterns that improve recall@K by 5%+ over linear MF, especially for multi-intent keywords."
+    }
+  ]
+}

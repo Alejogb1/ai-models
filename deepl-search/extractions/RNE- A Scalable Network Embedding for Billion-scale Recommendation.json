@@ -1,0 +1,15 @@
+{
+  "source": "RNE- A Scalable Network Embedding for Billion-scale Recommendation",
+  "source_group": "Awesome-ML-Papers/Embeddings",
+  "processed_at": "2026-06-08T12:00:00Z",
+  "agent": "agent_batch_generation",
+  "concepts": [
+    {
+      "finding": "RNE: efficient network embedding via randomized edge sampling and negative sharing. Samples edges uniformly vs. by weight for efficiency. Shares negative samples across nodes (batch negatives). Achieves 10x training speedup over LINE/DeepWalk with comparable quality on recommendation tasks at billion-node scale.",
+      "category": "ModelCandidate",
+      "implication": "Efficient keyword embedding training via edge sampling and negative sharing. Random edge sampling may suffice for keyword co-occurrence graphs where edge weights are noisy. Batch negative sampling dramatically reduces training time.",
+      "open_question": "Does random (uniform) edge sampling preserve keyword-intent structure as well as weighted sampling? What is the optimal negative sharing factor?",
+      "testable_hypothesis": "RNE with batch negative sharing achieves 90% of the intent cluster quality of full LINE/DeepWalk at 10x lower training cost."
+    }
+  ]
+}

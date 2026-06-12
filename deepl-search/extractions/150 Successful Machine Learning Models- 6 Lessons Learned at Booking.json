@@ -1,0 +1,148 @@
+{
+  "source": "150 Successful Machine Learning Models- 6 Lessons Learned at Booking.pdf",
+  "source_group": "Awesome-ML-Papers/Other",
+  "processed_at": "2026-06-08",
+  "agent": "agent5_final",
+  "concepts": [
+    {
+      "finding": "Our platform is developed by\nmany different interdisciplinary teams working on different prod-\nucts, ranging from a large new application like our recent Booking\nAssistant, or an important page of the website with rich business\nvalue like the search results page, to a part of it, like the destinatio",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Providing a\npersonalized experience regardless of how often a guest interacts\nwith Booking.com and being capable to find an audience for every\nApplied Data Science Track Paper\nKDD ’19, August 4–8, 2019, Anchorage, AK, USA\n1743\n\nproperty from the very beginning of them joining Booking.com are\ndifficu",
+      "category": "FailureRisk",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "At the\nsame time we do not want to overstate the generality of this result,\nthe external validity can be easily challenged by noting that these\nmodels work in a specific context, for a specific system, they are\nbuilt in specific ways, they all target the same business metric, and\nfurthermore they ar",
+      "category": "Experiment",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "How to address the limitation described: At the\nsame time we do not want to overstate the generality of this result,\nthe external validity can be easily challenged by noting that these\nmodels work in a specific context, for a specific system",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "A basic\nfirst step is to “set up” a Machine Learning Problem, and we learned\nthat focusing on this step is key.",
+      "category": "FailureRisk",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Our main conclu-\nsion is that an iterative, hypothesis driven process, integrated with\nother disciplines was fundamental to build 150 successful products\nenabled by Machine Learning.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Permission to make digital or hard copies of part or all of this work for personal or\nclassroom use is granted without fee provided that copies are not made or distributed\nfor profit or commercial advantage and that copies bear this notice and the full citation\non the first page.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Providing satisfying shopping and accommodation experiences\nstarting from this almost-zero-query scenario is one of the key\nchallenges of our platform.",
+      "category": "FailureRisk",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "How to address the limitation described: Providing satisfying shopping and accommodation experiences\nstarting from this almost-zero-query scenario is one of the key\nchallenges of our platform.",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Successfully exploiting such rich content by presenting it\nto users in an accessible and relevant way is another key challenge\nof our platform.",
+      "category": "FailureRisk",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "How to address the limitation described: Successfully exploiting such rich content by presenting it\nto users in an accessible and relevant way is another key challenge\nof our platform.",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Wagstaff position paper [13] mentions\nthe lack of studies and lessons on how to exploit Machine Learning\nand achieve relevant impact in real world problems.",
+      "category": "FailureRisk",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "One important\nlesson we have learned is that Machine Learning can be used for\nmany and very different products in widely different contexts.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "For instance, they\noptimize the size of an specific element of the user interface, or\nprovide recommendations tailored for one point on the funnel and\none specific context.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "They model understandable concepts, enabling everyone involved\nin product development to introduce new features, personalization,\npersuasion messages, etc., based on the output of the model.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "All these improvements were enabled by the\nfirst algorithm, illustrating the indirect impact of Machine Learning\nprojects through other disciplines.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "For example, we might build a recommender system\nbased on Click Through Rate because we know that CTR\nhas a strong correlation or even causation with Conversion\nRate, the business metric we really care about in this case.",
+      "category": "Experiment",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "But as models get better and better, they might end up “just\ndriving clicks”, without any actual effect on conversion.",
+      "category": "ModelCandidate",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "An\nexample of this is a model that learned to recommend very\nsimilar hotels to the one a user is looking at, encouraging\nthe user to click (presumably to compare all the very similar\nhotels), eventually drowning them into the paradox of choice\nand hurting conversion.",
+      "category": "ModelCandidate",
+      "implication": "Relevant for similarity-based retrieval and lookalike targeting",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "After a few successful iterations we hypothesize that the\nmodel is lacking diversity, so we create a challenger model that\nalthough still minimizes RMSE, somehow produces higher diversity.",
+      "category": "FailureRisk",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "How to address the limitation described: After a few successful iterations we hypothesize that the\nmodel is lacking diversity, so we create a challenger model that\nalthough still minimizes RMSE, somehow produces higher diversity.",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "The Problem Construction Process\ntakes as input a business case or concept and outputs a well defined\nmodeling problem (usually a supervised machine learning problem),\nsuch that a good solution effectively models the given business case\nFigure 4: Relative difference in a business metric vs relative ",
+      "category": "LabelValidation",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "For example, we could learn to predict how many different\ndates the user will consider applying regression to a specific dataset\ncomposed by users as observations, or to estimate the probability\nof changing dates by solving a classification problem, where the\nobservations are searches, and so on.",
+      "category": "Experiment",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Another popular approach that works well for ranking\nproblems is to compare the performance of simple models\nagainst trivial baselines like random and popularity.",
+      "category": "Baseline",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    }
+  ]
+}

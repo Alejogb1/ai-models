@@ -1,0 +1,15 @@
+{
+  "source": "InfoGAN- Interpretable Representation Learning by Information Maximizing Generative Adversarial Nets .pdf",
+  "source_group": "Awesome-ML-Papers/GANs",
+  "processed_at": "2026-06-08",
+  "agent": "agent6_remaining",
+  "concepts": [
+    {
+      "finding": "InfoGAN maximizes mutual information between a small subset of latent variables and the generator output, learning interpretable and disentangled representations without supervision.",
+      "category": "ModelCandidate",
+      "implication": "Maximizing mutual information between latent codes and outputs yields interpretable representations without labels, directly applicable to learning interpretable query representations.",
+      "open_question": "Can InfoGAN-style mutual information maximization learn interpretable dimensions (commercial vs. informational intent) in query embeddings without intent labels?",
+      "testable_hypothesis": "An InfoGAN-style objective will learn query embeddings with interpretable dimensions correlating with human-judged intent categories at r > 0.7 without any intent labels."
+    }
+  ]
+}

@@ -1,0 +1,1000 @@
+HIN2Vec: Explore Meta-paths in Heterogeneous Information
+Networks for Representation Learning
+Tao-yang Fu
+The Pennsylvania State University
+University Park, PA 16802, USA
+txf225@cse.psu.edu
+Wang-Chien Lee
+The Pennsylvania State University
+University Park, PA 16802, USA
+wlee@cse.psu.edu
+Zhen Lei
+The Pennsylvania State University
+University Park, PA 16802, USA
+zlei@psu.edu
+ABSTRACT
+In this paper, we propose a novel representation learning frame-
+work, namely HIN2Vec, for heterogeneous information networks
+(HINs). The core of the proposed framework is a neural network
+model, also called HIN2Vec, designed to capture the rich seman-
+tics embedded in HINs by exploiting different types of relation-
+ships among nodes. Given a set of relationships specified in forms
+of meta-paths in an HIN, HIN2Vec carries out multiple prediction
+training tasks jointly based on a target set of relationships to learn
+latent vectors of nodes and meta-paths in the HIN. In addition to
+model design, several issues unique to HIN2Vec, including regular-
+ization of meta-path vectors, node type selection in negative sam-
+pling, and cycles in random walks, are examined. To validate our
+ideas, we learn latent vectors of nodes using four large-scale real
+HIN datasets, including Blogcatalog, Yelp, DBLP and U.S. Patents,
+and use them as features for multi-label node classification and
+link prediction applications on those networks. Empirical results
+show that HIN2Vec soundly outperforms the state-of-the-art repre-
+sentation learning models for network data, including DeepWalk,
+LINE, node2vec, PTE, HINE and ESim, by 6.6% to 23.8% ofmicro-f1
+in multi-label node classification and 5% to 70.8% of MAP in link
+prediction.
+KEYWORDS
+representation learning, heterogeneous information network
+1
+INTRODUCTION
+Network data analysis and mining is an important research field
+because network data, capturing phenomena in various networks,
+such as social networks, paper citation networks, and World Wide
+Web, are ubiquitous in the real world [6, 15, 29]. Network analy-
+sis often involves prediction tasks over nodes or edges, e.g., node
+classification [14], node clustering [23] and link prediction [20]. In
+order to achieve good performance in these tasks, a proper repre-
+sentation of network nodes and edges that captures embedded in-
+formation in the network structure while preserving the original
+Permission to make digital or hard copies of all or part of this work for personal or
+classroom use is granted without fee provided that copies are not made or distributed
+for profit or commercial advantage and that copies bear this notice and the full cita-
+tion on the first page. Copyrights for components of this work owned by others than
+the author(s) must be honored. Abstracting with credit is permitted. To copy other-
+wise, or republish, to post on servers or to redistribute to lists, requires prior specific
+permission and/or a fee. Request permissions from permissions@acm.org.
+CIKM’17, November 6–10, 2017, Singapore.
+© 2017 Copyright held by the owner/author(s). Publication rights licensed to ACM.
+ISBN 978-1-4503-4918-5/17/11…$15.00
+DOI: https://doi.org/10.1145/3132847.3132953
+relationships amongst nodes is much needed to serve as input fea-
+tures to supervised machine learning algorithms. This is a prepro-
+cessing step for data mining and knowledge discovery, well known
+as feature engineering. A typical approach of feature engineering is
+to involve domain experts to manually design domain-specific rep-
+resentation of data, i.e., feature vectors of data, for specific predic-
+tion tasks. This approach, heavily relying on prior knowledge and
+experiences of domain experts, is time-consuming and expensive.
+This issue has given rise to a great deal of interest in representation
+learning in networks that aims to embed a network into a low-
+dimensional space and represent each node as a low-dimensional
+feature vector for supervised learning.
+In this paper, we propose a new neural network (NN) model,
+namely Heterogeneous Information Network to Vector (HIN2Vec) for
+representation learning of nodes in heterogeneous information net-
+works (HINs). The HIN2Vec model aims to capture the rich in-
+formation in an HIN by exploiting various types of relationships
+among nodes and the network structure. HINs, such as Yelp social
+network [4], DBLP collaboratoin network [3], and U.S. patent ci-
+tation network [2], are networks with nodes and edges belonging
+to different types. With heterogeneous types of nodes and edges,
+HINs are able to describe various types of relationships among
+nodes and thus contain very rich information. A meta-path, con-
+sisted of a sequence of node types and/or edge types, is usually
+used to denote a particular relationship between node pairs. There-
+fore, different meta-paths may have different semantics. For ex-
+ample, consider a DBLP collaboration network, which consists of
+three node types: Author, Paper and Venue, and two edge types:
+an author writes a paper, and a paper is published in a venue. A
+meta-path Author-Paper-Author describes the collaboration be-
+tween two authors, while Author-Paper-Venue-Paper-Author
+describes the relationship where both authors have papers pub-
+lished in the same conference venue. We claim that encoding the
+rich information embedded in meta-paths and the whole network
+structure would help learning meaningful representation which is
+useful for various applications, because the different semantics of
+relationships are better captured.
+To achieve this goal and to train the HIN2Vec model, we design a
+new learning framework (also called HIN2Vec) (shown in Figure 1)
+which, given an HIN and a set of targeted relationships specified
+in forms of meta-paths, learns latent vectors of both nodes and the
+targeted relationships in the HIN by predicting relationships be-
+tween nodes. Compared with previous works, the HIN2Vec model
+preserves more contextual information, not only assuming that
+two nodes are relevant if there exists a relationship between them
+Session 9B: Representation Learning
+CIKM’17, November 6-10, 2017, Singapore
+1797
+Figure 1: Overview of the HIN2Vec framework
+(as previous works do) but also distinguishing the different rela-
+tionships between nodes and treating them differently by learn-
+ing relationship vectors jointly. In specific, the HIN2Vec frame-
+work consists of two phases: (1) Training data preparation: A data
+preparation approach based on random walk and negative sampling
+is developed to prepare training data in accordance with the tar-
+geted relationships for representation learning of nodes in HINs;
+and (2) Representation learning: The novel neural network model,
+HIN2Vec model, is designed to learn both node vectors and re-
+lationship vectors by maximizing the likelihood of predicting re-
+lationships among nodes jointly. The proposed neural network
+model is trained by predicting multiple heterogeneous relationships
+between node pairs simultaneously and jointly. This multi-task
+learning approach allows the proposed model to jointly embed the
+rich information of different relationships and the overall network
+structure into node vectors. Conceptually, relevant nodes which
+have relationships are close to each other. On the other hand, the
+relationship vectors indicate which dimension captures certain re-
+lationships, and are useful for providing analytical insights, such
+as grouping meta-paths with similar semantics. Furthermore, it
+is essential for the proposed model to be scalable for large-scale
+real-world datasets. We leverage asynchronous stochastic gradi-
+ent descent in representation learning in parallel.
+There are a few previous works on representation learning in
+homogeneous information networks [10, 24, 28]. Although these
+prior works all claim that their approaches are able to capture the
+structural information of networks, the specific objective functions
+used in their models tend to consider only part of aggregated in-
+formation among nodes or limited types of relationships between
+nodes separately. There are also several existing works on rep-
+resentation learning in HINs [8, 11, 13, 25, 27]. However, some
+models aim to only capture limited types of relationships between
+nodes (e.g., one-hop or two-hop neighberhood between two nodes)
+[8, 11, 27], and some tend to miss the different semantics of rela-
+tionships between nodes and only capture the aggregated informa-
+tion of relationships [8, 11, 13, 27]. Only one study [25] tries to cap-
+ture different relationships between nodes. However, it highly de-
+pends on a user-guided way to determine a user-given meta-path
+set and the weight of each meta-path for representation learning.
+Moreover, some parts of its objective function to encode relation-
+ships between nodes, e.g., the multiplication of vectors of meta-
+paths, are illy defined.
+The major contributions of our work are summarized as follows.
+A novel idea for representation learning in HINs. With mul-
+tiple types of nodes and edges, HINs are able to describe various
+types of relationships between nodes, which have different seman-
+tics. We show that by capturing various types of relationships be-
+tween nodes would help representation learning because it better
+captures more detailed and precise information embedded in the
+network structure.
+A new representation learning framework for HINs. We pro-
+pose a two-phase framework to learn representations of nodes and
+meta-paths in HINs. The training data preparation algorithm in
+Phase 1 adopts random walk generation and negative sampling
+to prepare training data tailored for HIN2Vec. The HIN2Vec NN
+model, core of phase 2, is designed as a logistic binary classifier
+that predicts whether two input nodes has a specific relationship
+in order to efficiently learn model parameters, i.e., node vectors
+and meta-path vectors. Issues in these two phases, such as cycles
+in random walks, node selection in negative sampling, and regu-
+larization of meta-path vectors are studied.
+Empirical study using real-world data. We evaluate HIN2Vec
+by conducting a comprehensive evaluation with two different ap-
+plications, node classification and link prediction, using four large-
+scale real HIN datasets, including Blogcatalog, Yelp, DBLP and
+U.S. patents, in comparison with six state-of-the-art representation
+learning models. Empirical result shows that HIN2Vec soundly
+outperforms all existing models. In addition, an analysis on the
+learned meta-path vectors shows that the learned representation
+of relationships capture their semantics.
+In the rest of this paper, we first review the related work in
+Section 2, and introduce HINs, meta-paths, problem definition and
+analysis in Section 3. We present the proposed HIN2Vec frame-
+work in Section 4 and show experiment results in Section 5. Fi-
+nally, we conclude the paper in Section 6.
+2
+RELATED WORK
+Recent development on representation learning has shed a light
+on alleviating the dependence of feature engineering on human
+knowledge and labors [7, 24, 28]. The goal of representation learn-
+ing aims to automatically learn useful latent representations of
+data that are effective and discriminative as input features to su-
+pervised machine learning algorithms for various prediction tasks.
+Among the various approaches of representation learning, the neu-
+ral network based learning models have received significant at-
+tention in recent years, and achieved successes in several empir-
+ical research studies of various domains, including speech recog-
+nition [12, 22], computer vision [9, 16], and natural language pro-
+cessing (NLP) [21].
+Recently, research on representation learning has been extended
+to network data [8, 10, 11, 13, 24, 25, 27, 28]. However, instead of
+the complex Heterogeneous information networks (HINs) targeted
+in this paper, some prior works focus only on learning node vec-
+tors in homogeneous information networks [10, 24, 28]. Moreover,
+while they all claim that their approaches are able to capture the
+embedded structures of information networks, these models tend
+to consider only aggregated information among nodes or limited
+types of relationships. For instance, DeepWalk [24] and node2vec
+Session 9B: Representation Learning
+CIKM’17, November 6-10, 2017, Singapore
+1798
+[10] learn feature vectors of nodes by capturing the nearby neigh-
+borhood to each node by simulating uniform and parameterized
+random walks, respectively. LINE [28] captures 1-hop and 2-hop
+neighborhood relationships, separately, to learn two representa-
+tions of nodes.
+There are also several existing works on representation learn-
+ing on HINs [8, 11, 13, 25, 27]. Some models aim to only capture
+limited types of relationships between nodes.
+Specifically, PTE
+[27] and HNE [8] learn feature vectors of nodes by capturing 1-
+hop neighborhood relationships between nodes. HEBE [11] cap-
+tures 2-hop neighberhood between multiple nodes. Some tend to
+miss the different semantics of relationships between nodes and
+only capture the aggregated information of relationships [8, 11, 13,
+27]. Only one study [25] tries to capture different relationships be-
+tween nodes. However, it relies heavily on user guidance to deter-
+mine a user-given meta-path set and the weight of each meta-path
+for representation learning. Moreover, some parts of its objective
+function to encode relationships between nodes, e.g., the multipli-
+cation of vectors of meta-paths, are illy defined.
+3
+PRELIMINARIES
+In this section, we first introduce the notions of HINs and meta-
+paths, then define the tackled problem, and discuss the challenges.
+3.1
+Information Network and Meta-Path
+We first define information networks and meta-paths.
+Definition 1. Information Network. An information network
+is a directed graph G = (V ,E,Φ,Ψ), where V is the set of nodes;
+E ⊆V × V is the set of edges in V . Φ : V →A and Ψ : E →R
+are type mapping functions for nodes and edges, respectively. Here
+each node v ∈V is mapped to one particular node type in A, i.e.,
+Φ(v) ∈A, and each link e ∈E belongs to a particular edge type in
+R, i.e., Ψ(e) ∈R. When |A| > 1 or |R| > 1, the network is called a
+heterogeneous information network (HIN); otherwise, it is a homoge-
+neous information network.
+The concept of meta-paths has been proposed to describe how
+nodes are related to each other [18] [26]. In the following, we de-
+fine meta-paths.
+Definition 2. Meta-path. Given a heterogeneous information
+network G = (V ,E,Φ,Ψ), a meta-path π is a sequence of node types
+a1,a2,...,an and/or edge types r1,r2,...,rn−1:
+π = a1
+r1→...ai
+ri→...
+rn−1
+→an
+A path p, which goes though nodes v1,v2,...,vn, is an instance
+of the meta-path π, if∀i = 1,...,n,ai = Φ(vi) andri = Ψ(vi,vi+1).
+3.2
+Problem Definition and Analysis
+The goal of this work is to learn a representation of nodes in an
+HIN. In the following, we formally define the problem.
+Definition 3. Representation Learning on HIN. Given a heteroge-
+neous information network (HIN), denoted as a graphG = (V ,E,Φ,Ψ).
+Representation learning aims to learn a function f : V →Rd that
+projects each node v ∈V to a vector in a d-dimensional space Rd,
+where d ≪|V |.
+Figure 2:
+A conceptual
+model for HIN2Vec
+Figure 3:
+A paper-author
+HIN
+In this paper, we propose a neural network model to tackle the
+representation learning problem on HIN. Our idea is to explore the
+rich information and network structure in HIN by capturing mul-
+tiple relationships (i.e., meta-paths) between nodes and use them
+as prediction objectives simultaneously and jointly for learning of
+the node vectors. To realize this idea, nevertheless, we face the
+following challenges: (1) Model design. A well designed NN model
+is critical to effective and efficient learning of the HIN2Vec frame-
+work. A conceptual neural network model, developed in our pre-
+liminary design, trains a multi-label classifier to learn node vec-
+tors, but it faces excessive overhead in both training data prepara-
+tion and model learning processes. The proposed HIN2Vec model
+is a better design. (2) Regularization. Due to the semantics and
+implications of latent vectors in the learning process, proper regu-
+larization on certain model parameters are required. (3) Training
+data preparation. Training data need to be prepared and tailored
+based on the learning logic behind the proposed HIN2Vec model.
+There is a trade-off, especially for large-scale HINs, between the
+computational/spacial efficiency and the quality of training data.
+4
+THE HIN2VEC FRAMEWORK
+As introduced earlier, the HIN2Vec framework consists of two
+phases: Training data preparation and Representation learning (See
+Figure 1). In the following, we first present our approach for the
+representation learning phase (Section 4.1), where we discuss a
+conceptual design of NN model for our framework and its pitfalls,
+and then introduce the proposed HIN2Vec NN model and some
+issues to consider. Next, for the training data sampling phase, we
+propose an efficient training data sampling method, based on ideas
+of random walks and negative sampling, to generate training data
+for the proposed model and discuss related issues (Section 4.2).
+4.1
+Representation Learning
+As discussed, our idea to learn node vectors for HIN applications
+lies in jointly learning a model for multiple prediction tasks, one
+for each meta-path. Thus, an intuitive approach is to develop an
+NN model that predicts a set of targeted relationships between any
+given pair of nodes.
+Conceptually, we can adopt a single-hidden-layer feedforward
+neural network model (as illustrated in Figure 2) that takes a pair of
+nodesx,y ∈V as the input to predict the probabilities P(ri |x,y)(i =
+1..|R|) of relationships between x and y in the target relationship
+set R as the output. In the model, the input layer takes in two one-
+hot vectors, ⃗x and ⃗y both of length |V |, representing x and y. In
+the latent layer, ⃗x and ⃗y are transformed into latent vectors W ′
+X ⃗x
+andW ′
+Y ⃗y, whereWX andWY are two |V | ×d matrices representing
+the transformation, W ′
+X and W ′
+Y are their transpose matrices, and
+d is the dimensionality of the hidden layer. Finally, in the output
+Session 9B: Representation Learning
+CIKM’17, November 6-10, 2017, Singapore
+1799
+Figure 4: The HIN2Vec NN model
+layer, the model outputs a vector of length |R| that predicts the
+probability of each relationship r ∈R between x and y, where WR
+is a |R| ×d matrix representing the transformation from the latent
+layer to output. In summary, this conceptual model can be seen
+as a multi-label classifier, and the three matrices,WX ,WY andWR,
+collect the feature vectors of input node pairs and their relation-
+ships.1
+To illustrate the conceptual NN model and issues arising in the
+HIN2Vec framework, Figure 3 shows a simple HIN consisting of
+four papers (P) P1 … P4, and two authors (A) A1 and A2. In this
+example, an edge between two papers denotes their citation rela-
+tionship (we ignore the direction of citations for simplicity) and an
+edge between a paper and an author denotes the authorship. Let
+R denote a target relationship set that includes all relationships be-
+tween nodes within 2 hops, i.e., R = {P-P, P-A, A-P, P-P-P, P-
+P-A, P-A-P, A-P-P, A-P-A}, specified by meta-paths. To train
+the conceptual model based on our idea of HIN2Vec, training data
+need to be prepared for eight prediction tasks corresponding to R.
+For instance, P1 and A1 have two relationships, P-A and P-P-A. A
+training data entry is ⟨x : P1,y : A1,output : [0,1,0,0,1,0,0,0]⟩.
+In practice, however, an issue arising in preparing the training
+set for this model is the high cost in scanning the whole network
+to find all the relationships in R for each pair of nodes in the net-
+work. In addition, during the training process, the transformation
+matrices, i.e., WX , WY and WR, need to be updated in accordance
+with all the relationships, whether they are in presence (positive)
+between two input nodes or not (negative).
+4.1.1
+The HIN2Vec model. To address the aforementioned is-
+sues, we propose the HIN2Vec NN model that reduces the predic-
+tion tasks of the conceptual NN model (i.e., predicting the probabil-
+ities of relationships between two nodes) into new prediction tasks
+— whether two nodes, x and y, have a specific relationship r. As to
+be discussed later, this design avoids scanning for all relationships
+in data preparation as well as examining/updating for all relation-
+ships during training.
+As shown in Figure 4, the HIN2Vec model is a binary classi-
+fier that takes a pair of nodes x and y, and a certain relationship
+r ∈R as the input to predict whether the relationship r exists be-
+tween x and y. The input layer takes in three one-hot vectors, ⃗x, ⃗y,
+and ⃗r, which are transformed into latent vectors W ′
+X ⃗x, W ′
+Y ⃗y, and
+f01(W ′
+R⃗r) in the latent layer. Note that the treatment on r is differ-
+ent from x and y due to their different semantics and implications
+1As a conceptual model, here we do not discuss some implementation details such as
+aggregation and activation operations in detail.
+in the learning process. Here we apply a regularization function
+f01(.) to restrict the values of latent vector for r to be between 0
+and 1. We apply Hadamard function, i.e., element-wise multipli-
+cation, to aggregate the three vectors, denoted by W ′
+X ⃗x ⊙W ′
+Y ⃗y ⊙
+f01(W ′
+R⃗r) and then apply the Identity function for activation. Fi-
+nally, the output layer, taking Summation as the input function
+and Sigmoid function for activation, computes siдmoid
+(∑W ′
+X ⃗x
+⊙W ′
+Y ⃗y ⊙f01(W ′
+R⃗r) to realize logistic classification. Notice that, in
+the framework, we can regularize WX and WY to be the same ma-
+trix or two different matrices, depending on whether we would like
+to emphasize on the individual roles of input nodes in the relation-
+ships. In our experiments, we makeWX andWY to be identical, so
+WX andWR consist of learned node vectors and meta-path vectors,
+respectively.
+4.1.2
+Regularization of WR. As discussed, the regularization
+function f01(.) ofWR regularizes values inWR within 0 and 1. The
+goal is two-fold: 1) it avoids negative values in WR, which would
+inverse the sign in the multiplication of node vectors, thus interfer-
+ing the learning of node vectors. Suppose we do not apply f01(.)
+on WR, and some values in a relationship vector are negative. The
+signs of corresponding values in the two node vectors may become
+opposite to optimize W ′
+R(W ′
+X ⃗x ⊙W ′
+Y ⃗y) in the model. However, if
+these nodes are actually positively related, the signs of values in
+these two nodes vectors should be the same so as to stay positive
+after passing through the Sigmoid function at the output layer. 2)
+it prevents values inWR from becoming too large, which decreases
+the effectiveness of learning. In specific, because HIN2Vec adopts
+element-wise multiplication to aggregate the three vectors W ′
+X ⃗x,
+W ′
+Y ⃗y, andW ′
+R⃗r. If a value ofW ′
+R⃗r is greater than 1, it decreases the
+importance of values of W ′
+X ⃗x and W ′
+Y ⃗y in the multiplication, thus
+interfering the learning of node vectors.
+Several functions, e.g., Sigmoid function or Binary Step func-
+tion, may serve the purpose described above. We empirically show
+that the Binary Step function outperforms Sigmoid.
+4.1.3
+Optimization Objective. The learning of HIN2Vec model
+parameters (i.e., node vectors and meta-path vectors) is realized by
+setting multiple optimization objectives, one for each meta-path in
+R, to facilitate iterative training upon the training data. It is critical
+to set the objective functions properly.
+To train HIN2Vec, a training set D containing training data in
+the form of ⟨x,y,r,L(x,y,r)⟩is extracted from the HIN. Here
+L(x,y,r), a binary value, indicates whether x and y have r. With
+D, HIN2Vec is trained by the backpropagation training algorithm
+in conjunction with stochastic gradient descent. It goes backwards
+to adjust the weights in WX ,WY , and WR for each entry in D, at-
+tempting to maximize the objective function O, which is the multi-
+plication of Ox,y,r (x,y,r) for each training data entry in D, where
+Ox,y,r (x,y,r) quantifies how HIN2Vec correctly predicts L(x,y,r).
+To ease the computation in the optimization process, we maximize
+logO rather than directly maximize O. The objective function O
+and derivation of logO are shown below.
+O ∝logO = ∑
+x,y,r ∈D logOx,y,r (x,y,r)
+In the above, Ox,y,r (x,y,r) quantifies how HIN2Vec correctly
+predicts a training data ⟨x,y,r,L(x,y,r)⟩based on P(r|x,y), which
+is the output of HIN2Vec and is the predicted probability that x and
+Session 9B: Representation Learning
+CIKM’17, November 6-10, 2017, Singapore
+1800
+y have the relationship r in the network. Specifically, for a train-
+ing data entry ⟨x,y,r,L(x,y,r)⟩, when L(x,y,r) is 1, Ox,y,r (x,y,r)
+aims to maximize P(r|x,y); otherwise, Ox,y,r (x,y,r) aims to mini-
+mize P(r|x,y). Thus, Ox,y,r (x,y,r), logOx,y,r (x,y,r) and P(r |x,y)
+are derived as below,
+Ox,y,r (x,y,r) =
+
+P(r |x,y),
+if L(x,y,r) = 1
+1 −P(r|x,y),
+if L(x,y,r) = 0
+logOx,y,r (x,y,r) =L(x,y,r) log P(r |x,y)
++ [1 −L(x,y,r)] log[1 −P(r|x,y)]
+P(r |x,y) = siдmoid
+(∑W ′
+X ⃗x ⊙W ′
+Y ⃗y ⊙f01(W ′
+R⃗r)
+)
+We then apply the stochastic gradient descent algorithm to max-
+imize the objective function O. Specifically, for each training data
+entry, ⟨x,y,r,L(x,y,r)⟩, it goes backwards to adjust the weights
+inW ′
+X ⃗x,W ′
+Y ⃗y, andW ′
+R⃗r based on the gradients of logOx,y,r (x,y,r)
+differentiated by W ′
+X ⃗x,W ′
+Y ⃗y, and W ′
+R⃗r, respectively, by
+W ′
+X ⃗x := W ′
+X ⃗x + d logOx,y,r (x,y,r)
+dW ′
+X ⃗x
+W ′
+Y ⃗y := W ′
+Y ⃗y + d logOx,y,r (x,y,r)
+dW ′
+Y ⃗y
+W ′
+R⃗r := W ′
+R⃗r + d logOx,y,r (x,y,r)
+dW ′
+R⃗r
+4.2
+Training Data Preparation
+We develop an efficient algorithm to sample the HIN while extract-
+ing training data for HIN2Vec in the form of ⟨x,y,r,L(x,y,r)⟩. No-
+tice that there is a trade-off in data collection between the compu-
+tational efficiency (e.g., to sample training data randomly instead
+of enumerating) and the quality (e.g., the training dataset should
+cover as many nodes pairs with correct semantics in their relation-
+ships as possible). Therefore, it’s essential to design an efficient
+data sample extraction scheme for training data preparation.
+We apply random walks in the task for several advantages. First,
+it is computationally efficient for both space and time complexity.
+The space complexity of storing the direct neighbors of a node to
+select the next node in a random walk isO(|V |), and the space com-
+plexity of storing the path of a random walk with length l is O(l).
+The time complexity of selecting the next node is O(1) (by some
+random selection methods, such as Alias method [5, 17]), and the
+time complexity of generating a path with length l by a random
+walk is O(l). Moreover, subsequences of a random walk are also
+random walks, which can be used to generate training data with-
+out re-generating new random walks. Suppose we consider all re-
+lationships within w-hop neighborhood. Given a random walk of
+length l > w, it can generate w training data for l −w nodes. Thus,
+the time complexity of generating training data given a random
+walk is O(w(l −w)). Therefore, if we consider 1 to w-hop neighbor
+relationships, the space complexity and time complexity of gener-
+ating training data by a random walk with length l is O(|V | + l)
+and O(l + w(l −w)), respectively. When l and w are both much
+smaller than |V |, using random walks to generate training data is
+scalable for large-scale networks.
+Consider the example of paper-author network discussed ear-
+lier. Suppose we generate a random walk P1,P2,A1,P3,A1. Let
+the target relationship set R include all relationships with meta-
+path length no greater than 2-hop. We can generate training data
+Table 1: Statistics of Datasets
+Blogcatalog
+User
+Group
+10312
+39
+Yelp
+User
+Business
+City
+Category
+630639
+86810
+10
+807
+DBLP
+Paper
+Author
+Venue
+53464
+54949
+20
+U.S. Patents
+Patent
+Inventor
+Assignee
+Class
+295145
+293848
+31805
+14
+for the first node P1 as ⟨P1,P2,P-P⟩and ⟨P1,A1,P-P-A⟩, for the
+second node P2 as ⟨P2,A1,P-A⟩and ⟨P2,A3,P-A-P⟩, and so on.
+There are issues in applying random walks to HIN2Vec data
+preparation. First, a random walk may give rise to cycles, which
+hurt the quality of the training data, because a path instance with
+cycles may not comply to the semantics of the corresponding meta-
+path. For example, the third node A1 in the above random walk
+generates a training data entry ⟨A1,A1,A-P-A⟩by the path
+A1,P3,A1. However, an author has no coauthorship with herself.
+Thus, we eliminate data entries with any cycle by checking dupli-
+cate nodes.
+Second, random walks are used to sample positive data, but the
+model also needs negative data for learning. Thus, while generat-
+ing positive samples via random walks, we also generate negative
+data entries following the ideas of negative sampling in Word2Vec
+[21]. For each sampled positive entry, ⟨x,y,r⟩, we generate neg-
+ative data entries by randomly replacing one of the three values
+with other x ′, y′, or r ′, where x ′ and y′ are randomly selected
+nodes, and r ′ is a randomly selected relationship from R. A gen-
+erated negative data entry, ⟨x ′′,y′′,r ′′⟩indicates that x ′′ and y′′
+are not expected to have a certain relationship r ′′. However, for
+HIN2Vec, more erroneous negative data (which actually a positve
+data) might be generated by replacement of r compared with by re-
+placement of x or y since |V | is usually much larger than |R|, while
+|R| is usually not very large (tens to hundreds). To maintain effi-
+ciency and the cleanness of the negative samples, we only sample
+negative data by randomly replacing x or y, and filter out erro-
+neously generated positive samples. To do so, we also ensure that
+the randomly selected x ′ or y′ has the same node type as x or y.
+For example, for a positive data ⟨P1,P2,P-P⟩, we randomly select
+a paper, says P3, to replace P2 (or P1) to generate a negative data
+that indicates P2 (or P1) does not have a citation relationship with
+P3. In other words, we do not select a node with a different node
+type, says authors, for replacement. We empirically examine the
+effect of avoiding cycles in random walks and ensuring the same
+node type in negative sampling.
+5
+EXPERIMENTS
+In this section, we conduct a comprehensive evaluation on HIN2Vec.
+We first introduce four real-world HINs used for experiments and
+six models for representation learning on networks. Then, we eval-
+uate HIN2Vec and those models by two applications: multi-label
+classification for nodes and link prediction for edges.
+Session 9B: Representation Learning
+CIKM’17, November 6-10, 2017, Singapore
+1801
+5.1
+Datasets and Models for Evaluation
+Our evaluation involves two social network datasets (Blogcatalog
+and Yelp) and two scientific publication datasets (DBLP and U.S.
+Patents). Some statistics of the HINs extracted from these datasets
+are summarized in Table 1.
+Blogcatalog is a blog dataset of Blogcatalog, released by Arizona
+State University [1]. We use all bloggers (U) and their groups (G)
+as nodes to form a social network, which contains friendships (U-
+U) and users’ groups (U-G) as edges.
+Yelp is a social media dataset, released in Yelp Dataset Challenge
+[4]. We extract data of the top 10 cities with the most businesses to
+form a network, which includes users (U), businesses (B), cities(C)
+and categories (T) as nodes, and friendships (U-U), users’ reviews
+(B-U), businesses’ cities (B-L) and businesses’ categories (B-C) as
+edges. We filter small categories with less than 10 businesses.
+DBLP is a bibliographic dataset in computer science [3]. We ex-
+tract papers published between 1994 to 2014 of 20 conferences in 4
+research fields to form a network 2. The network includes papers
+(P), authors (A) and venues (V) as nodes, and authorships (P-A),
+papers’ venues (P-V) as edges.
+U.S. Patent is a patent dataset of United States Patent and Trade-
+mark Office (USPTO) [2]. We extract patents issued between 1998
+to 2012 in 14 drug related patent classes to form a network 3. The
+network contains patents (P), inventors (I), assignees (A) and patent
+classes (C) as nodes, and inventorships (P-I), patents’ assignees (P-
+A), patents’ classes (P-C) and citations (P→P) as edges.
+We evaluate HIN2Vec against six state-of-the-art representation
+learning models. Among them, DeepWalk, LINE and node2vec, are
+designed for homogeneous information networks. The are applied
+by treating all node and edges in the HINs as homogeneous ones.
+DeepWalk [24] learns d-dimensional node vectors by capturing
+node pairs within w-hop neighborhood via uniform random walks
+in the network.
+LINE [28] learns node vectors by considering first- and second-
+order proximities of nodes in a network separately. We apply LINE
+to learn d/2 dimensions by capturing first-order information, and
+the other d/2 dimensions by capturing the second-order informa-
+tion, and then use both to form d-dimensional node vectors.
+node2vec [10] is generalized from DeepWalk. It learns d-
+dimensional node vectors by capturing node pairs within w-hop
+neighborhood via parameterized random walks.
+PTE [27] decomposes an HIN to a set of bipartite networks by
+edge tyes, and learns d-dimensional node vectors by capturing 1-
+hop neighborhood of the resulting bipartite networks.
+HINE [13] learns d-dimensional node vectors by capturing path
+counts or path constrained random walks [19] of node pairs within
+w-hop neighborhood.
+ESim [25] learns d-dimensional node vectors by paths between
+nodes along a given set of meta-paths. This model also learns meta-
+path vectors, which is used to shift node vectors in the designed
+objective function.
+220 conferences are ”AAAI”, ”CVPR”, ”ECML”, ”IJCAI”, ”SIGMOD”, ”VLDB”, ”PODS”,
+”EDBT”, ”ICDE”, ”ICDM”, ”KDD”, ”PAKDD”, ”PKDD”, ”SDM”, ”ECIR”, ”SIGIR”,
+”WSDM”, ”WWW”, ”CIKM”, that belong to 4 research fields, including DM, DB, IR,
+and ML.
+3Drug related patent classes are 128, 351, 433, 424, 435, 623, 514, 600, 601, 602, 604,
+606, 607, 800.
+5.2
+Multi-label Classification of Nodes
+In this section, we evaluate the models by multi-label classification
+of nodes. We first introduce the experimental setup, including the
+process of classification, the preparation of labeled datasets and
+the default settings of parameters in the compared models. Then,
+we perform sensitivity tests on parameters of HIN2Vec to deter-
+mine their default settings. Next, we examine several issues in the
+HIN2Vec framework, including the regularization on meta-path
+vectors WR, cycles in random walks, and negative sampling with
+the same node type. Finally, we show the experimental results and
+analyze the meta-path vectors learned by HIN2Vec.
+5.2.1
+Experimental Setup. After learning the node vectors, we
+select a set of nodes, which are assigned one or more labels from
+a finite label set, and use their representations as feature vectors
+to learn and test a linear SVM classifier with five-fold cross vali-
+dation. We use micro-f1 score and macro-f1 score as metrics for
+evaluation.
+In Blogcatalog, users are categorized by 39 groups, which serve
+as labels. Thus, all users are included in the labeled dataset for
+user group classification. In Yelp, as the majority of businesses are
+restaurants, we select 10 main cuisines in restaurants’ categories
+as labels, and select 13,111 restaurants with at least one of those
+labels to form a labeled dataset for restaurant type classification 4.
+In DBLP, we use the 4 research fields as labels, and assign an au-
+thor with a field if he/she has a publication in a conference in that
+field to form a labeled dataset for author classification. Finally, for
+U.S. Patents, we use 14 drug related patent classes as labels, and in-
+volve all patents to form a labeled dataset for patent classification.
+For these node classifications, we eliminate from HINs, groups in
+Blogcatalog, categories in Yelp, venues in DBLP and patent classes
+in U.S. Patents, when we learn the representation of nodes.
+Regarding default parameters, the dimensionality of node vec-
+tors,d, is set to 128 for all approaches. The negative sampling raten
+is set to 5. The initial learning rate α in stochastic gradient descent
+is 0.025. The context window for DeepWalk and node2vec is set to
+4 because they achieve good performance. Also, we use all meta-
+paths with length w ≤4 for HINE, ESim and HIN2Vec. For ESim,
+we set the weight of training data sampling of each meta-path
+based on its length. For example, a meta-path with lengthl, its sam-
+pling weight is 1/l. We also try equal weighting of each meta-path,
+but weighting by meta-path length performs better. For node2vec,
+the two parameters q and p for parameterized random walks are
+set to 4 and 1, respectively. The number of training data sampling
+or the length of random walks for generating training data varies
+for each model and for each dataset, in order to obtain converged
+results.
+5.2.2
+Parameter Tuning in HIN2Vec. Parameters settings in
+HIN2Vec affect the node representation learning and the applica-
+tion performance. To decide the default settings, we vary the val-
+ues of important parameters to observe how the micro-f1 changes
+in node classification in the networks. The results are shown in
+Figure 5.
+410 main cuisines are ”American”, ”Mexican”, ”Italian”, ”Chinese”, ”Japanese”, ”Thai”,
+”Indian”, ”Canadian”, ”Middle Eastern” and ”Greek”
+Session 9B: Representation Learning
+CIKM’17, November 6-10, 2017, Singapore
+1802
+(a) Dimensionality d
+(b) Number of Negative Samples n
+(c) Length of Random Walks l
+(d) Length of Meta-paths w
+Figure 5: Parameter Tuning
+No. of dimensionality. First of all, Figure 5(a) shows that set-
+ting the number of dimension d at 128 is reasonable.
+General
+speaking, a small d is not sufficient to capture the information em-
+bedded in relationships between nodes, but a large d may lead to
+noises and cause overfitting. In Blogcatalog, the best performance
+is achieved when d is 128. In the other three networks, increasing
+d up to 256 continuously improves the performance, though their
+improvements are small (about 0.7% to 6.2%). Generally, a larger
+network may need a larger d to capture the information embedded
+in relationships between nodes.
+No. of negative samples per positive sample. As shown in Fig-
+ure 5(b), the performance does not change much when the number
+of negative sampling per positive sample n is set at between 3 to 7.
+Thus, setting n to 5 is a good choice.
+Length of Random Walks. A longer random walk can generates
+more sample data. Figure 5(c) suggests that when the length of
+random walks l is increased (resulting in more sample data), the
+performance continues to improve and converge when l is set to
+1280 or 2560.
+Length of Meta-Paths. Finally, we study the impact of the maxi-
+mum lengthw of meta-paths of interest. Figure 5(d) shows that the
+maximum length of meta-paths does not affect the performance
+significantly in Blogcatalog, Yelp and U.S. Patents, because that 1-
+hop and 2-hop relationships, e.g., friendships in Blogcatalog and
+citations in U.S. Patents, are the most important relationship in
+these networks. However, a larger w is still helpful in these net-
+works, and the performance improves by 9% when w is 4. On the
+other hand, capturing meta-paths with larger w is crucial in DBLP
+because some longer meta-paths have important semantic mean-
+ing. For examples, A-P-A-P-A (two authors have co-authorship
+with the same author) in DBLP would help the classification as
+these two authors are likely to be in the same research field.
+Based on these results, for HIN2Vec, the dimensionality of node
+representation, d, is set to 128, the negative sampling rate n is set
+to 5, and to use all meta-paths with length w ≤4, because that
+these parameter values can achieve good performance in the all
+Figure 6: Comparison of approaches to issues in HIN2Vec
+networks. Also, these parameter values are set for the fair compar-
+ison with the compared models. The length of random walks in
+HIN2Vec is set to 1280 to obtained converged performance.
+5.2.3
+Study of unique issues in HIN2Vec. As discussed previ-
+ously, there are several unique issues arising due to HIN data prepa-
+ration and HIN2Vec design. In this section, we examine the issues
+of i) regularization functions on relationship vectors WR, ii) nega-
+tive sampling with the same node types, and iii) cycle elimination
+in random walks. For (i), HIN2Vec uses the Binary Step function
+instead of Sigmoid; for (ii), HIN2Vec ensures negative sampling
+choosing the same types of nodes as the corresponding positive
+samples rather than arbitrary node types, and for (iii), HIN2Vec
+eliminates cycles from random walks instead of leaving them in
+the data samples. We perform experiments to compare the differ-
+ent choices in these issues and justify our decisions.
+Specifically, we compare 5 settings. First, the Baseline setting
+adopts Sigmoid function (Sigmod), uses arbitrary node types in
+negative sampling (Arbitrary Type), and has cycles in random
+walks (Cycle). On the other hand, the Best setting applies Bi-
+nary Step function (Binary Step), ensures the same node type in
+negative sampling (Same Type), and eliminates cycles in random
+walks (No Cycle). Three additional settings regarding particular
+issues are tested: a) Sigmod+ Same Type + No Cycle, b) Bi-
+nary Step+ Arbitrary Type + No Cycle, and c) Binary Step +
+Same Type + Cycle. Figure 6 shows that the Best setting used in
+HIN2Vec performs the best, outperforming the Baseline setting in
+all the networks by about 3.4% to 9.2%.
+Regarding the issue of regularization functions, we find that us-
+ing Binary Step is better than using Sigmoid in all networks, by
+about 0.5% to 7.4%. The main difference is that Sigmoid function
+regularizes values to a continuous number between 0 to 1 and Bi-
+nary Step function regularizes values to 0 or 1 by the threshold
+0.5. When a value in a meta-path vector is regularized to a num-
+ber between 0 to 1 by Sigmoid, it amplifies the importance of the
+multiplication of two input node vectors, thus mis-guiding repre-
+sentation learning.
+The result also shows that Same Type is better than Arbitrary
+Type, by a margin of about 1.6% to 5% (excluding Blogcatalog net-
+work because that it only contains one node type, and thus does
+not have this issue.) The result suggests that ensuring the same
+node type in negative sampling is necessary.
+Finally, No Cycle and Cycle do not show significant difference.
+Actually, eliminating cycles in random walks does not always per-
+form better than leaving cycles in training data. Perhaps this is
+because the number of erroneous data is relatively small. How-
+ever, our experiments show that avoiding the training data with
+Session 9B: Representation Learning
+CIKM’17, November 6-10, 2017, Singapore
+1803
+cycles improve the efficiency while maintaining the effectiveness.
+Thus, HIN2Vec chooses to remove cycles from training data.
+5.2.4
+Evaluation of models. The performance of node classifi-
+cation by all evaluated models is summarized in Table 2. HIN2Vec
+outperforms all the state-of-the-art models. As shown, the im-
+provement ratio (compared with the best of these existing models,
+marked by ’*’) ranges from 6.4% to 23.8%. We have the following
+observations from the comparison.
+Exploring meta-paths of longer length is useful. Compared
+with LINE and PTE, which only capture 1-hop or 2-hop neigh-
+borhood of nodes, other models usually have better performance
+(except ESim) because they also capture “longer” relationships be-
+tween nodes.
+Distinguishing different meta-paths between nodes is use-
+ful. Comparing with DeepWalk, node2vec, HINE and HIN2Vec, all
+of which consider relationships of nodes within w(=4)-hop neigh-
+borhood, HIN2Vec further distinguishes different relationships be-
+tween nodes, whereas others only capture aggregated information.
+Thus, HIN2Vec is able to capture more detailed information of net-
+work structure and thus can achieve higher performance in node
+classification.
+Appropriate model design to distinguish relationships be-
+tween nodes is crucial. Comparing with ESim which also cap-
+tures meta-path relationships between nodes, HIN2Vec outperforms
+ESim in all four networks. We argue the superiority of HIN2Vec
+is due to a better model design that precisely captures the relation-
+ships between nodes.
+5.2.5
+Analysis of Meta-paths. In addition to node vectors,
+HIN2Vec also learns meta-path vectors as a side-product. In this
+section, we analyze the representations of relationships (i.e., meta-
+path vectors) by clustering those vectors to examine whether meta-
+paths with relevant semantics are clustered together. We use Yelp
+and U.S. Patent networks as the study cases because they have
+more complex schema of networks, with more meta-paths than
+Blogcatalog and DBLP. We select top 20 meta-paths in these two
+networks with the highest frequency when generating the train-
+ing data by random walks, and then apply K-Means algorithm to
+group meta-paths into 6 clusters. The results are shown in Table 3.
+In Yelp, we observe that each of clusters 1 to 5 have clear and dis-
+tinct semantics. Specifically, Cluster 1 groups meta-paths of friend-
+ships (except 3-hop friendship). Cluster 2 groups meta-paths be-
+tween two businesses via only friendships (except B-U-U-B which
+is not in top 20 frequent meta-path set). Cluster 3 contains meta-
+paths between business to users via multiple hops of friendships.
+In Cluster 4, B-U has unique semantics that no other meta-path is
+similar with it. Cluster 5 contains meta-paths with cities. Cluster
+6 contains several meta-paths that do not share semantics, and due
+to the lack of space, we skip to show meta-paths in Cluster 6.
+Among the 20 meta-paths in the U.S. Patent network, each of
+clusters 1 to 5 also shows obvious semantics. Specifically, Clus-
+ters 1 contains co-citing and co-cited meta-paths, which are rele-
+vant because two patents are likely in the same research field if
+they are co-cited or co-cite the same patents. Cluster 2 contains 1-
+hop and 2-hop citation meta-paths, which both indicate knowledge
+flow among patents. Cluster 3 has meta-paths describing the rela-
+tionships between inventors and his/her citing and cited patents.
+In Cluster 4, the patents’ assignees, P-A, has unique semantics,
+and thus no other meta-path is similar to it. Cluster 5 contains re-
+lationships between patents via bibliographic information (inven-
+tors and assignees) (except P-I). However, Cluster 6 also contains
+several meta-paths with no similar semantics.
+These analyses suggest that the representations of meta-paths
+in HIN2Vec capture semantics of meta-paths very well, placing
+meta-path vectors in the latent space closely with other vectors
+of relevant semantics.
+5.3
+Link Prediction
+In this section, we demonstrate that the same node vectors learned
+by HIN2Vec can be used effectively for another application, link
+prediction. We first introduce the experimental setup including
+the experimental flow of link prediction and metrics for evaluation.
+Then, we study different vector functions that transform two node
+vectors into one vector for the purpose of link prediction. Finally,
+we show the experimental results of HIN2Vec, in comparison with
+other models.
+5.3.1
+Experimental Setup. We model the link prediction prob-
+lem as a recommendation problem that aims to rank node pairs
+in terms of their relevancy, which may lead to potential linkage
+between them. Specifically, given a network, we first generate a
+sub-network by selecting an edge class and randomly removing a
+certain fraction (20% in our experiments) of edges of the selected
+edge class as missing edges. After removing edges, we apply rep-
+resentation learning models on the resulting sub-network. Then,
+to perform the recommendation on the sub-network, we apply su-
+pervised models to rank node pairs which are more likely to have
+missing edges. In specific, we randomly select 2000 nodes to form
+a training set. For a selected node, we first use its neighbors within
+a certain number of hops as candidates to form a set of candidate
+node pairs (a pair contains the node and a candidate node). This
+candidate selection step aims to reduce the number of node pairs
+to be ranked. We choose an appropriate hop number for different
+networks to ensure the coverage of missing edges is greater than
+85%. To form a training set, for each node pair, we label it with 1 if
+they have a missing edge, and with 0, otherwise. We study differ-
+ent vector functions (to be discussed later) to construct a feature
+vector for the node pair based on the two nodes’ representations.
+Finally, we apply linear SVM to perform ranking, by using the pre-
+dicted confidence of each data with five-fold cross validation. We
+use Mean Average Precision (MAP) and The top-k recall (recall@k)
+as metrics for evaluation.
+(1) Mean Average Precision (MAP): the mean of the average pre-
+cision scores for the ranking result of each nodev. The average pre-
+cision score (AveP) is the sum of the top-k precision (precision@k),
+the percentage of top-k ranking results that hit the ground truth
+over k. The equations of AveP and MAP are shown below.
+AveP(v) = Σn
+k=1
+precision@k
+k
+MAP = ΣK
+i=1AveP(vi )
+K
+(2) The top-k recall (recall@k): the percentage of the ground
+truth or indicators ranked in the top-k returned results.
+recall@k =
+# of hits in top−k
+# of positive documents in theдround truth
+To construct a feature vector for a node pair based their node
+vectors, we study four vector functions, Hadamard, Average, Minus
+Session 9B: Representation Learning
+CIKM’17, November 6-10, 2017, Singapore
+1804
+Table 2: Performance Evaluation of Node Classification
+Blogcatalog
+Yelp
+DBLP
+U.S. Patents
+micro-f1
+macro-f1
+micro-f1
+macro-f1
+micro-f1
+macro-f1
+micro-f1
+macro-f1
+DeepWalk
+0.244
+0.140
+0.276
+0.165
+0.481
+0.463
+0.675
+0.676
+LINE
+0.239
+0.128
+0.270
+0.163
+0.449
+0.429
+0.66
+0.663
+node2vec
+0.246
+0.141
+0.276
+0.166
+0.491
+0.470
+0.676
+0.677
+PTE
+0.179
+0.096
+0.222
+0.130
+0.417
+0.394
+0.547
+0.555
+HINE
+*0.250
+*0.144
+*0.2

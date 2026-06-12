@@ -1,0 +1,15 @@
+{
+  "source": "Expanding Taxonomies with Implicit Edge Semantics",
+  "source_group": "Awesome-ML-Papers/Embeddings",
+  "processed_at": "2026-06-08T12:00:00Z",
+  "agent": "agent_batch_generation",
+  "concepts": [
+    {
+      "finding": "Learns edge semantics (IS_A, PART_OF, RELATED_TO) in taxonomies from data. Edge type is predicted using embeddings of parent and child nodes. Enables automatic taxonomy expansion: given new term, predict correct parent and edge type. Achieves 85%+ accuracy on taxonomy placement.",
+      "category": "ModelCandidate",
+      "implication": "New keywords can be placed into existing intent taxonomies by predicting their parent intent and the type of relationship. Edge semantics distinguish direct intent membership from loose relatedness.",
+      "open_question": "Should keyword-intent relationships be typed (IS_A, RELATED_TO, INSTANCE_OF) or is a single membership type sufficient?",
+      "testable_hypothesis": "Typed keyword-intent relationships (with learned edge semantics) produce more actionable keyword clustering than uniform membership assignments."
+    }
+  ]
+}

@@ -1,0 +1,1868 @@
+Article
+Charting the Path to Purchase Using
+Topic Models
+Hongshuang (Alice) Li and Liye Ma
+Abstract
+In gathering information for an intended purchase decision, consumers submit search phrases to online search engines. These
+search phrases directly express the consumers’ needs in their own words and thus provide valuable information to marketing
+managers. Interpreting consumers’ search phrases renders a better understanding of their purchase intentions, which is critical
+for marketing success. In this article, the authors develop an integrated model to connect the latent topics embedded in con-
+sumers’ search phrases to their website visits and purchase decisions. Using a unique data set containing more than 8,000 search
+phrases submitted by consumers, the model identifies latent topics underlying the searches that led consumers to the firm’s
+website. Compared with a model lacking any textual information from consumers’ search phrases, a model using textual data in a
+heuristic approach, and a model based on the latent Dirichlet allocation, the proposed model provides a better evaluation of a
+consumer’s position on the path to purchase and achieves much better predictive accuracy, which could in turn substantially
+increase the firm’s revenue. The authors also extend the discussion to aggregators, affiliated websites, and segments of consumers
+who are exposed to the firm’s outbound ads. Marketing managers can use this method to extract structured information from
+consumers’ search phrases to facilitate their inference of consumers’ latent purchase states and thereby improve marketing
+efficiency.
+Keywords
+path to purchase, search phrase, textual analysis, topic model, hidden Markov model.
+Online supplement: https://doi.org/10.1177/0022243720954376
+For decades, firms have show n a keen interest in inferring
+consumers’ positions on the complex and winding purchase
+journey and aimed to deliver the right nudge at the right
+moment to enhance conversions. The research on consumers’
+decisions and behaviors along their path to purchase dates back
+to the awareness-interest-desire-action (AIDA) model (Howard
+and Sheth 1969; Strong 1925), in which a prospective con-
+sumer first becomes aware of a product, then develops interest,
+researches and narrows down options, and finally makes the
+purchase. In an online shopping environment, consumers leave
+touchpoints along their purchase journeys, and their channel
+preferences may vary according to their needs (Li et al. 2020).
+Firms routinely gather the granular touchpoint data and endea-
+vor to discover consumers’ needs and purchase intentions
+through their online visit and purchase behaviors (Taniguchi
+2019). By examining the many touchpoints through a variety of
+marketing channels, firms have significantly improved their
+grasp of the consumer journey.
+Prior empirical research on consumers’ purchase journey
+has analyzed the patterns of impressions and clicks in click-
+stream data or customer relationship management data and
+inferred consumers’ purchase propensity based on these pat-
+terns—such as the frequency of impressions or clicks, the
+sequence of website visits, and the duration between two clicks
+(e.g., Manchanda et al. 2006; Montgomery et al. 2004). In
+addition to the touchpoint data, textual data can help reveal
+consumers’ purchase intentions (Berger et al. 2020). There is
+an increasing amount of literature about textual analyses of
+consumers’ online word of mouth (Bu ¨schken and Allenby
+2016, 2020; Lee and Bradlow 2011; Netzer et al. 2012; Tiru-
+nillai and Tellis 2014) and search queries (Gong, Abhishek, and
+Li 2018; Liu and Toubia 2018). However, little research has
+connected the rich information embedded in consumer-
+generated textual data to consumers’ purchase journeys. In this
+article, we develop a framework to extract structured and quan-
+tifiable information from consumers’ search queries and use
+this information to improve the inference about consumers’
+purchase intentions along their path to purchase.
+Hongshuang (Alice) Li is Assistant Professor of Marketing, Fisher College of
+Business, The Ohio State University, USA (email: li.815@osu.edu). Liye Ma is
+Associate Professor of Marketing, Robert H. Smith School of Business,
+University of Maryland, USA (email: liyema@rhsmith.umd.edu).
+Journal of Marketing Research
+1-18
+ª American Marketing Association 2020
+Article reuse guidelines:
+sagepub.com/journals-permissions
+DOI: 10.1177/0022243720954376
+journals.sagepub.com/home/mrj
+
+
+===PAGE BREAK===
+
+The proliferation of online marketing channels provides
+marketing managers with various means to interact with con-
+sumers, among which the paid search channel has attracted a
+large portion of online marketing dollars in recent years (Van-
+Boskirk et al. 2019). It generates inbound traffic through con-
+sumers’ clicks on both free organic search listings and paid
+search listings. The search phrases used by consumers on their
+path to purchase are especially informative, as these phrases
+directly express what consumers are looking for at that moment
+in their own words. The content in these search phrases offers a
+glimpse into consumers’ interest, and the variation of search
+phrases reveals how consumers’ purchase intentions evolve
+along their purchase journeys . Prior marketing research on
+search phrases has centered primarily on the presence of a
+retailer’s or brand’s name, the popularity of a keyword, and
+the specificity of a keyword (Ghose and Yang 2009; Jerath,
+Ma, and Park 2014; Li et al. 2016; Lu and Yang 2017; Rutz and
+Bucklin 2011). Although recent efforts have been made to use
+latent themes in search phrases to infer consumers’ content
+preference (Liu and Toubia 2018) and keyword ambiguity
+(Gong, Abhishek, and Li 2018), no research has connected the
+semantics embedded in these search phrases to consumers’
+purchase decisions, arguably one of the most important mar-
+keting variables.
+Our study fills this gap in the literature by extracting quan-
+tifiable semantic information from consumers’ search phrases
+to shed light on their positions along the path to purchase.
+Specifically, we propose a modeling framework that uses a
+topic model to capture the latent themes embedded in consu-
+mers’ search phrases and integrates this topic model with
+choice models that characterize consumers’ visit and purchase
+decisions driven by their latent states of purchase. Compared
+with existing applications of topic models in marketing (Bu¨sch-
+ken and Allenby 2016, 2020; Liu and Toubia 2018; Tirunillai
+and Tellis 2014; Trusov, Ma, and Jamal 2016), including var-
+iants of the latent Dirichlet allocation (LDA) and the correlated
+topic model (CTM), our model is novel in that it integrates a
+topic model with consumers’ purchase decisions and utilizes
+textual data to infer consumers’ latent purchase intentions.
+Consequently, our new approach provides valuable insights
+and managerial implications directly associated with the con-
+sumers’ purchase decisions. In addition, we provide two imple-
+mentations of the modeling framework—one in discrete state
+space and the other in continuous state space—for robust and
+generalizable applications.
+We estimate the proposed model using a rich data set pro-
+vided by a large hospitality firm, which conducts marketing
+campaigns across multiple online marketing channels such as
+search engines, display ads, email, referral engines, and the
+firm’s own website. The data consist of touchpoints for more
+than 2,000 consumers from August 1, 2012, to December 15,
+2012, containing their channel visits, purchases, and search
+phrases submitted to search engines such as Google, Yahoo,
+Bing, and AOL. From the unstructured search phrases, our
+model estimates reveal five distinct latent topics: convenience,
+economy, loyalty, luxury, and location. We examine the
+dynamics and heterogeneity of consumers’ topic choices along
+the path to purchase and analyze the relationship between the
+firm’s brands and the topics searched by consumers. Our results
+confirm that consumers at different stages of purchase search
+on different topics. For example, consumers in an early stage of
+purchase are more likely to search the “convenience” and
+“loyalty” topics, but as they progress along the path to pur-
+chase, the probability of searching both topics decreases. Unco-
+vering such semantic information in search phrases provides a
+better understanding of consumers’ purchase intentions, which
+in turn enables more accurate predictions of their purchase
+decisions. For example, at the 5 % false positive rate (FPR),
+our proposed model can achieve a 67.2 % true positive rate
+(TPR), compared with the 37.8 % TPR from the model that
+does not use any textual information, the 54.9 % TPR from the
+method that uses textual data in a heuristic approach, and the
+52.7% TPR from an LDA-based model. By more accurately
+identifying consumers with high purchase propensities, our
+model has the potential to substantially increase firms’ market-
+ing performance.
+By exploiting the semantic information in search queries to
+infer consumers’ progress on their path to purchase, our
+method makes both methodological and substantive contribu-
+tions to the literature. From a methodological perspective, we
+provide an integrated modeling framework that connects the
+latent topics searched by consumers to their visit and purchase
+decisions, in both discrete and continuous state-space versions.
+Substantively, we utilize consumers’ search phrases to reveal
+crucial insights into their latent purchase stages, which can help
+improve a firm’s marketing performance.
+The rest of this article is organized as follows. In the next
+section, we review several streams of literature related to our
+research. We then introduce the proposed model, followed by
+the empirical application. Next, we demonstrate the predictive
+performance of the proposed model and finally conclude with
+summaries, managerial implications, and limitations.
+Literature Review
+Our research is related to three streams of literature: consu-
+mers’ path to purchase, search keywords, and recent applica-
+tions of topic models in marketing.
+Path to Purchase
+Understanding and predicting consumers’ purchase journey has
+been a cornerstone in the field of marketing. Several recent
+reviews provide comprehensiv e summaries of the relevant
+studies (e.g., Hamilton and Price 2019; Lee et al. 2018; Lemon
+and Verhoef 2016). The efforts to describe the consumer jour-
+ney date back to the classic AIDA framework (Howard and
+Sheth 1969; Strong 1925), in which a consumer progresses
+through awareness, interest, desire, and action phases along the
+purchase funnel. As the shopping environment has changed
+dramatically over time (e.g., the growth of online shopping,
+real-time targeting and promotion, pre- and postpurchase
+2 Journal of Marketing Research XX(X)
+
+===PAGE BREAK===
+
+information sharing among consumers), the AIDA model has
+also been expanded and modified accordingly. For example,
+McKinsey & Company depicts a consumer’s shopping journey
+with a circular consumer decision journey model (Court et al.
+2009), which differs from the unidirectional AIDA model. In
+consumer behavior literature, Lee et al. (2018) propose a
+needs-adaptive model and highlight the nonlinear and adaptive
+features of the consumer journey.
+The advent of multichannel and multiscreen shopping has
+significantly increased the complexity of consumers’ purchase
+journeys (Verhoef, Kannan, and Inman 2015). Moreover, the
+availability of granular online touchpoint data enables empiri-
+cal research on a diverse set of topics, such as consumers’
+online browsing behaviors, cross-channel search and shopping
+behaviors, and staged purchase funnels (Colicev, Kumar, and
+O’Connor 2019; Joo et al. 2013; Li and Kannan 2014; Moe and
+Fader 2004; Montgomery et al. 2004; Trusov, Ma, and Jamal
+2016), which prior researchers were unable to investigate due
+to data limitation. Meanwhile, modeling techniques such as the
+hidden Markov model (HMM) have been introduced to mar-
+keting to help infer dynamic consumer behaviors driven by
+latent states (Du and Kamakura 2006; Li, Sun, and Montgom-
+ery 2011; Ma, Sun, and Kekre 2015; Netzer, Lattin, and Srini-
+vasan 2008; Schweidel, Bradlow, and Fader 2011). However,
+the large volume of textual data created by consumers on their
+purchase journeys remains underresearched in this stream of
+literature. In this article, we propose a model that incorporates
+textual data via topic models into a choice model framework
+and leverages the rich and direct information contained in the
+textual data generated by consumers on their path to purchase.
+Search Keywords
+As consumers progress on their purchase journeys, they can visit
+through various marketing channels, prominent among which is
+the search channel. Researchers have studied the characteristics
+of search keywords based on the presence of certain terms, such
+as brand names, retailer names, and geolocations (Ghose and
+Yang 2009; Rutz and Bucklin 2011), the popularity of a keyword
+by its ranking (Jerath, Ma, and Park 2014), and the specificity of
+a keyword using keyword length (Ghose and Yang 2009) or
+subjective ratings (Li et al. 2016). More recent research has also
+applied the LDA model on search queries to evaluate consu-
+mers’ content preference (Liu and Toubia 2018) and keyword
+ambiguity (Gong, Abhishek, and Li 2018). However, the textual
+analysis of search phrases has not been connected to consumers’
+shopping behaviors or purchase propensities. To fill this gap, we
+apply a topic model to identify the latent topics among consu-
+mers’ search phrases, which we use to provide insights regarding
+consumers’ positions on their path to purchase and help in pre-
+dicting their purchase decisions.
+Topic Models
+Search keywords are one example of textual data consumers
+generate on the path to purchase. Other examples of consumer-
+generated textual data include search queries submitted on
+firms’ websites, text entered in online chats with customer
+representatives, and so on. Among the challenges in analyz-
+ing such textual data are its lack of structure and high
+dimensionality. To address the se challenges, researchers
+in statistics and machine learning have developed sophisti-
+cated textual analysis methods. Topic models are among
+the most widely used methods in this category (Blei and
+Lafferty 2007; Blei, Ng, and Jordan 2003). Following early
+e f f o r t st oa p p l yt e x tm i n i n gm e t h o d sa n dh e u r i s t i c s( L e e
+and Bradlow 2011; Netzer et a l. 2012), Tirunillai and Tellis
+(2014) were among the first to introduce LDA, an early
+standard of topic models, to ma r k e t i n gr e s e a r c ht oa n a l y z e
+user-generated content. The LDA model is also extended to
+constrain words inside the same sentence to the same topic
+(Bu¨schken and Allenby 2016) and to leverage the conjunc-
+tions and punctuation that capture topic carryover from
+sentence to sentence (Bu ¨s c h k e na n dA l l e n b y2 0 2 0 ) .
+The fast development of topic models and the interest in
+exploiting textual data have fueled a rapid increase in the appli-
+cation of topic models. Table 1 summarizes and compares the
+relevant studies that have applied topic models on search
+keywords.
+Several studies have utilized L DA to extract latent topics
+from search keywords. Li et al. (2013) use Wikipedia for
+data training and then apply LDA on search keywords.
+Their analysis does not relate the latent topics to any con-
+sumer behaviors such as visits or purchases. Gong,
+Abhishek, and Li (2018) apply LDA to extract the latent
+topics in keywords and construct an index of topic entropy,
+which is then used in the prediction of the click-through
+rates (CTR) and ad rankings. Liu and Toubia (2018)
+develop a dual LDA model to connect the latent topics in
+consumers’ search queries with the latent topics in search
+results. In both Gong, Abhishek, and Li and Liu and Toubia,
+LDA is first applied on keywords to generate latent topics,
+and then in a two-stage manner the LDA output is used in
+interpreting consumers’ click-throughs of search ads. Our
+model differs from these approa ches in two aspects: first,
+our model jointly estimates latent topics and consumers’
+visit and purchase choices; second, our model utilizes the
+latent topics to infer consum ers’ purchase intentions and
+predict their purchase decisions. Moreover, we adopt a dif-
+ferent topic model, the CTM, first applied in marketing by
+Trusov, Ma, and Jamal (2016), to allow for the correlations
+among topics that is not captu red by the LDA applications.
+Our work differs from Trus ov, Ma, and Jamal in that we
+employ the CTM in an HMM framework to explicitly cap-
+ture consumers’ latent purchase stages on their purchase
+journeys, and our textual analysis is directly tied to the
+consumers’ purchase decisions. Topic models and HMM
+have been used in a two-step manner. For example, Wu
+et al. (2014) apply both LDA and HMM to study the liter-
+ature on stem cells, where LDA is first applied to extract
+latent topics, followed by analyses of latent topics using
+HMM. In their study, the LDA and HMM are not jointly
+Li and Ma 3
+
+===PAGE BREAK===
+
+estimated, and latent topics are treated as latent states,
+whereas in our model the topic model and HMM are inte-
+grated and the latent states are consumers’ positions on the
+path to purchase.
+In summary, compared with the a forementioned research,
+our article contributes on t wo key aspects: (1) we connect
+topic models to consumers’ vis it and purchase choices using
+an integrated modeling framework and (2) we focus on
+consumers’ latent purchase in tentions and, consequently,
+their purchase decisions, arguably the most important vari-
+able to marketing managers. These two contributions are
+closely connected, with the former taking the methodologi-
+cal perspective and the latter t he substantive. In addition to
+these two main contributions, we make two other relatively
+modest contributions: (1) we have implemented the model
+in both continuous an d discrete state spaces and produced
+consistent results, which both enhances result robustness
+and broadens the applicability of the modeling framework,
+and (2) we have expanded the CTM model by jointly esti-
+mating all individual-level parameters from a consumer’s
+visit, purchase, and topic allocation equations to enable
+tighter integration of the topic model and choice models.
+We add to the literature with a modeling framework that
+researchers and practitioners ca n utilize to better understand
+and predict consumers’ latent purchase stages on their path
+to purchase.
+Model
+Conceptual Framework
+Consumers progress on the purchase journey to fulfill their
+needs. The classic AIDA model depicts the consumer journey
+as a purchase funnel (Howard and Sheth 1969; Strong 1925),
+where consumers’ latent purchase propensities can be influ-
+enced by their goals or situational factors in the shopping envi-
+ronment (Hamilton and Price 2019; Lee et al. 2018). Our model
+characterizes several key components of the consumer journey,
+including the consumer’s channel choice, the topic composi-
+tion of their search queries, and the purchase decision, at the
+individual consumer level. Figure 1 illustrates the conceptual
+framework of our proposed model.
+Our model explicitly captures consumers’ latent purchase
+states, which reflect their positions on the purchase journey.
+We order the latent states according to purchase propensities,
+with a higher state implying a higher likelihood of purchase or
+a later stage on the path to purchase. Although the states are
+ordered, as consumers travel along the purchase journey from
+one visit to another, the model allows for transitions between
+any states. That is, consumers can progress from a lower state
+to a higher state or backtrack from a higher state to a lower one.
+As the center of Figure 1 shows, on the nth visit, the con-
+sumer is in a latent purchase state that is conditional on her past
+latent state on visit (n /C0 1). As the arrows indicate, the current
+Table 1. Summary of Relevant Literature.
+Research Topic Model
+Joint Modeling of Topics and
+Consumer Choices
+Connected with the Purchase
+Decisions
+Captures
+Latent States
+Level of
+Analyses
+Li et al. (2013) LDA No No No Keyword
+Wu et al. (2014) LDA, HMM No No Yes. Latent topics
+are treated as
+latent states in
+HMM.
+Keyword
+Trusov, Ma, and
+Jamal (2016)
+CTM No. Visitation intensity and latent
+topics are jointly estimated, but
+the consumer does not make a
+visit choice or purchase choice.
+No No Consumer
+Gong, Abhishek,
+and Li (2018)
+LDA No. LDA is first applied to extract
+latent topics. Then an entropy
+index derived from latent topics is
+used in the prediction of CTRs
+and ad rankings.
+No No Keyword
+Liu and Toubia
+(2018)
+LDA No. LDA is first applied to extract
+latent topics. Then the similarity
+between latent topics and content
+preference is used in the
+prediction of CTRs.
+No No Consumer
+Our article CTM-HMM (a
+joint
+model)
+Yes. Visit and purchase decisions are
+jointly modeled with latent topics.
+Yes. Both discrete-state and
+continuous-state models are
+implemented to capture the latent
+purchase intentions. The purchase
+decisions are jointly estimated
+with channel choices and search
+topic choices.
+Yes. Latent stages
+of purchase are
+explicitly
+captured as
+latent states.
+Consumer
+Notes: CTR ¼ click-through rate.
+4 Journal of Marketing Research XX(X)
+
+===PAGE BREAK===
+
+latent state on visit n determines which channel the consumer
+chooses to visit, her search topic, and her purchase decision.
+The consumer moves along the path to purchase by using one
+or more marketing channels until she either quits or converts.
+Channel visits help capture the encounters with the firm and the
+environmental factors that influence the consumer’s transition
+among latent states, thus performing a crucial role in moving
+consumers through the purchase journey. The channel choice
+on the nth visit can further affect the consumer’s latent state on
+the next visit, visit (n þ 1). If the visit involves any search
+queries, the latent state also affects the topic composition of
+that search. At the end of visit n, the consumer makes a pur-
+chase decision based on her latent state. Channel choice, search
+topic, and purchase all help us infer the consumer’s latent state
+of purchase on visit n, which then determines the latent state on
+visit (n þ 1).
+Consumers’ search queries offer information about their
+purchase intentions—consumers in an early state of purchase
+journey are likely to have different focuses from consumers
+close to purchase, leading to different keyword choices. While
+extant literature has explored this idea by comparing generic
+with branded searches (Rutz and Bucklin 2011) or by analyzing
+keyword popularity (Jerath, Ma, and Park 2014), textual anal-
+ysis tools such as topic models now make a more in-depth
+analysis of search semantics feasible.
+In this study, we use a modified version of CTM (Blei and
+Lafferty 2007), which allows for both the inclusion of covari-
+ates in determining topic weight and the flexible correlations
+among topics. In our context, the modified CTM setup enables
+us to integrate the topic model into the choice models for
+channel visit and purchase decisions, such that the textual
+information can be used to infer consumers’ progress on their
+path to purchase. Specifically, we posit that the search phrases
+consumers use are driven by the specific topics of focus in their
+mind, and such topics evolve as they navigate through the
+purchase journey. Analyzing the topics of consumers’ search
+phrases, therefore, can help managers better assess consumers’
+purchase intentions.
+Our goal is to develop an integrated model that incorporates
+textual data to help infer consumers’ latent purchase stage.
+Both discrete-state and contin uous-state models have been
+widely used to model hidden states, and both are compatible
+with our conceptual framework. For broader applicability, we
+develop two model specifications consistent with the concep-
+tual framework, one using discrete states (i.e., HMM) and the
+other using continuous states. Overall, we find that the HMM
+version has better predictive performance than the continuous
+state-space version, while the key empirical findings are con-
+sistent between the two. Because these two model specifica-
+tions share the same theoretical foundation with only technical
+differences, in the main text we discuss only the HMM version.
+More details of the continuous state-space version are provided
+in Web Appendices A–C. The model setup of the continuous
+state-space implementation appears in Web Appendix A. Web
+Appendix B describes the Markov chain Monte Carlo (MCMC)
+procedure for the continuous state-space model. Web Appen-
+dix C reports the empirical findings, robustness checks, and
+predictive performance of the continuous state-space model.
+Model Specification
+We develop a comprehensive model, guided by the conceptual
+framework, to analyze consumers’ channel visits, keyword
+searches, and conversions. We consider a set of I consumers,
+indexed by i (i ¼ 1, ... , I). Consumers move along their pur-
+chase journeys driven by their latent states of purchase (Berger
+et al. 2020; Howard and Sheth 1969; Lemon and Verhoef 2016;
+Taniguchi 2019). In the model, the latent state of purchase
+determines a consumer’s decisions on what topic to search,
+which channel to visit and, ultimately, whether to make a pur-
+chase. A consumer’s underlying state, and thus her purchase
+propensity, evolves depending on her goals and encounters
+with the firm and contextual factors across visits (Lee et al.
+2018). We define a set of S hidden states to capture the con-
+sumer’s latent states of purchase and denote the state of
+consumer i at visit n as s in, where s in 2 1; ... ; Sfg . For identi-
+fication, we assume that states are ordered in increasing intrin-
+sic purchase propensities (si milar to Netzer, Lattin, and
+Srinivasan [2008], in which states were assumed to have
+increasing donation probabilities). With this assumption,
+Channel 
+choicePurchase Search 
+topic
+Latent purchase state
+at visit (n − 1)
+Latent purchase state
+at visit n
+Latent purchase state
+at visit (n + 1)
+Figure 1. Conceptual framework.
+Notes: We elaborate the details only for the nth visit. Arrows indicate dependency.
+Li and Ma 5
+
+===PAGE BREAK===
+
+a higher state in our setup indicates that the consumer is at a
+later stage of the purchase process and more likely to buy,
+whereas a lower state suggests the consumer is at an earlier
+stage. As a consumer visits over time, she can transition among
+states in any order—from a lower state to a higher state or vice
+versa, and s in is updated accordingly after each visit.
+We model a consumer’s jour ney along latent purchase
+stages with the standard HMM approach, where both the initial
+state and the transition among states across visits are modeled
+probabilistically. The initial state probability is governed by the
+vector P 0 ¼ð r01; ... ; r0SÞ, where r0s is the probability that a
+consumer starts from state s at the beginning of the first visit, or
+the first visit after a purchase, which is considered the begin-
+ning of the next purchase journey. On each visit n, consumer i
+accumulates information, which may change her latent state of
+purchase. The state transition probability of consumer i at visit
+n is specified as an S /C2 Sm a t r i x : Pin ¼ rinss0
+/C8/C9
+s;s0 2 1;...;Sfg ,
+where rinss0 denotes the probability that consumer i transitions
+from state s on visit n to state s
+0
+on visit ðn þ 1Þ. Because the
+state transition is driven by information acquired through chan-
+nel visits, we model the state-transition probabilities as chan-
+nel-specific:
+Pin ¼ Pjin ; Pj ¼ rjss0
+no
+s;s0 2 1;...;Sfg
+; j ¼ 1; ... ; J: ð1Þ
+In Equation 1, j in represents the channel used by consumer i
+at visit n. The evolution of the consumer’s latent state of pur-
+chase is thus governed by the initial probability vector P 0
+together with J state-transition matrices P j; j ¼ 1; ... ; J. Con-
+sistent with the conceptual framework, this technical setup
+captures both the consumer’s distinct latent purchase stages
+and the flexible transition among stages.
+At the beginning of each visit, the consumer first decides
+which channel to use, choosing from all J channels. A consu-
+mer’s channel visit not only moves her along the path to pur-
+chase, as discussed previously on state transition, but also
+reflects her present position on the purchase journey. There-
+fore, we model a consumer’s channel choice as driven by her
+latent state of purchase. The probability of consumer i choosing
+channel j on her nth visit is:
+pv
+ijn ¼ pv
+ijsin ¼
+expðlijsin ÞP
+jexpðlijsin Þ ; j ¼ 1; ... ; J; liJsin ¼ 0: ð2Þ
+In Equation 2, the superscript v on the left-hand side repre-
+sents visit. The channel choice probabilities are determined by
+the channel-specific parameters, lijsin , with channel J being the
+baseline. The parameters are state-dependent, as indicated by
+sin in the subscript, to capture the concept that consumers at
+different purchase stages may have different channel prefer-
+ences. The parameters are also consumer-specific, which we
+estimate using a hierarchical Bayesian setup, discussed in the
+next subsection.
+At the end of each visit, the consumer decides whether to
+make a purchase. The purchase probability conditional on the
+consumer’s latent purchase state is specified in Equation 3. The
+superscript p on the left-hand side represents purchase. The
+parameter aisin characterizes consumer i’s propensity to pur-
+chase on her nth visit, which determines the binary logit pur-
+chase probability.
+pp
+in ¼ pp
+isin
+¼ expðaisin Þ
+1 þ expðaisin Þ : ð3Þ
+A consumer’s visit may begin with a search consisting of a
+set of words. We account for the generation of such keywords
+using topic models. Specifically, we employ the CTM to inte-
+grate the topic model into the overall framework (i.e., to link
+keyword searches with consumers’ position along the path to
+purchase) and allow for flexible correlations among topics. We
+denote the search phrase submitted by consumer i on the nth
+visit as W in ¼ win1 ; ... ; winKinfg . Each word of W in is drawn
+from a topic t ink 2 1; ... ; Tfg ; k ¼ 1; ... ; Kin, where T is the
+total number of topics. Each topic t is defined by a mapping to
+words Ft ¼ ft1 ; ... ftVfg , where ftw represents the probabil-
+ity of a word from topic t being the word w, and V is the size of
+the vocabulary. Consistent with both LDA and CTM, these
+topic-to-word mappings are specified as following a Dirichlet
+distribution:
+Ft * Dirichlet ðZtÞ: ð4Þ
+Each word w ink is thus drawn from a multinomial
+distribution:
+wink * MultinomialðFtink Þ: ð5Þ
+As the consumer progresses along the purchase journey, the
+topic composition of her search may change according to her
+latent state of purchase. Let p w
+itn ¼ pw
+itsin denote the topic prob-
+ability (i.e., the probability of each word of the search phrase
+used by consumer i on her nth visit being drawn from topic t,
+where the superscript w is for topic composition. We model
+each p w
+itsin through a logistic transformation as follows:
+pw
+itn ¼ pw
+itsin ¼ expðyitsin ÞP
+texpðyitsin Þ ; t ¼ 1; :::::; T; yðiTsinÞ ¼ 0: ð6Þ
+In Equation 6, s in in the subscript indicates that the topic prob-
+ability is state-dependent. This captures the notion that consu-
+mers in different purchase stages may search different topics,
+as discussed in the conceptual framework. Furthermore, mak-
+ing the topic parameters state-dependent effectively integrates
+the HMM part and the CTM part of the model, allowing the
+textual information to assist in the inference of consumers’
+purchase stages.
+The topic of each word in search phrase W in is then drawn
+from the multinomial distribution:
+zink *Multinomialðpw
+isin Þ: ð7Þ
+To summarize the relationshi p among the parameters in
+Equations 2–7, Figure 2 displays a plate diagram for our pro-
+posed model at a specific visit under latent state s. All
+6 Journal of Marketing Research XX(X)
+
+===PAGE BREAK===
+
+subscripts and superscripts are suppressed in this graph, with
+details of hierarchical Bayesian setup being discussed in the
+next subsection. The boxes in Figure 2 are plates indicating
+replicates of visits, search phrases, words, and topics, and the
+arrows between nodes denote conditional dependencies. The
+shaded nodes w, v, and p are observations of word, visit, and
+purchase, respectively, while the other nodes represent random
+variables. Parameter a denotes the coefficient in the purchase
+model, and l is the parameter for the visit model. The para-
+meters in braces, a, l, and y, are a jointly estimated vector. The
+arrow pointing from y to z and then to w from the left, as well as
+the arrow pointing from Z to F and then to w from the right,
+illustrate the structure of CTM. In the plate diagram, the CTM
+and LDA models look the same. However, while y follows a
+Dirichlet distribution in LDA, it follows a logistic transforma-
+tion in CTM.
+We explicitly model consumers’ latent purchase intention via
+the latent states in the HMM framework. These latent states
+reflect consumers’ purchase propensities and determine which
+channels they choose to visit, their search topics, and purchase
+decisions. Consumers move through the path to purchase by
+using one or more marketing channels until they either quit or
+convert. Channel visits thus perform a crucial function in mov-
+ing consumers through the purchase journey, and the visit
+choices affect consumers’ latent states on the next visit. At the
+end of a visit, consumers make purchase decisions based on their
+latent states. If a visit involves any search queries, the latent state
+also affects the topic composition of that search. Meanwhile, the
+search keywords also offer information about the consumer’s
+purchase intention—a consumer in the early state of purchase
+is likely to have a different focus from a consumer very close to
+purchase, leading to very different keyword choices. We can
+utilize these keywords to know what latent topics the consumer
+is searching, and meanwhile these keywords can also help us
+identify the consumer’s current latent state.
+Our model makes three behavioral assumptions. First, con-
+sumers travel through different states in any order on their path
+to purchase. Second, we assume that different latent purchase
+states lead to different consumer decisions—different channel
+visit choices, different topics to search, and different purchase
+propensities. These two are standard assumptions and common
+in the literature of the consumer purchase journey. The third
+assumption is that consumers’ search phrases consist of and
+reflect multiple underlying topics, which is a standard assump-
+tion in topic models.
+We note an important distinction between our model and
+LDA, given the latter’s popularity in the literature. In the orig-
+inal LDA model, the document-to-topic mapping is modeled
+using a Dirichlet prior. By contrast, in our model the mapping
+is done through a logistic transformation (see Equation 6) fol-
+lowing the CTM setup, which allows for both the inclusion of
+covariates1 in determining topic probabilities and the admis-
+sion of correlations among topics, rendering a more general and
+flexible model. In addition, our model further extends from the
+standard CTM setup by allowing for correlations among all
+individual customer-level parameters to enable tighter integra-
+tion of the topic model into the overall modeling framework.
+Our model is different from existing heuristic approaches
+that extract information from search phrases, such as categor-
+izing keywords as branded versus generic (Ghose and Yang
+2009; Rutz and Bucklin 2011), ranking keywords by their
+popularity (Jerath, Ma, and Park 2014), or subjectively evalu-
+ating the specificity of keywords (Li et al. 2016). These heur-
+istics result in one or a set of measures that are later used as
+explanatory variables in the model of visit, purchase, or other
+decisions. In contrast to these existing studies, the latent topics
+in our model do not directly enter the visit utility in Equation 2
+or purchase utility in Equation 3 as explanatory variables. We
+believe it is not the consumers’ topic choices that drive their
+visit and purchase decisions. Rather, it is the latent purchase
+states that determine the consumers’ topic choices as well as
+their visit and purchase decisions. Thus, we model the topic
+decisions as determined by the latent purchase states in a sep-
+arate equation (i.e., Equation 6). The topic decisions help to
+identify the latent states of purchase, which also affect the visit
+and purchase decisions through Equations 2 and 3.
+Hierarchical Bayesian Setup
+To complete the model setup, we adopt a hierarchical Bayesian
+framework by treating all indi vidual consumer-level para-
+meters as drawn from a population-level multivariate Normal
+distribution:
+Gi*MVNð /C22G; SÞ; ð8Þ
+where Gi ¼ð aisfg s¼1;...;S; lijs
+/C8/C9
+j¼1;...;J/C0 1;s¼1;...;S; yitsfg t¼1;...;T/C0 1;s¼1;...;SÞT:
+In Equation 8, the vector Gi includes all individual
+consumer-level parameters that govern visits, purchases, and
+α
+λ
+θ
+p
+v
+z Φ η
+Search phrase
+Word Topic
+Visit
+w
+s
+Figure 2. Graphical representation of the proposed HMM.
+Notes: We illustrate a scenario in which the consumer is under the latent state s.
+All subscripts and superscripts are suppressed in this graph. Boxes are plates
+indicating replicates of visit, search phrase, word, and topic, and the arrows
+denote conditional dependencies. The shaded nodes are observations, while
+the other nodes represent random variables. The nodes F and Z are defined in
+Equation 4, whereas node z is posited in Equation 7. The parameters in braces,
+a, l,a n d y, are a jointly estimated vector.
+1 We include covariates in the continuous-state model in Web Appendix A.
+Li and Ma 7
+
+===PAGE BREAK===
+
+topic choices, which are drawn from a multivariate Normal
+distribution. /C22G is the population-level mean parameter of this
+distribution, and S is the covariance matrix. The covariance
+matrix represents a further extension from the standard CTM
+setup by accounting for the correlations among all individual-
+level parameters rather than just the topic-weight ones. This
+setup, in addition to making topic probabilities state-
+dependent, further integrates the topic model component into
+the overall framework. 2 With this setup, the model can then be
+estimated using the MCMC method by iterating through ran-
+dom draws of each parameter from its posterior distribution
+conditional on other parameters. Web Appendix D describes
+the MCMC estimation procedure for the model.
+Empirical Application
+In this section, we illustrate an empirical application of our
+proposed model on consumers’ path-to-purchase data compris-
+ing both touchpoint data from consumers’ visits and purchases
+and textual data from consumers’ search phrases. We first
+describe the data set and the contextual background and select
+the optimal number of latent states and topics for the proposed
+model. Then, we report our re sults in detail, followed by
+robustness checks on our empirical findings.
+Data Description
+Our data set is provided by a leading global hospitality com-
+pany that owns a parent brand and a broad portfolio of sub-
+brands of hotels and lodging facilities. The firm accommodates
+both business travelers and leisure travelers, with its parent
+brand being considered a high-quality luxury brand and the
+service quality and price ranges varying extensively across its
+subbrands. At the firm’s website, all brands are classified into
+four categories, which, without revealing the firm’s identity,
+can be paraphrased as the parent brand and low-end, mid-range,
+and high-end subbrands, respectively.
+This unique data set contains a random sample of 2,093
+consumers’ website visitation and purchase records over four
+and a half months from August 1, 2012, to December 15, 2012,
+including 40,985 clicks on organic and paid search listings,
+display ads, emails, referral links from affiliated sites, social
+media and referral sites, and direct visits to the firm’s website.
+These observations are recorded at the cookie ID level. A
+unique customer is identified by the email address used to
+enroll in the focal firm’s loyalty program. When multiple coo-
+kie IDs are found to log onto the same customer account, the
+tracked visits and purchases from these cookie IDs are merged
+under the same customer’s profile. If a cookie ID does not show
+any login activity to any registered customer account, this coo-
+kie ID is treated as a unique customer. The firm integrates its
+touchpoint data from five sources: (1) data related to display
+ads and search ads collected by Google DoubleClick, (2)
+cookie-based data collected by Omniture SiteCatalyst, 3 (3)
+consumers’ direct visits to the firm’s website identified by the
+consumers’ cookie IDs and/or login IDs, (4) data shared by
+affiliated websites, and (5) data from the firm’s in-house email
+management system.
+Following extant literature, we group the marketing chan-
+nels into three categories: paid, owned, and earned (Stephen
+and Galak 2012). The paid category includes the visits through
+paid search, paid referral engines, 4 display, affiliated sites, and
+business-to-business channels. The owned category contains
+direct visits to the firm’s website and visits via email click-
+throughs, while the earned category covers the click-throughs
+from the remaining channels: organic search, unpaid referral
+links and websites, and social media. Table 2 reports the sum-
+mary statistics of the click-throughs and conversions of each
+channel category. Each channel has a considerable number of
+clicks and conversions. Note that we do not observe the impres-
+sions preceding these clicks and purchases. The conversion
+rates for all channels are in the range of 1.2 % to 2.0 %.
+Consumers’ purchase decisions in our context are usually
+made after extensive information gathering and deliberation. In
+the data set, a consumer typically visits the website repeatedly,
+often through multiple channels, before making a purchase.
+The 2,093 consumers in our data set made 40,985 visits during
+the observation window, with consumers on average making 20
+visits and using two out of the three channel categories. The
+solid line in Figure 3 shows the model-free relationship
+between the conversion rates and consumers’ visit sequence
+on the path to purchase. We can see that consumers’ purchase
+probability increases with their numbers of visits. A simple
+ordinary least square regression of this relationship shows a
+positive slope (the dashed line) that is significant at the .05
+level.
+Table 2. Summary Statistics of Clicks and Conversions.
+Channels
+Number of
+Clicks
+Number of
+Conversions
+Conversion
+Rates
+Paid 2,094 41 1.958%
+Owned 25,091 390 1.554%
+Earned 13,800 170 1.232%
+Total 40,985 601 1.466%
+2 Our model captures correlations am ong parameters at the individual
+consumer level. At the visit instance level, the logit setup in Equations 2, 3,
+and 6 implies a conditional (on state) independence assumption among search,
+visit, and purchase decisions, without accounting for potential correlation
+among the respective error terms. Be cause our focus is on using textual
+information to help infer states, we use this parsimonious setup on error
+terms. If needed, our model can be modified to account for such correlations
+(e.g., by using probit instead of logit). We thank an anonymous reviewer for
+pointing this out.
+3 Omniture SiteCatalyst was acquired by Adobe in 2009 and integrated into
+Adobe Marketing Cloud in 2012.
+4 Paid referral engines include third-party websites such as Expedia, Orbitz,
+Travelocity, and so on. Consumers can also purchase directly at these
+third-party websites to receive the f ocal firm’s service. However, we can
+observe only the purchases made on the focal firm’s website.
+8 Journal of Marketing Research XX(X)
+
+===PAGE BREAK===
+
+When consumers search and click on the focal firm’s
+organic or paid search ads, we can observe the exact search
+phrases5 typed in by consumers. 6 In the data, we observe 8,163
+search phrases submitted by 1,296 consumers to search engines
+such as Google, Yahoo, Bing, and AOL. These searches led to
+6,945 clicks through earned channels (i.e., organic search links)
+and 1,218 clicks through paid channels (i.e., paid search ads).
+We preprocess all search phrases following standard steps in
+textual analysis, including tr ansforming all words to lower
+case, removing stop words and rare words, and stemming.
+More details are reported in Web Appendix E. The cleaned
+data set contains a corpus of 472 unique words, with the longest
+search phrase containing 10 words.
+Estimation
+We estimate the proposed model with MCMC methods in Java.
+Of the 100,000 iterations of drawing the model parameters, we
+discard the first 80,000 draws as burn-in. For the remaining
+20,000 draws, we keep every 50th draw for the analysis of
+posteriors. We run multiple chains, and the convergence of all
+Markov chains is evaluated with Geweke’s (1991) diagnostics
+which yield an average p-value > .1. In addition, we check the
+Gelman–Rubin statistics for be tween-chain variance versus
+within-chain variance. The potential scale reduction factors for
+parameters are all lower than 1.1.
+Selecting the Number of States and Topics
+In our study, we first select the number of latent states and the
+number of latent topics for the proposed model that best fit the
+data set. We vary both the number of states and the number of
+topics from two to ten, and find that with four or more latent
+states, there are topics in certain states with very few word
+occurrences, which can give rise to inaccurate estimation of
+the state-dependent parameters. Thus, we limit the state num-
+ber to three or lower and report the log-marginal density
+(LMD) for all models with fivefold cross-validation in Table 3.
+According to the LMD, the best-fitting model is the one with
+three latent states and five latent topics, which we choose as the
+specification of the proposed model.
+Results
+We examine the latent topics identified by the proposed model
+and name each latent topic based on the meaning conveyed by
+its top words as well as its weights on branded words belonging
+to different brand categories. As Table 4 shows, we label the
+five topics “convenience,” “economy,” “loyalty,” “luxury,”
+and “location,” respectively. These labels are created for ease
+of reference and do not necessarily encompass the comprehen-
+sive meaning of all top words on a topic. Below each topic
+label, there are examples of top words on that topic. Note that
+each branded word is classified according to the firms’ own
+categorization into one of the four categories—parent brand
+and low-end, mid-range, and high-end subbrands. The percent-
+age in Table 4 is based on the word-topic association, F,i n
+Equation 4. Each topic allocates 100 % weight to all words in
+the vocabulary. Here we report only the weights for branded
+words belonging to the parent, low-end, mid-range, and high-
+end brand categories under a specific topic. The bottom row is
+the sum of the weights on all branded words under the same
+topic.
+.0%
+.5%
+1.0%
+1.5%
+2.0%
+2.5%
+3.0%Conversion Rate
+1 3 5 7 9 11 13 15 17 19 21 23 25 27 29 31 33 
+nth Visit on the Path to Purchase
+Figure 3. Changes in conversion rates on the path to purchase.
+Notes: The solid line is conversion rates across the nth visit on the purchase
+journey. The dashed line is the fitted value based on an ordinary least square
+regression.
+Table 3. Selecting the Number of States and Topics.
+Number of Topics
+LMD
+Two States Three States
+T ¼ 2 /C0 141,709 /C0 146,037
+T ¼ 3 /C0 144,388 /C0 145,434
+T ¼ 4 /C0 145,845 /C0 140,645
+T ¼ 5 /C0 144,660 /C0 137,841
+T ¼ 6 /C0 148,035 /C0 145,630
+T ¼ 7 /C0 145,780 /C0 150,560
+T ¼ 8 /C0 145,248 /C0 146,010
+T ¼ 9 /C0 147,156 /C0 159,387
+T ¼ 10 /C0 147,094 /C0 158,256
+Notes: Higher values of LMD indicate better model fit.
+5 The consumer-input search phrase s could be different from the firm’s
+“keywords” listed on search engines. The former are directly typed in by
+consumers and thus represent consumers’ interests and desires, whereas the
+latter are created by the firm and can be broadly or exactly matched to the
+consumers’ search phrases. For example, a consumer may search for “family
+friendly suite in NYC,” and a firm may win the bid for keyword “hotel NYC”
+using broad matching and guide the consumer to the firm’s site. In this
+example, the consumer’s search query provides richer and more accurate
+information on the consumer’s purchase intention than the keyword bid on
+by the firm.
+6 Our data contains only the search phrases consumers type into search
+engines. We do not observe consumers’ search terms at the firm’s own
+website or third-party referral websites. Moreover, we do not observe the
+search results not clicked on by consumers.
+Li and Ma 9
+
+===PAGE BREAK===
+
+The first column of Table 4 shows the “convenience” topic.
+Its top words are related to the convenient features of a trip,
+such as “downtown,” “airport,” “city,” and “center.” Its
+weights on the parent brand and low-end and high-end sub-
+brands are in the middle compared with other topics, but it has
+the highest weight, 13.8 %, on the mid-range branded words.
+At the focal hotel chain, the mid-range brands target mainly
+business travelers and feature the convenient amenities of
+their hotels. Thus, we name this topic “convenience.” The
+second topic includes top words like “inn,” “suite,” “extend,”
+and “stay,” and the weight on low-end subbrands is 28.8 %,t h e
+highest among all topics, while each of the remaining four
+topics receives a weight less than 1 % on words associated
+with low-end subbrands. The greater weight on low-end sub-
+brands in this topic could imply that consumers are more
+interested in affordable hote l rooms or economical rooms
+suited for a longer stay. Accordingly, we classify the second
+topic as the “economy” topic. The third topic includes top
+words like “reward,” “point,” and “platinum,” which are
+directly associated with the fir m’s loyalty program. In addi-
+tion, 57.5 % weight is loaded onto words related to the parent
+brand, and the total weight on branded words is 59.8 %,t h e
+highest among all five topics. Thus, we label the third topic as
+the “loyalty” topic. The fourth topic contains a collection of
+top words referring to high-end travel experiences such as
+“beach,” “resort,” “harbor,” and “spa.” Moreover, its weight
+on high-end subbrands is the highest among all five topics and
+its weight on low-end subbrands is the lowest. Therefore, we
+label this topic as the “luxury” t opic. The last topic contains
+general words such as “hotel” and a few travel destinations
+such as Denver, Boston, and P ittsburgh. Its total weight on
+branded words is only 5.5 %, the lowest among all topics, so
+we label this topic as “location” and use it as the baseline topic
+in model estimation.
+Our coefficient estimates are based on fivefold cross-
+validation. Table 5 reports the posterior means and the 95 %
+credible intervals of the proposed HMM, regarding consumers’
+purchase decision, visit decision, and the topic composition of
+search phrases being used.
+The top part of Table 5 shows the coefficient estimates of a
+for each state. Higher a values correspond to higher conversion
+propensities. Accordingly, we refer to States 1–3 as “early,”
+“middle,” and “late” states of purchase on the consumer jour-
+ney, respectively.
+The middle part of Table 5 presents the coefficient estimates
+for consumers’ visit decisions (i.e., how consumers choose
+among paid, owned, and earned channels to make a visit on
+the path to purchase). We set earned channels as the baseline
+with visit utility being 0. The results suggest that the early-
+journey visit utility is the highest for owned channels such as
+the firm’s own website and its email newsletters and cam-
+paigns, followed by earned channels including organic search,
+unpaid referrals, and social media; paid channels such as paid
+search, paid referrals, affiliate sites, and business-to-business
+channels are the least visited at the beginning of a purchase
+journey. As the consumers advance along the purchase journey
+from State 1 to State 2, they are more likely to visit owned
+channels and even less likely to visit paid channels, whereas in
+State 3, the consumers’ propensities to visit owned channels is
+the lowest across all three states and the propensities to visit
+paid channels is the highest. Albeit with variation across states,
+consumers’ likelihood to visit owned channels is the highest
+among all three channels, followed by earned channels and
+then paid channels.
+The lower part of Table 5 shows the substantive findings
+from consumers’ textual data. These mean estimates reveal the
+trend of the underlying topics searched by consumers and illus-
+trate the relationship between consumers’ latent purchase states
+and the latent topics they search on. As summarized previously
+in this subsection, we have identified five latent topics: con-
+venience, economy, loyalty, luxury, and location. The last
+topic, location, is used as the baseline. At the early purchase
+state, State 1, the initial topics searched by consumers are more
+likely to be the loyalty topic, followed by the convenience
+topic. In comparison, consumers are less likely to search on
+the luxury and economy topics than the location topic up front
+on the path to purchase. When consumers’ latent purchase
+states are switched up, they search more on the economy and
+Table 4. Example Top Words and Associations Between Branded Words and Topics.
+Topic 1 2 3 4 5
+Label Convenience Economy Loyalty Luxury Location
+Examples of top words
+downtown, airport,
+city, center
+inn, suite,
+extend, stay
+reward, point,
+club, platinum
+beach, resort,
+harbor, spa
+hotel, denver,
+boston, pittsburgh
+Weight on parent brand 19.4% 4.9% 57.5% 18.4% .9%
+Weight on low-end brands .4% 28.8% .1% .1% .4%
+Weight on mid-range brands 13.8% 11.6% .7% 1.2% 2.8%
+Weight on high-end brands 2.0% .2% 1.5% 7.1% 1.4%
+Total weight on brands 35.5% 45.6% 59.8% 26.8% 5.5%
+Notes: The percentage is based on the word-topic association, F, in Equation 4. Each topic allocates 100% weight to all words in the vocabulary. Here, we report
+only the weight for branded words belonging to the parent, low-end, mid-range, and high-end brand categories under a specific topic. The bottom row ad ds up the
+weights on all branded words under the same topic.
+10 Journal of Marketing Research XX(X)
+
+===PAGE BREAK===
+
+luxury topics and less on the loyalty topic, whereas the conve-
+nience topic is more likely to be searched at the early and late
+states, as compared with the location topic.
+In summary, consumers start off by searching for the brand
+names and the loyalty program of the focal firm that account
+for a heavy weight on the loyalty topic. They may pay more
+attention to the convenience and location of the hotel and less
+attention to the affordability or the luxury features. When con-
+sumers move to the later stage of their purchase journey, they
+may pay more attention to the affordability and luxury options,
+as their questions and concerns related to the loyalty program,
+convenience, and location may have already been addressed.
+Our empirical findings of the dynamic latent topics reflect the
+adaptive consumer needs along their purchase journey (Lee
+et al. 2018). The interpretation of the latent topics can be
+enriched by extant behavioral research on information process-
+ing. For example, in our context, when consumers are more
+focused on the affordability of the hotel (a more utilitarian
+feature), the purchase can be more goal-driven and involve
+deeper information processing (Novak, Hoffman, and Duha-
+chek 2003). However, when consumers seek luxury features
+at a hotel (a more hedonic feature), the information may be
+processed in a more holistic ma nner (Melnyk, Klein, and
+Vo¨lckner 2012). Together with the new knowledge of consu-
+mers’ latent purchase states and latent search topics, using our
+proposed model, marketing managers have access to a deeper
+and richer understanding of consumers’ current needs and pur-
+chase intentions and thus can improve their ads and offerings
+accordingly.
+Table 6 shows the posterior means and 95 % credible inter-
+vals of initial probabilities of each latent state and the transition
+probabilities among states. Ini tially, when a consumer first
+visits the firm’s website or when we observe a consumer for
+the first time, 37.3 % consumers belong to the early purchase
+state, 52.6 % in the middle state, and 10.1 % in the late state.
+There is considerable stickiness for consumers to stay in the
+same state on consecutive visits, as shown on the diagonals of
+the transition matrices in Table 6. For example, when the recent
+visit is to paid channels, the probability is 88.2 % for consumers
+to stay in State 1, 91.0 % to stay in State 2, and 85.9 % to stay in
+State 3. Similar stickiness can also be found for the other two
+channels. The credible intervals for the probabilities to stay in
+Table 5. Estimation Results from the Proposed HMM.
+State 1 State 2 State 3
+Purchase
+a /C0 8.032 [/C0 8.065, /C0 8.000] /C0 4.817 [/C0 4.855, /C0 4.775] /C0 2.662 [/C0 2.691, /C0 2.630]
+Visit
+Paid channel ( l1) /C0 2.145 [/C0 2.225, /C0 2.055] /C0 2.306 [/C0 2.392, /C0 2.221] /C0 1.559 [/C0 1.625, /C0 1.505]
+Owned channel ( l2) .718 [.580, .862] 1.172 [.998, 1.329] .345 [.241, .458]
+Earned channel (baseline) — — —
+Topic
+Convenience ( y1) .320 [.218, .405] /C0 .048 [ /C0 .160, .041] .130 [.066, .201]
+Economy (y2) /C0 .655 [/C0 .756, /C0 .574] /C0 .454 [/C0 .544, /C0 .363] /C0 .189 [/C0 .269, /C0 .104]
+Loyalty ( y3) .634 [.548, .727] .607 [.496, .709] .345 [.268, .422]
+Luxury ( y4) /C0 .400 [/C0 .469, /C0 .326] /C0 .386 [/C0 .481, /C0 .295] /C0 .040 [ /C0 .110, .024]
+Location (baseline) — — —
+Note: All reported estimates are posterior means, along with the 95% credible intervals in brackets. The significant mean estimates are highlighted in bol dface.
+Table 6. Mean Posterior Initial Probabilities and Transition Matrices.
+State 1 State 2 State 3
+Initial probabilities 37.3% [34.8%, 40.4%] 52.6% [50.1%, 55.7%] 10.1% [8.3%, 11.8%]
+Transition Probabilities, Given That (t /C0 1) Visit Was in a Paid Channel
+From State 1 88.2% [84.7%, 92.0%] 11.1% [7.7%, 14.9%] .7% [.0%, 2.0%]
+From State 2 3.2% [1.4%, 5.3%] 91.0% [88.5%, 93.8%] 5.8% [3.3%, 8.0%]
+From State 3 5.6% [1.3%, 10.0%] 8.4% [3.0%, 13.8%] 85.9% [79.6%, 91.1%]
+Transition Probabilities, Given That (t /C0 1) Visit was in an Owned Channel
+From State 1 90.1% [88.9%, 91.1%] 8.6% [7.5%, 9.6%] 1.3% [.7%, 1.8%]
+From State 2 5.3% [4.7%, 5.9%] 93.7% [93.1%, 94.3%] 1.1% [.8%, 1.3%]
+From State 3 3.2% [1.5%, 4.7%] 3.4% [1.9%, 5.0%] 93.4% [91.6%, 95.0%]
+Transition Probabilities, Given That (t /C0 1) Visit was in an Earned Channel
+From State 1 88.7% [87.7%, 89.9%] 11.1% [9.9%, 12.2%] .2% [.0%, .5%]
+From State 2 8.7% [8.0%, 9.8%] 90.1% [89.2%, 91.0%] 1.2% [.7%, 1.7%]
+From State 3 1.5% [.1%, 3.0%] 8.9% [6.8%, 11.2%] 89.6% [87.4%, 91.8%]
+Notes: All reported estimates are posterior means, along with the 95% credible intervals in brackets.
+Li and Ma 11
+
+===PAGE BREAK===
+
+States 1 and 2 have considerable overlap among all three chan-
+nels, while the probability to stay in State 3 is the highest for
+recent visits to owned channels, which is 93.4 %, compared
+with 85.9 % for paid channels and 89.6 % for earned channels.
+The off-diagonal numbers indicate the probabilities of switch-
+ing from one state to another, conditional on the channel most
+recently visited. Some of the credible intervals of the estimates
+are fairly large, so that the measure conditional on one channel
+may not be statistically different from those based on the other
+two channels. However, some interesting patterns emerge from
+the matrices. For example, if a consumer’s most recent visit
+was to a paid channel, she has a good chance of advancing from
+State 1 to higher states, and the probability of moving from
+State 2 to State 3 is 5.8%, significantly higher than those for the
+other two channels. Another example is for consumers whose
+most recent visits were to an earned channel, the probability of
+switching down from State 2 to State 1 is 8.7 %, which is the
+highest among all channels. These estimates of transition prob-
+abilities provide insights into consumers’ state switching, con-
+ditional on their recent visits to a specific channel.
+Robustness Check
+Some firms may strategically target prospective customers in
+hopes of attracting more traffic to their website. As a result,
+some consumers’ interactions with the firm could be a response
+to the firm’s outreach. Although the focal firm did not use an
+automated algorithm to selectiv ely target certain customers
+with display ads or emails during the data collection period,
+the consumers who received firm-initiated contacts, such as
+display ads and emails, may have been determined by their
+purchase inertia and past interactions with the firm. Thus, in
+this subsection, we test the robustness of our empirical findings
+with subset samples that contrast the consumers who have been
+exposed to the firm’s outbound marketing contact, such as
+display ads and emails, with those who are not. These analyses
+of data subsets do not eliminate the impact of a firm’s targeting
+via display ads and emails. Rather, we use it as a post hoc
+robustness check to examine whether the key empirical find-
+ings would differ between the two groups of customers. In
+particular, we offer one such subset analysis of display ads and
+the other on emails. Apart from these subset analyses, we also
+pay special attention to the third-party aggregators and
+affiliated websites that can act differently from the other paid
+channels. We treat these aggregators and affiliated sites as a
+separate channel category and estimate the proposed model
+with four channel categories.
+In the first subset analysis, we split the data into two subsets
+based on whether the customer has clicked on any display ads
+during the data window. We estimate our model separately on
+these two subsets and compare their results with our main
+estimates. The estimates of this subset analysis are presented
+in columns 2 and 3 of Table 7, compared with those using the
+full data set in the first column. The estimates on these two
+subsets closely resemble the estimates in the main model
+except for some insignificant estimates for the convenience and
+economy topics in State 3. In the second analysis, we split the
+data into two subsets based on whether a consumer has clicked
+on any emails during the data window. The estimates based on
+these subsets are reported in columns 4 and 5 of Table 7. The
+coefficient estimates are also similar to the main estimates,
+except that the coefficients for the luxury topic become insig-
+nificant in State 1 for both subsets and in State 2 for the subset
+with email clicks. In both subset analyses, a few topic para-
+meters lose significance. Determining whether this is due to
+smaller sample sizes requires more data. Nevertheless, the
+parameters for the visit and purchase decisions and all signif-
+icant topic parameters are consistent with those using the full
+data set.
+In addition to firm-initiated channels such as display ads or
+emails, third-party aggregators and affiliate websites could also
+play an important yet different role from the other paid chan-
+nels. Thus, to examine the paid channels more deeply, we
+perform another robustness check in which aggregators and
+affiliated sites are treated as a separate channel category, the
+referral channels, alongside the original paid, owned, and
+earned channels. We run this four-channel analysis using the
+proposed model and report the results in the last column of
+Table 7. The addition of this new referral channel does not
+significantly change the estimates for the other three channels.
+This helps validate the robustness of our empirical findings and
+also sheds light on the impact of the aggregators and affiliated
+websites. Our results indicate that the probability of visiting a
+referral channel compared with that of visiting earned channels
+decreases as consumers move from State 1 to State 2 and then
+increases from State 2 to State 3. Generally speaking, the
+impact of aggregators and affiliated websites is very similar
+to the impact of the other channels in the paid channel category.
+Overall, the subset analyses and the four-channel analysis
+confirm the robustness of our results. Although we cannot
+ignore or eliminate the firm’s strategic targeting or the hetero-
+geneity in each channel category, when we contrast the con-
+sumers with and without interactions with the firm’s outbound
+marketing and when we further refine consumers’ channel
+options, our empirical findings remain robust.
+Predicting Consumer Purchases
+One key motivation of our study is to connect topic models
+with consumers’ choices on the purchase journey, which can
+help firms assess consumers’ positions on their path to pur-
+chase and improve the firms’ performance. In this section,
+we elaborate on two aspects related to the improved predictive
+accuracy from our model: (1) how much improvement our
+model makes in predictive accuracy against three benchmark
+models; and (2) how the more accurate assessment of consu-
+mers’ positions affects firms’ decisions.
+Improved Predictive Accuracy
+By uncovering the semantic information embedded in search
+queries, our model reveals meaningful insights into consumers’
+12 Journal of Marketing Research XX(X)
+
+===PAGE BREAK===
+
+progress on their path to purchase. With an improved under-
+standing of consumers’ purchase propensity, our model enables
+more accurate predictions of consumers’ purchase decisions, a
+key challenge faced by marketing managers. Next, we compare
+the proposed model with three benchmark models. The first
+benchmark model is the no-topic model, which includes only
+the visit and purchase decisions. That is, the topic equation in
+the proposed model is removed. Models from many extant
+studies, which may use different modeling structures, are com-
+parable to this no-topic benchmark model in terms of the
+amount of information incorporated into the model. The com-
+parison between the proposed model and the no-topic model
+shows the effect of including textual information. The second
+benchmark model is the top-50-word model, similar to the first
+benchmark model except that it includes a dummy variable for
+each of the top 50 most frequently used words in both the visit
+and purchase equations. This benchmark model does not have
+an integrated equation to jointly capture the underlying topics
+searched by consumers, but it can capture to a certain extent the
+relationship between frequently used words and consumers’
+underlying purchase intentions. The third benchmark model
+is the LDA model, in which we estimate a standard LDA model
+on the search phrases and add the topic weights from the LDA
+estimates into the visit and purchase equations as explanatory
+Table 7. Results of Subset Analysis and Four-Channel Analysis.
+Full Set Display No Display Email No Email Four Channels
+State 1
+Purchase
+a /C0 8.032 /C0 8.250 /C0 7.833 /C0 8.010 /C0 7.750 /C0 7.825
+Visit
+Paid channel ( l1) /C0 2.145 /C0 1.868 /C0 2.296 /C0 1.623 /C0 2.211 /C0 1.874
+Owned channel ( l2) .718 .537 1.113 1.031 .387 1.247
+Referral channel /C0 2.661
+Earned channel (baseline) — — — — — —
+Topic
+Convenience ( y1) .320 .320 .354 .178 .104 .220
+Economy (y2) /C0 .655 /C0 .210 /C0 .321 /C0 .444 /C0 .411 /C0 .330
+Loyalty ( y3) .634 .781 .727 .657 .378 .431
+Luxury ( y4) /C0 .400 /C0 .155 /C0 .305 .009 .066 /C0 .124
+Location (baseline) — — — — — —
+State 2
+Purchase
+a /C0 4.817 /C0 4.988 /C0 4.801 /C0 4.813 /C0 4.933 /C0 5.130
+Visit
+Paid channel ( l1) /C0 2.306 /C0 1.751 /C0 2.270 /C0 1.894 /C0 1.936 /C0 2.132
+Owned channel ( l2) 1.172 .826 .706 .871 1.312 1.070
+Referral channel /C0 2.883
+Earned channel (baseline) — — — — — —
+Topic
+Convenience ( y1) /C0 .048 .101 .070 .205 .160 .192
+Economy (y2) /C0 .454 /C0 .455 /C0 .094 /C0 .185 /C0 .443 /C0 .411
+Loyalty ( y3) .607 .295 .334 .889 .169 .795
+Luxury ( y4) /C0 .386 /C0 .589 /C0 .420 /C0 .151 /C0 .360 /C0 .238
+Location (baseline) — — — — — —
+State 3
+Purchase
+a /C0 2.662 /C0 2.003 /C0 2.732 /C0 2.235 /C0 2.701 /C0 2.613
+Visit
+Paid channel ( l1) /C0 1.559 /C0 .425 /C0 1.804 /C0 .717 /C0 1.196 /C0 1.436
+Owned channel ( l2) .345 .606 .667 .474 .476 .332
+Referral channel /C0 1.906
+Earned channel (baseline) — — — — — —
+Topic
+Convenience ( y1) .130 /C0 .132 .135 .383 .147 .309
+Economy (y2) /C0 .189 /C0 .124 .006 /C0 .497 /C0 .196 /C0 .210
+Loyalty ( y3) .345 .300 .604 .175 .116 .701
+Luxury ( y4) /C0 .040 /C0 .086 /C0 .047 /C0 .014 .006 /C0 .053
+Location (baseline) — — — — — —
+Notes: Boldface indicates that the estimates are significant at the 5% level. Column 1 shows the estimates based on the full data set (i.e., those reported in T able 5).
+The other columns each use a subset of data.
+Li and Ma 13
+
+===PAGE BREAK===
+
+variables, while the topic equation is removed. Although both
+our proposed model and the benchmark LDA model incorpo-
+rate textual information, the LDA model does not provide the
+same richness in heterogeneity or the direct connections with
+the visit and purchase decisions as our proposed model does. In
+other words, while the amount of information used in both
+models is the same, the modeling structures are different—the
+LDA benchmark model extracts and uses the textual informa-
+tion in a two-step manner, whereas our proposed model incor-
+porates the textual information in an integrated manner. We use
+the LDA benchmark model to demonstrate the potential bene-
+fits of jointly modeling consumers’ visit and purchase deci-
+sions together with the topic composition of their search
+phrases as we do in the proposed model.
+We first assess the model fit by comparing the LMDs of the
+visit and purchase equations w ith fivefold cross-validation.
+Because none of the three benchmark models have an inte-
+grated equation for textual information, we compare only the
+LMDs of the visit and purchase equations between the three
+benchmark models and the proposed model, as shown in
+Table 8. The proposed model has a higher LMD than all bench-
+mark models, indicating better model fit. Moreover, the pro-
+posed model also outperforms the benchmark models in terms
+of both mean absolute error (MAE) and root mean square error
+(RMSE), for which lower values indicate better prediction
+accuracy. Compared with the benchmark models, the improve-
+ment of the proposed model is 7.4 %–10.0% based on MAE and
+3.9%–6.2%% based on RMSE. In summary, the superior fit of
+the proposed model confirms the value of extracting the deeper
+semantic information embedded in search text and incorporat-
+ing it in an integrated manner.
+To further examine the predictive performance of the pro-
+posed model and compare it with that of the benchmark mod-
+els, we also generate the receiver operating characteristic
+(ROC) curves of the proposed model to compare against the
+three benchmark models in Figure 4. An ROC curve is a two-
+dimensional graph, plotting the TPR on the y-axis and the FPR
+on the x-axis. As a higher FPR is allowed (usually by making
+the selection criteria less stringent), a higher TPR can be
+achieved. The 45-degree diagonal line is the baseline accuracy
+of flipping a fair coin, and a larger area under the curve (AUC)
+indicates better predictive performance. As Figure 4 shows, our
+proposed model outperforms all three benchmark models.
+In Table 9, we provide two examples at specific FPRs, 5% and
+10%, to illustrate the predictive advantage of the proposed model
+over benchmark models. Suppose a manager is willing to tolerate
+a5 % FPR, as in the scenario shown in the first two columns of
+Table 9, the TPR for the proposed model is 67.2%, compared with
+a3 7 . 8% TPR for the no-topic model, 54.9% for the top-50-word
+model, and 52.7% for the LDA model. The last two columns of
+Table 9 show another scenario in which the manager can tolerate a
+10% FPR. The proposed model achieves a TPR that is 84.2 %,
+higher than the 54.9% TPR for the no-topic model, 70.5% for the
+top-50-word model, and 69.1% for the LDA model. The inclusion
+of text data, reflected via the comparison between the no-topic
+model and the proposed model, leads to approximately 30 %
+increase in TPR at the range of 5 %–10% FPRs.
+Finally, we compare the AUC between the proposed model
+and benchmark models in Table 10. The AUC for in-sample
+Table 8. Model Comparison.
+Model Definition LMD MAE RMSE
+Proposed model HMM with topic
+assignment jointly
+estimated
+/C0 163,576 .0251 .1105
+No-topic model HMM /C0 169,402 .0279 .1178
+Top-50-word
+model
+HMM with dummies for
+top 50 words
+/C0 166,452 .0275 .1150
+LDA model HMM with LDA weights /C0 165,453 .0271 .1156
+Note: Higher LMD values indicate better model fit. Lower values of MAE or
+RMSE indicate better prediction accuracy.
+0.0 0.2 0.4 0.6 0.8 1.0
+0.0 0.2 0.4 0.6 0.8 1.0
+False Positive Rate
+True Positive Rate
+Proposed
+LDA
+Top Words
+No Topic
+Figure 4. ROC curve of proposed HMM versus three benchmark
+models.
+Notes: All models are built under the HMM framework. Results are based on
+fivefold cross-validation. A larger area under the ROC curve indicates better
+predictive performance.
+Table 9. Illustration of Improvement in Predictive Accuracy in ROC
+Curve.
+Model
+TPR
+At 5%
+FPR Improvement
+At 10%
+FPR Improvement
+Proposed model 67.2% 84.2%
+No-topic model 37.8% 29.4% 54.9% 29.3%
+Top-50-word
+model
+54.9% 12.3% 70.5% 13.7%
+LDA model 52.7% 14.5% 69.1% 15.1%
+Notes: An ROC curve is a two-dimensional graph, plotting the TPR on the y-axis
+against the FPR on the x-axis.
+14 Journal of Marketing Research XX(X)
+
+===PAGE BREAK===
+
+estimation is reported in the first two columns. The AUC is the
+highest for the proposed model, .945, an 11.4 % improvement
+from the no-topic model in which text data is completely
+ignored. The AUC for the proposed model also shows a notice-
+able improvement on the top-50-word model by 4.0 % and the
+LDA model by 4.1 %. We further extend the comparison of the
+AUC to the out-of-sample predictions. The last two columns of
+Table 10 report the AUC for the proposed model as .624, which
+is 9.1% more than the no-topic model, 5.2 % more than the top-
+50-word model, and 7.6 % more than the LDA model. These
+out-of-sample measures again demonstrate the superior perfor-
+mance of the proposed model.
+Decision Implications
+In this subsection, we discuss both generally and specifically
+how firms can improve decision making using our model. At a
+general level, we note that there has been sustained interest in
+the marketing community in understanding consumer purchase
+stages, dating back to the AIDA model (Howard and Sheth
+1969; Strong 1925). The recent expansion in channels and
+touchpoints has further heightened this interest (Lee et al.
+2018; Lemon and Verhoef 2016). By providing more accurate
+predictions of consumers’ latent positions on the purchase jour-
+ney, our model can improve the efficiency of marketing deci-
+sions that can be customized according to such positions. Next,
+we illustrate the potential benefits of our model both qualita-
+tively and quantitatively.
+Our model can be used to improve the quality of down-
+stream experiments. Firms now routinely perform A/B testing
+to evaluate alternative decision options (e.g., price, promotion,
+advertising creative), and the effectiveness of an option often
+depends on a customer’s purchase stage (Hoban and Bucklin
+2015; Zantedeschi, Feit, and Bradlow 2017). Because this stage
+is typically latent, observed or derived proxies are often used in
+empirical analyses. By improving predictive accuracy, our
+model can reduce the biases in the proxies of consumers’ latent
+purchase stages and in turn improve the quality of field experi-
+ments and A/B tests.
+To quantitatively assess the effect of improved predictive
+accuracy on a firm’s revenue, we conduct a scenario analysis
+following the setup in Trusov, Ma, and Jamal (2016). Assume
+there is a simplified market of two segments—one segment of
+top users (e.g., State 3 in our proposed model) whose
+conversion rate is 1 % and the other segment of all other users
+(e.g., States 1 and 2 in our proposed model) whose conversion
+rate is .2 %. Assume the focal firm uses display ads to generate
+traffic to its website with a fixed daily budget, and the cost per
+thousand impressions, or cost-per-mille, for display ads is set at
+$6.78, according to the industry statistics in the 4th quarter of
+2019 (Statista 2020). In addition, we set the CTR to be .47 %,
+which is the average CTR for the travel and hospitality industry
+at Google Display Network in 2019 (Volovich 2020). Ideally,
+firms hope to attract as many top users as possible. In reality,
+however, they can achieve only certain precision in their iden-
+tification of top users, which our model can facilitate with
+better accuracy. The numeric illustration, detailed in Web
+Appendix F, shows that, using the no-topic model as the bench-
+mark, our proposed model can improve revenue by 45.7 %,
+compared with an increase of 22.9 % by the LDA model and
+a2 5 . 7% increase by the top-50-word model. Thus, the
+increased predictive accuracy of our model can lead to a sub-
+stantial increase in the firm’s revenue.
+Predicting consumers’ purchase intentions is a central chal-
+lenge for marketing managers. T herefore, the substantial
+improvement in the predictive performance of our model has
+significant implications. By using the semantic information
+embedded in search phrases to help infer consumers’ positions
+on their path to purchase, our model yields much improved
+predictive performance compared with a model lacking any
+textual information. Furthermore, our proposed model outper-
+forms both the top-50-word benchmark model and the LDA
+benchmark model, which indicates that the topic model is valu-
+able in extracting information from textual data and that jointly
+modeling visit and purchase decisions together with the topic
+composition of consumer’s search phrases as in our proposed
+model is more effective than using a standard LDA model in a
+two-step manner. With its more accurate evaluation of consu-
+mers’ current stage of purchase, improved prediction of pur-
+chase probability, and informative latent topics in searches, our
+model provides valuable inputs and guidance for making man-
+agerial decisions.
+Conclusion, Implications, and Limitations
+Knowing what consumers are looking for at any given moment
+is critical for marketing success. A variety of frameworks have
+been proposed to understand the decision-making process and
+the distinct stages along the consumer journey. However, an
+important source of information along this path to purchase—
+the large volume of search phrases used by consumers to gather
+information from search engines—has been underutilized.
+In this research, we develop an integrated modeling frame-
+work that connects consumers’ search keywords to their chan-
+nel visits and purchase decisions. We build two specifications
+of the proposed framework, one in discrete state space and the
+other in continuous state space, and show that the semantic
+information contained in consumers’ search keywords is infor-
+mative about consumers’ positions along the path to purchase.
+We find that topic models, which have traditionally been used
+Table 10. Comparison of AUC in ROC Curve.
+In-Sample Out-of-Sample
+Model AUC Improvement AUC Improvement
+Proposed model .945 .624
+No-topic model .848 11.4% .572 9.1%
+Top-50-word model .909 4.0% .593 5.2%
+LDA model .908 4.1% .580 7.6%
+Notes: An ROC curve is a two-dimensional graph, plotting the TPR on the
+y-axis against the FPR on the x-axis.
+Li and Ma 15
+
+===PAGE BREAK===
+
+to analyze long text documents, are also effective in retrieving
+semantic information from short search phrases. Applying our
+model to a data set from the hospitality industry, we reveal
+distinct and meaningful topics that underlie thousands of key-
+word searches. More importantly, we show that once such
+semantic information is connected to purchase decisions, firms
+can significantly improve their inferences about consumers’
+positions on the purchase journey. By leveraging such semantic
+information, our proposed model not only outperforms existing
+models that do not account for textual data but also leads to
+more accurate assessments than a standard LDA model or
+existing methods that make inferences on the basis of the pres-
+ence of frequently used words.
+Our model captures the dynamic trend in consumers’ chan-
+nel choices and purchases. In particular, in an early state on the
+purchase journey, consumers are more likely to use owned
+channels, followed by earned and paid channels. As the con-
+sumers move along their path to purchase, from the early state
+to the middle state, the propen sity to visit owned channels
+reaches its highest point while that for paid channels drops to
+its lowest, whereas in the late state of purchase, consumers
+have the lowest propensity to visit owned channels while the
+propensity to visit paid channels is the highest among all states.
+Despite the considerable heterogeneity in consumers’ topic
+choices, we are able to identify a dynamic trend that consumers
+are likely to begin by searching the loyalty and convenience
+topics, and as they progress on their purchase journey they are
+more likely to search for the economy and luxury topics. By
+ignoring such dynamics in consumers’ search phrases, which
+also reflect the dynamics in consumer demand, the firm could
+miss opportunities to convert consumers who are close to mak-
+ing a purchase. Our analysis als o reveals the relationship
+between the firm’s subbrands and the topics searched by con-
+sumers. These new findings provide insights for the firm to
+evaluate its search campaign effectiveness and improve key-
+word selection for search engine marketing.
+Our study also reveals some more general and broader
+insights. As one of the first empirical studies to leverage textual
+data in understanding the consumer journey, we show that a
+large volume of unstructured text data can be effectively asso-
+ciated with consumers’ latent purchase states using topic mod-
+els. We demonstrate the dynamics in the topics searched by
+consumers when they travel through their path to purchase.
+Furthermore, we show that incorporating textual information
+using the proposed modeling f ramework can significantly
+improve the accuracy of assessing consumers’ latent stages and
+purchase likelihood.
+Our analysis output can help managers enhance the perfor-
+mance of their search engine marketing via improved keyword
+selection. In a solution framework, the assessment of consu-
+mers’ positions on their path to purchase would be an important
+upstream component that feeds into downstream optimization
+strategies. By extracting information from keyword searches to
+help infer consumers’ positions in the purchase journey and
+reveal their intention and preference expressed in their own
+language, our model provides the essential intelligence for such
+an initiative.
+With adjustments, the proposed method can be applied to a
+wide range of contexts involving textual information about
+consumers’ position on the path to purchase. For example, in
+addition to the textual data observed on search engines, our
+model can be applied to consumers’ searches at a firm’s web-
+site. Our model can also be applied to text data collected from
+online chatting between consumers and customer representa-
+tives, where consumers direct their queries to customer repre-
+sentatives rather than search engines. Once we observe the text
+submitted by consumers as well as the consumers’ visit touch-
+points and purchases, we can integrate the data and apply our
+model. In these scenarios, our model can be adjusted according
+to the actual situation and provide insights and suggestions to
+marketing managers.
+Given the single data source and sample size of our data, the
+generalizability of our substantive findings depends on the
+research context and the exact data. That said, as the charac-
+teristics of our data set are likely to be similar to those of the
+data used by many managers for their decision making (i.e.,
+they face the same set of issues of single source data), our
+modeling framework is well suited to help managers improve
+their understanding of consumers by using the information at
+hand. Although our findings are closely tied to the focal firm’s
+contextual background and the actual situation, the latent topics
+we identify may be similar to those at other hotel chains. The
+latent topics pursued by consumers and the dynamics of latent
+topics from time to time can serve as important indicators for
+marketing managers to track and evaluate, and the output can
+be incorporated into the firm’s automated marketing planning
+and allocation. Using clickstream data (Montgomery et al.
+2004; Trusov, Ma, and Jamal 2016) or designing experiments
+(Liu and Toubia 2018; Zantedeschi, Feit, and Bradlow 2017)
+can supplement our research with insights regarding consu-
+mers’ online browsing behaviors across multiple websites.
+Our research has several limitations, some due to the model
+and others due to data availability. Using a logit setup for
+consumers’ decisions on topics, visits, and purchases, our
+model assumes the conditiona l independence among these
+three decisions, without accounting for the correlations among
+the error terms. Future research could enrich our parsimonious
+model with correlated errors and alternative model setups.
+Our research is also limited by the nature and structure of
+our data. For example, we do not observe the impressions in
+any visit channels, which is a weakness of our data that dam-
+pens our model performance. On a related note, our data con-
+tains only consumers’ online t ouchpoints. Integrating the
+offline channels and touchpoints such as visits and purchases
+made in person or through phone calls can further improve
+predictions and insights regarding omnichannel shopping beha-
+vior (Ansari, Mela, and Neslin 2008; Danaher et al. 2020;
+Verhoef, Kannan, and Inman 2015). Moreover, it is possible
+the firm is conducting marketing campaigns in some untracked
+channels (e.g., magazine print ads) or in tracked channels
+where data is lost due to consumers’ deletion of cookie IDs
+16 Journal of Marketing Research XX(X)
+
+===PAGE BREAK===
+
+or switching of devices. To reduce the dimension of para-
+meters, we have grouped the marketing channels into paid,
+owned, and earned categories. Some insights could be aggre-
+gated out when we combine channels. Another limitation is that
+we do not observe all marketing interventions such as promo-
+tions and discounts, without which we cannot offer specific
+insight into a particular channel or campaign or conduct coun-
+terfactual analyses. Field experiments may be helpful in future
+studies to validate the effectiveness of various promotion tech-
+niques for consumers at differ ent positions of the purchase
+funnel. In addition, our data set does not contain demographic
+information, which is commonly used for segmentation analy-
+sis. Incorporating such information could help identify the dif-
+ferent journeys taken by different consumers. Furthermore, our
+data set does not contain the exact products consumers browsed
+or the price presented on each visit, which, if available, could
+help further connect the search keywords to consumers’ other
+information gathering activities. Finally, our data contain only
+the observations of search phrases typed by the consumers at
+search engines. We do not observe consumers’ search terms at
+the firm’s own website or third-party referral websites. Should
+such data become available, it would be straightforward to
+incorporate it into the proposed model. This offers avenues for
+future research that could extend our substantive findings with
+more textual information.
+Acknowledgments
+The authors thank the Editor and the review team for their valuable
+guidance and suggestions throughout the review process. They also
+thank P.K. Kannan and seminar participants at Dartmouth College, the
+Ohio State University, Cheung Kong Graduate School of Business,
+Marketing Dynamics Conference, University of Houston, Erasmus
+University, and Washington University in St. Louis for their helpful
+comments on previous versions of this article.
+Associate Editor
+Gerard Tellis
+Declaration of Conflicting Interests
+The author(s) declared no potential conflicts of interest with respect to
+the research, authorship, and/or publication of this article.
+Funding
+The author(s) disclosed receipt of the following financial support for
+the research, authorship, and/or publication of this article: Alice Li
+acknowledges support from Adobe Inc. via Adobe Digital Marketing
+Research Award and support from Fisher College of Business via
+Small Grant. Both authors thank the National Center of the Middle
+Market for providing a research grant.
+ORCID iD
+Hongshuang (Alice) Li https://orcid.org/0000-0001-8752-690X
+References
+Ansari, Asim, Carl F. Mela, and Scott A. Neslin (2008), “Customer
+Channel Migration,” Journal of Marketing Research ,4 5( 1 ) ,
+60–76.
+Berger, Jonah, Ashlee Humphreys, Stephan Ludwig, Wendy W. Moe,
+Oded Netzer, and David A. Schweidel (2020), “Uniting the Tribes:
+Using Text for Marketing Insight,” Journal of Marketing , 84 (1),
+1–25.
+Blei, David M. and John D. Lafferty (2007), “A Correlated Topic
+Model of Science,” Annals of Applied Statistics , 1 (1), 17–35.
+Blei, David M., Andrew Y. Ng, and Michael I. Jordan (2003), “Latent
+Dirichlet Allocation,” Journal of Machine Learning Research ,3 ,
+993–1022.
+Bu¨schken, Joachim and Greg M. Allenby (2016), “Sentence-Based
+Text Analysis for Customer Reviews,” Marketing Science ,3 5
+(6), 953–75.
+Bu¨schken, Joachim and Greg M. Allenby (2020), “Improving Text
+Analysis Using Sentence Conjunctions and Punctuation,” Market-
+ing Science , 39 (4), 727–42.
+Colicev, Anatoli, Ashish Kumar, and Peter O’Connor (2019),
+“Modeling the Relationship Between Firm and User Generated
+Content and the Stages of the Marketing Funnel,” International
+Journal of Research in Marketing , 36 (1), 100–116.
+Court, David, Dave Elzinga, Susan Mulder, and Ole Jorgen Vetvik
+(2009), “The Consumer Decision Journey,” McKinsey Quarterly
+(June), https://www.mckinsey.com/business-functions/marketing-
+and-sales/our-insights/the-consumer-decision-journey.
+Danaher, Peter J., Tracy S. Danaher, Michael S. Smith, and Ruben
+Loaiza-Maya (2020), “Advertising Effectiveness for Multiple
+Retailer-Brands in a Multimedia and Multichannel environment,”
+Journal of Marketing Research , 57 (3), 455–67.
+Du, Rex Y. and Wagner A. Kamakura (2006), “Household Life Cycles
+and Lifestyles in the United States,” Journal of Marketing
+Research, 43 (1), 121–32.
+Geweke, John (1991), “Evaluating the Accuracy of Sampling-Based
+Approaches to the Calculation of Posterior Moments,” Vol. 96.
+Federal Reserve Bank of Minneapolis.
+Ghose, Anindya and Sha Yang (2009), “An Empirical Analysis of
+Search Engine Advertising: Sponsored Search in Electronic Mar-
+kets,” Management Science , 55 (10), 1605–22.
+Gong, Jing, Vibhanshu Abhishek, and Beibei Li (2018), “Examining
+the Impact of Keyword Ambiguity on Search Advertising Perfor-
+mance: A Topic Model Approach,” MIS Quarterly, 42 (3), 805–30.
+Hamilton, Rebecca and Linda L. Price (2019), “Consumer Journeys:
+Developing Consumer-Based Strategy,” Journal of the Academy of
+Marketing Science , 47 (2), 187–91.
+Hoban, Paul R. and Randolph E. Bucklin (2015), “Effects of Internet
+Display Advertising in the Purchase Funnel: Model-Based Insights
+from a Randomized Field Experiment,” Journal of Marketing
+Research, 52(3), 375–93.
+Howard, John A. and Jagdish N. Sheth (1969), The Theory of Buyer
+Behavior. New York: John Wiley & Sons.
+Jerath, Kinshuk, Liye Ma, and Young-Hoon Park (2014), “Consumer
+Click Behavior at a Search Engine: The Role of Keyword
+Popularity,” Journal of Marketing Research , 51 (4), 480–86.
+Li and Ma 17
+
+===PAGE BREAK===
+
+Joo, Mingyu, Kenneth C. Wilbur, Bo Cowgill, and Yi Zhu (2013),
+“Television Advertising and Online Search,” Management Sci-
+ence, 60 (1), 56–73.
+Lee, Leonard, J. Jeffrey Inman, Jennifer J. Argo, Tim Bo ¨ttger, Utpal
+Dholakia, Timothy Gilbride, et al. (2018), “From Browsing to
+Buying and Beyond: The Needs-Adaptive Shopper Journey Model,”
+Journal of the Association for Consumer Research, 3 (3), 277–93.
+Lee, Thomas Y. and Eric T. Bradlow (2011), “Automated Marketing
+Research Using Online Customer Reviews,” Journal of Marketing
+Research, 48 (5), 881–94.
+Lemon, Katherine N. and Peter C. Verhoef (2016), “Understanding
+Customer Experience Throughout the Customer Journey,” Journal
+of Marketing, 80 (6), 69–96.
+Li, Hongshuang (Alice) and P.K. Kannan (2014), “Attributing Con-
+versions in a Multichannel Online Marketing Environment: An
+Empirical Model and a Field Experiment,” Journal of Marketing
+Research, 51 (1), 40–56.
+Li, Hongshuang (Alice), P.K. Ka nnan, Siva Viswanathan, and
+Abhishek Pani (2016), “Attribution Strategies and Return on Key-
+word Investment in Paid Search Advertising,” Marketing Science,
+35 (6), 831–48.
+Li, Jingjing, Ahmed Abbasi, Amar Cheema, and Linda B. Abraham
+(2020), “Path to Purpose? How Online Customer Journeys Differ
+for Hedonic Versus Utilitarian Purchases,” Journal of Marketing ,
+84 (4), 127–46
+Li, Lin, Guandong Xu, Zhenglu Yang, Peter Dolog, Yanchun Zhang,
+and Masaru Kitsuregawa (2013), “An Efficient Approach to Sug-
+gesting Topically Related Web Queries Using Hidden Topic Mod-
+el,” World Wide Web , 16 (3), 273–97.
+Li, Shibo, Baohong Sun, and Alan L. Montgomery (2011), “Cross-
+Selling the Right Product to the Right Customer at the Right
+Time,” Journal of Marketing Research , 48 (4), 683–700.
+Liu, Jia and Olivier Toubia (2018), “A Semantic Approach for Esti-
+mating Consumer Content Preferences from Online Search Quer-
+ies,” Marketing Science , 37 (6), 930–52.
+Lu, Shijie and Sha Yang (2017), “Investigating the Spillover Effect of
+Keyword Market Entry in Sponsored Search Advertising,” Mar-
+keting Science , 36 (6), 976–98.
+Ma, Liye, Baohong Sun, and Sunder Kekre (2015), “The Squeaky
+Wheel Gets the Grease: An Empirical Analysis of Customer Voice
+and Firm Intervention on Twitter,” Marketing Science ,3 4( 5 ) ,
+627–45.
+Manchanda, Puneet, Jean-Pierre Dub´e, Khim Yong Goh, and Pradeep
+K. Chintagunta (2006), “The Effect of Banner Advertising on
+Internet Purchasing,” Journal of Marketing Research ,4 3( 1 ) ,
+98–108.
+Melnyk, Valentyna, Kristina Klein, and Franziska Vo ¨lckner (2012),
+“The Double-Edged Sword of Foreign Brand Names for Compa-
+nies from Emerging Countries,” Journal of Marketing ,7 6( 6 ) ,
+21–37.
+Moe, Wendy W. and Peter S. Fader (2004), “Dynamic Conversion
+Behavior at E-Commerce Sites,” Management Science ,5 0( 3 ) ,
+326–35.
+Montgomery, Alan L., Shibo Li, Kannan Srinivasan, and John C.
+Liechty (2004), “Modeling Online Browsing and Path Analysis
+Using Clickstream Data,” Marketing Science , 23 (4), 579–95.
+Netzer, Oded, James M. Lattin, and Vikram Srinivasan (2008),
+“A Hidden Markov Model of Customer Relationship Dynamics,”
+Marketing Science , 27 (2), 185–204.
+Netzer, Oded, Ronen Feldman, Jacob Goldenberg, and Moshe Fresko
+(2012), “Mine Your Own Business: Market-Structure Surveillance
+Through Text Mining,” Marketing Science , 31 (3), 521–43.
+Novak, Thomas P., Donna L. Hoffman, and Adam Duhachek (2003),
+“The Influence of Goal-Directed and Experiential Activities on
+Online Flow Experiences,” Journal of Consumer Psychology ,1 3
+(1/2), 3–16.
+Rutz, Oliver J. and Randolph E. Bucklin (2011), “From Generic to
+Branded: A Model of Spillover Dynamics in Paid Search Adver-
+tising,” Journal of Marketing Research , 48 (1), 87–102.
+Schweidel, David A., Eric T. Bradlow, and Peter S. Fader (2011),
+“Portfolio Dynamics for Customers of a Multiservice Provider,”
+Management Science , 57 (3), 471–86.
+Statista (2020), “Social Media A dvertising Cost-Per-Mille (CPM)
+Worldwide from 2nd Quarter 2018 to 4th Quarter 2019,” (accessed
+May 18, 2020), https://www.statista.com/statistics/873631/social-
+media-advertising-cpm/.
+Stephen, Andrew T. and Jeff Galak (2012), “The Effects of Traditional
+and Social Earned Media on Sales: A Study of a Microlending
+Marketplace,” Journal of Marketing Research , 49 (5), 624–39.
+Strong, Edward K., Jr. (1925), The Psychology of Selling and Adver-
+tising. New York: McGraw-Hill.
+Taniguchi, Nina (2019), “Same Search Terms, Different Emotions:
+Anticipate Customer Needs Throughout the Journey,” Think with
+Google (October), https://www.thinkwithgoogle.com/consumer-
+insights/search-intent-and-customer-needs/.
+Tirunillai, Seshadri and Gerard J. Tellis (2014), “Mining Marketing
+Meaning from Online Chatter: Strategic Brand Analysis of Big
+Data Using Latent Dirichlet Allocation,” Journal of Marketing
+Research, 51 (4), 463–79.
+Trusov, Michael, Liye Ma, and Zainab Jamal (2016), “Crumbs of the
+Cookie: User Profiling in Customer-Base Analysis and Behavioral
+Targeting,” Marketing Science , 35 (3), 405–26.
+VanBoskirk, Shar, Brandon Verblow, Keith Johnston, Brigitte
+Majewski, Alex Sobchuk, and Rachel Birrell (2019), “The US
+Digital Marketing Forecast, 2018 to 2023,” Forrester Research
+(February 7), https://www. forrester.com /report/The þUS þ
+DigitalþMarketingþForecastþ2018þToþ2023/-/E-RES142558.
+Verhoef, Peter, P.K. Kannan, a nd Jeffrey Inman (2015), “From
+Multi-Channel Retailing to Omni-Channel Retailing: Introduction
+to the Special Issue on Mu lti-Channel Retailing,” Journal of
+Retailing, 91 (2), 174–81.
+Volovich, Kristina (2020), “What’s a Good Clickthrough Rate? New
+Benchmark Data for Google AdWords,” HubSpot (January 7),
+https://blog.hubspot.com/age ncy/google-adwords-benchmark-
+data.
+Wu, Qingqiang, Caidong Zhang, Qingqi Hong, and Liyan Chen
+(2014), “Topic Evolution Based on LDA and HMM and Its Appli-
+cation in Stem Cell Research,” Journal of Information Science ,4 0
+(5), 611–20.
+Zantedeschi, Daniel, Eleanor McDonnell Feit, and Eric T. Bradlow
+(2017), “Measuring Multichannel Advertising Response,” Man-
+agement Science , 63 (8), 2706–28.
+18 Journal of Marketing Research XX(X)

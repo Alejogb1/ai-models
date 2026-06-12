@@ -1,0 +1,113 @@
+{
+  "source": "Adaptive look-alike targeting in social networks advertising.pdf",
+  "source_group": "Awesome-ML-Papers/Lookalike",
+  "processed_at": "2026-06-08",
+  "agent": "agent5_final",
+  "concepts": [
+    {
+      "finding": "It is\na major machine learning problem in online advertisement which is called CTR-prediction (click-through rate) or\nCR-prediction (conversion rate) problem.",
+      "category": "FailureRisk",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Our method has achieved average 12.5% AUC\nimprovement in comparison to the baseline look-alike models.",
+      "category": "Baseline",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Recommendation based models [17, 9] consider look-alike modeling as a recommendation problem and solve\nthe problem by expanding the user set by applying similarity measures.",
+      "category": "FailureRisk",
+      "implication": "Relevant for similarity-based retrieval and lookalike targeting",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "The second metric is AUC, which shows the quality of users ranking and classiﬁcation.",
+      "category": "Experiment",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Contextual advertising by combining relevance with click feedback, in: Proceedings of the\n17th international conference on World Wide Web, ACM.",
+      "category": "ModelCandidate",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Evolved from traditional media advertising such as television, radio, magazines, and contextual advertising in\nsearch engines, targeting advertising is currently now one of the fastest advancing areas in the IT industry [20].",
+      "category": "TargetConstruct",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "[5]) and Yahoo4 are\nengaged in research to improve the quality of user behaviour comprehension and, thus, to improve the quality of life\nof all process participants.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "The research aims to improve the eﬃciency of ad campaigns for advertisers, the revenue\nof platforms and the happiness of users.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "purchase,\nclick or subscription to a page) for the user to decide, if is it proﬁtable to show a given ad to the user or not.",
+      "category": "ModelCandidate",
+      "implication": "Can inform intent modeling for recommendation systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Due to the exploration of sparse feature importance is performed\nby getting feedback from users, it collides with requirements of showing the advertisement to the users having the\nhighest probability of the positive feedback Balancing between them is the well-known problem of exploration vs\nexploita",
+      "category": "FailureRisk",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "We introduce a concept of the adaptive look-alike model, which incorporate iterative exploratory approach to\nlook-alike modelling.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Existing Look-alike Models\nThe most widely spread approach to the problem is to solve an isolated problem of searching an expanded audience\nthat consist of similar users.",
+      "category": "FailureRisk",
+      "implication": "Relevant for similarity-based retrieval and lookalike targeting",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "The model has achieved the improved performance in comparison to the baseline method by 12.5% in AUC using\na Thompson Sampling model.",
+      "category": "Baseline",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "This improvement encourages us to continue studying applications for reinforcement\nlearning to the online advertising targeting problem.",
+      "category": "TargetConstruct",
+      "implication": "Can optimize long-term user engagement metrics",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Instead of solving the sorting\nor expanding task, we can solve the following task: predict, if it is proﬁtable to show the ad for a speciﬁc user to reach\nthe advertising campaign global goal, i.e cost per conversion.",
+      "category": "TargetConstruct",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    }
+  ]
+}

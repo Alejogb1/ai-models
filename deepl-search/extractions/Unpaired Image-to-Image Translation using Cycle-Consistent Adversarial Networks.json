@@ -1,0 +1,15 @@
+{
+  "source": "Unpaired Image-to-Image Translation using Cycle-Consistent Adversarial Networks .pdf",
+  "source_group": "Awesome-ML-Papers/GANs",
+  "processed_at": "2026-06-08",
+  "agent": "agent6_remaining",
+  "concepts": [
+    {
+      "finding": "CycleGAN introduces cycle consistency loss (forward-backward translation should return to original) enabling unpaired image translation without paired examples.",
+      "category": "ModelCandidate",
+      "implication": "Cycle consistency creates supervision from unpaired data, directly applicable to cross-domain search (e.g., translating queries across languages or domains without parallel query pairs).",
+      "open_question": "Can cycle-consistent training align query embeddings across domains (web search, e-commerce, video) without paired query data?",
+      "testable_hypothesis": "A cycle-consistent adversarial training approach will align query embeddings across two search domains with comparable quality to supervised alignment using 100K+ paired queries."
+    }
+  ]
+}

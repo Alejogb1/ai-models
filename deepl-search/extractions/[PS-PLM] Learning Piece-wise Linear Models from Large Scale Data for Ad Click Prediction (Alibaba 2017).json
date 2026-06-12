@@ -1,0 +1,134 @@
+{
+  "source": "[PS-PLM] Learning Piece-wise Linear Models from Large Scale Data for Ad Click Prediction (Alibaba 2017).pdf",
+  "source_group": "Awesome-ML-Papers/CTR-CVR-Prediction",
+  "processed_at": "2026-06-08",
+  "agent": "agent5_final",
+  "concepts": [
+    {
+      "finding": "1\nIntroduction\nClick-through rate (CTR) prediction is a core problem in the multi-billion dollar online advertising industry.",
+      "category": "FailureRisk",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "In this paper, we introduce an industrial strength solution with model named Large Scale\nPiece-wise Linear Model (LS-PLM).",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Then, we propose a novel algorithm to\nsolve it eﬃciently, based on directional derivatives and quasi-Newton method.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "To improve the accuracy of CTR prediction, more and more data are involved, making CTR prediction a\nlarge scale learning problem, with massive samples and high dimension features.",
+      "category": "Experiment",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "In particular, user-click generation involves many complex factors, like ad quality, context information,\nuser interests, and complex interactions of these factors.",
+      "category": "ModelCandidate",
+      "implication": "Can inform intent modeling for recommendation systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "We show LS-PLM with L1 and L2,1 regularizer can achieve good sparsity.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "We propose an eﬃcient optimization\nmethod for such problems, based on directional derivatives and quasi-Newton method.",
+      "category": "FailureRisk",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "It is also applied in recommendation systems, search engines and other product systems.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "In Section 3 we introduce our parallel implementation structure.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "in Section 4, we evaluate the model carefully and demonstrate the advantage of LS-PLM compared with LR.",
+      "category": "Experiment",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Here we propose a general and eﬃcient optimization method to solve such kind of non-convex\nproblems.",
+      "category": "FailureRisk",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Find Θ(k+1) with constrained line search (12).",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "3\nImplementation\nIn this section, we ﬁrst provide our parallel implementation of LS-PLM model for large-scale data, then\nintroduce an important trick which helps to accelerate the training procedue greatly.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Due to the common feature pattern of our production data, employing the common feature trick improves\nthe performance of training procedure greatly, which will be shown in the following section 4.3.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "9\n\nAs shown in Figure 5, LS-PLM outperforms LR clearly.",
+      "category": "Baseline",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "The average improvement of AUC for LR is\n1.44%, which has signiﬁcant impact to the overall online ad system performance.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "5\nConclusions\nIn this paper, a piece-wise linear model, LS-PLM for CTR prediction problem is proposed.",
+      "category": "FailureRisk",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Finding the expected direction turns to an optimization problem, which is formulated as follows:\nmin\nd f ′(Θ; d)\ns.t.",
+      "category": "FailureRisk",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    }
+  ]
+}

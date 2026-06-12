@@ -1,0 +1,3306 @@
+PTE: Predictive Text Embedding through Large-scale
+Heterogeneous Text Networks
+Jian Tang
+Microsoft Research Asia
+jiatang@microsoft.com
+Meng Qu∗
+Peking University
+mnqu@pku.edu.cn
+Qiaozhu Mei
+University of Michigan
+qmei@umich.edu
+ABSTRACT
+Unsupervised text embedding methods, such as Skip-gram
+and Paragraph Vector, have been attracting increasing at-
+tention due to their simplicity, scalability, and eﬀectiveness.
+However, comparing to sophisticated deep learning architec-
+tures such as convolutional neural networks, these methods
+usually yield inferior results when applied to particular ma-
+chine learning tasks. One possible reason is that these text
+embedding methods learn the representation of text in a
+fully unsupervised way, without leveraging the labeled in-
+formation available for the task. Although the low dimen-
+sional representations learned are applicable to many diﬀer-
+ent tasks, they are not particularly tuned for any task. In
+this paper, we ﬁll this gap by proposing a semi-supervised
+representation learning method for text data, which we call
+the predictive text embedding (PTE). Predictive text embed-
+ding utilizes both labeled and unlabeled data to learn the
+embedding of text. The labeled information and diﬀerent
+levels of word co-occurrence information are ﬁrst represented
+as a large-scale heterogeneous text network, which is then
+embedded into a low dimensional space through a princi-
+pled and eﬃcient algorithm. This low dimensional embed-
+ding not only preserves the semantic closeness of words and
+documents, but also has a strong predictive power for the
+particular task. Compared to recent supervised approaches
+based on convolutional neural networks, predictive text em-
+bedding is comparable or more eﬀective, much more eﬃcient,
+and has fewer parameters to tune.
+Categories and Subject Descriptors
+I.2.6 [Artiﬁcial Intelligence]: Learning
+General Terms
+Algorithms, Experimentation
+∗This work was done when the second author was an intern
+at Microsoft Research Asia.
+Permission to make digital or hard copies of all or part of this work for personal or
+classroom use is granted without fee provided that copies are not made or distributed
+for proﬁt or commercial advantage and that copies bear this notice and the full cita-
+tion on the ﬁrst page. Copyrights for components of this work owned by others than
+ACM must be honored. Abstracting with credit is permitted. To copy otherwise, or re-
+publish, to post on servers or to redistribute to lists, requires prior speciﬁc permission
+and/or a fee. Request permissions from Permissions@acm.org.
+KDD’15, August 10-13, 2015, Sydney, NSW, Australia.
+c⃝2015 ACM. ISBN 978-1-4503-3664-2/15/08 ...$15.00.
+DOI: http://dx.doi.org/10.1145/2783258.2783307.
+Keywords
+predictive text embedding, representation learning
+1.
+INTRODUCTION
+Learning a meaningful and eﬀective representation of text,
+e.g., for words and documents, is a critical prerequisite for
+many machine learning tasks such as text classiﬁcation, clus-
+tering and retrieval. Traditionally, every word is represented
+independently to each other, and each document is rep-
+resented as a “bag-of-words”.
+However, both representa-
+tions suﬀer from problems such as data sparsity, polysemy,
+and synonymy, as the semantic relatedness between diﬀerent
+words are commonly ignored.
+Distributed representations of words and documents [18,
+10] eﬀectively address this problem through representing
+words and documents in low-dimensional spaces, in which
+similar words and documents are embedded closely to each
+other. The essential idea of these approaches comes from
+the distributional hypothesis that “you shall know a word
+by the company it keeps” (Firth, J.R. 1957:11) [7].
+Mik-
+ilov et al. proposed a simple and elegant word embedding
+model called the Skip-gram [18], which uses the embedding
+of the target word to predict the embedding of each individ-
+ual context word in a local window. Le and Mikolov further
+extended this idea and proposed the Paragraph Vectors [10]
+in order to embed arbitrary pieces of text, e.g., sentences
+and documents. The basic idea is to use the embeddings
+of sentences/documents to predict the embeddings of words
+in the sentences/documents. Comparing to other classical
+approaches that also utilize the distributional similarity of
+word context, such as the Brown clustering or nearest neigh-
+bors, these text embedding approaches have been proved to
+be quite eﬃcient, scaling up to millions of documents on a
+single machine [18].
+Because of the unsupervised learning process, the repre-
+sentations learned through these text embedding models are
+general enough and can be applied to a variety of tasks such
+as classiﬁcation, clustering and ranking.
+However, when
+compared end-to-end with sophisticated deep learning ap-
+proaches such as the convolutional neural networks (CNNs)
+[5, 8], the performance of text embeddings usually falls short
+on speciﬁc tasks [30]. This is perhaps not surprising as the
+deep neural networks fully leverage labeled information that
+is available for a task when they learn the representations of
+the data. Most text embedding methods are not able to con-
+sider labeled information when learning the representations;
+the labels only kick in later when a classiﬁer is trained using
+the representations as features.
+In other words, unsuper-
+arXiv:1508.00200v1  [cs.CL]  2 Aug 2015
+Figure 1: Illustration of converting a partially labeled text corpora to a heterogeneous text network. The word-word co-
+occurrence network and word-document network encode the unsupervised information, capturing the local context-level and
+document-level word co-occurrences respectively; the word-label network encodes the supervised information, capturing the
+class-level word co-occurrences.
+vised text embeddings are generalizable for diﬀerent tasks
+but have a weaker predictive power for a particular task.
+Despite this deﬁciency, there are still considerable advan-
+tages of text embedding approaches comparing to deep neu-
+ral networks. First, the training of deep neural networks,
+especially convolutional neural networks is computational
+intensive, which usually requires multiple GPUs or clusters
+of CPUs when processing a large amount of data; second,
+convolutional neural networks usually assume the availabil-
+ity of a large amount of labeled examples which is unrealis-
+tic in many tasks. The easily obtainable unlabeled data are
+usually used through an indirect way of pre-training; third,
+the training of CNNs requires exhaustive tuning of many
+parameters, which is very time consuming even for experts
+and infeasible for non-experts. On the other hand, text em-
+bedding methods like Skip-gram are much more eﬃcient, are
+much easier to tune, and naturally accommodate unlabeled
+data.
+In this paper, we ﬁll this gap by proposing the predic-
+tive text embedding (PTE), which adapts the advantages of
+unsupervised text embeddings but naturally utilizes labeled
+information in representation learning. With predictive text
+embedding, an eﬀective low dimensional representation is
+learned jointly from limited labeled examples and a large
+amount of unlabeled examples. Comparing to unsupervised
+embeddings, this representation is optimized for particular
+tasks like what convolutional neural networks do (i.e., the
+representation has strong predictive power for the particular
+classiﬁcation task).
+The proposed method naturally extends our previous work
+of unsupervised information network embedding [27] and
+ﬁrst learns a low dimensional embedding for words through
+a heterogeneous text network. The network encodes diﬀer-
+ent levels of co-occurrence information between words and
+words, words and documents, and words and labels. The
+network is embedded into a low dimensional vector space
+that preserves the second-order proximity [27] between the
+vertices in the network. The representation of an arbitrary
+piece of text (e.g., a sentence or a document) can be simply
+inferred as the average of the word representations, which
+turns out to be quite eﬀective. The whole optimization pro-
+cess remains very eﬃcient, which scales up to millions of
+documents and billions of tokens on a single machine.
+We conduct extensive experiments with real-world text
+corpora, including both long and short documents. Experi-
+mental results show that the predictive text embeddings sig-
+niﬁcantly outperform the state-of-the-art unsupervised em-
+beddings in various text classiﬁcation tasks. Compared end-
+to-end with convolutional neural networks for text classiﬁ-
+cation [8], predictive text embedding outperforms on long
+documents and generates comparable results on short doc-
+uments. PTE enjoys various advantages over convolutional
+neural networks as it is much more eﬃcient, accommodates
+large-scale unlabeled data eﬀectively, and is less sensitive to
+model parameters. We believe our exploration points to a
+direction of learning text embeddings that could compete
+head-to-head with deep neural networks in particular tasks.
+To summarize, we make the following contributions:
+• We propose to learn predictive text embeddings in
+a semi-supervised manner.
+Unlabeled data and la-
+beled information are integrated into a heterogeneous
+text network which incorporates diﬀerent levels of co-
+occurrence information in text.
+• We propose an eﬃcient algorithm “PTE”, which learns
+a distributed representation of text through embed-
+ding the heterogeneous text network into a low dimen-
+sional space. The algorithm is very eﬃcient and has
+few parameters to tune.
+• We conduct extensive experiments using various real-
+world data sets and compare predictive text embed-
+ding end-to-end with both unsupervised text embed-
+dings and convolutional neural networks.
+The rest of this paper is organized as follows. We ﬁrst
+introduce the related work in Section 2. Section 3 formally
+deﬁnes the problem of predictive text embedding through
+heterogeneous text networks. Section 4 introduces the pro-
+posed algorithm in details. Section 5 presents the results of
+empirical experiments. We conclude in Section 6.
+2.
+RELATED WORK
+Our work is mainly related to distributed text represen-
+tation learning and information network embedding.
+2.1
+Distributed Text Embedding
+Distributed representation of text has proved to be quite
+eﬀective in many natural language processing tasks such as
+word analogy [18], POS tagging [6], parsing [6], language
+modeling [17], and sentiment analysis [16, 10, 5, 8].
+Ex-
+isting approaches can be generally classiﬁed into two cat-
+egories:
+unsupervised and supervised.
+Recent developed
+unsupervised approaches normally learn the embeddings of
+words and/or documents by utilizing word co-occurrences
+in the local context (e.g., Skip-gram [18]) or at document
+level (e.g., paragraph vectors [10]). These approaches are
+quite eﬃcient, scaling up to millions of documents. The su-
+pervised approaches [5, 8, 23, 6] are usually based on deep
+neural network architectures, such as recursive neural ten-
+sor networks (RNTNs) [24] or convolutional neural networks
+(CNNs) [11]. In RNTNs, each word is embedded into a low
+dimensional vector, and the embeddings of the phrases are
+recursively learned by applying the same tensor-based com-
+position function over the sub-phrases or words in a parse
+tree. In CNNs [5], each word is also represented with a vec-
+tor, and the same convolutional kernel is applied over the
+context windows in diﬀerent positions of the sentences, fol-
+lowed by a max-pooling and fully connected layer.
+The major diﬀerence between these two categories of ap-
+proaches is how they utilize labeled and unlabeled informa-
+tion in the representation learning phase. The unsupervised
+methods do not include labeled information when learning
+the representations and only use the labels to train the classi-
+ﬁer after the data is transformed into the learned representa-
+tion. RNTNs and CNNs incorporate the labels directly into
+representation learning, so the learned representations are
+particularly tuned for the classiﬁcation task. To incorporate
+unlabeled examples, however, these neural nets usually have
+to use an indirect approach such as to pretrain the word
+embeddings with unsupervised approaches. Comparing to
+these two lines of work, PTE learns the text vectors in a
+semi-supervised way - the representation learning algorithm
+directly utilizes both labeled information and large-scale un-
+labeled data.
+Another piece of work similar to predictive word embed-
+ding is [15], which learns word vectors that are particularly
+tuned for sentiment analysis. However, their approach does
+not scale to millions of documents and does not generalize
+to other classiﬁcation tasks.
+2.2
+Information Network Embedding
+Our work is also related to the problem of network/graph
+embedding as the word representations of PTE are learned
+through a heterogeneous text network.
+Embedding net-
+works/graphs into low dimensional spaces is very useful in
+a variety of applications, e.g., node classiﬁcation [3] and
+link prediction [13]. Classical graph embedding algorithms
+such as MDS [9], IsoMap [28] and Laplacian eigenmap [1]
+are not applicable for embedding large-scale networks that
+contain millions of vertices and billions of edges.
+There
+are some recent work attempting to embed very large real-
+world networks.
+Perozzi et al.
+[20] proposed a network
+embedding model called the “DeepWalk,” which uses trun-
+cated random walks on the networks and is only applicable
+for networks with binary edges.
+Our previous work pro-
+posed a novel large-scale network embedding model called
+the “LINE,” which is suitable for arbitrary types of informa-
+tion networks: undirected or directed, binary or weighted [27].
+The LINE model optimizes an objective function which aims
+to preserve both the local and global network structures.
+Both Deepwalk and LINE are unsupervised and only handle
+homogeneous networks. The network embedding algorithm
+used by PTE extends the LINE to deal with heterogeneous
+networks, in which multiple types of vertices (including the
+class labels) and edges exist.
+3.
+PROBLEM DEFINITION
+Let us begin with formally deﬁning the problem of predic-
+tive text embedding through heterogeneous text networks.
+Comparing to unsupervised text embedding approaches in-
+cluding Skip-gram and Paragraph Vectors that learn gen-
+eral semantic representations of text, our goal is to learn
+a representation of text that is optimized for a given text
+classiﬁcation task. In other words, we anticipate the text
+embedding to have a strong predictive power of the perfor-
+mance of the given task. The basic idea is to incorporate
+both the labeled and unlabeled information when learning
+the text embeddings. To achieve this, it is desirable to ﬁrst
+have an uniﬁed representation to encode both types of infor-
+mation. In this paper, we propose diﬀerent types of networks
+to achieve this, including word-word co-occurrence networks,
+word-document networks, and word-label networks.
+Definition 1. (Word-Word Network) Word-word co-
+occurrence network, denoted as Gww = (V, Eww), captures
+the word co-occurrence information in local contexts of the
+unlabeled data. V is a vocabulary of words and Eww is the
+set of edges between words. The weight wij of the edge be-
+tween word vi and vj is deﬁned as the number of times that
+the two words co-occur in the context windows of a given
+window size.
+The word-word network captures the word co-occurrences
+in local contexts, which is the essential information used
+by existing word embedding approaches such as Skip-gram.
+Beyond the local contexts, word co-occurrence at the docu-
+ment level is also widely explored in classical text representa-
+tions such as statistical topic models, e.g., the latent Dirich-
+let allocation [4]. To capture the document-level word co-
+occurrences, we introduce another network, word-document
+network, deﬁned as below:
+Definition 2. (Word-Document Network) Word-
+document network, denoted as Gwd = (V ∪D, Ewd), is a
+bipartite network where D is a set of documents and V is
+a set of words. Ewd is the set of edges between words and
+documents. The weight wij between word vi and document
+dj is simply deﬁned as the number of times vi appears in
+document dj.
+The word-word and word-document networks encode the
+unlabeled information in large-scale corpora, capturing word
+co-occurrences at both the local context level and the docu-
+ment level. To encode the labeled information, we introduce
+the word-label network, which captures word co-occurrences
+at category-level .
+Definition 3. (Word-Label Network) Word-label net-
+work, denoted as Gwl = (V ∪L, Ewl), is a bipartite network
+that captures category-level word co-occurrences. L is a set
+of class labels and V a set of words. Ewl is a set of edges
+between words and classes. The weight wij of the edge be-
+tween word vi and class cj is deﬁned as: wij = P
+(d:ld=j) ndi,
+where ndi is the term frequency of word vi in document d,
+and ld is the class label of document d.
+The three types of networks above can be further inte-
+grated into one heterogeneous text network.
+Definition 4. (Heterogeneous Text Network) The het-
+erogeneous text network is the combination of word-word,
+word-document, and word-label networks constructed from
+both unlabeled and labeled text data. It captures diﬀerent
+levels of word co-occurrences and contains both labeled and
+unlabeled information.
+Note that the deﬁnition of a heterogeneous text network
+can be generalized to integrate other types of networks such
+as word-sentence, word-paragraph, and document-label net-
+works. In this work we are using the three types of networks
+(word-word, word-document, and word-label) as an illustra-
+tive example.
+We particularly focus on word networks in
+order to ﬁrst represent words into low dimensional spaces.
+The representation of other text units (e.g., sentences or
+paragraphs) can be then computed through aggregating the
+word representations.
+Finally, we formally deﬁne the problem of predictive text
+embedding as follows:
+Definition 5. (Predictive Text Embedding) Given a
+large collection of text data with unlabeled and labeled infor-
+mation, the problem of predictive text embedding aims
+to learn low dimensional representations of words by embed-
+ding the heterogeneous text network constructed from the
+collection into a low dimensional vector space.
+4.
+PREDICTIVE TEXT EMBEDDING
+In this section, we introduce the proposed method that
+learns predictive text embedding through heterogeneous text
+networks. Our method ﬁrst learns vector representations of
+words by embedding the heterogeneous text networks con-
+structed from free text into a low dimensional space, and
+then infer text embeddings based on the learned word vec-
+tors.
+As the heterogeneous text network is composed of
+three bipartite networks, we ﬁrst introduce an approach for
+embedding individual bipartite networks.
+4.1
+Bipartite Network Embedding
+In our previous work, we introduced the LINE model to
+learn the embedding of large-scale information networks [27].
+LINE is mainly designed for homogeneous networks, i.e.,
+networks with the same types of nodes.
+LINE cannot be
+directly applied to heterogeneous networks as the weights
+on diﬀerent types of edges are not comparable. Here, we
+ﬁrst adapt the LINE model for embedding bipartite net-
+works. The essential idea is to make use of the second-order
+proximity [27] between vertices, which assumes vertices with
+similar neighbors are similar to each other and thus should
+be represented closely in a low dimensional space.
+Given a bipartite network G = (VA ∪VB, E), where VA
+and VB are two disjoint sets of vertices of diﬀerent types,
+and E is the set of edges between them. We ﬁrst deﬁne the
+conditional probability of vertex vi in set VA generated by
+vertex vj in set VB as:
+p(vi|vj) =
+exp(⃗uT
+i · ⃗uj)
+P
+i′∈A exp(⃗uT
+i′ · ⃗uj),
+(1)
+where ⃗ui is the embedding vector of vertex vi in VA, and ⃗uj is
+the embedding vector of vertex vj in VB. For each vertex vj
+in VB, Eq (1) deﬁnes a conditional distribution p(·|vj) over
+all the vertices in the set VA; for each pair of vertices vj, vj′,
+the second-order proximity can actually be determined by
+their conditional distributions p(·|vj), p(·|vj′). To preserve
+the second-order proximity, we can make the conditional dis-
+tribution p(·|vj) be close to its empirical distribution ˆp(·|vj),
+which can be achieved by minimizing the following objective
+function:
+O =
+X
+j∈B
+λjd(ˆp(·|vj), p(·|vj)),
+(2)
+where d(·, ·) is the KL-divergence between two distributions,
+λj is the importance of vertex vj in the network, which can
+be set as the degree degj = P
+i wij, and the empirical dis-
+tribution can be deﬁned as ˆp(vi|vj) =
+wij
+degj . Omitting some
+constants, the objective function (2) can be calculated as:
+O = −
+X
+(i,j)∈E
+wij log p(vj|vi).
+(3)
+The objective (3) can be optimized with stochastic gradi-
+ent descent using the techniques of edge sampling [27] and
+negative sampling [18]. In each step, a binary edge e = (i, j)
+is sampled with the probability proportional to its weight
+wij, and meanwhile multiple negative edges (i, j) are sam-
+pled from a noise distribution pn(j).
+The sampling pro-
+cedures address signiﬁcant deﬁciency of stochastic gradient
+descent in learning network embeddings. For the detailed
+optimization process, readers can refer to [27].
+The embeddings of the word-word, word-document, and
+word-label network can all be learned by the above model.
+Note that the word-word network is essentially a bipartite-
+network by treating each undirected edge as two directed
+edges, and then VA is deﬁned as the set of the source nodes,
+VB as the set of target nodes.
+Therefore, we can deﬁne
+the conditional probabilities p(vi|vj), p(vi|dj) and p(vi|lj)
+according to equation (1), and then learn the embeddings
+by optimizing objective function (3).
+Next, we introduce
+our approach of embedding the heterogeneous text network.
+4.2
+Heterogeneous Text Network Embedding
+The heterogeneous text network is composed of three bi-
+partite networks: word-word, word-document and word-label
+networks, where the word vertices are shared across the three
+networks.
+To learn the embeddings of the heterogeneous
+text network, an intuitive approach is to collectively em-
+bed the three bipartite networks, which can be achieved by
+minimizing the following objective function:
+Opte = Oww + Owd + Owl,
+(4)
+where
+Oww = −
+X
+(i,j)∈Eww
+wij log p(vi|vj)
+(5)
+Owd = −
+X
+(i,j)∈Ewd
+wij log p(vi|dj)
+(6)
+Owl = −
+X
+(i,j)∈Ewl
+wij log p(vi|lj)
+(7)
+The objective function (4) can be optimized in diﬀerent
+ways, depending on how the labeled information, i.e., the
+word-label network, is used.
+One solution is to train the
+model with the unlabeled data (the word-word and word-
+document networks) and the labeled data simultaneously.
+We call this approach joint training. An alternative solution
+is to learn the embeddings with unlabeled data ﬁrst, and
+then ﬁne-tune the embeddings with the word-label network.
+This is inspired by the idea of pre-training and ﬁne-tuning
+in the literature of deep learning [2].
+In joint training, all three types of networks are used
+together.
+A straightforward solution to optimize the ob-
+jective (4) is to merge the all the edges in the three sets
+Eww, Ewd, Ewl and then deploy edge sampling [27], which
+samples an edge for model updating in each step, with the
+sampling probability proportional to its weight. However,
+when the network is heterogeneous, the weights of the edges
+between diﬀerent types of vertices are not comparable to
+each other. A more reasonable solution is to alternatively
+sample from the three sets of edges. We summarize the de-
+tailed training algorithm in Alg. 1.
+Algorithm 1: Joint training.
+Data: Gww, Gwd, Gwl, number of samples T , number of
+negative samples K.
+Result: word embeddings ⃗w.
+while
+iter ≤T do
+• sample an edge from Eww and draw K negative edges,
+and update the word embeddings;
+• sample an edge from Ewd and draw K negative edges,
+and update the word and document embeddings;
+• sample an edge from Ewl and draw K negative edges,
+and update the word and label embeddings;
+end
+Algorithm 2: Pre-training + Fine-tuning.
+Data: Gww, Gwd, Gwl, number of samples T , number of
+negative samples K.
+Result: word embeddings ⃗w.
+while
+iter ≤T do
+• sample an edge from Eww and draw K negative edges,
+and update the word embeddings;
+• sample an edge from Ewd and draw K negative edges,
+and update the word and document embeddings;
+end
+while
+iter ≤T do
+• sample an edge from Ewl and draw K negative edges,
+and update the word and label embeddings;
+end
+Similarly, we summarize the training process of pre-training
+and ﬁne-tuning in Alg. 2.
+4.3
+Text Embedding
+The heterogeneous text network encodes word co-occurrences
+at diﬀerent levels, extracted from both unlabeled data and
+labeled information for a speciﬁc classiﬁcation task. There-
+fore, the word representations learned by embedding the het-
+erogeneous text network are not only more robust but also
+optimized for that task. Once the word vectors are learned,
+the representation of an arbitrary piece of text can be ob-
+tained by simply averaging the vectors of the words in that
+piece of text. That is, the vector representation of a piece
+of text d = w1w2 · · · , wn can be computed as
+⃗d = 1
+n
+n
+X
+i=1
+⃗ui,
+(8)
+where ⃗ui is the embedding of word wi.
+In fact, the average of the word embeddings is the solution
+to minimizing the following objective function:
+O =
+n
+X
+i=1
+l(⃗ui, ⃗d),
+(9)
+where the loss function l(·, ·) between the word embedding ⃗ui
+and text embedding ⃗d is speciﬁed as the Euclidean distance.
+Related is the inference process of paragraph vectors [10],
+which minimizes the same objective but with a diﬀerent loss
+function l(⃗ui, ⃗d) = −
+1
+1+exp(−⃗uT
+i ⃗d). It however does not lead
+to a close form solution and has to be optimized by gradient
+descent algorithm.
+5.
+EXPERIMENTS
+In this section, we move forward to evaluate the eﬀec-
+tiveness of the proposed PTE algorithm for predictive text
+embedding. A variety of text classiﬁcation tasks and data
+sets are selected for this purpose. The experiments are set
+up as the following.
+5.1
+Experiment Setup
+Data Sets
+We select two types of text corpora, which consist of either
+long or short documents.
+Long Document Corpora: (1) 20ng, the widely used
+text classiﬁcation data set 20newsgroup1, containing 20 cat-
+egories; (2)Wiki, a snapshot of Wikipedia corpus in April
+2010 containing around two million English articles. Only
+common words appeared in the vocabulary of wiki2010 [22]
+are kept. We choose seven diverse categories for the classiﬁ-
+cation task, including “Arts,” “History,” “Human,” “Mathe-
+matics,”“Nature,”“Technology,”and“Sports”from DBpedia
+ontology2. For each category, we randomly select 9,000 ar-
+ticles as labeled documents for training; (3) Imdb, a data
+set for sentiment classiﬁcation from [15]3. To avoid the dis-
+tribution bias between the training and test data sets, we
+randomly shuﬄe the training and test data sets; (4) RCV1,
+a large benchmark corpus for text classiﬁcation [12]4. Four
+subsets including Corporate, Economics, Government
+and Market are extracted from the corpus. In RCV1 data
+sets, all the documents have already been represented as
+“bag-of-words,” and orders between words are lost.
+Short Document Corpora: (1) Dblp, which contains ti-
+tles of papers from the computer science bibliography5. We
+choose six diverse research ﬁelds for classiﬁcation includ-
+ing“database,”“artiﬁcial intelligence,”“hardware,”“system,”
+“programming languages,” and “theory.” For each ﬁeld, we
+select representative conferences and collect the papers pub-
+lished in the selected conferences as the labeled documents;
+(2) Mr, a movie review data set, in which each review
+only contains one sentence [19]6; (3) Twitter, a corpus
+1Available at http://qwone.com/~jason/20Newsgroups/
+2Available
+at
+http://downloads.dbpedia.org/3.9/en/article_
+categories_en.nq.bz2.
+3Available at http://ai.stanford.edu/~amaas/data/sentiment/
+4Available at http://www.ai.mit.edu/projects/jmlr/papers/volume5/
+lewis04a/lyrl2004_rcv1v2_README.htm
+5Available at http://arnetminer.org/billboard/citation
+6Available
+at
+http://www.cs.cornell.edu/people/pabo/
+movie-review-data/
+of Tweets for sentiment classiﬁcation7, from which we ran-
+domly sampled 1,200,000 Tweets and split them into train-
+ing and testing sets.
+No further text normalization such as removing stop words
+or stemming is done on top of the original data. We sum-
+marize the detailed statistics of these data sets in Table 1.
+Compared Algorithms
+We compare the PTE algorithm with other representation
+learning algorithms for text data, including the classical
+“bag-of-words” representation and the state-of-the-art ap-
+proaches to unsupervised and supervised text embedding.
+• BOW: the classical“bag-of-words”representation. Each
+document is represented with a |V |-dimensional vector,
+in which the weight of each dimension is calculated
+with the TFIDF weighting [21].
+• Skip-gram: the state-of-the-art word embedding model
+proposed by Mikolov et al. [18].
+For the document
+embedding, we simply take the average of the word
+embeddings as explained in Section 4.3.
+• PVDBOW: the distributed bag-of-words version of para-
+graph vector model proposed by Le and Mikolv [10], in
+which the orders of words in a document are ignored.
+• PVDM: the distributed memory version of paragraph
+vector which considers the order of the words [10].
+• LINE: the large-scale information network embedding
+model proposed by Tang et al. [27]. We use the LINE
+model to learn unsupervised embeddings with the word-
+word network, word-document network or the combi-
+nation of the two networks.
+• CNN: the supervised text embedding approach based
+on a convolutional neural network [8]. Though CNN
+is proposed for modeling sentences, we adapt it for
+general word sequences including long documents. Al-
+though CNN typically works with fully labeled docu-
+ments, it can also utilize unlabeled data by pre-training
+the model with unsupervised word embeddings, which
+is marked as CNN(pretrain).
+• PTE: our proposed approach for learning predictive
+text embedding. There are diﬀerent variants of PTE
+that use diﬀerent combinations of the word-word, word-
+document and word-label networks. We denote PTE(Gwl)
+for the version that uses the word-label network only;
+PTE(pretrain) learns an unsupervised embedding with
+the word-word and word-document networks, and then
+ﬁne-tune the word embeddings with the word-label
+network; PTE(joint) jointly trains the heterogeneous
+text network composed of all the three networks.
+Classiﬁcation and Parameter Settings
+Once the vector representations of documents are constructed
+or learned, we apply the same classiﬁcation process using the
+same training data set. In particular, all the documents in
+the training set are used in both the representation learning
+phase and the classiﬁer learning phase. The class labels of
+these documents are not used in the representation learning
+7Available
+at
+http://thinknook.com/
+twitter-sentiment-analysis-training-corpus-dataset-2012-09-22/
+phase if an unsupervised embedding method is used; they
+only kick in at the classiﬁer learning phase. The class label
+are used in both the representation learning phase and the
+classiﬁer learning phase if a predictive embedding method
+is used. The test data is held-out from both phases. In the
+classiﬁcation phase, we use the one-vs-rest logistic regression
+model in the LibLinear package8. The classiﬁcation perfor-
+mance is measured with the micro-F1 and macro-F1 metrics.
+For Skip-gram, PVDBOW, PVDM and PTE, the mini-batch
+size of the stochastic gradient descent is set as 1; the learning
+rate is set as ρt = ρ0(1−t/T), in which T is the total number
+of mini-batches or edge samples and ρ0 = 0.025; the number
+of negative samples is set as 5; the window size is set as 5 in
+Skip-gram, PVDBOW, PVDM and when constructing the
+word-word co-occurrence network. We use the structure of
+the CNN in [8], which uses one convolution layer, followed
+by a max-pooling layer and a fully-connected layer. Follow-
+ing [8], we set the window size in the convolution layer as
+3 and the number of feature maps as 100. For CNN, 1% of
+the training data set is randomly selected as the validation
+data for early stopping. The dimensionality of word vectors
+is set as 100 by default for all the embedding models.
+Note that for the PTE models, the parameters are all
+set as above by default on diﬀerent data sets.
+The only
+parameter that needs to be tuned is the number of samples
+T in edge sampling, which can be safely set to be large.
+5.2
+Quantitative Results
+5.2.1
+Performance on Long Documents
+Table 2 and 3 compare the performance of text classiﬁca-
+tion on long documents. Let us start with Table 2 on 20ng,
+Wiki and Imdb data sets.
+We ﬁrst compare the perfor-
+mance of unsupervised embedding methods, which use either
+local word co-occurrences (Skip-gram, LINE(Gww)), docu-
+ment level word co-occurrences (PV-DBOW, LINE(Gwd)),
+or the combination (LINE(Gww+Gwd)). We can see that the
+LINE(Gwd) with document-level word co-occurrences per-
+forms the best among the unsupervised embeddings. The
+performance of PVDM is inferior to that of PVDBOW, which
+is diﬀerent from what is reported in [10]. Unfortunately we
+are not able to replicate their results. Similar results to ours
+are also reported in [14]. For the results of PVDBOW on the
+imdb data set, our results are diﬀerent from those reported
+in [10, 16].
+This is because their embeddings are trained
+on the mixture of training and test data sets while our em-
+beddings are only trained with the training data, which we
+believe is a more reasonable experiment setup.
+Next we compare the performance of predictive embed-
+dings, including diﬀerent variants of CNN and PTE. When
+PTE is jointly trained using the heterogeneous text network
+or with the combination of word-document and word-label
+networks, it performs the best among all the approaches. All
+PTE approaches jointly trained with the word-label network
+(e.g., Gww + Gwl) outperform their corresponding unsuper-
+vised embedding approaches (e.g., Gww), which shows the
+power of learning predictive text embeddings with the su-
+pervision. PTE(joint) consistently outperforms PTE(Gwl),
+demonstrating that incorporating unlabeled information, i.e.,
+word-word and word-document networks, also improves the
+quality of the embeddings. PTE(joint) also signiﬁcantly out-
+performs PTE(pretrain). This shows that jointly training
+8http://www.csie.ntu.edu.tw/~cjlin/liblinear/
+Table 1: Statistics of the Data Sets
+Long Documents
+Short Documents
+Name
+20ng
+Wiki
+IMDB
+Corporate
+Economics
+Government
+Market
+Dblp
+Mr
+Twitter
+Train
+11,314
+1,911,617*
+25,000
+245,650
+77,242
+138,990
+132,040
+61,479
+7,108
+800,000
+Test
+7,532
+21,000
+25,000
+122,827
+38,623
+69,496
+66,020
+20,000
+3,554
+400,000
+|V|
+89,039
+913,881
+71,381
+141,740
+65,254
+139,960
+64,049
+22,270
+17,376
+405,994
+Doc. length
+305.77
+672.56
+231.65
+102.23
+145.10
+169.07
+119.83
+9.51
+22.02
+14.36
+#classes
+20
+7
+2
+18
+10
+23
+4
+6
+2
+2
+*In the Wiki data set, only 42,000 documents are labeled.
+Table 2: Results of text classiﬁcation on long documents.
+20NG
+Wikipedia
+IMDB
+Type
+Algorithm
+Micro-F1
+Macro-F1
+Micro-F1
+Macro-F1
+Micro-F1
+Macro-F1
+Word
+BOW
+80.88
+79.30
+79.95
+80.03
+86.54
+86.54
+Unsupervised
+Embedding
+Skip-gram
+70.62
+68.99
+75.80
+75.77
+85.34
+85.34
+PVDBOW
+75.13
+73.48
+76.68
+76.75
+86.76
+86.76
+PVDM
+61.03
+56.46
+72.96
+72.76
+82.33
+82.33
+LINE(Gww)
+72.78
+70.95
+77.72
+77.72
+86.16
+86.16
+LINE(Gwd)
+79.73
+78.40
+80.14
+80.13
+89.14
+89.14
+LINE(Gww + Gwd)
+78.74
+77.39
+79.91
+79.94
+89.07
+89.07
+Predictive
+Embedding
+CNN
+78.85
+78.29
+79.72
+79.77
+86.15
+86.15
+CNN(pretrain)
+80.15
+79.43
+79.25
+79.32
+89.00
+89.00
+PTE(Gwl)
+82.70
+81.97
+79.00
+79.02
+85.98
+85.98
+PTE(Gww + Gwl)
+83.90
+83.11
+81.65
+81.62
+89.14
+89.14
+PTE(Gwd + Gwl)
+84.39
+83.64
+82.29
+82.27
+89.76
+89.76
+PTE(pretrain)
+82.86
+82.12
+79.18
+79.21
+86.28
+86.28
+PTE(joint)
+84.20
+83.39
+82.51
+82.49
+89.80
+89.80
+Table 3: Results of text classiﬁcation on long documents (RCV1 data sets).
+Corporate
+Economics
+Government
+Market
+Algorithm
+Micro-F1
+Macro-F1
+Micro-F1
+Macro-F1
+Micro-F1
+Macro-F1
+Micro-F1
+Macro-F1
+BOW
+78.45
+63.80
+86.18
+81.67
+77.43
+62.38
+95.55
+94.09
+PVDBOW
+65.87
+45.78
+79.63
+74.82
+70.74
+54.08
+91.81
+88.88
+LINE(Gwd)
+76.76
+60.30
+85.55
+81.46
+77.82
+63.34
+95.66
+93.90
+PTE(Gwl)
+76.69
+60.48
+84.88
+80.02
+78.26
+63.69
+95.58
+93.84
+PTE(pretrain)
+77.03
+61.03
+84.95
+80.63
+78.48
+64.50
+95.54
+93.79
+PTE(joint)
+79.20
+64.29
+87.05
+83.01
+79.63
+66.15
+96.19
+94.58
+Table 4: Results of text classiﬁcation on short documents.
+DBLP
+MR
+Twitter
+Type
+Algorithm
+Micro-F1
+Macro-F1
+Micro-F1
+Macro-F1
+Micro-F1
+Macro-F1
+Word
+BOW
+75.28
+71.59
+71.90
+71.90
+75.27
+75.27
+Unsupervised
+Embedding
+Skip-gram
+73.08
+68.92
+67.05
+67.05
+73.02
+73.00
+PVDBOW
+67.19
+62.46
+67.78
+67.78
+71.29
+71.18
+PVDM
+37.11
+34.38
+58.22
+58.17
+70.75
+70.73
+LINE(Gww)
+73.98
+69.92
+71.07
+71.06
+73.19
+73.18
+LINE(Gwd)
+71.50
+67.23
+69.25
+69.24
+73.19
+73.19
+LINE(Gww + Gwd)
+74.22
+70.12
+71.13
+71.12
+73.84
+73.84
+Predictive
+Embedding
+CNN
+76.16
+73.08
+72.71
+72.69
+75.97
+75.96
+CNN(pretrain)
+75.39
+72.28
+68.96
+68.87
+75.92
+75.92
+PTE(Gwl)
+76.45
+72.74
+73.44
+73.42
+73.92
+73.91
+PTE(Gww + Gwl)
+76.80
+73.28
+72.93
+72.92
+74.93
+74.92
+PTE(Gwd + Gwl)
+77.46
+74.03
+73.13
+73.11
+75.61
+75.61
+PTE(pretrain)
+76.53
+72.94
+73.27
+73.24
+73.79
+73.79
+PTE(joint)
+77.15
+73.61
+73.58
+73.57
+75.21
+75.21
+with unlabeled and labeled data is much more eﬀective com-
+pared to separating them into two phases of pre-training and
+ﬁne-tuning.
+It is interesting to observe that PTE(joint) consistently
+outperforms CNN. This is promising as PTE does not use a
+sophisticated neural network architecture. We also attempt
+to pre-train the CNN with the word embeddings learned by
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+0.2
+0.4
+0.6
+0.8
+1.0
+0.50
+0.60
+0.70
+0.80
+# percentage of labeled data
+Micro−F1
+G
+Skip−gram
+PTE(Gwl)
+CNN
+PTE(pretrain)
+CNN(pretrain)
+PTE(joint)
+NB+EM
+LP
+(a) 20ng
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+0.2
+0.4
+0.6
+0.8
+1.0
+0.70
+0.75
+0.80
+0.85
+0.90
+# percentage of labeled data
+Micro−F1
+G
+Skip−gram
+PTE(Gwl)
+CNN
+PTE(pretrain)
+CNN(pretrain)
+PTE(joint)
+NB+EM
+LP
+(b) imdb
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+0.2
+0.4
+0.6
+0.8
+1.0
+0.64
+0.68
+0.72
+0.76
+# percentage of labeled data
+Micro−F1
+G
+Skip−gram
+PTE(Gwl)
+CNN
+PTE(pretrain)
+CNN(pretrain)
+PTE(joint)
+NB+EM
+LP
+(c) dblp
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+0.2
+0.4
+0.6
+0.8
+1.0
+0.60
+0.64
+0.68
+0.72
+# percentage of labeled data
+Micro−F1
+G
+Skip−gram
+PTE(Gwl)
+CNN
+PTE(pretrain)
+CNN(pretrain)
+PTE(joint)
+NB+EM
+LP
+(d) mr
+Figure 2: Performance w.r.t. # labeled data.
+the LINE(Gwl + Gwd) and then ﬁne tune it with the labels.
+Surprisingly, the performance of CNN with pre-training sig-
+niﬁcantly improves on the 20ng and imdb data sets and
+remains almost the same on the wiki data set.
+This im-
+plies that pre-training CNN with a well learned unsuper-
+vised embeddings can be very useful. However, even with
+pre-training the performance of CNN is still inferior to that
+of PTE(joint). This is probably because the PTE model can
+jointly train with both the unlabeled and labeled data while
+CNN can only utilize them separately through pre-training
+and ﬁne-tuning. PTE(joint) also outperforms the classical
+“bag-of-words” representation even though the dimensional-
+ity of the embeddings learned by the PTE is way smaller
+than that of “bag-of-words.”
+Table 3 reports the results on the RCV1 data sets. As
+the order between the words is lost, the embedding methods
+that require the word order information are not applicable.
+Similar results are observed.
+Predictive text embeddings
+outperform unsupervised embeddings.
+PTE(joint) is also
+much more eﬀective than PTE(pretrain).
+All the embedding approaches (except“bag-of-words”) are
+trained with asynchronous stochastic gradient descent algo-
+rithm using 20 threads on a single machine with 1T memory,
+40 CPU cores at 2.0GHZ. We compare the running time of
+CNN and PTE(joint) on the imdb data set. The PTE(joint)
+method is typically more than 10 times faster than the CNN
+models.
+When pre-trained with preexisting word embed-
+dings, CNN converges much faster, but still more than 5
+times slower than PTE(joint).
+5.2.2
+Performance on Short Documents
+Table 4 compares the performance on short documents.
+Among unsupervised embeddings, the LINE(Gww + Gwd),
+which combines the document-level and local context-level
+word co-occurrences, performs the best. The LINE(Gww)
+utilizing the local context-level word co-occurrences outper-
+forms the LINE(Gwd) using document-level word co-occurrences,
+which is opposite to the observations on long documents.
+This is because document-level word co-occurrences suﬀer
+from the sparsity in short documents, with similar results
+observed in statistical topic models [26]. The performance
+of PVDM is still inferior to that of PVDBOW, which is con-
+sistent with the results on long documents.
+For predictive embeddings, the best performance is ob-
+tained by the PTE (on dblp, mr ) or CNN (on twit-
+ter). Among the PTE approaches, the predictive embed-
+dings learned by incorporating the word-label network out-
+perform the corresponding unsupervised embeddings, which
+is consistent with the results on long documents. PTE(joint)
+outperforms LINE(Gwl), showing the usefulness of incorpo-
+rating unlabeled information. PTE(joint) also signiﬁcantly
+outperforms the PTE(pretrain), showing the advantage of
+jointly training with the labeled and unlabeled data.
+On the short documents, we observe that PTE(joint) does
+not consistently outperform the CNN. The reason is proba-
+bly due to the problem of word sense ambiguity, which be-
+comes more serious on the short documents. CNN reduces
+the problem of word ambiguity through using the word or-
+ders in local context in the convolutional kernels while PTE
+does not leverage the orders. We believe there is consider-
+able room to improve predictive text embedding by utilizing
+word orders, which we leave as future work.
+5.3
+Effects of Labeled Data
+We compare CNN and PTE head-to-head by varying the
+percentages of labeled data. We consider the cases without
+or with unlabeled data, mimicking the scenarios of super-
+vised and semi-supervised learning. In the setting of semi-
+supervised learning, we also compare with classical semi-
+supervised approaches, Naive Bayes with EM (NB+EM) [25]
+and label propagation (LP) [31]. Fig. 2 reports the perfor-
+mance on both long and short documents.
+Overall, both
+CNNs and PTEs improve when the size of labeled data
+increases.
+In the supervised settings, i.e., between CNN
+and PTE(Gwl), PTE(Gwl) outperforms or is comparable
+to CNN on both the long and short documents.
+In the
+semi-supervised settings, i.e., between CNN(pretrain) and
+PTE(joint), PTE(joint) consistently outperforms CNN(pretrain),
+which is pre-trained with the best performing unsuper-
+vised word embeddings. The PTE(joint) also outperforms
+the state-of-the-art semi-supervised approaches Naive Bayes
+with EM and label propagation.
+We also notice that when the size of labeled data is scarce,
+pre-training CNN with unsupervised embeddings is quite
+helpful, especially on the short documents.
+It even out-
+performs all PTEs when the training examples are too few.
+However, when the size of labeled data increases, pre-training
+CNN does not always improve its performance (e.g., on the
+dblp and mr data sets).
+Note that for Skip-gram, increasing the number of labeled
+data in training does not further increase the performance.
+We also notice that when the labeled documents are too
+few, the performance of PTE is inferior to the Skip-gram on
+the dblp data set. The reason is that when the number of
+labeled examples is scarce, the word-label network is very
+noisy and PTE treats the word-label network equally to the
+robust word-word/word-document networks. A way to ﬁx is
+to adjust the sampling probability from the word-label and
+word-word/word-document when the labeled data is scarce.
+We leave it as future work.
+5.4
+Effects of Unlabeled Data
+0.0
+0.2
+0.4
+0.6
+0.8
+1.0
+0.50
+0.60
+0.70
+# percentage of unlabeled data
+Micro−F1
+PTE(pretrain)
+CNN(pretrain)
+PTE(joint)
+(a) 20ng
+0.0
+0.2
+0.4
+0.6
+0.8
+1.0
+0.72
+0.73
+0.74
+0.75
+0.76
+# percentage of unlabeled data
+Micro−F1
+PTE(pretrain)
+CNN(pretrain)
+PTE(joint)
+(b) dblp
+Figure 3: Performance w.r.t. # unlabeled data.
+We also analyze the performance of the CNNs and PTEs
+w.r.t. the size of unlabeled data. For CNN, the unlabeled
+data is used for pre-training while for the PTE, the unlabeled
+data can be used for either pre-training or jointly training.
+Fig. 3 reports the results on 20ng and dblp data sets. Due
+to space limitation, we omit the results on other data sets,
+which are similar. On 20ng, we use 10% documents as la-
+beled while the rest is used as the unlabeled; on dblp, we
+randomly sample 200,000 titles of the papers published in
+the other conferences as the unlabeled data. We use the un-
+supervised embeddings (learned by LINE(Gww + Gwd)) as
+the pre-training of CNN. We can see that the performance
+of both CNN and PTE improves when the size of unlabeled
+data increases. For PTE, the way of jointly training with
+the unlabeled and labeled data is much more eﬀective than
+separating them into pre-training and ﬁne-tuning.
+5.5
+Parameter Sensitivity
+G
+G
+G
+G
+GGG
+GG
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+0
+200
+400
+600
+800
+0.80
+0.81
+0.82
+0.83
+0.84
+#samples(*million) 
+Micro−F1
+(a) 20ng
+G
+G
+G
+GG
+G
+GG
+G
+G
+G
+G
+G
+G
+G
+G
+G
+0
+20
+40
+60
+80
+100
+0.74
+0.75
+0.76
+0.77
+#samples(*million) 
+Micro−F1
+(b) dblp
+Figure 4: Sensitivity of PTE w.r.t. number of samples T.
+For the proposed PTE models, as mentioned previously,
+most of the parameters except for the number of edge sam-
+ples T are not sensitive to diﬀerent data sets and can be
+set by default. Here we analyze the performance sensitivity
+of PTE(joint) w.r.t the number of samples T.
+Fig. 4 re-
+ports the results on the 20ng and dblp data sets. On both
+data sets, we can see that when the number of samples T
+becomes large enough, the performance of PTE(joint) con-
+verges. Therefore, in practice, one can just set the number
+of samples T to be suﬃciently large. A reasonable estima-
+tion of T we ﬁnd in practice is several times of the number
+of edges in the heterogeneous text networks.
+5.6
+Document Visualization
+Finally, we give an illustrative visualization of the docu-
+ments in 20ng to compare the unsupervised and predictive
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●●●
+●●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●●
+●●
+●
+●●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●●
+●
+●●
+●
+●
+●
+●
+●●
+●●
+●●
+●
+●
+●
+●
+●
+●
+●
+●
+●●
+●
+●
+●
+●
+●
+●
+●
+●
+●●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●●
+●
+●●
+●●●●
+●
+●●
+●●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●●
+●
+●
+●
+●
+●
+●
+●●
+●●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●●●●
+●
+●
+●
+●
+●
+●●
+●
+●
+●
+●●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●●
+●
+●
+●●
+●
+●
+●
+●●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●●
+●
+●
+●●
+●
+●
+●
+●
+●
+●
+●
+●●●
+●
+●●●
+●
+●
+●
+●
+●
+●
+●●
+●●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●●
+●
+●
+●
+●
+●
+●●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●●
+●
+●
+●
+●
+●
+●●
+●
+●
+●
+●
+●
+●
+●
+●●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●●
+●●
+●●
+●
+●
+●
+●
+●
+●
+●●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●●
+●
+●
+●
+●
+●
+●
+●●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●●●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●●
+●
+●
+●●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●●●●
+●
+●
+●●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●●●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●●
+●
+●
+●●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●●●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●●●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●●
+●
+●
+●
+●
+●●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●●
+●
+●
+●
+●
+●
+●
+●
+●
+●●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●●
+●
+●●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●●
+●
+●
+●
+●
+●●●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●●
+●
+●
+●
+●●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●●
+●
+●
+●
+●●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●●
+●
+●●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●●
+●
+●
+●
+●
+●●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●●●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●●
+●
+●
+●●
+●
+●
+●
+●
+●
+●
+●
+●●
+●
+●
+●
+●
+●●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●●
+●
+●
+●
+●
+●
+●
+●
+●
+●●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●

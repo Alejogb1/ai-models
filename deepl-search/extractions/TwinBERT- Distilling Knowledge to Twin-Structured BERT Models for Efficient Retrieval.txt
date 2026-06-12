@@ -1,0 +1,995 @@
+TwinBERT: Distilling Knowledge to Twin-Structured BERT
+Models for Eﬀicient Retrieval
+Wenhao Lu
+Bing Ads of AI & Research Group
+Microsof
+One Microsof Way
+Redmond, WA 98052-6399
+wenhlu@microsof.com
+Jian Jiao
+Bing Ads of AI & Research Group
+Microsof
+One Microsof Way
+Redmond, WA 98052-6399
+jiajia@microsof.com
+Ruofei Zhang
+Bing Ads of AI & Research Group
+Microsof
+One Microsof Way
+Redmond, WA 98052-6399
+bzhang@microsof.com
+ABSTRACT
+Pre-trained language models like BERT have achieved great success
+in a wide variety of NLP tasks, while the superior performance
+comes with high demand in computational resources, which hin-
+ders the application in low-latency IR systems. We present Twin-
+BERT model for eﬀective and eﬃcient retrieval, which has twin-
+structured BERT-like encoders to represent query and document
+respectively and a crossing layer to combine the embeddings and
+produce a similarity score. Diﬀerent from BERT, where the two
+input sentences are concatenated and encoded together, TwinBERT
+decouples them during encoding and produces the embeddings
+for query and document independently, which allows document
+embeddings to be pre-computed oﬄine and cached in memory.
+Tereupon, the computation lef for run-time is from the query
+encoding and query-document crossing only. Tis single change
+can save large amount of computation time and resources, and
+therefore signiﬁcantly improve serving eﬃciency. Moreover, a few
+well-designed network layers and training strategies are proposed
+to further reduce computational cost while at the same time keep
+the performance as remarkable as BERT model. Lastly, we develop
+two versions of TwinBERT for retrieval and relevance tasks corre-
+spondingly, and both of them achieve close or on-par performance
+to BERT-Base model.
+Te model was trained following the teacher-student framework
+and evaluated with data from one of the major search engines. Ex-
+perimental results showed that the inference time was signiﬁcantly
+reduced and was ﬁrstly controlled around 20ms on CPUs while at
+the same time the performance gain from ﬁne-tuned BERT-Base
+model was mostly retained. Integration of the models into pro-
+duction systems also demonstrated remarkable improvements on
+relevance metrics with negligible inﬂuence on latency.
+CCS CONCEPTS
+•Computing methodologies →Massively parallel algorithms;
+Machine learning algorithms; Supervised learning; Neural
+networks; Learning latent representations; •Information sys-
+tems →Document representation; Qery representation; Spon-
+sored search advertising;
+KEYWORDS
+Deep Learning; Deep Neural Network (DNN); Semantic Embedding;
+Information Retrieval; k-NN; CDSSM; PyTorch; Sponsored Search;
+BERT; Knowledge Distillation
+1
+INTRODUCTION
+Pre-trained language models such as BERT [6] and GPT [25] have
+led a series of breakthroughs in a broad variety of NLP tasks in-
+cluding question answering, natural language inference, sentiment
+classiﬁcation and others, and more impressively, they even sur-
+passed human performance on some of them 1. However, to serve
+these deep-structured models in a production system, besides accu-
+racy, latency is also an important factor to consider. A BERT-Base
+model, for instance, has 110 million parameters and 12 stacked
+multi-head atention networks, which is extremely computation-
+ally intensive and makes it challenging to deploy such a model in a
+real-world system.
+In the age of information explosion, to meet people’s informa-
+tion needs, a variety of modern applications have been developed
+including web search, online advertising, product recommendation,
+digital assistant and personalized feed. At the heart of these sys-
+tems, information retrieval (IR) plays an important role in handling
+the increasingly growing volume of information. Te quality of an
+IR system crucially depends on the deep understanding of queries
+and documents, which fundamentally is an NLP problem and could
+beneﬁt from the state-of-the-art pre-trained models. However, con-
+sidering the large-scale and low-latency nature of IR systems, the
+long inference time of these models becomes a botleneck for their
+applications in the area. Most of the prior knowledge distillation
+eﬀorts on BERT [13], [22], [30], [31] showed eﬀectiveness in com-
+pressing the complex models and reducing the inference time to a
+certain degree. Nevertheless, few of them could meet the latency
+requirement of IR systems.
+To address the latency problem brought by the advanced NLP
+techniques, this paper proposes a novel language representation
+model for eﬃcient retrieval, called TwinBERT. Te model has twin-
+structured BERT-like encoders to encode the query and document
+respectively and a crossing layer to combine the two embeddings
+and produce a similarity score. Te model was evaluated using data
+collected from one of the major search engines and the accuracy
+performance is close to a complex BERT-Base model. More impor-
+tantly, the implementation with PyTorch, although not as eﬃcient
+as C/C++ and others, showed considerable reduction in inference
+time, and the average time cost on CPU over 1,000 random queries
+was only around 20 milliseconds for scoring 100 documents.
+Our contributions are summarized as below. 1) a twin-BERT
+structure which separates BERT inputs when encoding and allows
+embeddings to be pre-computed 2) an eﬃcient retrieval model based
+on cosine similarity supporting ANN search 3) an eﬃcient relevance
+1htps://gluebenchmark.com/leaderboard/
+arXiv:2002.06275v1  [cs.IR]  14 Feb 2020
+prediction model based on residual network with performance close
+to BERT-Base.
+Te rest of the paper is organized as follows. Section 2 presents
+a literature review on related works. Section 3 brieﬂy introduces
+the context of paid search. Section 4 discusses details of TwinBERT
+including network architecture, model training and online serving.
+Section 5 reports the experimental results of TwinBERT compared
+to baseline models. Section 6 introduces how TwinBERT is deployed
+and used in production system. In the end, Section 7 concludes the
+work and lists future directions to explore.
+2
+RELATED WORK
+Learning Representations through Language Models
+Language representations, as the building blocks of NLP models,
+are impressively eﬀective in improving model performance on NLP
+tasks, and therefore have become an important research area over
+the years. According to how the representations are employed in
+downstream tasks, prior works in the area can be broadly grouped
+into two categories: feature-based approaches and ﬁne-tuning ap-
+proaches. Word representations, sentence-based representations,
+and most recently contextual word representations are three direc-
+tions of the feature-based representations. Word2Vec [21], GloVe
+[23] and FastText [1] focus on learning word representations and
+diﬀerent senses of a word are all combined into one vector while
+Skip-thought [15], FastSent [10], Qick-thought [20], Universal sen-
+tence encoder [3] and other works [4], [29] extract sentence-level
+representations. Unlike the previous works, ELMo [24] derives
+word representation based on the entire sentence and captures
+representations of words on multiple granularity by combining
+vectors from intermediate layers of a multi-layer BiLSTM. All these
+methods only require one round of training before used in any
+downstream tasks. In recent two years, pre-trained models such
+as GPT [25] and BERT [6] demonstrated superior performance. In
+contrast to previous works, the representations from these models
+are learned in two phases. In the ﬁrst phase, a language model is
+learned in an unsupervised manner. In the second phase, the model
+is ﬁne-tuned with task-speciﬁc label data to produce representa-
+tions used in downstream tasks.
+BERT stands for bidirectional encoder representations from
+transformers and achieved the state-of-the-art performance on a
+broad variety of NLP tasks. BERT is pre-trained on a large corpus of
+unlabelled text data including the entire Wikipedia and BooksCor-
+pus [41]. It has two pre-training tasks: masked language model
+(MLM) and next sentence prediction (NSP). MLM enforces the model
+to learn parameters by optimizing the prediction of masked tokens.
+To beter serve the downstream binary classiﬁcation tasks such as
+question answering (QA) and natural language inference (NLI), NSP
+is introduced to jointly train with MLM, which requires a pair of
+sentences as input. Trough the multi-layer bidirectional structure,
+tokens from the two sentences deeply interact with each other and
+as a result, model performance is eﬀectively improved for binary
+classiﬁcation tasks. As a side eﬀect, the computational cost is also
+highly increased, especially in the area of information retrieval,
+where one query needs to be paired with a large number of docu-
+ment candidates. BERT has overwhelming inﬂuence and to extend
+the work, a few variants have been developed including MTDNN
+[18], XLNet [37], ERNIE [39], RoBERTa [19], ALBERT [16] and T5
+[26].
+Distilling Knowledge to Compact Models
+With limited computational resources and strict latency require-
+ment, expensive models such as BERT normally cannot be directly
+deployed in real-world applications, and knowledge distillation
+(KD) [2],[11] is typically adopted to address the issue. Te idea is to
+transfer the knowledge learnt from an expensive high-performance
+teacher model to a compact student model without signiﬁcant per-
+formance loss. In contrast to traditional machine learning tasks,
+a loss function is deﬁned on sofen probabilities produced by the
+teacher model instead of hard labels, which are so-called sof la-
+bels, and sof labels supposedly have higher entropy which could
+provide more information and less variance. Prior eﬀorts in KD on
+deep-structured models like BERT mainly focused on the transfer
+techniques. [31] augmented the training data for distillation with
+synthetic examples. BERT-PKD [30] learned distilled knowledge
+from intermediate layers besides the output layer. [32] demon-
+strated pre-trained student had beter performance than random
+initialization. TinyBERT [13] further expanded distillation to trans-
+former layers. [22] proposed teacher assistant to bridge the gap
+between student and teacher. MT-DNN ensemble [17], [40] and
+MKDN [38] improved the student model performance via learning
+from multiple teachers.
+To the best of our knowledge, none of these works have at-
+tempted to decouple the two-sentence input, which could therefore
+reduce the inference time complexity for two-input cases from
+quadratic to linear time complexity.
+3
+SPONSORED SEARCH
+TwinBERT is developed in the context of sponsored search. Readers
+can refer to [7] for a comprehensive introduction of the topic. In
+short, sponsored search engine delivers ads alongside the organic
+search results. Tere are ofen three parties involved in the spon-
+sored search ecosystem: the user, the advertiser and the search
+platform. Te goal of the platform is to display a list of ads that
+best match user’s intent. Below is the minimum set of key concepts
+for discussions that follow.
+Qery: A short text string that contains user’s intent. Users
+enter queries in a search box to look for related informa-
+tion.
+Keyword: A short text string that expresses advertiser’s in-
+tent. Keywords are provided by advertisers and are not
+visible to end users but they are pivotal in that search
+engine relies on them to match user intents.
+Impression: An ad being displayed to the end user, on the
+result page of the search engine.
+On the backend of a paid search engine, the number of keywords
+created by advertisers are typically at the scale of billions. Fast IR
+techniques are ﬁrstly applied to reduce the number of keywords
+to a much smaller matched subset and then sent to downstream
+components, where more complex and less eﬃcient algorithms are
+used to ﬁnalize the ads to display.
+To be consistent with the above context, keywords are used
+instead of documents throughout the paper.
+2
+Query
+Token Embedding
+Pooling Layer
+x L
+Crossing Layer
+Keyword
+Multi-Head 
+Self-Attention 
+Add & Norm
+Feed Forward
+Add & Norm
+Token Embedding
+Pooling Layer
+Add & Norm
+Feed Forward
+Add & Norm
+x L
+Output
+Multi-Head 
+Self-Attention 
++
++
+Position 
+Embedding
+Position 
+Embedding
+Figure 1: TwinBERT Architecture
+4
+TWINBERT
+Te architecture of TwinBERT is presented in this section with a
+few well-designed network layers to balance the eﬀectiveness and
+eﬃciency. Other topics including model training and online serving
+are also discussed in detail.
+4.1
+Model Architecture
+As shown in Figure 1, the architecture of TwinBERT consists of two
+multi-layer transformer encoders and a crossing layer to combine
+the vector outputs of encoders and produce the ﬁnal output. It is
+noteworthy that the parameters of the two encoders of query and
+keyword could be shared or diﬀerent. Te detailed comparison of
+the two styles is discussed in Section 5.
+Similar to BERT model architecture, at the botom of each en-
+coder is the embedding layer, where the query and keyword sen-
+tences are represented separately as embeddings and then fed into
+corresponding encoders. Te middle part of each encoder is a stack
+of transformer encoders with the same implementation as described
+in [33] but a diﬀerent seting. Following the notations in BERT,
+the number of layers is denoted as L, the hidden size is H, and the
+number of self-atention heads is A. In this work, the performance
+is mainly reported with the following model seting: L = 6, H = 512
+and A = 8 (the size of the feed-forward intermediate layer is also set
+to equal to H). Te last and top layer of the encoder is the weighted
+pooling layer which applies a weighted sum of the ﬁnal hidden
+vectors and produces a single embedding for each input sentence.
+4.2
+Input Representation
+In TwinBERT, the two input sentences are decoupled and encoded
+separately, with each encoder only taking care of one single sen-
+tence. Diﬀerent from BERT, there is no need to introduce a separator
+token [SEP] to separate the two segments and the input sequence
+length is roughly reduced by half. According to [33], the per-layer
+complexity of self-atention is O(n2) on sequence length and other
+operations are O(n). As a result of the cut on sequence length,
+the overall inference cost is correspondingly decreased. Te other
+classiﬁcation token [CLS] in BERT is dropped in weighted-average
+pooling while reserved only in classiﬁcation token pooling, which
+will be discussed in the pooling layer section.
+For token embeddings, TwinBERT uses the tri-leter based word
+embeddings introduced in [28]. Compared to the 30K dimensional
+WordPiece embeddings [36] in BERT, tri-leter based embeddings
+have larger vocabulary size (50K), and therefore can bear more
+information for beter performance. On the other hand, they are
+more eﬃcient when extracted at inference time since the extrac-
+tion of each token is independent, while WordPiece extraction is a
+recursive process.
+BERT embeddings are combinations of three components: to-
+ken embeddings, segment embeddings and position embeddings.
+While, the input of a TwinBERT encoder only contains one single
+sentence and segment embeddings are unnecessary. Terefore, the
+input embeddings only consist of the sum of token embeddings and
+position embeddings.
+4.3
+Pooling Layer
+Te output of the encoder is a sequence of vectors, each correspond-
+ing to an input token with position information implied from its
+index in the input sentence. To provide a unique ﬁx-length vector
+representation for both inputs, a pooling layer is added to provide
+a robust approach to unify all token vectors into a single sentence
+level embedding. Speciﬁcally, two pooling methods are experi-
+mented: weighted-average pooling and classiﬁcation token pooling.
+Compared to standard average pooing, weighted-average pool-
+ing introduces a weight to each token vector and the output is
+the weighted-average of all token vectors. Te weight parameters
+are learned as part of the entire network. Te second method is
+inspired by the special classiﬁcation token ([CLS]) in BERT and
+is so called classiﬁcation token pooling. Te implementation
+involves preﬁxing the sequence with [CLS] at the input layer. Te
+output of encoder is simply the ﬁnal hidden vector of [CLS]. Com-
+parison results of the two methods are presented in the experiment
+section.
+4.4
+Crossing Layer
+Given the sentence embeddings of query and keyword, here comes
+the question: how to combine the two? Two versions of TwinBERT
+are proposed to address the problem, denoted as TwinBERTcos and
+TwinBERTres respectively:
+Cosine similarity
+Cosine similarity is an intuitive approach
+for combining two vectors of the same length. Formally, cosine
+3
+similarity is deﬁned as
+cos(q, k) =
+q · k
+∥q∥· ∥k∥
+(1)
+, where q and k correspond to the embedding vectors of query and
+keyword. Te output falls in the range of [−1, 1], while the sof
+targets from teacher model are between 0 and 1. In order to align
+the two, an additional logistic regression layer is applied to the
+cosine similarity score and convert it to [0, 1].
+Cosine similarity projects the two embeddings to the same vector
+space, and when both vectors are normalized, it can be easily trans-
+formed into Euclidean distance. Tereupon, approximate nearest
+neighbor (ANN) algorithms can be naturally applied for retrieval
+tasks [12].
+Residual network
+Residual networks were ﬁrstly proposed in
+[9] to solve the image recognition problem. Inspired by [27], where
+residual layers were used in a non-convolutional network in the
+NLP domain, they are adopted here to overcome over-ﬁting and
+gradient vanishing problems. Speciﬁcally, the embeddings of query
+and keyword are ﬁrst combined by a max operator and then fed
+into the residual connection. Te formal deﬁnition for residual
+function is as follows:
+y = F (x,W ,b) + x
+(2)
+, where x is the max of query vector q and keyword vector k and F is
+the mapping function from x to the residual with parametersW and
+b. Using concatenation instead of max operator is another option.
+Here, the motivation behind choosing max over concatenation is
+that it provides a down-sampling eﬀect and also sofly maps the
+two embeddings to a closer vector space.
+Similarly, a logistic regression layer is applied to the output
+vector of residual function y to predict the binary relevance label.
+Compared to cosine similarity, the deep-structured network could
+model more complex problems and therefore produce beter per-
+formance, but as a tradeoﬀ, it is less eﬃcient in computation and
+cannot easily work with the ANN algorithms.
+4.5
+Knowledge Distillation
+TwinBERT is trained following the teacher-student framework via
+knowledge distillation since comparing to learning from scratch,
+student models usually have beter performance [11]. For simplicity,
+Google’s 12-layer BERT-Base model is ﬁne-tuned using editorial
+query-keyword relevance labels as the teacher model and is then
+used to score a collection of impressed query-keyword pairs. Te
+logits z are outputed to generate sof labels using the following
+equation
+yi =
+exp(zi/T)
+Í
+j exp(zj/T)
+, where T is the temperature parameter controlling sofness of the
+labels. When T = 1, it is equivalent to standard sofmax function.
+As T grows, the target values become sofer and hence provide
+more information. Speciﬁcally, in TwinBERT, T is set to 2.
+Te cross-entropy loss function for binary classiﬁcation is de-
+ﬁned as
+loss = −
+N
+Õ
+i=1
+(yi log(pi) + (1 −yi) log(1 −pi))
+Online
+Offline
+Query 
+Representation
+Keyword 
+Representation
+Keywords
+Input query
+Keyword Index Store
+Matching
+Ranking
+Search results
+Figure 2: Online Serving
+, where N is the number of samples andp is the predicted probability.
+It was claimed in [31] that mean squared error (MSE) produced
+beter results but our experiments showed the opposite.
+4.6
+Online Serving
+TwinBERT is designed to adopt the latest NLP breakthroughs to IR
+systems, particularly the paid search engine. Figure 2 outlines the
+high-level architecture of TwinBERT-based information retrieval
+system.
+Te keywords that advertisers entered are stored in a distributed
+database. As the oﬄine process of the system, keywords are ex-
+tracted from the database and represented as embeddings {kj |j <
+m} through keyword-side TwinBERT encoder. For eﬃcient re-
+trieval, ANN techniques such as locality-sensitive hashing [5] and
+k-d trees [8] are typically employed to improve search performance.
+Speciﬁcally in TwinBERT, the keyword embeddings are stored and
+organized in a graph structure as described in [34].
+At run-time, when a user enters a search query, the query em-
+bedding q is generated on-the-ﬂy by the query-side TwinBERT
+encoder and ANN search is performed to ﬁnd the top results from
+the pre-built keyword indices, which are normally pre-loaded in
+memory.
+4
+5
+EXPERIMENTS
+Tis section presents training details and experimental results of
+TwinBERT models. Section 5.1 introduces the data and hyper-
+parameters used in teacher and student model training. Sections
+5.2 and 5.3 give evaluation results on relevance and retrieval tasks.
+In the relevance experiment, a few baseline models and two versions
+of TwinBERT models, TwinBERTcos and TwinBERTres which diﬀer
+in the design of the crossing layer, were evaluated. In the retrieval
+experiment, where ANN was used when searching keywords in a
+vector space, TwinBERTcos was picked and compared with C-DSSM
+[28]. In 5.4, a few eﬀective training strategies are discussed. 5.5
+gives the overall evaluation results. Lastly, in 5.6, inference time of
+TwinBERT models with diﬀerent conﬁgurations are reported for
+beter understanding on the design of TwinBERT models.
+5.1
+Teacher and Student Model Training
+5.1.1
+Training teacher model. Te teacher model used in this
+paper was a BERT-Base (BERT12) model ﬁne-tuned from the un-
+cased checkpoint trained and released by the authors of [6]. 5.8
+million query-keyword data was used for ﬁne-tuning. In the data,
+query-keywords were given labels which indicate 4 diﬀerent lev-
+els of relevance: bad, fair, good and excellent. In the ﬁne-tuning
+process, fair, good and excellent were mapped into one level which
+was non-bad and the model learnt query-keyword relevance from
+binary labels (bad vs. non-bad) based on cross-entropy loss. Hyper-
+parameters of ﬁne-tuning were the same as what suggested in [6].
+Batch size was set to 2, 048 and model was trained for 5 epochs.
+5.1.2
+Training student models. Te student models in this paper
+were distilled from the same teacher model. 500 million impressions
+were sampled from log and scored by the teacher model to generate
+sof targets for student model training. In the training process of
+TwinBERT, model parameters were randomly initialized and Adam
+[14] was used for optimization. Training was done on four V100
+GPUs and hyper-parameters were adopted from BERT pre-training
+[6]: learning rate = 1e −4, β1 = 0.9, β2 = 0.999, L2 weight decay =
+0.01. Te model was trained for 10 epochs with batch size set to
+2, 048. Te two encoders in TwinBERT models were trained with
+shared parameters.
+5.2
+Evaluation on Relevance Task
+5.2.1
+Experiment setup. In the relevance experiment, C-DSSM
+and 3-layer BERT (BERT3) were chosen for baseline student models.
+Te former proved to be eﬀective for information retrieval tasks
+and here for fair comparison, the hidden size was set to be the
+same as what used in TwinBERT, which was 512. Te later, as a
+student model, was used in multiple knowledge distillation works
+[30], [38]. In addition, BERT3 has about 46 million parameters,
+which is comparable to TwinBERT model (35 million).
+To evaluate the relevance performance of teacher and student
+models, two test sets were sampled from logs in a major sponsored
+search system. Tere are roughly 600,000 and 700,000 instances in
+test set 1 and 2 respectively. Te two sets were sampled from diﬀer-
+ent components in the system, so describe diﬀerent perspectives of
+query-keyword relevance in the system. Both test sets are held-out.
+Table 1: ROC-AUC of diﬀerent settings on test set 1
+Token.
+Pos.
+Pooling
+Crossing
+L
+AUC1
+1
+Tri-leter
+√
+Weighted
+Cos
+6
+0.8883
+2
+Tri-leter
+√
+Weighted
+Max + Res
+6
+0.9010
+3
+Tri-leter
+√
+Weighted
+Max + Res
+3
+0.8994
+4
+Tri-leter
+√
+Weighted
+Concat + Res
+6
+0.8995
+5
+WordPiece
+√
+Weighted
+Max + Res
+6
+0.8987
+6
+Tri-leter
+Weighted
+Max + Res
+6
+0.8989
+7
+Tri-leter
+√
+CLS
+Max + Res
+6
+0.8897
+5.2.2
+Eﬀects of Design Choices. In the design of TwinBERT, a
+few choices were experimented before the model was ﬁnalized. Te
+results are summarized in Table 1.
+Number of layers: Comparing Seting 2 vs. Seting 3 suggests
+that reducing the number of layers by half results in around 0.16%
+drop in performance, which is signiﬁcant when talking about hun-
+dreds of millions of impressions. If latency capacity allows, it is
+beter to have deeper structure.
+Crossing layer: Using max to combine the query and keyword
+embeddings has beter performance than the naive concatenation
+with about 0.15% gain (Seting 2 vs. Seting 4). Again, it is signif-
+icant considering the scale of search. Max function produces an
+abstraction of the two representations of query and keyword, and
+helps with the generalization.
+Token embedding: Character-level trigram representation out-
+performs WordPiece by 0.26% (Seting 2 vs. Seting 5). Compared
+to WordPiece, trigrams could map diﬀerent forms of a word to a
+similar representation and have more dimensions. In the context of
+sponsored search where query and keyword tend to have more out
+of vocabulary words (e.g., typo words or invented names), these
+pros are shown to be eﬀective in boosting the performance. Besides,
+character-level trigrams are more eﬃcient at extraction.
+Position embedding: In sponsored search, both the query and
+keyword are ofen short phrases but the order of words is still
+important and meaningful for understanding. Position embedding
+helps to improve the performance by about 0.23% by comparing
+Seting 2 to Seting 6.
+Classiﬁcation token: Although in BERT, the signal from clas-
+siﬁcation token hidden vector proves to be eﬀective in many down-
+stream tasks, it is less eﬀective than weighted average when there is
+a need to combine two embeddings. Te diﬀerence between Seting
+7 and Seting 2 is as high as 1%, more signiﬁcant than other changes.
+5.2.3
+Model accuracy. Table 2 shows the ROC-AUC of Twin-
+BERT models comparing with C-DSSM, BERT3 and BERT12. Te
+AUC comparison of diﬀerent models is consistent on two test sets.
+First of all, both TwinBERTcos and TwinBERTres outperform C-
+DSSM model by 1.9% and 3.4% on test set 1 while 2.0% and 6.3% on
+test set 2, which exhibits the advance of TwinBERT model’s archi-
+tecture. However, the performance gap between TwinBERTcos and
+TwinBERTres suggests that the current cosine version is still not
+eﬀective enough to express the interaction between query and key-
+word but the more complex residual network can. Compared with
+BERT3, TwinBERTres achieves higher AUC (+0.17% and +0.07%),
+and most impressively, its performance is close to BERT12 with
+5
+Table 2: ROC-AUC of TwinBERT models comparing with C-
+DSSM, BERT3 and BERT12 on two test sets
+Model
+AUC1
+AUC2
+C-DSSM
+0.8713
+0.8571
+BERT3
+0.8995
+0.9107
+TwinBERTcos
+0.8883
+0.8743
+TwinBERTres
+0.9010
+0.9113
+BERT12
+0.9011
+0.9137
+Table 3: Density diﬀerences of all 4 labels by comparing top
+5 results from TwinBERTcos and C-DSSM
+bad
+fair
+good
+excellent
+-7.4%
+-2.6%
+1.9%
+18.8%
+only -0.01% and -0.26% diﬀerences, which proves the eﬀectiveness of
+TwinBERT model in distilling knowledge from a BERT-like teacher
+model.
+5.3
+Evaluation on Retrieval Task
+5.3.1
+Experiment setup. In the retrieval experiment, C-DSSM
+was selected as the baseline and compared with TwinBERTcos. Both
+models were trained on the same training data with the same hyper-
+parameters as described in the relevance experiment. Te evalua-
+tion was conducted in three steps. Firstly, embeddings of queries
+and keywords were generated with the model, and a keyword index
+was built based on the embeddings of keywords. Secondly, ANN
+search was performed to ﬁnd the top results from the pre-built
+keyword indices. Lastly, top N results for each query were col-
+lected and nDCG (normalized Discounted Cumulative Gain) was
+evaluated for each model based on the editorial labels. Tis time,
+all 4 labels were used for evaluation. In the experiment, the query
+set had 2,000 randomly sampled queries and keyword set had 100
+million randomly sampled keywords. Top 5 results were collected
+for nDCG evaluation.
+5.3.2
+Model accuracy. nDCGs of TwinBERTcos and C-DSSM at
+diﬀerent positions were presented in Figure 3. Te solid lines give
+the nDCGs at diﬀerent positions for TwinBERTcos and C-DSSM
+models. At all positions, TwinBERTcos is consistently beter than
+C-DSSM by at least 5.3%. Te dashed lines show another group of
+nDCGs by converting 4-level labels back to binary label. Similarly,
+TwinBERTcos outperforms C-DSSM by at least 3.6%. Both results
+indicate that TwinBERTcos embeddings capture more information
+about query and keyword. Table 3 gives the density diﬀerences
+of all 4 labels by comparing top 5 results from both models. Te
+density diﬀerences show TwinBERTcos recalls 18.8% more excellent
+and 7.4% less bad query-keywords, which proves its superiority in
+retrieval tasks.
+5.4
+Eﬀective Training Strategies
+Two training strategies, actual label ﬁne-tuning and asymmetric
+training, were tested on top of the standard training process and will
+1
+2
+3
+4
+5
+0.6
+0.7
+0.8
+0.9
+1
+position
+nDCG
+C-DSSM (4 labels)
+TwinBERTcos (4 labels)
+C-DSSM (2 labels)
+TwinBERTcos (2 labels)
+Figure 3: nDCGs of TwinBERTcos and C-DSSM
+Table 4: ROC-AUC of TwinBERT w/ actual label ﬁne-tuning
+(FT) and asymmetric training (ASYM) on two test sets
+Model
+AUC1
+AUC2
+TwinBERTres
+0.9010
+0.9113
+TwinBERTcos
+0.8883
+0.8743
+TwinBERTres w/ FT
+0.9030
+0.9140
+TwinBERTcos w/ FT
+0.8926
+0.8953
+TwinBERTres w/ ASYM+FT
+0.9033
+0.9127
+TwinBERTcos w/ ASYM+FT
+0.8982
+0.9057
+be discussed in this section independently, as they are orthogonal
+to the design of TwinBERT model.
+5.4.1
+Actual label fine-tuning. In the standard training process,
+TwinBERT model learns parameters from sof labels generated by a
+teacher model. Actual label ﬁne-tuning adds a round of ﬁne-tuning
+based on the editorial labels post the standard training process.
+Learning rate was further tuned down to 2e-5. Te ﬁne-tuning step
+took 2 epochs to converge. Te ﬁrst 4 rows of Table 4 give the AUC
+of TwinBERT models w/ and wo/ actual label ﬁne-tuning on the
+same test sets used in the relevance experiment. On TwinBERTres,
+the improvements are 0.22% and 0.3%, while on TwinBERTcos, the
+improvements are much more signiﬁcant (0.48% and 2.4%). Te
+gains demonstrate positive eﬀect of actual label ﬁne-tuning on both
+models. Ofen, a teacher model establishes the upper bound of the
+performance of student models, and it is worth pointing out that the
+ﬁne-tuned TwinBERTres has already beat the teacher model on both
+sets by 0.21% and 0.03%, which indicates that by introducing actual
+labels, the ﬁne-tuning step can bring in additional information.
+5.4.2
+Asymmetric training. In the current architecture of Twin-
+BERT model, to keep the structure simple, parameters are shared
+between encoders, while asymmetric parameter training could po-
+tentially bring higher performance. To further explore the eﬀect,
+TwinBERT models were retrained with independent parameters
+6
+between the encoders. All other training parameters for both stan-
+dard training and label ﬁne-tuning stayed the same. Te last 4 rows
+of Table 4 give the AUC of models w/ and wo/ asymmetric training.
+On TwinBERTcos, asymmetric training brings 0.63% and 1.2% AUC
+gains on two test sets, which means TwinBERTcos does beneﬁt
+from the more complex conﬁguration. However, on TwinBERTres,
+even though training loss has slightly drop, AUC shows +0.03% and
+-0.14% diﬀerences on two test sets suggesting asymmetric is barely
+eﬀective when crossing layer is more complex.
+5.5
+Overall Results
+In summary, the best TwinBERT model (TwinBERTres) achieves
+3.4% and 0.17% AUC improvements over C-DSSM and BERT3 stu-
+dent models following the teacher-student framework, which demon-
+strates its eﬀectiveness in distilling knowledge from a BERT-like
+teacher model. On top of that, actual label ﬁne-tuning and asym-
+metric training help boosting the performance with another 0.26%
+incremental gain. Overall, the best TwinBERT model outper-
+forms C-DSSM and BERT3 models by 3.7% and 0.42% while
+also beats the teacher model, BERT12, by 0.24%.
+5.6
+Inference Time
+To test the inference time, we implemented TwinBERT and the
+baseline models using PyTorch based on [35] and ran benchmarks
+on a workstation with the following conﬁguration: Intel® Core™i7-
+4790 CPU @ 3.6GHz and 32.0GB memory. To eliminate the impact
+of noise on queries, we evaluated the average inference time on
+1,000 queries and the results are summarized in Table 5.
+One of the beneﬁts of TwinBERT compared to BERT is that the
+two inputs are decoupled and if the query stays the same, there is
+no need to regenerate the query embedding. Tis could be more
+clearly explained by the time complexity of TwinBERT and BERT
+w.r.t number of queries (Nq) and number of keywords (Nk). Te
+time complexity of TwinBERT is O(TeNq(1+Nk)+TcNqNk), while
+it isO(TBNqNk) for a BERT model. Here, we useTe,Tc,TB to denote
+the time cost of a single encoder in TwinBERT model, the crossing
+layer in TwinBERT model and BERT model respectively. Another
+beneﬁt of TwinBERT is that, in certain scenarios like sponsored
+search, the keyword embeddings could be pre-computed and loaded
+in memory so there’s no computation for keyword encoding at run-
+time. Tus, the time complexity of TwinBERT during serving could
+be even simpliﬁed to O(TeNq + TcNqNk). In Table 5, QEL refers
+to the number of query encoding loops and the boolean factor
+(Memory) indicates if the keyword embeddings are in memory.
+Te number of keywords is another important factor to consider
+when talking about eﬃciency for the initial retrieval phase and
+reﬁnement/ranking phase afer. More speciﬁcally, it impacts the
+time complexity of the evaluation of crossing layers in TwinBERT
+model O(TcNqNk) and the evaluation of BERT model O(TBNqNk).
+In the test, the average number of keywords per query is designed
+to be 100.
+Te ﬁrst two rows in Table 5 correspond to the inference time
+for TwinBERTcos and TwinBERTres to score 100 keywords per
+query assuming only the query-side encoder and crossing layer are
+performed. Te computation cost of cosine similarity is much lower
+than residual network, which leads to the 8ms diﬀerence. Compared
+Table 5: Average inference time for TwinBERT, BERT3 and
+BERT12 over 1,000 queries. QEL refers to the number of
+query encoding loops.
+Model
+QEL
+Memory
+Inf. time (ms)
+TwinBERTcos
+1
+√
+14
+TwinBERTres
+1
+√
+22
+TwinBERTres
+1
+1,077
+TwinBERTres
+100
+2,144
+BERT3
+100
+1,699
+BERT12
+100
+9,282
+to the last two rows of BERT3 and BERT12, where the query and
+keyword are concatenated and encoded as a whole, the eﬃciency
+of TwinBERTres is 77 and 422 times faster. With TwinBERTcos, the
+eﬃciency is even 121 and 663 times faster. Moreover, if the keyword
+embeddings are generated at run-time, the overall inference time
+is still beter than BERT3 according to Row 3 and Row 5. However,
+if the query embedding is also repeatedly generated, the inference
+time of TwinBERT becomes higher than BERT3 as listed in Row 4.
+6
+TWINBERT IN PRODUCTION SYSTEM
+TwinBERT models have been successfully deployed in the backend
+of a major sponsored search system and are proved to be very
+eﬀective and eﬃcient in both retrieval and relevance tasks with
+acceptable latency. Te models achieved 90+% of the incremental
+gains observed from a ﬁne-tuned BERT12 model and bad ads in
+online impressions decreased by 10+% in production. However,
+the additional serving cost is minimum even on CPUs, compared
+to the service of a BERT12 model which is not feasible on CPUs
+but requires hundreds of GPUs. On query side, model is served
+with onnx runtime online and the latency of TwinBERT inference
+is less than 10ms on average, which could be shadowed by other
+serving components if it is not on a critical path. On document
+side, embeddings are prepared oﬄine and indexed in a distributed
+database for serving. At run-time, only the latency of crossing
+layers is introduced to the overall latency, which is subtle in a
+distributed serving system. In addition, the embeddings could be
+mapped to a lower dimension to further improve the eﬃciency of
+crossing layers and also reduce the cost on storage in practise.
+7
+CONCLUSION AND FUTURE WORK
+Te TwinBERT model presented in this paper successfully adapts
+the technical advances from the pre-trained language models to
+the area of information retrieval. Decoupling the two inputs and
+pre-computing embeddings oﬄine improve eﬃciency by 77+ and
+422+ times on BERT3 and BERT12 on a presumable number of
+100 queries, which enables real-time online serving on CPUs. Te
+innovations on network layers manage to keep majority of the
+performance gain from BERT12, which makes TwinBERT eﬀective
+in both retrieval and relevance tasks.
+TwinBERT models have demonstrated to be as eﬀective as BERT-
+Base model. Going forward, more experiments need to be con-
+ducted to evaluate the performance with a teacher model that has
+7
+larger capacity such as BERT-Large. Furthermore, TwinBERT mod-
+els are developed based on original Transformer. As the increas-
+ing demand of model performance, further improvement could be
+achieved through innovations on Transformer.
+To make the presentation pragmatic and intuitive, TwinBERT is
+introduced in the context of information retrieval. However, Twin-
+BERT is not constrained by a speciﬁc problem domain. Looking
+forward, eﬀorts will be spent on other domains such as question
+answering.
+REFERENCES
+[1] Piotr Bojanowski, Edouard Grave, Armand Joulin, and Tomas Mikolov. 2017.
+Enriching word vectors with subword information. Transactions of the Association
+for Computational Linguistics 5 (2017), 135–146.
+[2] Cristian Buciluf, Rich Caruana, and Alexandru Niculescu-Mizil. 2006. Model
+compression. In Proceedings of the 12th ACM SIGKDD international conference on
+Knowledge discovery and data mining. ACM, 535–541.
+[3] Daniel Cer, Yinfei Yang, Sheng-yi Kong, Nan Hua, Nicole Limtiaco, Rhomni St.
+John, Noah Constant, Mario Guajardo-Cespedes, Steve Yuan, Chris Tar, Yun-
+Hsuan Sung, Brian Strope, and Ray Kurzweil. 2018. Universal Sentence Encoder.
+CoRR abs/1803.11175 (2018). arXiv:1803.11175 htp://arxiv.org/abs/1803.11175
+[4] Alexis Conneau, Douwe Kiela, Holger Schwenk, Loic Barrault, and Antoine
+Bordes. 2017. Supervised learning of universal sentence representations from
+natural language inference data. arXiv preprint arXiv:1705.02364 (2017).
+[5] Mayur Datar, Nicole Immorlica, Piotr Indyk, and Vahab S Mirrokni. 2004. Locality-
+sensitive hashing scheme based on p-stable distributions. In Proceedings of the
+twentieth annual symposium on Computational geometry. ACM, 253–262.
+[6] Jacob Devlin, Ming-Wei Chang, Kenton Lee, and Kristina Toutanova. 2018. Bert:
+Pre-training of deep bidirectional transformers for language understanding.
+arXiv preprint arXiv:1810.04805 (2018).
+[7] Benjamin Edelman, Michael Ostrovsky, and Michael Schwarz. 2007. Internet
+advertising and the generalized second-price auction: Selling billions of dollars
+worth of keywords. American economic review 97, 1 (2007), 242–259.
+[8] Jerome H Friedman, Jon Louis Bentley, and Raphael Ari Finkel. 1976. An algo-
+rithm for ﬁnding best matches in logarithmic time. ACM Trans. Math. Sofware
+3, SLAC-PUB-1549-REV. 2 (1976), 209–226.
+[9] Kaiming He, Xiangyu Zhang, Shaoqing Ren, and Jian Sun. 2016. Deep residual
+learning for image recognition. In Proceedings of the IEEE conference on computer
+vision and patern recognition. 770–778.
+[10] Felix Hill, Kyunghyun Cho, and Anna Korhonen. 2016. Learning Distributed
+Representations of Sentences from Unlabelled Data. CoRR abs/1602.03483 (2016).
+arXiv:1602.03483 htp://arxiv.org/abs/1602.03483
+[11] Geoﬀrey Hinton, Oriol Vinyals, and JeﬀDean. 2015. Distilling the knowledge in
+a neural network. arXiv preprint arXiv:1503.02531 (2015).
+[12] Po-Sen Huang, Xiaodong He, Jianfeng Gao, Li Deng, Alex Acero, and Larry
+Heck. 2013. Learning deep structured semantic models for web search using
+clickthrough data. In Proceedings of the 22nd ACM international conference on
+Information & Knowledge Management. ACM, 2333–2338.
+[13] Xiaoqi Jiao, Yichun Yin, Lifeng Shang, Xin Jiang, Xiao Chen, Linlin Li, Fang
+Wang, and Qn Liu. 2019. TinyBERT: Distilling BERT for Natural Language
+Understanding. arXiv preprint arXiv:1909.10351 (2019).
+[14] Diederik P. Kingma and Jimmy Ba. 2015. Adam: A Method for Stochastic
+Optimization. In 3rd International Conference on Learning Representations, ICLR
+2015, San Diego, CA, USA, May 7-9, 2015, Conference Track Proceedings. htp:
+//arxiv.org/abs/1412.6980
+[15] Ryan Kiros, Yukun Zhu, Ruslan R Salakhutdinov, Richard Zemel, Raquel Urtasun,
+Antonio Torralba, and Sanja Fidler. 2015. Skip-thought vectors. In Advances in
+neural information processing systems. 3294–3302.
+[16] Zhenzhong Lan, Mingda Chen, Sebastian Goodman, Kevin Gimpel, Piyush
+Sharma, and Radu Soricut. 2019. ALBERT: A Lite BERT for Self-supervised
+Learning of Language Representations. arXiv preprint arXiv:1909.11942 (2019).
+[17] Xiaodong Liu, Pengcheng He, Weizhu Chen, and Jianfeng Gao. 2019. Improv-
+ing Multi-Task Deep Neural Networks via Knowledge Distillation for Natural
+Language Understanding. arXiv preprint arXiv:1904.09482 (2019).
+[18] Xiaodong Liu, Pengcheng He, Weizhu Chen, and Jianfeng Gao. 2019. Multi-
+task deep neural networks for natural language understanding. arXiv preprint
+arXiv:1901.11504 (2019).
+[19] Yinhan Liu, Myle Ot, Naman Goyal, Jingfei Du, Mandar Joshi, Danqi Chen,
+Omer Levy, Mike Lewis, Luke Zetlemoyer, and Veselin Stoyanov. 2019. Roberta:
+A robustly optimized bert pretraining approach. arXiv preprint arXiv:1907.11692
+(2019).
+[20] Lajanugen Logeswaran and Honglak Lee. 2018. An eﬃcient framework for
+learning sentence representations. CoRR abs/1803.02893 (2018). arXiv:1803.02893
+htp://arxiv.org/abs/1803.02893
+[21] Tomas Mikolov, Kai Chen, Greg Corrado, and Jeﬀrey Dean. 2013. Eﬃcient
+estimation of word representations in vector space. arXiv preprint arXiv:1301.3781
+(2013).
+[22] Seyed-Iman Mirzadeh, Mehrdad Farajtabar, Ang Li, and Hassan Ghasemzadeh.
+2019. Improved knowledge distillation via teacher assistant: Bridging the gap
+between student and teacher. arXiv preprint arXiv:1902.03393 (2019).
+[23] Jeﬀrey Pennington, Richard Socher, and Christopher Manning. 2014. Glove:
+Global vectors for word representation. In Proceedings of the 2014 conference on
+empirical methods in natural language processing (EMNLP). 1532–1543.
+[24] Mathew E Peters, Mark Neumann, Mohit Iyyer, Mat Gardner, Christopher
+Clark, Kenton Lee, and Luke Zetlemoyer. 2018. Deep contextualized word
+representations. arXiv preprint arXiv:1802.05365 (2018).
+[25] Alec Radford, Karthik Narasimhan, Tim Salimans, and Ilya Sutskever. 2018.
+Improving language understanding with unsupervised learning. Technical Report.
+Technical report, OpenAI.
+[26] Colin Raﬀel, Noam Shazeer, Adam Roberts, Katherine Lee, Sharan Narang,
+Michael Matena, Yanqi Zhou, Wei Li, and Peter J. Liu. 2019.
+Exploring
+the Limits of Transfer Learning with a Uniﬁed Text-to-Text Transformer.
+arXiv:cs.LG/1910.10683
+[27] Ying Shan, T Ryan Hoens, Jian Jiao, Haijing Wang, Dong Yu, and JC Mao. 2016.
+Deep crossing: Web-scale modeling without manually crafed combinatorial
+features. In Proceedings of the 22nd ACM SIGKDD international conference on
+knowledge discovery and data mining. ACM, 255–262.
+[28] Yelong Shen, Xiaodong He, Jianfeng Gao, Li Deng, and Gr´egoire Mesnil. 2014.
+Learning semantic representations using convolutional neural networks for web
+search. In Proceedings of the 23rd International Conference on World Wide Web.
+ACM, 373–374.
+[29] Sandeep Subramanian, Adam Trischler, Yoshua Bengio, and Christopher J. Pal.
+2018. Learning General Purpose Distributed Sentence Representations via Large
+Scale Multi-task Learning. CoRR abs/1804.00079 (2018). arXiv:1804.00079 htp:
+//arxiv.org/abs/1804.00079
+[30] Siqi Sun, Yu Cheng, Zhe Gan, and Jingjing Liu. 2019. Patient knowledge distilla-
+tion for bert model compression. arXiv preprint arXiv:1908.09355 (2019).
+[31] Raphael Tang, Yao Lu, Linqing Liu, Lili Mou, Olga Vechtomova, and Jimmy
+Lin. 2019. Distilling Task-Speciﬁc Knowledge from BERT into Simple Neural
+Networks. arXiv preprint arXiv:1903.12136 (2019).
+[32] Iulia Turc, Ming-Wei Chang, Kenton Lee, and Kristina Toutanova. 2019. Well-
+read students learn beter: Te impact of student initialization on knowledge
+distillation. arXiv preprint arXiv:1908.08962 (2019).
+[33] Ashish Vaswani, Noam Shazeer, Niki Parmar, Jakob Uszkoreit, Llion Jones,
+Aidan N Gomez, Lukasz Kaiser, and Illia Polosukhin. 2017. Atention is all
+you need. In Advances in neural information processing systems. 5998–6008.
+[34] Jingdong Wang and Shipeng Li. 2012. Qery-driven iterated neighborhood graph
+search for large scale indexing. In Proceedings of the 20th ACM international
+conference on Multimedia. ACM, 179–188.
+[35] Tomas Wolf, Lysandre Debut, Victor Sanh, Julien Chaumond, Clement De-
+langue, Anthony Moi, Pierric Cistac, Tim Rault, R’emi Louf, Morgan Funtowicz,
+and Jamie Brew. 2019. HuggingFace’s Transformers: State-of-the-art Natural
+Language Processing. ArXiv abs/1910.03771 (2019).
+[36] Yonghui Wu, Mike Schuster, Zhifeng Chen, Qoc V Le, Mohammad Norouzi,
+Wolfgang Macherey, Maxim Krikun, Yuan Cao, Qin Gao, Klaus Macherey, et al.
+2016. Google’s neural machine translation system: Bridging the gap between
+human and machine translation. arXiv preprint arXiv:1609.08144 (2016).
+[37] Zhilin Yang, Zihang Dai, Yiming Yang, Jaime Carbonell, Ruslan Salakhutdinov,
+and Qoc V Le. 1906. XLNet: Generalized autoregressive pretraining for language
+understanding, 2019. URL htps://www. arxiv. org/abs (1906).
+[38] Ze Yang, Linjun Shou, Ming Gong, Wutao Lin, and Daxin Jiang. 2019. Model
+Compression with Multi-Task Knowledge Distillation for Web-scale Qestion
+Answering System. arXiv preprint arXiv:1904.09636 (2019).
+[39] Zhengyan Zhang, Xu Han, Zhiyuan Liu, Xin Jiang, Maosong Sun, and Qn Liu.
+2019. ERNIE: Enhanced Language Representation with Informative Entities.
+arXiv preprint arXiv:1905.07129 (2019).
+[40] Wei Zhu, Xiaofeng Zhou, Keqiang Wang, Xun Luo, Xiepeng Li, Yuan Ni, and
+Guotong Xie. 2019. PANLP at MEDIQA 2019: Pre-trained Language Models,
+Transfer Learning and Knowledge Distillation. In Proceedings of the 18th BioNLP
+Workshop and Shared Task. 380–388.
+[41] Yukun Zhu, Ryan Kiros, Richard S. Zemel, Ruslan Salakhutdinov, Raquel Urtasun,
+Antonio Torralba, and Sanja Fidler. 2015. Aligning Books and Movies: Towards
+Story-like Visual Explanations by Watching Movies and Reading Books. CoRR
+abs/1506.06724 (2015). arXiv:1506.06724 htp://arxiv.org/abs/1506.06724
+8

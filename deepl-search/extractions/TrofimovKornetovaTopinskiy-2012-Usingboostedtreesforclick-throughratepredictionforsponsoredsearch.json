@@ -1,0 +1,148 @@
+{
+  "source": "TrofimovKornetovaTopinskiy-2012-Usingboostedtreesforclick-throughratepredictionforsponsoredsearch.pdf",
+  "source_group": "Awesome-ML-Papers/CTR-CVR-Prediction",
+  "processed_at": "2026-06-08",
+  "agent": "agent5_final",
+  "concepts": [
+    {
+      "finding": "Moscow, Russia\nvtopin@yandex-team.ru\nABSTRACT\nWe describe a new approach to solving the click-through rate\n(CTR) prediction problem in sponsored search by means of\nMatrixNet, the proprietary implementation of boosted trees.",
+      "category": "FailureRisk",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Categories and Subject Descriptors\nH.3.3 [Informational Storage and Retrieval]: Informa-\ntion Search and Retrieval; I.2.6 [Artiﬁcial Intelligence]:\nLearning\nGeneral Terms\nAlgorithms, Measurement, Performance, Experimentation\nKeywords\nClick-through rate, sponsored search, Web advertising, CTR,\nboosti",
+      "category": "Experiment",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Using boosted trees for click-through rate prediction\nfor sponsored search\nIlya Troﬁmov\nYandex\n16 Leo Tolstoy St.",
+      "category": "ModelCandidate",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "The\nﬁrst approach is to estimate click-through rate for each ad-\nkeyword pair oﬀ-line.",
+      "category": "ModelCandidate",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "In this case click-through rates for\nads with impressions more then some threshold are used as\noutput variables in a regression problem.",
+      "category": "FailureRisk",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "The second approach is to use click data directly from the\nsearch engine log.",
+      "category": "ModelCandidate",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "It is natural to\nmodel a click for a given x as a binomial random variable\nhaving conditional probability CTR(x)\nP(click = 1|x) = CTR(x), P(click = 0|x) = 1 −CTR(x)\nOne can see that the true click-through rate minimizes both\nexpected squared loss and negative likelihood\nΨ1(y, F(x)) = (y −F(x))2\nΨ2(y",
+      "category": "FailureRisk",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Second\nis negative likelihood\nNLL = −1\nN\nN\n∑\ni=0\n(yilog(CTRi) + (1 −yi)log(1 −CTRi))\nThird is Pearson’s correlation\nCor =\n∑N\ni=1(yi −¯y)(CTRi −CTR)\n√∑N\ni=1(yi −y)2 ∑N\ni=1(CTRi −CTR)2\nThe baseline values are these measures for the click-through\nrate prediction algorithm currently deployed in the prod",
+      "category": "Baseline",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Good improvement of click-through rate prediction\nresults in likelihood improvement about 1%.",
+      "category": "ModelCandidate",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "This uncertainty remains even if ad has many views and\nhistorical CTR (=clicks/impressions) is a good estimate for\nthe click-through rate.",
+      "category": "ModelCandidate",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "EXPERIMENTAL EVALUATION\n6.1\nPlanning of the experiment\nWhen we have constructed the new click-through rate pre-\ndiction CTR(·), it remains to tune parameters of the adver-\ntisement system such as Ti from the algorithm mentioned\nin Section 2.",
+      "category": "Experiment",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Average empirical click-through\nrate of the top ad placement increased by 6 −24% at dif-\nferent parts of the search traﬃc, speciﬁed by a user location\nand a search engine page number.",
+      "category": "ModelCandidate",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "We described our approach to es-\ntimation of the new click-through rate prediction algorithm\nimpact to the advertisement system performance.",
+      "category": "ModelCandidate",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Oﬀ-line measures improvement leads\nto increased empirical click-through rate in the production\nsystem.",
+      "category": "ModelCandidate",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Web-scale bayesian click-through rate\nprediction for sponsored search advertising in\nmicrosoft’s bing search engine.",
+      "category": "ModelCandidate",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "This problem is of special importance for the search engine,\nbecause choosing the ads to display substantially depends\non the predicted CTR and greatly aﬀects the revenue of\nthe search engine and user experience.",
+      "category": "FailureRisk",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Finally, we compare MatrixNet with sev-\neral other methods and present experimental results from\nthe production system.",
+      "category": "Experiment",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "In this paper we\nstudy click-through rate prediction algorithm only for top\nad placement.",
+      "category": "ModelCandidate",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "On the other hand, this approach lacks\nof using all click context - user and query features.",
+      "category": "ModelCandidate",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Our colleagues have used Ma-\ntrixNet for learning-to-rank problem [10] and have achieved\nsuccess.",
+      "category": "FailureRisk",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    }
+  ]
+}

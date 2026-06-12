@@ -1,0 +1,15 @@
+{
+  "source": "LINE- Large-scale Information Network Embedding",
+  "source_group": "Awesome-ML-Papers/Embeddings",
+  "processed_at": "2026-06-08T12:00:00Z",
+  "agent": "agent03_embeddings_mf_ranking_search_compiled",
+  "concepts": [
+    {
+      "finding": "Preserves first-order proximity (observed links) and second-order proximity (shared neighborhood). Second-order proximity captures that nodes with shared neighbors should be similar even with no direct edge. Edge-sampling algorithm addresses gradient explosion with weighted edges. Scales to millions of nodes on single machine.",
+      "category": "Model Candidate",
+      "implication": "Second-order proximity in keyword graphs captures that two keywords are similar if they co-occur with similar neighbor keywords - even if they never directly co-occur. This is critical for synonyms and paraphrases.",
+      "open_question": "What is the relative importance of first-order vs second-order proximity for keyword intent clustering?",
+      "testable_hypothesis": "Second-order proximity (LINE 2nd order) better captures synonym intent relationships than first-order proximity for keyword embeddings."
+    }
+  ]
+}

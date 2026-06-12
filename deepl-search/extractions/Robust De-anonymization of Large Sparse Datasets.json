@@ -1,0 +1,57 @@
+{
+  "source": "Robust De-anonymization of Large Sparse Datasets.pdf",
+  "source_group": "Awesome-ML-Papers/Other",
+  "processed_at": "2026-06-08",
+  "agent": "agent5_final",
+  "concepts": [
+    {
+      "finding": "Our second contribution is a very general class of\nde-anonymization algorithms, demonstrating the funda-\nmental limits of privacy in public micro-data (section 4).",
+      "category": "FailureRisk",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Ex-\namples include anonymized transaction records (if the\nadversary knows a few of the individual’s purchases,\ncan he learn all of her purchases?), recommendations\nand ratings (if the adversary knows a few movies that\nthe individual watched, can he learn all movies she\nwatched?), Web browsing and se",
+      "category": "ModelCandidate",
+      "implication": "Can inform intent modeling for recommendation systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Second, to improve robustness, the matching crite-\nrion requires that the top score be signiﬁcantly above the\nsecond-best score.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "In section 4.2, we will show that much less\nauxiliary information is needed to de-anonymize records\ndrawn from sparse distributions (real-world transaction\nand recommendation datasets are all sparse).",
+      "category": "Experiment",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Finally,\nthe\nVideo\nPrivacy\nProtection\nAct\nof\n1988 [13] lays down strong provisions against disclo-\nsure of personally identiﬁable rental records of “prere-\ncorded video cassette tapes or similar audio visual ma-\nterial.” While the Netﬂix Prize dataset does not explic-\nitly include personally identiﬁ",
+      "category": "Experiment",
+      "implication": "Relevant for similarity-based retrieval and lookalike targeting",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "To show that this is not a signiﬁcant limitation, consider\nthat most subscribers rate fairly rare movies:\nNot in X most rated\n% of subscribers who rated .",
+      "category": "FailureRisk",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "How to address the limitation described: To show that this is not a signiﬁcant limitation, consider\nthat most subscribers rate fairly rare movies:\nNot in X most rated\n% of subscribers who rated .",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Interestingly, the ﬁrst user\nwas de-anonymized mainly from the ratings and the sec-\nond mainly from the dates.",
+      "category": "ModelCandidate",
+      "implication": "Can inform intent modeling for recommendation systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    }
+  ]
+}

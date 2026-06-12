@@ -1,0 +1,148 @@
+{
+  "source": "Finding Users Who Act Alike- Transfer Learning for Expanding Advertiser Audiences.pdf",
+  "source_group": "Awesome-ML-Papers/Lookalike",
+  "processed_at": "2026-06-08",
+  "agent": "agent5_final",
+  "concepts": [
+    {
+      "finding": "1.2\nUnique Contributions to Look-alike\nAdvertising\nOur approach introduces the following novel contributions to the\nfield of look-alike advertising:\n• Modeling users in an embedding space, yielding user embed-\ndings and a user-user similarity metric.",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "In Sections 3.2 and 3.3, we present\na novel model which combines a learned user embedding and ap-\nproximate retrieval techniques and is the main focus of this work.",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Although the model is trained to find\nsimilarity between a user and a piece of content, it will be applied to\nthe transfer problem of user-to-advertiser similarity.",
+      "category": "FailureRisk",
+      "implication": "Relevant for similarity-based retrieval and lookalike targeting",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Finally, we propose an\nensemble approach that combines single-advertiser classifiers with\nthe embedding-based technique.",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "This includes the ability to show\nads to specific demographic groups, people who are searching for\nspecific keywords, or users who have expressed prior interest in\nspecific topics.",
+      "category": "ModelCandidate",
+      "implication": "Can inform intent modeling for recommendation systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "We will demonstrate in\nexperiments in section 5 that this method outperforms a classifier-\nbased baseline for small seeds, and that an ensemble of embedding-\nand classifier-based models performs best for all seed list sizes.",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "The embedding model significantly improves on the\nclassifier baseline for both precision and recall, and the blended\nmodel improves these metrics even further.",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "We evaluated all three models’\nperformance on CPC (Cost-per-click) ads, an important format for\nwhich the advertiser’s goal is user clicks and our goal is to achieve a\nhigh click rate.",
+      "category": "Experiment",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Overall, the embedding-only model de-\ncreased CTR compared to the classifier model, but the blended\nmodel improved CTR.",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Finally,\nwe described how to blend data from classifier- and embedding-\nbased approaches to improve offline and online performance for all\nseed list sizes.",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Finding Users Who Act Alike: Transfer Learning for Expanding\nAdvertiser Audiences\nStephanie deWet∗\nsdewet@pinterest.com\nPinterest\nSeattle, WA\nJiafan Ou∗\njiafanou@pinterest.com\nPinterest\nSeattle, WA\n(a) Seed Users\n(b) Expanded Audience\n(c) Random Users (aka Background)\nFigure 1: Three views of the sa",
+      "category": "Data",
+      "implication": "Can inform intent modeling for recommendation systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "For\nthe first stage we trained a global user embedding model on sitewide\nuser activity logs.",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "In the second stage, we use transfer learning and\nstatistical techniques to create lightweight seed list representations\nin the embedding space for each advertiser.",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Permission to make digital or hard copies of all or part of this work for personal or\nclassroom use is granted without fee provided that copies are not made or distributed\nfor profit or commercial advantage and that copies bear this notice and the full citation\non the first page.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "KEYWORDS\nneural networks; embeddings; transfer learning; lookalike advertis-\ning\nACM Reference Format:\nStephanie deWet and Jiafan Ou.",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "We should be able to mea-\nsure how well users are matched to advertisers by measuring\noverall user engagement metrics such as number of clicks,\nnumber of ads viewed, etc.",
+      "category": "Experiment",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "More specifically, we break the modeling problem into two parts: (a)\nbuilding a universal model of user-user similarity based on organic\ndata, to be shared between all advertisers, and (b) representing\neach advertiser’s seed list of users in a way that builds from our\nunderstanding of user-user simi",
+      "category": "FailureRisk",
+      "implication": "Relevant for similarity-based retrieval and lookalike targeting",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "By sharing the universal user-similarity model\namongst all advertisers, the second task of building a light-weight\nmodel of advertiser seed lists can be done using computationally\ncheap methods that provide meaningful results even for small seed\nlists.",
+      "category": "ModelCandidate",
+      "implication": "Relevant for similarity-based retrieval and lookalike targeting",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "The literature around word-embeddings (word2vec [8], GloVe\n[9]) has shown that embeddings can be trained so that dot-products\nand distances in a low-dimensional embedding space capture simi-\nlarity and relationships.",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "We introduce advertiser information by building a lightweight\nrepresentation that summarizes the advertiser’s seed list users.",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    }
+  ]
+}

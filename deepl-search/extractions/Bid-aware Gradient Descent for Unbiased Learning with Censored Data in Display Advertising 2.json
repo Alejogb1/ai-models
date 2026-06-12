@@ -1,0 +1,148 @@
+{
+  "source": "Bid-aware Gradient Descent for Unbiased Learning with Censored Data in Display Advertising 2.pdf",
+  "source_group": "Awesome-ML-Papers/CTR-CVR-Prediction",
+  "processed_at": "2026-06-08",
+  "agent": "agent5_final",
+  "concepts": [
+    {
+      "finding": "ISBN 978-1-4503-4232-2/16/08...$15.00\nDOI: http://dx.doi.org/10.1145/2939672.2939713\nThe major supervised learning tasks range from predicting\nthe market price distribution and volume of a given ad im-\npression type [4], estimating the click-through rate (CTR)\n[23] and conversion rate [17], to the o",
+      "category": "LabelValidation",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Only\nin this situation the corresponding user feedback, i.e., click\nand conversion, to this ad impression, along with the second\nprice (or market price [1]) for this auction, are received by\nthe advertisers as the labels of this data instance.",
+      "category": "LabelValidation",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Such a bias is problematic as intuitively\nconversions or clicks from those low market-valued impres-\nsions are more crucial than those from high market-valued\nimpressions in order to obtain a more economic solution.",
+      "category": "FailureRisk",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Click-through rate (CTR)\nestimation and conversion rate (CVR) estimation are criti-\ncal in data driven targeted advertising as these techniques\nprovide a quantiﬁcation of the user’s interest on a speciﬁc\ndisplayed ad, which in turn help advertisers better allocate\nbudget across audiences [28, 33].",
+      "category": "TargetConstruct",
+      "implication": "Can inform intent modeling for recommendation systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "With the idea that the\npopular but unrated items were more possible to be the true\nnegative items for a user, the authors in [21, 26] proposed to\nsample the negative items more from the popular items and\nobtained signiﬁcant recommendation improvement.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Compared to uomp, kmmp curve\nis much closer to truth, which shows its advantage of mak-\ning use of the lost bid request data to improve the winning\nprobability estimation.",
+      "category": "Baseline",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "4.6\nBid Optimisation Results\nFor bid optimisation experiment, we mainly focus on the\nclick performance improvement from bidding strategy pa-\nrameter optimisation via Eqs.",
+      "category": "Experiment",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Table 7 shows the overall\nclick and eCPC performance comparison against diﬀerent\nbudget settings on TukMob dataset.",
+      "category": "Experiment",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "The improvements for clicks and impressions are positive\nfor all budget settings and the eCPC drops are negative for\nall budget settings (except full on 1/2), which show the\nrobustness of the unbiased training schemes.",
+      "category": "ModelCandidate",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Web-scale bayesian click-through rate prediction for\nsponsored search advertising in microsoft’s bing search\nengine.",
+      "category": "ModelCandidate",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "For an advertiser, the cam-\npaign information is incomplete — the user responses (e.g,\nclicks or conversions) and the market price of each ad im-\npression are observed only if the advertiser’s bid had won the\ncorresponding ad auction.",
+      "category": "ModelCandidate",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "The predictions, such as bid land-\nscape forecasting, click-through rate (CTR) estimation, and\nbid optimisation, are all operated in the pre-bid stage with\nfull-volume bid request data.",
+      "category": "ModelCandidate",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Derived\nfrom a survival model, we show that historic bid information\nis naturally incorporated to produce Bid-aware Gradient De-\nscents (BGD) which controls both the importance and the\ndirection of the gradient to achieve unbiased learning.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Ultimately advertisers not only need to identify the impres-\nsions that have high chance to be clicks/converted, but also\n(and equally importantly) require the cost of winning those\nimpressions is relatively small.",
+      "category": "ModelCandidate",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "The re-\nsults demonstrate large improvements brought from our so-\nlution over the start-of-the-art models.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "We then\nformulate the problem and propose our solutions for unbi-\nased CTR estimation and bid optimisation under censored\nauction data in Section 3.",
+      "category": "FailureRisk",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Essentially, CTR/CVR es-\ntimation is a probability regression problem where the pos-\nitive instances are extremely sparse [11].",
+      "category": "FailureRisk",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Based on user response prediction,\nadvertisers can estimate the value of a speciﬁc ad impression,\nwhich is the value of a response (click or conversion) mul-\ntiplied by the predicted response rate (CTR or CVR) [17].",
+      "category": "ModelCandidate",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "In [38], the authors proposed a func-\ntional optimisation framework to induce the optimal bidding\nfunctions that maximises the target key performance indi-\ncator (KPI).",
+      "category": "TargetConstruct",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "More\ngenerally, the authors in [35] hypothesised that the unrated\nitems with high predicted interest could actually be the neg-\native samples to the user, and proposed dynamic negative\nitem sampling which substantially improved the recommen-\ndation performance on implicit feedback data.",
+      "category": "ModelCandidate",
+      "implication": "Can inform intent modeling for recommendation systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    }
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "source": "From GAN to WGAN.pdf",
+  "source_group": "Awesome-ML-Papers/GANs",
+  "processed_at": "2026-06-08",
+  "agent": "agent6_remaining",
+  "concepts": [
+    {
+      "finding": "WGAN uses Earth Mover (Wasserstein-1) distance instead of Jensen-Shannon divergence, providing stable training, meaningful loss curves correlating with sample quality, and eliminating mode collapse.",
+      "category": "ModelCandidate",
+      "implication": "Wasserstein-based ranking losses may provide better gradient signals than pointwise or pairwise losses for search retrieval models.",
+      "open_question": "Does Wasserstein-based ranking loss outperform standard pairwise (margin-based) ranking loss for search retrieval?",
+      "testable_hypothesis": "A retrieval model trained with Wasserstein ranking loss will achieve 3%+ higher NDCG@10 than one trained with hinge-based pairwise loss."
+    }
+  ]
+}

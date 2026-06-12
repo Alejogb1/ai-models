@@ -1,0 +1,15 @@
+{
+  "source": "PyTorch BigGraph",
+  "source_group": "Awesome-ML-Papers/Embeddings",
+  "processed_at": "2026-06-08T12:00:00Z",
+  "agent": "agent_batch_generation",
+  "concepts": [
+    {
+      "finding": "Framework for large-scale graph embedding (billions of nodes, trillions of edges). Distributed training with graph partitioning, negative sampling (uniform, adversarial, or filtered), and configurable loss functions (margin ranking, logistic). Handles multi-relation graphs. Trains 100M-node graph in <1 day on single machine.",
+      "category": "Experiment",
+      "implication": "PBG provides the infrastructure for billion-node keyword embeddings. Multi-relation support allows different relationship types (co-occurrence, search session, click-through). Adversarial negative sampling improves embedding quality.",
+      "open_question": "What graph embedding framework (PBG, DGL-KE, GraphVite) scales best for million-node keyword-intent graphs?",
+      "testable_hypothesis": "PBG-trained keyword embeddings achieve similar cluster quality to single-machine methods while scaling to 100x more keywords."
+    }
+  ]
+}

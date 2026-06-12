@@ -1,0 +1,15 @@
+{
+  "source": "Pre-trained Language Model based Ranking in Baidu Search",
+  "source_group": "Awesome-ML-Papers/Ranking",
+  "processed_at": "2026-06-08T12:00:00Z",
+  "agent": "agent_batch_generation",
+  "concepts": [
+    {
+      "finding": "Baidu deploys pre-trained language model (ERNIE) for search ranking in production. Two-stage: (1) candidate generation via embedding retrieval, (2) ranking with cross-attention PLM. Key challenges: latency (must respond in <50ms), training efficiency (500B+ samples), cold-start queries. Knowledge-enhanced pre-training improves ranking for entity-centric queries.",
+      "category": "Experiment",
+      "implication": "Production keyword-intent systems face latency constraints. Two-stage architecture: fast embedding retrieval (candidate intent generation) followed by precise PLM re-ranking (intent disambiguation). Knowledge-enhanced models help for entity-related keywords.",
+      "open_question": "Is a two-stage keyword-intent system (fast candidate generation + PLM re-ranking) practical for real-time intent prediction? What latency budget is feasible?",
+      "testable_hypothesis": "A two-stage keyword-intent system (embedding retrieval + PLM re-ranker) achieves 90%+ accuracy of pure PLM with <10ms latency at production scale."
+    }
+  ]
+}

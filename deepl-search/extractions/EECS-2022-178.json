@@ -1,0 +1,148 @@
+{
+  "source": "EECS-2022-178.pdf",
+  "source_group": "Web-Sources",
+  "processed_at": "2026-06-08",
+  "agent": "agent5_final",
+  "concepts": [
+    {
+      "finding": "Edwin Bonilla\nand Gernot Heiser first introduced me to research, Richard Buckland showed me the joy of\nteaching, Andrew Krioukov and Andy Konwinski made me start seriously thinking about\nentrepreneurship as a viable career path.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Today, recommender systems and search engines\nallow us to find useful content at the click of a button while also filtering out a vast sea of\ninformational noise.",
+      "category": "ModelCandidate",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "In their\nseminal paper, Krizhevsky, Sutskever, and Hinton [137] developed a convolutional neural\nnetwork that achieved a top-5 error rate of 15.3% in the ImageNet 2012 challenge [200], a 10\npercentage point improvement over contemporary methods.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "How to address the limitation described: In their\nseminal paper, Krizhevsky, Sutskever, and Hinton [137] developed a convolutional neural\nnetwork that achieved a top-5 error rate of 15.3% in the ImageNet 2012 challenge [200], a 10\npercentage",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Yet most recommendation research ignores the dynamics inherent to the problem,\nand instead makes the simplifying assumption of a static environment [143, 177, 191, 206, 218,\n231, 248].",
+      "category": "FailureRisk",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "However, we argue that the dynamics of recommendation are key to properly understanding\n\nCHAPTER 1.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "How to address the limitation described: However, we argue that the dynamics of recommendation are key to properly understanding\n\nCHAPTER 1.",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "1.2\nThe Feedback Problem\nFeedback loops occur when the output of a system is the input of another system, the second\nsystem’s output is then routed back as an input into the first system.",
+      "category": "FailureRisk",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Motivated by these findings, we derive a generalization lower bound which shows that\nindependent nominator training can lead to performance on par with uniformly random\nrecommendations.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "However, we find that the relative ordering of different recommendation algorithms\nis stable under these sampling shifts.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "How to address the limitation described: However, we find that the relative ordering of different recommendation algorithms\nis stable under these sampling shifts.",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Chaney, Stewart, and Engelhardt [43] propose an environment in which\nusers have limited knowledge of their utility, and show that recommendation algorithms\nhomogenize user behavior within their simulations.",
+      "category": "FailureRisk",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "CF-NADE improves\nmuch more slowly than LLORMA, explaining the difference in rating between both\nalgorithms despite the similar nDCG.6 As we show in Section 2.6, this is primarily due\nto the negative effect of the user dynamics on CF-NADE.",
+      "category": "ModelCandidate",
+      "implication": "Relevant for similarity-based retrieval and lookalike targeting",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Furthermore,\nCF-NADE performs significantly better, showing that the same user dynamics can have\npositive or negative effects on performance depending on the recommendation algorithm.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "We showed that ranking recommender systems using offline metrics is\na methodology that is surprisingly robust to changes in the sampling distribution of the offline\ndataset.",
+      "category": "Experiment",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "(2) We introduce cafl: a causal adjustment algorithm that can provably break\nfeedback loops for existing recommendation algorithms.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Causal inference provides a solution to this challenge: the intervention distribution of\nrecommendations on ratings P(Rs | do(As = a)) achieves this independence and does not\nsuffer from feedback loops [181].",
+      "category": "FailureRisk",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "How to address the limitation described: Causal inference provides a solution to this challenge: the intervention distribution of\nrecommendations on ratings P(Rs | do(As = a)) achieves this independence and does not\nsuffer from feedback loop",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "We show that cafl significantly outperforms both the correction\n\nCHAPTER 3.",
+      "category": "Baseline",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "The\nsecond uniform sampling approach does not suffer from feedback loops because it observes\nrandomly sampled data (although makes non-random recommendations).",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "cafl, feedback loops, and homogenization\nRecommendation systems and their feedback loops have been shown to homogenize the set\nof items that users will observe beyond what is necessary to achieve optimal utility [43].",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Across\nempirical studies, we find that cafl improves recommendation quality and mitigates negative\nfeedback effects.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "The main culprit is the difference between context distribution in and outside of each pool:\ncombined with the misspecification, either one can result in more favorable optima from the\noverall two-stage performance perspective.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "We further assumed that recommendation performance is captured\nby a few measurements like regret or precision/recall at K, even though design of meaningful\nevaluation criteria remains a challenge [55, 93, 120, 167]; we caution against deployment\nwithout careful analysis of downstream effects and bro",
+      "category": "Experiment",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "How to address the limitation described: We further assumed that recommendation performance is captured\nby a few measurements like regret or precision/recall at K, even though design of meaningful\nevaluation criteria remains a challenge [55,",
+      "testable_hypothesis": ""
+    }
+  ]
+}

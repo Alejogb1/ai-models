@@ -1,0 +1,148 @@
+{
+  "source": "Revealed_Attention.pdf",
+  "source_group": "Web-Sources",
+  "processed_at": "2026-06-08",
+  "agent": "agent5_final",
+  "concepts": [
+    {
+      "finding": "Furthermore, we illustrate the problem of the welfare judgment \nwithout specifying the underlying choice procedure by showing an example where \nour method and the conservative criterion of Bernheim and Rangel (2007, 2009) \nresult in the completely opposite implication.",
+      "category": "FailureRisk",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "If the policymaker knows the DM \nfollows a choice with limited attention, however, he should first elicit her preference \nbased on our method and then pick the inconsistency-minimizing preference only \nfrom those that are consistent with our revealed preference.",
+      "category": "ModelCandidate",
+      "implication": "Can inform intent modeling for recommendation systems",
+      "open_question": "How to address the limitation described: If the policymaker knows the DM \nfollows a choice with limited attention, however, he should first elicit her preference \nbased on our method and then pick the inconsistency-minimizing preference only",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "For example, while using \na search engine, a DM might only pay attention to alternatives appearing on the first \npage of the results since it takes too much time to consider all the search results.",
+      "category": "ModelCandidate",
+      "implication": "Architecture pattern applicable to sequence modeling for user behavior",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Interestingly, this property is also satisfied when the DM actually chooses the \nconsideration sets by taking the cost of investigation and the expected benefit \ninto account.",
+      "category": "ModelCandidate",
+      "implication": "Can inform intent modeling for recommendation systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Furthermore, this \nproperty is also satisfied when the formation is based on many decision heuristics, \nsuch as paying attention only to the N-most advertised alternatives or the products \nappearing in the first page of search results.",
+      "category": "ModelCandidate",
+      "implication": "Architecture pattern applicable to sequence modeling for user behavior",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "This intuitive \ncriterion of welfare analysis is meaningful, however, only if the DM considers all \nthe presented alternatives.7 In Section II, we discuss this issue in detail to illustrate \nthe problem of the naive use of the model-free approach.",
+      "category": "FailureRisk",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "How to address the limitation described: This intuitive \ncriterion of welfare analysis is meaningful, however, only if the DM considers all \nthe presented alternatives.7 In Section II, we discuss this issue in detail to illustrate \nthe probl",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "(2010) study a different model of \nchoice under limited consideration where a product attracting attention on a crowded \nsupermarket shelf will be noticed when there are fewer products.8 Masatlioglu and \nNakajima (2009) propose a model of an iterative search where a decision maker can-\nnot consider ",
+      "category": "ModelCandidate",
+      "implication": "Architecture pattern applicable to sequence modeling for user behavior",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "• Consider the products that appear on the first page of the web search and/or \nsponsored links (Hotchkiss et al.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Or consider the \ntop-two job candidates from all first-tier schools and the top candidate from \nsecond-tier schools.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "The DM first checks online \nto find the store offering the largest variety of bikes and goes to that store.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "It is easy to see that her consideration set mapping is an attention filter as the \nsupermarket does not changes its lineups in its first aisle when something in the \nsecond aisle become unavailable.",
+      "category": "ModelCandidate",
+      "implication": "Architecture pattern applicable to sequence modeling for user behavior",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Although these models have different character-\nizations, all of them satisfy the axiom called Weak WARP (Manzini and Mariotti \n2007) so we only need to show that it violates that axiom.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "We put the stronger requirement on ​P​2​ in order to highlight that the differ-\nence between these models is generated by the first stage, not by the incompleteness or intransitivity of the second \nrationale, which corresponds to the DM’s preference in our model.",
+      "category": "ModelCandidate",
+      "implication": "Can inform intent modeling for recommendation systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Consider the \nfollowing example of the rational shortlist model:\nExample 3: The first rationale (not transitive19) and the second rationale (transi-\ntive) are:\n\t\nt ​P​1​ y, y ​P​1​ x, z ​P​1​ x, z​ P​1​ s,\t\n\t\ns ​P​2​ x P​2​ y ​P​2​ z ​P​2​ t .",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "For instance, if the feasible set is {s, y, z}, s is eliminated in the first stage by z and \nshe picks y in the second stage by comparing y and z according to ​P​2​ .",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Lehmann and Pan (1994) show experimentally that introducing new \n19 One can show that if ​P​1​ is transitive, the first-stage elimination generates an attention filter so the resulting \nchoice will be a CLA as long as ​P​2​ is complete and transitive.",
+      "category": "ModelCandidate",
+      "implication": "Architecture pattern applicable to sequence modeling for user behavior",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Although most of the research on attraction effect is centered around one decoy \noption, a natural extension of the attraction effect is to include additional decoys.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "As illustrated before, however, we cannot determine the ranking of z.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "How to address the limitation described: As illustrated before, however, we cannot determine the ranking of z.",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "(See \nTable 2.)\nOne possible story that generates such an attention pattern is “searching more \nwhen the decision is tough.” Several items are hard to find even if they are feasible.",
+      "category": "ModelCandidate",
+      "implication": "Architecture pattern applicable to sequence modeling for user behavior",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "The DM first considers alternatives that are feasible and easy to find and if there is \nan item that dominates all others, she chooses it immediately.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    }
+  ]
+}

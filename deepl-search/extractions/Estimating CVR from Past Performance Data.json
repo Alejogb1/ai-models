@@ -1,0 +1,148 @@
+{
+  "source": "Estimating CVR from Past Performance Data.pdf",
+  "source_group": "Awesome-ML-Papers/CTR-CVR-Prediction",
+  "processed_at": "2026-06-08",
+  "agent": "agent5_final",
+  "concepts": [
+    {
+      "finding": "In this paper, we present our approach\nto conversion rate estimation which relies on utilizing past\nperformance observations along user, publisher and adver-\ntiser data hierarchies.",
+      "category": "ModelCandidate",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "If a\nCPC or CPA goal is set up, then the optimal bid price can\nbe determined from the expected cost-per-impression, which\nis equal to the click-through-rate (CTR) for this impression\nmultiplied by the CPC goal, or the conversion rate (CVR)\nmultiplied by the CPA goal [8].",
+      "category": "TargetConstruct",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Given a user with a proﬁle, a page with some context, and\ncampaigns from various advertisers (where a campaign in-\nclude some constraints and ads), the goal (sometimes called\nthe fundamental problem of computational advertising) is\nto ﬁnd the best ad under constraints for the user and the\npage.",
+      "category": "TargetConstruct",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "In the learning context there\nare diﬀerent scenarios that might result in skewed training\ndata [16, 17], but in our problem the two main reasons for\nhaving data imbalance can be identiﬁed as follows:\n1.",
+      "category": "FailureRisk",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "We have shown that our algorithm provides\nconsistent improvement in conversion rate estimation over\nsome baseline estimators.",
+      "category": "Baseline",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Web-scale bayesian click-through rate\nprediction for sponsored search advertising in\nmicrosoft’s bing search engine.",
+      "category": "ModelCandidate",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Estimating Conversion Rate in Display Advertising from\nPast Performance Data\nKuang-chih Lee, Burkay Orten, Ali Dasdan, Wentong Li\nTurn Inc., 835 Main Street, Redwood City, CA 94063\n{klee, borten, adasdan, wli}@turn.com\nABSTRACT\nIn targeted display advertising, the goal is to identify the\nbest opport",
+      "category": "TargetConstruct",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Finding the best\nad impression, i.e., the opportunity to show an ad to a user,\nrequires the ability to estimate the probability that the user\nwho sees the ad on his or her browser will take an action,\ni.e., the user will convert.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "However, conversion probability\nestimation is a challenging task since there is extreme data\nsparsity across diﬀerent data dimensions and the conversion\nevent occurs rarely.",
+      "category": "ModelCandidate",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "How to address the limitation described: However, conversion probability\nestimation is a challenging task since there is extreme data\nsparsity across diﬀerent data dimensions and the conversion\nevent occurs rarely.",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Then we demonstrate how we can\ncombine these individual estimators using logistic regression\nto accurately identify conversion events.",
+      "category": "ModelCandidate",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "In our presenta-\ntion, we also discuss main practical considerations such as\ndata imbalance, missing data, and output probability cal-\nibration, which render this estimation problem more diﬃ-\ncult but yet need solving for a real-world implementation\nof the approach.",
+      "category": "FailureRisk",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "We provide results from real advertising\ncampaigns to demonstrate the eﬀectiveness of our proposed\napproach.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "The advertiser’s main goal\nis to reach the most receptive online audience in the right\ncontext, which will then engage with their displayed ad and\neventually take a desired action, identiﬁed by the type of the\ncampaign, e.g., brand advertising or direct product mar-\nketing.",
+      "category": "TargetConstruct",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "The CTR and the CVR are directly related to the inten-\ntion of the user interacting with the ad in a given context\nand they are fundamentally diﬃcult to directly model and\npredict.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "In practice, CVR is even harder to estimate than\nCTR since conversion events are far rarer than click events.",
+      "category": "ModelCandidate",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Finally, the ad serving sys-\ntem needs to perform in real-time, requiring the CVR or\nCTR estimation, optimal bid price calculation, and bid sub-\nmission to exchanges to be completed in a few milliseconds.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "We then\nformulate the problem of estimating the conversion rate of\nan event given an ad impression.",
+      "category": "FailureRisk",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Ex-\namples of this approach in the sponsored search advertising\ncontext can be found [10, 15].",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Note that this is nothing but\nthe maximum likelihood estimate (MLE) of the conversion\nrate and can be written as follows:\n˜Yijk ∼Binomial(Tijk, ˜pijk),\n˜pijk = p(Y = 1|u ∈UsrClusti, pj, ak),\n˜pMLE\nijk\n=\n( Sijk\nTijk ,\nif Tijk ̸= 0\nunknown,\nif Tijk = 0,\n(4)\nwhere Tijk denotes the number of trials (i.e",
+      "category": "ModelCandidate",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "It is important to point out that in equation (4),\ni does not index the particular user whose conversion rate\nwe are trying to estimate, but it indexes a cluster of users\nwhose conversion rates are assumed to be similar to this user.",
+      "category": "ModelCandidate",
+      "implication": "Applicable to user/item clustering for personalization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    }
+  ]
+}

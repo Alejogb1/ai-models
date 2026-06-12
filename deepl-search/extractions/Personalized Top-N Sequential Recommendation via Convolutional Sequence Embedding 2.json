@@ -1,0 +1,148 @@
+{
+  "source": "Personalized Top-N Sequential Recommendation via Convolutional Sequence Embedding 2.pdf",
+  "source_group": "Awesome-ML-Papers/Session-Based-Recommendations",
+  "processed_at": "2026-06-08",
+  "agent": "agent5_final",
+  "concepts": [
+    {
+      "finding": "1.3\nContributions\nTo address these above limitations of existing works, we propose\na ConvolutionAl Sequence Embedding Recommendation Model, or\nCaser for short, as a solution to top-N sequential recommendation.",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "How to address the limitation described: 1.3\nContributions\nTo address these above limitations of existing works, we propose\na ConvolutionAl Sequence Embedding Recommendation Model, or\nCaser for short, as a solution to top-N sequential recomm",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "The ex-\nperiments on public data sets demonstrated that Caser consistently\noutperforms state-of-the-art sequential recommendation methods\non a variety of common evaluation metrics.",
+      "category": "Baseline",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Finally, we evaluate the\ncontribution of each of Caser’s components, the horizontal convo-\nlutional layer (i.e., o), the vertical convolutional layer (i.e., ˜o), and\npersonalization (i.e., Pu), to the overall performance while keeping\nall hyperparameters at their optimal settings.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "In this paper, we propose a Convolutional Sequence\nEmbedding Recommendation Model (Caser) as a solution to address\nthis requirement.",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "(3) Caser outperforms\nstate-of-the-art methods for top-N sequential recommendation on\nreal life data sets.",
+      "category": "Baseline",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "(16)\nAs discussed for Eqn (7), this vertical ﬁlter serves as the weighted\nsum of the embeddings of the L previous items, like in Fossil, though\nFossil uses Similarity Model instead of LFM and factorizes it in the\n1Top-N recommendation ranks the items for each user individually, which is invariant\nto",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Combined with Matrix Factorization model, Bayesian\npersonalized ranking [20] is the state-of-the-art method for\nnon-sequential item recommendation on implicit feedback\ndata.",
+      "category": "Baseline",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Our experiments and case studies\non public real life data sets suggested that Caser outperforms the\nstate-of-the-art methods for top-N sequential recommendation.",
+      "category": "Baseline",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Personalized Top-N Sequential Recommendation via\nConvolutional Sequence Embedding\nJiaxi Tang\nSchool of Computing Science\nSimon Fraser University\nBritish Columbia, Canada\njiaxit@sfu.ca\nKe Wang\nSchool of Computing Science\nSimon Fraser University\nBritish Columbia, Canada\nwangk@cs.sfu.ca\nABSTRACT\nTop-N ",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "CCS CONCEPTS\n• Information systems →Retrieval models and ranking;\nKEYWORDS\nRecommender System; Sequential Prediction; Convolutional Neural\nNetworks\nACM Reference format:\nJiaxi Tang and Ke Wang.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "1.2\nLimitations of Previous Work\nThe Markov chain based model [2, 6, 21, 30] is an early approach to\ntop-N sequential recommendation, where an L-order Markov chain\nmakes recommendations based on L previous actions.",
+      "category": "FailureRisk",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "How to address the limitation described: 1.2\nLimitations of Previous Work\nThe Markov chain based model [2, 6, 21, 30] is an early approach to\ntop-N sequential recommendation, where an L-order Markov chain\nmakes recommendations based on L pre",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Factorized Sequential Pre-\ndiction with Item Similarity ModeLs (Fossil) [6] proposed by He\net al.",
+      "category": "ModelCandidate",
+      "implication": "Relevant for similarity-based retrieval and lookalike targeting",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "However, existing approaches suﬀered from two major\nlimitations:\nFail to model union-Level sequential patterns.",
+      "category": "FailureRisk",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "How to address the limitation described: However, existing approaches suﬀered from two major\nlimitations:\nFail to model union-Level sequential patterns.",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Although Fossil [6] considers\na high-order Markov chain, the overall inﬂuence is a weighted\nsum of previous items’ latent representations factorized from ﬁrst-\norder Markov transition matrices.",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Similar to [12], we regard\nthis embedding matrix as the “image” of the L items in the latent\nspace and search for sequential patterns as local features of this\n“image” using various convolutional ﬁlters.",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Restricted Bolzmann Machine (RBM) [23] is the ﬁrst successful 2-\nlayers neural network that is applied to recommendation problems.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "While RNN has shown to have an im-\npressive capability in modeling sequences [18], its sequentially\nconnected network structure may not work well under sequential\nrecommendation setting.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Because in sequential recommendation\nproblem, not all adjacent actions have dependency relationships\n(e.g.",
+      "category": "FailureRisk",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "While our proposed method doesn’t model sequential pat-\ntern as adjacent actions, it adopts convolutional ﬁlters from CNN\nand model sequential patterns as local features of the embeddings\nof previous items.",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "In fact, we will show that\nCaser generalizes several state-of-the-art methods.",
+      "category": "Baseline",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    }
+  ]
+}

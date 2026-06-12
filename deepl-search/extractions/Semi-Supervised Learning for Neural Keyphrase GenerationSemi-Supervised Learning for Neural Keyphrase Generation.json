@@ -1,0 +1,148 @@
+{
+  "source": "Semi-Supervised Learning for Neural Keyphrase GenerationSemi-Supervised Learning for Neural Keyphrase Generation.pdf",
+  "source_group": "Awesome-ML-Papers/Keywords-Extraction",
+  "processed_at": "2026-06-08",
+  "agent": "agent5_final",
+  "concepts": [
+    {
+      "finding": "ate keyphrases for news articles, illustrating that\nour models have learned some universal features\nbetween the two domains; and 2) semi-supervised\nlearning by leveraging unlabeled data improves\nthe generation performances more, indicating that\nour proposed method is reasonably effective when\nbeing ",
+      "category": "LabelValidation",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Experimental results\nshow that our semi-supervised learning-based\nmethods outperform a state-of-the-art model\ntrained with labeled data only.",
+      "category": "LabelValidation",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "For the second\napproach, we propose a multi-task learning (MTL)\nframework1 by jointly learning the main task of\nkeyphrase generation based on labeled samples,\nand an auxiliary task of title generation (Rush\net al., 2015) on unlabeled documents.",
+      "category": "LabelValidation",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Results on ﬁve differ-\nent datasets show that all of our semi-supervised\nlearning-based models can uniformly signiﬁcantly\noutperform a state-of-the-art model (Meng et al.,\n2017) as well as several competitive unsupervised\nand supervised keyphrase extraction algorithms\nbased on F1 and recall scores.",
+      "category": "LabelValidation",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "For future work, we will 1) leverage unlabeled\ndata to study domain adaptation or transfer learn-\ning for keyphrase generation; and 2) investigate\nnovel models to improve absent keyphrase gener-\nation when limited labeled data is available based\non semi-supervised learning.",
+      "category": "LabelValidation",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "While seq2seq model demonstrates good per-\nformance on keyphrase generation (Meng et al.,\n2017), it heavily relies on massive amounts of\nlabeled data for model training, which is of-\nten unavailable for new domains.",
+      "category": "LabelValidation",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Intuitively, additional\ndocuments, though unlabeled, can provide use-\nful knowledge on universal linguistic features\nand discourse structure, such as context infor-\nmation for keyphrases and that keyphrases are\nlikely to be noun phrases or main verbs.",
+      "category": "LabelValidation",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Fur-\nthermore, learning with unlabeled data can also\nmitigate the overﬁtting problem, which is often\ncaused by small size of labeled training data, and\nthus improve model generalizability and enhance\nkeyphrase generation performance on unseen data.",
+      "category": "LabelValidation",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "In the second step, re-ranking is applied\nto yield the ﬁnal keyphrases, based on supervised\nlearning (Frank et al., 1999; Witten et al., 1999;\nHulth, 2003; Lopez and Romary, 2010; Kim and\nKan, 2009), unsupervised graph algorithms (Mi-\nhalcea and Tarau, 2004; Wan and Xiao, 2008;\nBougouin et al., 2013",
+      "category": "LabelValidation",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Algorithm 1 Keyphrase Ranking\nInput: Generated top R keyphrase sequences S\n=\n[y1, · · · , yR] ranked with generation possibility from high\nto low with beam search\nOutput: Ranked keyphrase set A with importance from\nhigh to low\nfunction KEY-RANK(S)\nA ←list()\n▷set A as a empty list.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "We propose a ranking strat-\negy to collect the ﬁnal set of keyphrases.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Furthermore, we introduce multi-task\nlearning that jointly generates keyphrases and\nthe title of the document (Section 4.2).",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "4.2\nMulti-task Learning with Auxiliary Task\nThe second approach to leverage unlabeled doc-\numents is to employ a multi-task learning frame-\nwork which combines the main task of keyphrase\ngeneration with an auxiliary task through parame-\nter sharing strategy.",
+      "category": "LabelValidation",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "From\nthe results of present keyphrase generation as\nshown in Table 2, although trained on small-scale\n4Recall that present means the keyphrase appears in the\ndocument, otherwise, it is absent.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "The main reason\nmay lie in that synthetic keyphrases potentially\nintroduce noisy annotations, while the decoder\nin multi-task learning setting focuses on learn-\ning from gold-standard keyphrases.",
+      "category": "LabelValidation",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "The present keyphrase generation results are\nshown in Figure 6, from which we can see that\nwhen increasing the amount of unlabeled data,\nmodel performance is further improved.",
+      "category": "LabelValidation",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "5.6\nA Pilot Study for Cross-Domain Test\nUp to now, we have demonstrated the effectiveness\nof leveraging unlabeled data for in-domain exper-\niments, but is it still effective when being tested\non a different domain?",
+      "category": "LabelValidation",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Though un-\nsupervised methods are still superior, for future\nwork, we can leverage unlabeled out-of-domain\ncorpora to improve cross-domain keyphrase gen-\neration performance, which could be a promising\ndirection for domain adaption or transfer learning.",
+      "category": "LabelValidation",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "We introduced synthetic keyphrases con-\nstruction algorithm and multi-task learning to ef-\nfectively leverage abundant unlabeled documents.",
+      "category": "LabelValidation",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Extensive experiments demonstrated the effective-\nness of our methods, even in scenario where large-\nscale labeled data is available.",
+      "category": "LabelValidation",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    }
+  ]
+}

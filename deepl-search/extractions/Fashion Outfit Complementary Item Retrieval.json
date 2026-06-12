@@ -1,0 +1,148 @@
+{
+  "source": "Fashion Outfit Complementary Item Retrieval.pdf",
+  "source_group": "Awesome-ML-Papers/Shopping",
+  "processed_at": "2026-06-08",
+  "agent": "agent5_final",
+  "concepts": [
+    {
+      "finding": "Experimental results demonstrate that our approach\noutperforms state-of-the-art methods in both compatibility\nprediction and complementary item retrieval.",
+      "category": "Baseline",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "In ad-\ndition, we introduce an outﬁt ranking loss that considers\nthe item relationship of an entire outﬁt to improve the out-\nﬁt compatibility.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "The experimental results demonstrate that\nour model outperforms several state-of-the-art approaches\nin outﬁt compatibility, FITB and retrieval tasks.",
+      "category": "Baseline",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "In addi-\ntion, we introduce an outﬁt ranking loss that better models\nthe item relationships of an entire outﬁt.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "As shown in the experiment section, our approach outper-\nforms state-of-the-art methods both in compatibility predic-\ntion and complementary item retrieval.",
+      "category": "Baseline",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "To summarize, the main technical contributions of our\nwork are:\n• We propose a category-based attention selection mech-\nanism that only depends on the item categories.",
+      "category": "ModelCandidate",
+      "implication": "Architecture pattern applicable to sequence modeling for user behavior",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "The result shows that our outﬁt ranking loss\nfurther improves the performance of triplet loss, ∼3% in\nthe FITB task.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "However,\nwe did not see much improvement with ﬂipping, probably\nbecause the network has seen enough pairs so the learned\nfeature embedding generalizes to different orders.",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "How to address the limitation described: However,\nwe did not see much improvement with ﬂipping, probably\nbecause the network has seen enough pairs so the learned\nfeature embedding generalizes to different orders.",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Our method shows a consistent improvement over the\nbaseline approaches for different k.",
+      "category": "Baseline",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Our method shows a consistent\nimprovement over the baseline approaches for different k.",
+      "category": "Baseline",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Davis\nAmazon\n{yenliang,sontran,lrrydav}@amazon.com\nAbstract\nComplementary fashion item recommendation is critical\nfor fashion outﬁt completion.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "It is an important recommenda-\ntion problem especially for online retailers.",
+      "category": "FailureRisk",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Unlike visual or text similarity searching (e.g., [22, 19]),\nthe item of interest (a.k.a.",
+      "category": "ModelCandidate",
+      "implication": "Can inform intent modeling for recommendation systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Second row: re-\ntrieved results using our method.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Our system is designed for large scale retrieval\nand outperforms the state-of-the-art on compatibility pre-\ndiction, ﬁll-in-the-blank (FITB) and outﬁt complementary\nitem retrieval (see Section 4).",
+      "category": "Baseline",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "• We propose a new outﬁt ranking loss function that op-\nerates on entire outﬁts.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Instead of computing the similarity in a single space, sev-\neral recent approaches [17, 16, 15] explored learning sub-\nspace embedding to capture different notions of similari-\nties.",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "In recent work [8], complementary items\nwere retrieved based on the compatibility with scene im-\n2\n\nConvolutional Neural \nNetwork (CNN)\nImage\nCategory \nTarget category \n∗\nw1\n∗\nwK\n…\n…\n⊙\n⊙\nConcatenation\nfc\nfc\nAttention weights\nFeature\nEmbedding\nEach item\nCategory-based Subspace \nAttention Network (CSA",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "In this work, we propose a new outﬁt ranking loss to better\nleverage the item relationships in an entire outﬁt.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Illustration of the proposed outﬁt ranking loss that con-\nsiders the item relationship of the entire outﬁt.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "source": "Distilling the Knowledge in a Neural Network.pdf",
+  "source_group": "Awesome-ML-Papers/DNN Compression and Acceleration",
+  "processed_at": "2026-06-08",
+  "agent": "agent6_remaining",
+  "concepts": [
+    {
+      "finding": "Knowledge distillation transfers knowledge from a large model (or ensemble) to a small model by training on soft targets (class probabilities) using a temperature parameter to soften distributions.",
+      "category": "ModelCandidate",
+      "implication": "Distillation enables deploying lightweight student models approaching teacher accuracy, directly applicable to compressing large ranking or query understanding models for low-latency serving.",
+      "open_question": "What is the optimal temperature and student architecture for distilling cross-encoder ranking models into bi-encoder retrieval models?",
+      "testable_hypothesis": "A distilled bi-encoder ranking model will achieve within 3% NDCG@10 of a cross-encoder teacher while providing 100x faster inference on CPU."
+    },
+    {
+      "finding": "Specialist models (experts) trained on fine-grained confusable classes combined with a generalist model form an effective ensemble, efficiently trainable in parallel.",
+      "category": "Experiment",
+      "implication": "Specialist-generalist architecture is directly applicable to search: a general ranking model + specialist models for specific query types can improve overall ranking quality.",
+      "open_question": "How should specialist models be partitioned for optimal ranking quality across diverse query intents?",
+      "testable_hypothesis": "A mixture of experts (1 generalist + N domain specialists) for search ranking will outperform a single generalist model by 5%+ NDCG on domain-specific queries."
+    }
+  ]
+}

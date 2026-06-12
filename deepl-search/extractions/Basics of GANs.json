@@ -1,0 +1,15 @@
+{
+  "source": "Basics of GANs.pdf",
+  "source_group": "Awesome-ML-Papers/GANs",
+  "processed_at": "2026-06-08",
+  "agent": "agent6_remaining",
+  "concepts": [
+    {
+      "finding": "GANs consist of generator (produces fake samples) and discriminator (distinguishes real from fake) trained adversarially. Batch normalization stabilizes training by reducing internal covariate shift.",
+      "category": "Baseline",
+      "implication": "Adversarial training framework can be applied beyond generation to training robust query representations invariant to certain transformations.",
+      "open_question": "What transformations should query representations be invariant to (typos, synonyms, word order)?",
+      "testable_hypothesis": "Adversarially trained query embeddings will be more robust to typos and paraphrasing than standard embeddings, maintaining 90%+ intent accuracy vs. 75%+ for standard embeddings."
+    }
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "source": "Deep Hashing for Compact Binary Codes Learning.pdf",
+  "source_group": "Awesome-ML-Papers/Nearest Neighbor Search",
+  "processed_at": "2026-06-08",
+  "agent": "agent6_remaining",
+  "concepts": [
+    {
+      "finding": "Proposes a deep hashing framework that simultaneously learns feature representations and binary hash codes using pairwise loss and quantization regularization.",
+      "category": "ModelCandidate",
+      "implication": "Joint optimization of feature learning and hashing produces codes balancing discrimination and compactness, relevant for embedding compression in large-scale retrieval.",
+      "open_question": "What is the minimum bit-width for query embeddings that preserves 95% of retrieval accuracy?",
+      "testable_hypothesis": "Quantized 32-bit query embeddings will preserve >97% of retrieval recall compared to 32-bit float embeddings while reducing memory by 4x."
+    }
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "source": "Temporal-Contextual Recommendation in Real-Time",
+  "source_group": "Awesome-ML-Papers/MF",
+  "processed_at": "2026-06-08T12:00:00Z",
+  "agent": "agent_batch_generation",
+  "concepts": [
+    {
+      "finding": "Temporal-contextual recommendation: incorporates time-of-day, day-of-week, season, and user temporal patterns into recommendation. Factorization model with time-specific biases and temporal interaction features. Real-time: model updates as new interactions stream in. 15-20% improvement over time-independent models.",
+      "category": "ModelCandidate",
+      "implication": "Temporal keyword intent: same keyword has different intents depending on time. \"pizza\" at 8pm on Friday vs 8am on Monday. Time-aware keyword embeddings: incorporate time features into keyword representation for context-dependent intent prediction.",
+      "open_question": "What temporal features (hour, day, season, holiday) most strongly influence keyword intent? Can temporal patterns be used as weak labels for intent clustering?",
+      "testable_hypothesis": "Time-aware keyword embeddings (with hour-of-day and day-of-week features) improve intent disambiguation for time-sensitive keywords by 12%+ over time-independent embeddings."
+    }
+  ]
+}

@@ -1,0 +1,106 @@
+{
+  "source": "MonoForest framework for tree ensemble analysis.pdf",
+  "source_group": "Awesome-ML-Papers/Other",
+  "processed_at": "2026-06-08",
+  "agent": "agent5_final",
+  "concepts": [
+    {
+      "finding": "MonoForest framework for tree ensemble analysis\nIgor Kuralenok\nYandex / JetBrains Research\nsolar@yandex-team.ru\nVasily Ershov\nYandex\nnoxoomo@yandex-team.ru\nIgor Labutin\nYandex / Saint Petersburg campus of National Research University Higher School of Economics\nLabutin.IgorL@gmail.com\nAbstract\nIn thi",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "The main contributions of\nthis paper are:\n• an algorithm for tree ensemble conversion to polynomial form;\n• a proof of uniqueness of the polynomial form for all shapes of trees that have the same\nvalues;\n• an algorithm for conversion of polynomial ensemble representation to sum of symmetric\nobliviou",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "In our experiments,\nit shows comparable results with state-of-the-art interpretation techniques.",
+      "category": "Baseline",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Just a few lines of code could train\na model that solves classiﬁcation, regression, ranking, and other problems.",
+      "category": "FailureRisk",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Ensemble methods, especially gradient boosted decision trees, show state-of-the-art results on\nstructured and categorical data Prokhorenkova et al.",
+      "category": "Baseline",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "The rest of the paper is organized as follows: section 3 introduces the new framework; the next three\nsections study applications of the proposed framework: theoretical analysis is in section 4, model\nreduction is in section 5, and interpretation is in section 6.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "The proposed framework\ngives one more way to view these problems: we made a decomposition of complex decision function\nonto atomic decision factors with a certain degree of features interaction.",
+      "category": "FailureRisk",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "As shown in Section 3, it\nis possible to present a tree ensemble as polynomial:\nH(x) =\nX\nM∈2C\nwM\nY\nc∈M\nI\n\b\nxi(c) > b(c)\n\t\n(6)\nDue to the second property of the representation, for each feature k monomial M either contains\na single condition c such that i(c) = k, or there is no dependency on this fea",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "To demonstrate the quality of\nthe proposed approach we built a decision tree ensemble binary one-vs-rest classiﬁer for each class\nof the MNIST dataset using CatBoost and analyzed each classiﬁer using three methods: MonoForest,\nSHAP, and permutation based Model Reliance, proposed by Fisher et al.",
+      "category": "Experiment",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "The\nproposed framework demonstrated good results on two popular tasks: model interpretation and\nreduction.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "The proposed representation allows us to introduce a class of equivalence in tree ensembles and claim\nthat the decision space of the popular GBDT libraries is equivalent.",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "We have set up a problem of\noptimal ensemble conversion and provided a greedy algorithm to solve this problem.",
+      "category": "FailureRisk",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "As an example of such conversion, we used easy-to-train LightGBM trees\nand then converted them to a more effective form of oblivious trees used by CatBoost.",
+      "category": "ModelCandidate",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "The algorithm\ncan be improved by set optimization techniques to achieve even better results.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    }
+  ]
+}

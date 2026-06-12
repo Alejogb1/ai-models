@@ -1,0 +1,148 @@
+{
+  "source": "Auto-Sklearn 2.0- The Next Generation.pdf",
+  "source_group": "Awesome-ML-Papers/Other",
+  "processed_at": "2026-06-08",
+  "agent": "agent5_final",
+  "concepts": [
+    {
+      "finding": "In this paper we introduce new Automated Machine Learning\n(AutoML) techniques motivated by our winning submission to the second ChaLearn AutoML challenge, PoSH Auto-sklearn.",
+      "category": "FailureRisk",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "How to address the limitation described: In this paper we introduce new Automated Machine Learning\n(AutoML) techniques motivated by our winning submission to the second ChaLearn AutoML challenge, PoSH Auto-sklearn.",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "However, we\nfound this solution to introduce new problems: First, it is\ntime consuming since it requires to compute meta-features\ndescribing a new dataset, where good meta-features are\noften quite expensive to compute.",
+      "category": "Experiment",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "How to address the limitation described: However, we\nfound this solution to introduce new problems: First, it is\ntime consuming since it requires to compute meta-features\ndescribing a new dataset, where good meta-features are\noften quite exp",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "5\nIMPROVEMENT 1: MODEL SELECTION STRAT-\nEGY\nA key component of any efﬁcient AutoML system is its\nmodel selection strategy, which addresses the two following\nproblems: 1) how to approximate the generalization error of\na single ML pipeline and 2) how many resources to allocate\nfor each pipeline evalua",
+      "category": "Experiment",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "6\nIMPROVEMENT 2: PORTFOLIO BUILDING\nFinding the optimal solution to the optimization problem\nfrom Eq.",
+      "category": "FailureRisk",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "6.3\nPreview of Experimental Results\nWe introduced the portfolio-based warmstarting to avoid\ncomputing meta-features for a new dataset.",
+      "category": "Experiment",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "However, some high-level design decisions remain and thus\nAutoML systems suffer from a similar problem as they are\ntrying to solve.",
+      "category": "FailureRisk",
+      "implication": "Relevant for similarity-based retrieval and lookalike targeting",
+      "open_question": "How to address the limitation described: However, some high-level design decisions remain and thus\nAutoML systems suffer from a similar problem as they are\ntrying to solve.",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "We proposed\nthree improvements for faster and more efﬁcient AutoML:\n(i) we show the necessity of different model selection strate-\ngies to work well on various datasets, (ii) to get strong\nresults quickly we propose to use portfolios, which can be\nbuilt ofﬂine and thus reduce startup costs and (iii)",
+      "category": "Experiment",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "APPENDIX A\nRELATED WORK\nIn this section we provide additional related work on the\nimprovements we presented in the main paper.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "1\nAuto-Sklearn 2.0: The Next Generation\nMatthias Feurer, Katharina Eggensperger, Stefan Falkner, Marius Lindauer and Frank Hutter\nAbstract—Automated Machine Learning, which supports practitioners and researchers with the tedious task of manually designing\nmachine learning pipelines, has recently ach",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Our work is motivated by the ﬁrst and second ChaLearn\nAutoML challenge [7], which evaluated AutoML tools in a\nsystematic way under rigid time and memory constraints.",
+      "category": "Experiment",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "How to address the limitation described: Our work is motivated by the ﬁrst and second ChaLearn\nAutoML challenge [7], which evaluated AutoML tools in a\nsystematic way under rigid time and memory constraints.",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "3)\nWe introduce both the practical approach as well as\nthe theory behind building better portfolios for the\nmeta-learning component of Auto-sklearn.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "The paper is structured as follows: First, we formally\ndescribe the AutoML problem in Section 2 and then dis-\ncuss the background and basis of this work, Auto-sklearn\n(1.0) and PoSH Auto-sklearn in Section 3.",
+      "category": "FailureRisk",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "In the following\nfour sections, we describe in detail the improvements we\npropose for the next generation, Auto-sklearn (2.0).",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "We will introduce a novel\nsystem for designing π from data in Section 7 and extend\nthis to a function Ξ : D →π which automatically suggests\nan AutoML optimization policy for a new dataset.",
+      "category": "Experiment",
+      "implication": "Can optimize long-term user engagement metrics",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Finally, one can also\ncombine the models trained during the search phase in a\npost-hoc ensembling step.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "In the following, we give details\non the background of these four components, describe how\nwe implemented them in Auto-sklearn (1.0) and how we\nextended them for the second ChaLearn AutoML challenge.",
+      "category": "FailureRisk",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "How to address the limitation described: In the following, we give details\non the background of these four components, describe how\nwe implemented them in Auto-sklearn (1.0) and how we\nextended them for the second ChaLearn AutoML challenge.",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "For Auto-sklearn we\nuse random forests [14], since they have been shown to per-\nform well for high-dimensional and structured optimization\nproblems, like the CASH problem [2], [15].",
+      "category": "FailureRisk",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "3.5\nSecond AutoML Challenge\nThe goal of the challenge was to design an AutoML system\nthat, without any human intervention, operates under strict\ntime and memory limits on unknown binary classiﬁcation\ndatasets on the Codalab platform [7].",
+      "category": "Experiment",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "How to address the limitation described: 3.5\nSecond AutoML Challenge\nThe goal of the challenge was to design an AutoML system\nthat, without any human intervention, operates under strict\ntime and memory limits on unknown binary classiﬁcation\n",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Our main\nchanges with respect to Auto-sklearn (1.0) were the usage\nof successive halving instead of regular holdout to evaluate\nmore machine learning pipelines, a reduced search space\nto complement successive halving by mostly containing\niterative models, and a static portfolio instead of the KND\nte",
+      "category": "Experiment",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "The left plot in Figure 1 shows the\nsubstantial improvement of intermittent results retrieval.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    }
+  ]
+}

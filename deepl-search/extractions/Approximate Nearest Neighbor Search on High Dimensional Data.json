@@ -1,0 +1,15 @@
+{
+  "source": "Approximate Nearest Neighbor Search on High Dimensional Data.pdf",
+  "source_group": "Awesome-ML-Papers/Nearest Neighbor Search",
+  "processed_at": "2026-06-08",
+  "agent": "agent6_remaining",
+  "concepts": [
+    {
+      "finding": "Comprehensive survey categorizing ANN methods into tree-based, hashing-based, graph-based, and quantization-based approaches.",
+      "category": "Data",
+      "implication": "Systematic categorization helps practitioners select ANN approaches based on dimensionality, dataset size, index constraints, and latency requirements.",
+      "open_question": "What is the current best practice for billion-scale ANN search with sub-10ms latency across different hardware configurations?",
+      "testable_hypothesis": "For billion-scale datasets with sub-10ms latency, IVF-PQ will provide the best recall-storage tradeoff for GPU, while HNSW will be best for CPU."
+    }
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "source": "Keep It Simple- Graph Autoencoders Without Graph Convolutional Networks",
+  "source_group": "Awesome-ML-Papers/Embeddings",
+  "processed_at": "2026-06-08T12:00:00Z",
+  "agent": "agent_batch_generation",
+  "concepts": [
+    {
+      "finding": "Simple graph autoencoder (GAE*) without GCN layers: MLP encoder + inner product decoder. Shows GCN layers sometimes hurt due to oversmoothing. Linear graph autoencoder matches or outperforms GCN-based autoencoders on link prediction and node clustering tasks. Key insight: simplicity often outperforms complexity in graph AE design.",
+      "category": "ModelCandidate",
+      "implication": "For keyword co-occurrence graphs, a simple autoencoder (linear encoder + inner product decoder) may outperform complex GNN-based embeddings. Oversmoothing in deep GNNs can collapse keyword embeddings from different intent clusters.",
+      "open_question": "Is a simple linear autoencoder sufficient for keyword embedding, or do GNN-based methods provide meaningful benefits for keyword-intent graphs?",
+      "testable_hypothesis": "A simple linear graph autoencoder produces keyword embeddings with comparable or better intent cluster quality than GCN or GAT-based autoencoders."
+    }
+  ]
+}

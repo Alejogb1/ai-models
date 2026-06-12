@@ -1,0 +1,15 @@
+{
+  "source": "Multi-Rate Deep Learning for Temporal Recommendation",
+  "source_group": "Awesome-ML-Papers/MF",
+  "processed_at": "2026-06-08T12:00:00Z",
+  "agent": "agent_batch_generation",
+  "concepts": [
+    {
+      "finding": "Multi-rate deep learning: models user preference evolution at multiple timescales. Slow-changing long-term preferences (months) + medium-term trends (weeks) + fast-changing short-term context (sessions). Separate recurrent networks per timescale with gated fusion. Outperforms single-timescale models by 8-12%.",
+      "category": "ModelCandidate",
+      "implication": "Multi-timescale keyword intent: long-term stable intent associations (e.g., \"car\" -> automotive) + medium-term trending intents (e.g., \"AI\" -> generative AI in 2025) + short-term session intents. Separate models per timescale capture different drift rates.",
+      "open_question": "How rapidly do keyword-intent relationships change? Is a multi-timescale model necessary or does batch retraining suffice?",
+      "testable_hypothesis": "A multi-timescale keyword embedding model (slow + medium + fast components) adapts to intent shifts faster than single-timescale retraining, maintaining 5%+ higher accuracy during seasonal transitions."
+    }
+  ]
+}

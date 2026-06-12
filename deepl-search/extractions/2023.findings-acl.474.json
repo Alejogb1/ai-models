@@ -1,0 +1,148 @@
+{
+  "source": "2023.findings-acl.474.pdf",
+  "source_group": "Web-Sources",
+  "processed_at": "2026-06-08",
+  "agent": "agent5_final",
+  "concepts": [
+    {
+      "finding": "Our contributions include\n• a novel and practical research topic of product\ntype extraction from the Web pages associated\nwith a given shopping interest;\n• TRENC, a Transformer encoder-based model\nwith structural attention mechanisms for recov-\nering the DOM tree architecture from the node\nsequence ",
+      "category": "ModelCandidate",
+      "implication": "Can inform intent modeling for recommendation systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "For ex-\nample, a customer searching for COVID-19 crisis\ngets top results showing product types (PTs) such\nas books and test kits, while missing other essential\ncategories such as the face mask, thermometer, or\nmedicine.",
+      "category": "BehavioralTests",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "The main problem is the concept of “shopping\ninterest” is generally absent in e-commerce cat-\nalogs, which makes it difﬁcult to directly estab-\nlish the SI-PT connections and give correspond-\ning recommendations.",
+      "category": "FailureRisk",
+      "implication": "Can inform intent modeling for recommendation systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "However, Table 2\nshows that none outperforms BERT-base (Devlin\net al., 2019).",
+      "category": "Baseline",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "How to address the limitation described: However, Table 2\nshows that none outperforms BERT-base (Devlin\net al., 2019).",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "To\nestablish such connections, we propose to ex-\ntract PTs from the Web pages containing hand-\ncrafted PT recommendations for SIs.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Accordingly, we introduce TRENC,\nwhich stands for Tree-Transformer Encoders\nfor Node Classiﬁcation.",
+      "category": "ModelCandidate",
+      "implication": "Architecture pattern applicable to sequence modeling for user behavior",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Ex-\nperiments on our manually constructed dataset,\nWEBPT, show that TRENC outperforms the\nbest baseline model by 2.37 F1 points in the\nzero-shot setup.",
+      "category": "Baseline",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "The performance indicates\nthe feasibility of constructing SI-PT relations\nand using them to power downstream applica-\ntions such as search and recommendation.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "The essential hiking\ngear list:\n - The safety supply is the\nmost important \n - A pair of ...",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "To circumvent such system\nlimitations, customers today are accustomed to re-\nsearching their products on hand-curated “hub Web\npages”2, each related to an SI and presenting PT\n2E.g., hikinginthesmokys.com/hiking-checklist for hiking.",
+      "category": "FailureRisk",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "How to address the limitation described: To circumvent such system\nlimitations, customers today are accustomed to re-\nsearching their products on hand-curated “hub Web\npages”2, each related to an SI and presenting PT\n2E.g., hikinginthesmokys",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Figure 1 shows the desired search experience.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Accordingly, we incorpo-\nrate C with an embedding vector c ∈Rdmodel in a\nsimilar manner as that for node text sequence (1),\nand let the model learn the relevance between C\nand related PTs to rule out any false positive cases.",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Then, we integrate the semantic and structural\nembeddings using concatenation followed by an\nFFN layer to maintain the embedding dimensional-\nity.",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Sibling Attention\nAlthough sibling relations are\nnot described by the edges E, encoding them can\nprovide a useful contextual signal based on the\nobservation that sibling PT phrases often form a\ngroup.",
+      "category": "ModelCandidate",
+      "implication": "Applicable to user/item clustering for personalization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "As\nTransformers do not encode such node order, po-\nsitional embeddings are critical to capture such\npositioning.",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "2) Text similarity\ndecides whether a node is positive based on the co-\nsine similarity between text and SI embeddings.",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "5.2\nMain Results\nTable 1 shows the results of our comparative evalu-\nation.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Surprisingly, Graphormer underperforms\nGNN models and barely outperforms BERT-FT, a\nmodel that treats nodes independently without con-\nsidering the tree structures.",
+      "category": "Baseline",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Table 1 also shows that\nthe cosine similarity between SI and PT embed-\ndings does not present a good performance.",
+      "category": "ModelCandidate",
+      "implication": "Relevant for similarity-based retrieval and lookalike targeting",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Input Features\nAs seen, although removing any\ninput feature (§ 4.1) impairs the model perfor-\nmance, text sequence is the most critical feature\nfor TRENC.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    }
+  ]
+}

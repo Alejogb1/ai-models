@@ -1,0 +1,85 @@
+{
+  "source": "Predictability Limits in Session-based Next Item Recommendation.pdf",
+  "source_group": "Awesome-ML-Papers/Session-Based-Recommendations",
+  "processed_at": "2026-06-08",
+  "agent": "agent5_final",
+  "concepts": [
+    {
+      "finding": "We study seven benchmarks for session-based recommendation, \ncovering retail, music and news domains to investigate how accu­\nrately user behavior can be predicted from the session histories.",
+      "category": "Baseline",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "KEYWORDS \nSession-based recommendation; Predictability \nACM Reference Format: \nPriit Järv.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "The problem of making recom­\nmendations tailored to user sessions, rather than established users, \nis called session-based recommendation.",
+      "category": "FailureRisk",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "While the quality in recommendations goes beyond \njust being able to fnd the most likely item, this is still an important \nindicator in determining whether the model has captured user \ninterests accurately.",
+      "category": "ModelCandidate",
+      "implication": "Can inform intent modeling for recommendation systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Diferences in methodology, baselines and evaluation datasets \nin session-based recommendation research have made compari­\nson and analysis of diferent algorithmic approaches difcult.",
+      "category": "Baseline",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Purely session-based recommendation algorithms should not be \nexpected to improve above these values.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "On the other hand, where the exact prediction \nor the top position in a ranked list of recommendations is important, \nthe performance will be directly bound by these limits.",
+      "category": "FailureRisk",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "The estimates of predictabil­\nity for other metrics that consider multiple recommendations and \nranking positions, like the mean reciprocal rank (MRR) would be \nof practical value.",
+      "category": "Experiment",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "The algorithm-specifc analysis should be ex­\ntended to important sequential recommendation methods – matrix \nfactorization and neural networks.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Context-aware \nmusic recommendation based on latenttopic sequential patterns.",
+      "category": "Data",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Improved Recurrent Neural \nNetworks for Session-based Recommendations.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    }
+  ]
+}

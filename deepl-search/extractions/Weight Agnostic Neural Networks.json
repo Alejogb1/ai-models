@@ -1,0 +1,148 @@
+{
+  "source": "Weight Agnostic Neural Networks.pdf",
+  "source_group": "Awesome-ML-Papers/Other",
+  "processed_at": "2026-06-08",
+  "agent": "agent5_final",
+  "concepts": [
+    {
+      "finding": "In order to achieve state-of-the-art results, recent\nmethods narrow the search space to architectures composed of basic building blocks with strong\ndomain priors such as CNNs [70, 78, 95, 128], recurrent cells [53, 78, 128] and self-attention [107].",
+      "category": "Baseline",
+      "implication": "Architecture pattern applicable to sequence modeling for user behavior",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "As a proof of concept, we also apply our search method on a\nsupervised learning domain, and ﬁnd it can discover networks that, even without explicit weight\ntraining, can achieve a much higher than chance test accuracy of ∼92% on MNIST.",
+      "category": "LabelValidation",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "It has been shown that random search can already achieve SOTA results if such priors are used [69,\n94, 104].",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "The inner loop for training the weights of each candidate architecture before evaluation\nmakes the search costly, although efforts have been made to improve efﬁciency [10, 71, 91].",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "[85] proposed variance networks, which sample each weight from a distribution\nwith a zero mean and a learned variance parameter, and show that ensemble evaluations can improve\nperformance on image recognition tasks.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "3\nWeight Agnostic Neural Network Search\nCreating network architectures which encode solutions is a fundamentally different problem than\nthat addressed by neural architecture search (NAS).",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "By formulating the search as a multi-objective optimization problem [57, 83] we take into\naccount the size of the network as well as its performance when ranking it in the population.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "8\n\n5\nDiscussion and Future Work\nIn this work we introduced a method to search for simple neural network architectures with strong\ninductive biases.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "For instance, effectively training models that rely on discrete\ncomponents [32, 52] or utilize adaptive computation mechanisms [31] with gradient-based methods\nremain a challenging research area.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Performance improved, but ultimately we ﬁnd that black-box\noptimization methods such as CMA-ES and population-based REINFORCE can ﬁnd better solutions\nfor the WANN architectures evolved for MNIST, suggesting that the various activations proposed by\nthe WANN search algorithm may have produced optimiz",
+      "category": "Baseline",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Exploiting open-endedness to solve problems through the search for novelty.",
+      "category": "FailureRisk",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "We propose a search method for neural\nnetwork architectures that can already perform a task without any explicit weight\ntraining.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "We demonstrate that our method can ﬁnd minimal neural\nnetwork architectures that can perform several reinforcement learning tasks without\nweight training.",
+      "category": "ModelCandidate",
+      "implication": "Can optimize long-term user engagement metrics",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "On a supervised learning domain, we ﬁnd network architectures\nthat achieve much higher than chance accuracy on MNIST using random weights.",
+      "category": "LabelValidation",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "arXiv:1906.04358v2  [cs.LG]  5 Sep 2019\n\nDecades of neural network research have provided building blocks with strong inductive biases for\nvarious task domains.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Recent work [45, 117] demonstrated that even randomly-initialized CNNs can be used effectively\nfor image processing tasks such as superresolution, inpainting and style transfer.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "In order to ﬁnd neural network architectures with strong inductive biases, we propose to search for\narchitectures by deemphasizing the importance of weights.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "We demonstrate\nour approach can produce networks that can be expected to perform various continuous control tasks\nwith a random weight parameter.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Our method is\nbased on NEAT [110], an established topology search algorithm notable for its ability to optimize the\nweights and structure of networks simultaneously.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Ideas related to MDL\nfor making neural networks “simple” was proposed in the 1990s, such as simplifying networks by\nsoft-weight sharing [86], reducing the amount of information in weights by making them noisy [47],\nand simplifying the search space of its weights [102].",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    }
+  ]
+}

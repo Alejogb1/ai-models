@@ -1,0 +1,148 @@
+{
+  "source": "2005.13783v2.pdf",
+  "source_group": "Web-Sources",
+  "processed_at": "2026-06-08",
+  "agent": "agent5_final",
+  "concepts": [
+    {
+      "finding": "Although\nthere has been a significant improvement in user intent inference,\nquery understanding remains a major challenge [13].",
+      "category": "TargetConstruct",
+      "implication": "Can inform intent modeling for recommendation systems",
+      "open_question": "How to address the limitation described: Although\nthere has been a significant improvement in user intent inference,\nquery understanding remains a major challenge [13].",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Various ap-\nproaches have been proposed to address query understanding\nsuch as 1) considering predefined high-level categories (i.e., in-\nformational, navigational, and transactional), 2) deploying semi-\nsupervised learning with click graphs, 3) considering temporal\nquery intent modeling, 4) underst",
+      "category": "LabelValidation",
+      "implication": "Can inform intent modeling for recommendation systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "non-commercial\nand product category mapping tasks, because only a small fraction\nof data (1.5% in our domain) has a non-commercial intent, and\nwithin the commercial queries, some product categories contain\nsignificantly more samples compared to others, and 5) commercial\nqueries are easy to identify ",
+      "category": "Baseline",
+      "implication": "Directly applicable to CTR/CVR prediction in advertising systems",
+      "open_question": "How to address the limitation described: non-commercial\nand product category mapping tasks, because only a small fraction\nof data (1.5% in our domain) has a non-commercial intent, and\nwithin the commercial queries, some product categories co",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "In summary, the presented work advances the\nstate-of-the-art user intent prediction, and lays the groundwork for\nfuture research on user intent understanding in e-commerce.",
+      "category": "Baseline",
+      "implication": "Can inform intent modeling for recommendation systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "In this paper, we introduce Joint Query Intent\nUnderstanding (JointMap), a deep learning model to simultane-\nously learn two different high-level user intent tasks: 1) identifying\na query’s commercial vs.",
+      "category": "TargetConstruct",
+      "implication": "Can inform intent modeling for recommendation systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "To demonstrate the effectiveness of JointMap, we\nuse search queries collected from a large commercial website.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Our\nresults show that JointMap significantly improves both “commer-\ncial vs.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "To address these problems, we introduce a new method of jointly\nlearning query intent and category mapping, which allows trans-\nferring the inductive bias between these two relevant tasks.",
+      "category": "TargetConstruct",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "In summary, our contributions are: 1) proposing a deep learning\nmodel to jointly learn product category mapping as well as users’\nnon-commercial intents, 2) developing an active learning algorithm\nin conjunction with distant supervision to generate a user intent\ndataset from e-commerce data logs, an",
+      "category": "Data",
+      "implication": "Can inform intent modeling for recommendation systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "JointMap utilizes both word and category\nembeddings in which both representations are jointly trained to\nachieve an efficient semantic representation for a query.",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "For both tasks,\nthe word embedding vectors W are fed into a highway encoder\nlayer, which has shown its effectiveness in improving network\ncapacity [13].",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "In reference to user commercial intent prediction, a 2.3% improve-\nment is considerable since it is in the context of a large e-commerce\nsearch engine that receives billions of search queries per year.",
+      "category": "TargetConstruct",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "5\nCONCLUSIONS AND FUTURE WORK\nWe introduced JointMap, a deep learning model designed for jointly\nlearning two high-level intent tasks on e-commerce search data.",
+      "category": "TargetConstruct",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "JointMap: Joint Query Intent Understanding For Modeling\nIntent Hierarchies in E-commerce Search\nAli Ahmadvand∗\nEmory University\nali.ahmadvand@emory.edu\nSurya Kallumadi\nThe Home Depot\nsurya@ksu.edu\nFaizan Javed\nThe Home Depot\nfaizan_javed@homedepot.com\nEugene Agichtein\nEmory University\neugene.agichte",
+      "category": "TargetConstruct",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Our findings suggest a promising direction to\nmodel the intent hierarchies in an e-commerce search engine.",
+      "category": "TargetConstruct",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Permission to make digital or hard copies of all or part of this work for personal or\nclassroom use is granted without fee provided that copies are not made or distributed\nfor profit or commercial advantage and that copies bear this notice and the full citation\non the first page.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "1\nINTRODUCTION AND RELATED WORK\nQuery intent understanding is a key step in designing advanced\nretrieval systems like e-commerce search engines [6].",
+      "category": "TargetConstruct",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Finally, we propose an\nactive learning algorithm to generate data for commercial vs.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "In this paper, we introduce a data-driven approach, which we\ncall Joint Query Intent Mapping (JointMap).",
+      "category": "TargetConstruct",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Finally, we propose an approach\nbased on distant supervision in combination of active learning to\ngenerate both commercial and non-commercial queries.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    }
+  ]
+}

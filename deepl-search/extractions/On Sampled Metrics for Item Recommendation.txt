@@ -1,0 +1,1601 @@
+On Sampled Metrics for Item Recommendation
+Walid Krichene
+walidk@google.com
+Google Research
+Mountain View, California
+Steffen Rendle
+srendle@google.com
+Google Research
+Mountain View, California
+ABSTRACT
+The task of item recommendation requires ranking a large cata-
+logue of items given a context. Item recommendation algorithms
+are evaluated using ranking metrics that depend on the positions of
+relevant items. To speed up the computation of metrics, recent work
+often uses sampled metrics where only a smaller set of random
+items and the relevant items are ranked. This paper investigates
+sampled metrics in more detail and shows that they are inconsis-
+tent with their exact version, in the sense that they do not persist
+relative statements, e.g., recommender A is better than B, not even
+in expectation. Moreover, the smaller the sampling size, the less
+difference there is between metrics, and for very small sampling
+size, all metrics collapse to the AUC metric. We show that it is
+possible to improve the quality of the sampled metrics by applying
+a correction, obtained by minimizing different criteria such as bias
+or mean squared error. We conclude with an empirical evaluation of
+the naive sampled metrics and their corrected variants. To summa-
+rize, our work suggests that sampling should be avoided for metric
+calculation, however if an experimental study needs to sample, the
+proposed corrections can improve the quality of the estimate.
+CCS CONCEPTS
+• Information systems →Recommender systems; Evaluation
+of retrieval results; • Computing methodologies →Ranking.
+KEYWORDS
+Item Recommendation; Evaluation; Metrics; Sampled Metric
+ACM Reference Format:
+Walid Krichene and Steffen Rendle. 2020. On Sampled Metrics for Item
+Recommendation. In Proceedings of the 26th ACM SIGKDD Conference on
+Knowledge Discovery and Data Mining (KDD ’20), August 23–27, 2020, Virtual
+Event, CA, USA. ACM, New York, NY, USA, 10 pages. https://doi.org/10.
+1145/3394486.3403226
+1
+INTRODUCTION
+Over recent years, item recommendation from implicit feedback has
+received a lot of attention from the recommender system research
+community. At its core, item recommendation is a retrieval task,
+where given a context, a catalogue of items should be ranked and
+the top scoring ones are shown to the user. Usually the catalogue
+of items to retrieve from is large: tens of thousands in academic
+Permission to make digital or hard copies of part or all of this work for personal or
+classroom use is granted without fee provided that copies are not made or distributed
+for profit or commercial advantage and that copies bear this notice and the full citation
+on the first page. Copyrights for third-party components of this work must be honored.
+For all other uses, contact the owner/author(s).
+KDD ’20, August 23–27, 2020, Virtual Event, CA, USA
+© 2020 Copyright held by the owner/author(s).
+ACM ISBN 978-1-4503-7998-4/20/08.
+https://doi.org/10.1145/3394486.3403226
+studies and often many millions in industrial applications. Finding
+matching items from this large pool is challenging as the user will
+usually only explore a few of the highest ranked ones. For evaluating
+recommender algorithms, usually sharp metrics such as precision
+or recall over the few highest scoring items (e.g., top 10) are chosen.
+Another popular class are smooth metrics such as average precision
+or normalized discounted cumulative gain (NDCG) which place a
+strong emphasis on the top ranked items.
+Recently, it has become common in research papers to speed up
+evaluation by sampling a small set of irrelevant items and ranking
+the relevant documents only among this smaller set [7, 9, 10, 12, 15–
+17]. Sampling of negatives is commonly used during training of
+large models [4, 13], and several works have studied the implica-
+tions of sampling as well as various methods to improve it [5, 6],
+see [18] for a comparative study of sampling methods. However,
+to the best of our knowledge, the implications of sampling during
+evaluation have not been explored. In this work, the consequences
+of this approach are studied. In particular, it is shown that findings
+from sampled metrics (even in expectation) can be inconsistent
+with exact metrics. This means that if a recommender A outper-
+forms a recommender B on the sampled metric, it does not imply
+that A has a better metric than B when the metric is computed
+exactly. This is even a problem in expectation; i.e., with unlimited
+repetitions of the measurement. Moreover, a sampled metric has
+different characteristics than its exact counterpart. In general, the
+smaller the sampling size, the less differences there are between
+different metrics, and in the small sample limit, all metrics collapse
+to the area under the ROC curve, which discounts positions linearly.
+This is particularly problematic because many ranking metrics are
+designed to focus on the top positions.
+As we will show, the sampled metrics can be viewed as high-bias,
+low-variance estimators of the exact metrics. Their low variance
+can be particularly misleading if one does not recognize that they
+are biased, as repeated measurements may indicate a low variance,
+and yet no meaningful conclusion can be drawn because the bias is
+recommender-dependent, i.e. the value of the bias depends on the
+recommender algorithm being evaluated. We also show that this
+issue can be alleviated if one applies a point-wise correction to
+the sampled metric, by minimizing criteria that trade-off bias and
+variance. Empirical performance of the sampled metrics and their
+corrections is illustrated on a movie recommendation problem.
+This analysis suggests that if a study is really interested in metrics
+that emphasize the top ranked items, sampling candidates should
+be avoided for the purposes of evaluation, and if the size of the
+problem is such that sampling is necessary, corrected metrics can
+provide a more accurate evaluation. Lastly, if sampling is used,
+the reader should be aware that the reported metric has different
+characteristics than its name implies.
+0
+2000
+4000
+6000
+8000
+10000
+Rank r of relevant item
+0.0
+0.2
+0.4
+0.6
+0.8
+1.0
+Quality metric
+AUC
+Average Precision
+NDCG
+Recall at 20
+Precision at 20
+0
+20
+40
+60
+80
+100
+Rank r of relevant item
+0.0
+0.2
+0.4
+0.6
+0.8
+1.0
+Quality metric
+AUC
+Average Precision
+NDCG
+Recall at 20
+Precision at 20
+Figure 1: Visualization of metric vs. predicted rank for 𝑛= 10, 000. The left side shows the metrics over the whole set of 10, 000
+items. The right side zooms onto the contributions of the top 100 ranks. All metrics besides AUC are top heavy and almost
+completely ignore the tail. This is usually a desirable property for evaluating ranking because users are unlikely to explore
+items further down the result list.
+2
+EVALUATING ITEM RECOMMENDATION
+This section starts by formalizing the most common evaluation
+scheme for item recommendation. Let there be a pool of 𝑛items
+to recommend from. For a given instance1 x, a recommendation
+algorithm, 𝐴, returns a ranked list of the 𝑛items. In an evaluation,
+the positions, 𝑅(𝐴, x) ⊆{1, . . . ,𝑛}, of the withheld relevant items
+within this ranking are computed – 𝑅will also be referred to as
+the predicted ranks. For example, 𝑅(𝐴, x) = {3, 5} means for an
+instance x recommender 𝐴ranked two relevant items at positions
+3 and 5. Then, a metric 𝑀is used to translate the positions into a
+single number measuring the quality of the ranking. This process
+is repeated for a set of instances, 𝐷= {x1, x2, . . .}, and an average
+metric is reported:
+1
+|𝐷|
+Õ
+x∈𝐷
+𝑀(𝑅(𝐴, x)).
+(1)
+This problem definition assumes that in the ground truth, all rele-
+vant items are equally preferred by the user, i.e., that the relevant
+items are a set. This is the most commonly used evaluation scheme
+in recommender systems. In more complex cases, the ground truth
+includes preferences among the relevant items. For example, the
+ground truth can be a ranked list or weighted set. Our work shows
+issues with sampling in the simpler setup, which implies that the
+issues carry over to the more complex case.
+3
+METRICS
+This section recalls commonly used metrics for measuring the qual-
+ity of a ranking. For convenience, the arguments, 𝐴, x, from 𝑅(𝐴, x)
+are omitted whenever the particular recommender, 𝐴, or instance,
+x, is clear from context. Instead, the shorter form 𝑅is used.
+Area under the ROC curve (AUC) measures the likelihood that a
+random relevant item is ranked higher than a random irrelevant
+item.
+AUC(𝑅)𝑛=
+1
+|𝑅|(𝑛−|𝑅|)
+Õ
+𝑟∈𝑅
+Õ
+𝑟′∈({1,...,𝑛}\𝑅)
+𝛿(𝑟< 𝑟′)
+=
+𝑛−|𝑅|−1
+2
+−
+1
+|𝑅|
+Í
+𝑟∈𝑅𝑟
+𝑛−|𝑅|
+,
+(2)
+1E.g., a user, context, or query.
+with the indicator function 𝛿(𝑏) = 1 if 𝑏is true and 0 otherwise.
+Precision at position 𝑘measures the fraction of relevant items
+among the top 𝑘predicted items:
+Prec(𝑅)𝑘= |{𝑟∈𝑅: 𝑟≤𝑘}|
+𝑘
+.
+(3)
+Recall at position 𝑘measures the fraction of all relevant items that
+were recovered in the top 𝑘:
+Recall(𝑅)𝑘= |{𝑟∈𝑅: 𝑟≤𝑘}|
+|𝑅|
+.
+(4)
+Average Precision at 𝑘measures the precision at all ranks that hold
+a relevant item:
+AP(𝑅)𝑘=
+1
+min(|𝑅|,𝑘)
+𝑘
+Õ
+𝑖=1
+𝛿(𝑖∈𝑅)Prec(𝑅)𝑖.
+(5)
+Normalized discounted cumulative gain (NDCG) at 𝑘places an
+inverse log reward on all positions that hold a relevant item:
+NDCG(𝑅)𝑘=
+1
+Ímin( |𝑅|,𝑘)
+𝑖=1
+1
+log2(𝑖+1)
+𝑘
+Õ
+𝑖=1
+𝛿(𝑖∈𝑅)
+1
+log2(𝑖+ 1) .
+(6)
+3.1
+Simplified Metrics
+The remainder of the paper analyzes these metrics for |𝑅| = 1, i.e.,
+there exists exactly one relevant item which is ranked at position 𝑟.
+This will simplify the analysis and give a better understanding of
+the differences between these metrics. The metrics of the previous
+section simplify to the following:
+AUC(𝑟)𝑛= 𝑛−𝑟
+𝑛−1,
+(7)
+Prec(𝑟)𝑘= 𝛿(𝑟≤𝑘) 1
+𝑘,
+(8)
+Recall(𝑟)𝑘= 𝛿(𝑟≤𝑘),
+(9)
+AP(𝑟)𝑘= 𝛿(𝑟≤𝑘) 1
+𝑟,
+(10)
+NDCG(𝑟)𝑘= 𝛿(𝑟≤𝑘)
+1
+log2(𝑟+ 1) .
+(11)
+Predicted Ranks
+AUC
+AP
+NDCG
+Recall@10
+A
+100, 100, 100, 100, 100
+0.990
+0.010
+0.150
+0.000
+B
+40, 40, 8437, 9266, 4482
+0.555
+0.010
+0.122
+0.000
+C
+212, 2, 743, 5342, 1548
+0.843
+0.101
+0.208
+0.200
+Table 1: Toy example of evaluating three recommenders A, B and C on five instances.
+Predicted Ranks
+AUC
+AP
+NDCG
+Recall@10
+A
+100, 100, 100, 100, 100
+0.990±0.004
+0.630±0.129
+0.724±0.097
+1.000±0.000
+B
+40, 40, 8437, 9266, 4482
+0.555±0.014
+0.336±0.073
+0.444±0.054
+0.400±0.000
+C
+212, 2, 743, 5342, 1548
+0.843±0.014
+0.325±0.050
+0.460±0.039
+0.567±0.092
+Table 2: Sampled evaluation for the recommenders from Table 1. On sampled metrics, the relative ordering of A, B, C is not
+preserved, except for AUC.
+For metrics such as Average Precision and NDCG, it makes sense
+to also define their untruncated counterpart, e.g., for 𝑘= 𝑛:
+AP(𝑟) = 1
+𝑟,
+(12)
+NDCG(𝑟) =
+1
+log2(𝑟+ 1) .
+(13)
+Some other popular metrics can be reduced to these definitions:
+For |𝑅| = 1, Reciprocal Rank is equivalent to Average Precision, Hit
+Ratio is equivalent to Recall and Accuracy is equivalent to Recall
+at 1, and Precision at 1.
+Figure 1 visualizes how the different ranking metrics trade-off
+the position vs. quality score. Average precision has the sharpest
+score decay, e.g., rank 1 is twice as valuable as rank 2, whereas for
+NDCG, rank 1 is 1.58 more valuable than rank 2. The least position-
+aware metric is AUC which places a linear decay on the rank. E.g.,
+pushing an item from position 101 to 100 is as valuable as pushing
+an item from position 2 to 1.
+3.2
+Example
+This section concludes with a short example that will be used
+throughout this work. Let there be three recommenders 𝐴, 𝐵, 𝐶
+and a set of 𝑛= 10, 000 items. Each recommender is evaluated
+on five instances (i.e., |𝐷| = 5) with one relevant item each. For
+each instance, each recommender creates a ranking and the posi-
+tion at which the relevant item appears is recorded. Assume that
+recommender 𝐶manages to rank the relevant item in one of the
+evaluation instances on position 2, besides this it never achieves
+a good rank for the other four instances. Assume recommender 𝐵
+ranks relevant items in two evaluation instances at position 40. And
+recommender 𝐴is never good nor terrible and the relevant items
+are ranked at position 100 in each of the five instances. Table 1
+shows more details about the predicted ranks and the correspond-
+ing evaluation metrics. On AUC, recommender 𝐴is the best as it
+cares about all ranks equally. For top heavy metrics (AP, NDCG
+and Recall), recommender 𝐶scores the highest. This example will
+be revisited in Section 4.2 when sampled metrics are discussed.
+4
+SAMPLED METRICS
+Ranking all items is expensive when the number of items, 𝑛, is
+large. Recently, it has become common to sample a small set of 𝑚
+irrelevant items, add the relevant items, and compute the metrics
+only on the ranking generated by this subset [7, 9, 10, 12, 15–17].
+It is common to pick the number of sampled irrelevant items, 𝑚, in
+the order of a hundred while the number of items 𝑛is much larger,
+e.g., 𝑚= 100 samples for datasets with 𝑛= {4𝑘, 10𝑘, 17𝑘, 140𝑘, 2𝑀}
+items [7, 9, 15], 𝑚= 50 samples for 𝑛∈{2𝑘, 18𝑘, 14𝑘} items [10], or
+𝑚= 200 samples for 𝑛∈{17𝑘, 450𝑘} items [17]. This section will
+highlight that this approach is problematic. In particular, results
+can become inconsistent with the exact metrics.
+Let ˜𝑅be the ranks of the relevant items among the union of
+relevant items and the 𝑚randomly sampled irrelevant items. It is
+important to note that ˜𝑅is a random variable, i.e., it depends on
+the random sample of irrelevant items. The properties of ˜𝑅will be
+analyzed in Section 4.3.
+4.1
+Inconsistency of Sampled Metrics
+A central goal of evaluation metrics is to make comparisons between
+recommenders, such as, recommender 𝐴has a higher value than
+𝐵on metric 𝑀. When comparing recommenders among sampled
+metrics, we would hope that at least the relative order is preserved
+in expectation. This property can be formalized as follows.
+Definition 1 (Consistency). Let the evaluation data 𝐷be fixed.
+A metric 𝑀is consistent under sampling if the relative order of any
+two recommenders 𝐴and 𝐵is preserved in expectation. That is, for
+all 𝐴, 𝐵,
+1
+|𝐷|
+Õ
+x∈𝐷
+𝑀(𝑅(𝐴, x)) >
+1
+|𝐷|
+Õ
+x∈𝐷
+𝑀(𝑅(𝐵, x))
+⇐⇒𝐸
+"
+1
+|𝐷|
+Õ
+x∈𝐷
+𝑀( ˜𝑅(𝐴, x))
+#
+> 𝐸
+"
+1
+|𝐷|
+Õ
+x∈𝐷
+𝑀( ˜𝑅(𝐵, x))
+#
+.
+(14)
+If a metric is inconsistent, then measuring 𝑀on a subsample is
+not a good indicator of the true performance of 𝑀.
+4.2
+Example
+Now, the example from Section 3.2 is revisited and the same mea-
+sures are computed using sampling. Specifically, 𝑚= 99 random
+irrelevant items are sampled, the position ˜𝑟of the relevant item
+among this sampled subset is found, and then the metrics are com-
+puted for the rank ˜𝑟within the subsample. This procedure with a
+comparable sample size is commonly used in recent work [7, 9, 10,
+15, 17].
+0
+200
+400
+600
+800
+1000
+Number of Samples
+0.2
+0.4
+0.6
+0.8
+1.0
+Expected Average Precision
+Number of Samples: Average Precision
+Recommender A
+Recommender B
+Recommender C
+0
+200
+400
+600
+800
+1000
+Number of Samples
+0.2
+0.4
+0.6
+0.8
+1.0
+Expected NDCG
+Number of Samples: NDCG
+Recommender A
+Recommender B
+Recommender C
+0
+1000
+2000
+3000
+4000
+5000
+Number of Samples
+0.0
+0.2
+0.4
+0.6
+0.8
+1.0
+Expected Recall at 10
+Number of Samples: Recall at 10
+Recommender A
+Recommender B
+Recommender C
+0
+200
+400
+600
+800
+1000
+Number of Samples
+0.6
+0.7
+0.8
+0.9
+1.0
+Expected AUC
+Number of Samples: AUC
+Recommender A
+Recommender B
+Recommender C
+Figure 2: Expected sampling metrics for the running example (Section 3.2 and 4.2) while increasing the number of samples.
+For Average Precision, NDCG and Recall, even the relative order of recommender performance changes with the number of
+samples. That means, conclusions drawn from a subsample are not consistent with the true performance of the recommender.
+Table 2 shows the sampled metrics for the example from Sec-
+tion 3.2. As this is a random process, for better understanding of
+its outcome, here it is repeated 1000 times and the average and
+standard deviation is computed2.
+Compared to the exact metrics in Table 1, even the relative order-
+ing of metrics completely changed. On the exact metrics, C is clearly
+the best with a 10x higher average precision than B and A. But it
+has the lowest average precision when sampled measurements are
+used. A and B perform the same on the exact metrics, but A has a 2x
+better average precision on the sampled metrics. Sampled average
+precision does not give any indication of the true ordering among
+the methods. Similarly, sampled NDCG and sampled Recall at 10 do
+not agree with the exact metrics. Only AUC is consistent between
+sampled and exact computation. The other metrics are inconsistent.
+Figure 2 shows the same study as in the previous table, as we vary
+the number of samples, 𝑚. The relative ordering of recommenders
+changes with an increasing sample size. For example, for average
+precision, depending on the number of samples, any conclusion
+could be drawn: A better than C better than B (for sample size < 50),
+A better than B better than C (for sample size ≈200), C better than
+A better than B (for sample size ≈500), and finally C better than A
+equal B (for large sample sizes). This example shows that the bias of
+sampled average precision is recommender dependent and sample-
+size dependent. This is why the relative ordering of recommenders
+changes as we change the sample size. Similar observations can be
+made for NDCG. Recall is even more sensitive to the sample size,
+and it takes about 𝑚= 5, 000 samples out of 𝑛= 10, 000 items for
+the metric to become consistent. Only AUC is consistent for all 𝑚,
+and the expected metric is independent of sample size.
+4.3
+Rank Distribution under Sampling
+This section takes a closer look at the sampling process and derives
+the distribution of ranks, ˜𝑅and the expected metrics. For simplicity,
+the analysis is restricted to rankings with exactly one relevant item,
+i.e., | ˜𝑅| = 1, so we can use the simplified metrics from Section 3.1.
+Let 𝑟denote the true rank of the unique relevant item, and ˜𝑟denote
+its measured rank on the sample.
+When an irrelevant item is sampled uniformly, it can either rank
+higher or lower than the relevant item. If the number of all items is
+2In a real evaluation, the process would not be repeated because this would contradict
+the motivation of sampling to reduce computational cost.
+𝑛, then the probability that the sampled item 𝑗is ranked above 𝑟is:
+𝑝(𝑗< 𝑟) = 𝑟−1
+𝑛−1.
+(15)
+For example, if 𝑟is at position 1, the likelihood of a random irrel-
+evant being ranked higher is 0. If 𝑟= 𝑛, then the likelihood is 1.
+Note that the pool of all possible sampled items excludes the truly
+relevant item and thus has size 𝑛−1.
+Repeating the sampling procedure 𝑚times with replacement
+and counting how often an item is ranked higher, corresponds to
+a Binomial distribution. In other words, the rank ˜𝑟obtained from
+the sampling process follows ˜𝑟∼𝐵
+
+𝑚, 𝑟−1
+𝑛−1
+
++ 1. If there are no
+successes in getting a higher ranked item, the rank remains 1, if all
+𝑚samples are successful, the rank is 𝑚+ 1. The expected value of
+the metrics under this distribution is
+𝐸[𝑀(˜𝑟)] =
+𝑚+1
+Õ
+𝑖=1
+𝑝(˜𝑟= 𝑖)𝑀(𝑖).
+(16)
+Note that this is implicitly a function of 𝑟,𝑚, which appear as
+parameters of the Binomial distribution. Figure 3 visualizes the
+expected metrics 𝐸(𝑀(˜𝑟)) as we vary 𝑟. The figure highlights the
+weight that the sampled metric assigns to different ranks. Metrics
+like Average Precision or NDCG are much less top heavy. Even
+sharp metrics such as recall become smooth. Only AUC remains
+unchanged. In general, all metrics converge to a linear function in
+the small sample limit, similar to AUC behavior.
+4.4
+Expected Metrics
+This section analyzes sampled metrics in a more formal way by
+applying eq. (16) to particular metrics. The discussion focuses on
+uniform sampling with replacement, i.e., Binomial distributed ranks.
+Similar results hold for uniform sampling without replacement. In
+this case, the distribution is hypergeometric, with population size
+𝑛−1, where a pool of 𝑟−1 items can be potential successes. When
+appropriate, this variation will be discussed as well.
+4.4.1
+Expected AUC. First, AUC is a linear function of the rank:
+AUC𝑛(𝑟) = 𝑛−𝑟
+𝑛−1 = −
+1
+𝑛−1 𝑟+
+𝑛
+𝑛−1 = const1 𝑟+ const2.
+(17)
+0
+200
+400
+600
+800
+1000
+Rank r of relevant item
+0.0
+0.2
+0.4
+0.6
+0.8
+1.0
+Expected Average Precision
+Sampled Average Precision
+m=1
+m=10
+m=100
+m=1000
+Exact
+0
+200
+400
+600
+800
+1000
+Rank r of relevant item
+0.2
+0.4
+0.6
+0.8
+1.0
+Expected NDCG
+Sampled NDCG
+m=1
+m=10
+m=100
+m=1000
+Exact
+0
+200
+400
+600
+800
+1000
+Rank r of relevant item
+0.0
+0.2
+0.4
+0.6
+0.8
+1.0
+Expected Recall at 5
+Sampled Recall at 5
+m=1
+m=10
+m=100
+m=1000
+Exact
+0
+200
+400
+600
+800
+1000
+Rank r of relevant item
+0.90
+0.92
+0.94
+0.96
+0.98
+1.00
+Expected AUC
+Sampled AUC
+m=1
+m=10
+m=100
+m=1000
+Exact
+Figure 3: Characteristics of a sampled metric with a varying number of samples. Sampled Average Precision, NDCG and Recall
+change their characteristics substantially compared to exact computation of the metric. Even large sampling sizes (𝑚= 1000
+samples of 𝑛= 10000 items) show large bias. Note this plot zooms into the top 1000 ranks out of 𝑛= 10000 items.
+Thus by linearity of the expectation, and the fact that ˜𝑟follows a
+Binomial distribution, we have
+𝐸[AUC𝑚+1(˜𝑟)] = AUC𝑚+1(𝐸[˜𝑟]) = AUC𝑚+1
+
+1 + 𝑚𝑟−1
+𝑛−1
+
+=
+𝑚+ 1 −1 −𝑚𝑟−1
+𝑛−1
+𝑚+ 1 −1
+= 𝑛−𝑟
+𝑛−1 = AUC𝑛(𝑟).
+That means AUC measurements created by sampling are unbiased
+estimators of the exact AUC. This result is not surprising because
+the AUC can alternatively be defined as the expectation that a
+random relevant item is ranked over a random irrelevant item.
+Consequently, AUC is a consistent metric under sampling.
+This result holds also for any sampling distributions where the
+expected value of the sampled rank is 1 + 𝑚𝑟−1
+𝑛−1. For example, this
+is also true for sampling from a hypergeometric distribution – i.e.,
+uniform sampling without replacement.
+4.4.2
+Cut-off metrics. For a cutoff metric such as recall or precision:
+𝐸[Recall𝑘(˜𝑟)] =
+𝑚+1
+Õ
+𝑖=1
+𝑝(˜𝑟= 𝑖)Recall𝑘(𝑖) =
+𝑚+1
+Õ
+𝑖=1
+𝑝(˜𝑟= 𝑖)𝛿(𝑖≤𝑘)
+=
+𝑘
+Õ
+𝑖=1
+𝑝(˜𝑟= 𝑖) = CDF
+
+𝑘−1;𝑚, 𝑟−1
+𝑛−1
+
+.
+(18)
+This analysis carries over to any sampling distribution, including
+the hypergeometric distribution.
+4.4.3
+Average Precision. For the expected value of sampled average
+precision, we distinguish two cases. If 𝑟= 1, then ˜𝑟= 1 and the
+sampled metric is always equal to 1. If 𝑟> 1, then 𝑝(𝑗< 𝑟) > 0 and
+𝐸[AP(˜𝑟)] =
+𝑚+1
+Õ
+𝑖=1
+𝑝(˜𝑟= 𝑖)AP(𝑖) =
+𝑚+1
+Õ
+𝑖=1
+𝑝(˜𝑟= 𝑖) 1
+𝑖
+= 1 −(1 −𝑝(𝑗< 𝑟))𝑚+1
+𝑝(𝑗< 𝑟) (𝑚+ 1)
+=
+1 − 𝑛−𝑟
+𝑛−1
+𝑚+1
+(𝑟−1) 𝑚+1
+𝑛−1
+.
+(19)
+Interestingly, this can be written as:
+1 −AUC𝑛(𝑟)𝑚+1
+𝑟−1
+ 𝑛−1
+𝑚+ 1
+
+= 1 −AUC𝑛(𝑟)𝑚+1
+𝑟−1
+const.
+If 𝐴𝑈𝐶𝑛(𝑟)𝑚+1 ≈0.0, this would be
+1
+𝑟−1 and would be similar to
+the unsampled average precision metric. However, as soon as the
+relevant item is reasonably highly ranked (i.e., AUC is close to 1.0),
+it takes many samples 𝑚for this term to approach 0.
+4.4.4
+Small Sampling Size. This section investigates the behavior
+of sampled metrics in the limit, where 𝑚= 1. In this case, ˜𝑟∈{1, 2},
+and for any metric 𝑀and any sampling distribution:
+𝐸[𝑀(˜𝑟)] = 𝑝(˜𝑟= 1)𝑀(1) + (1 −𝑝(˜𝑟= 1))𝑀(2).
+For uniform sampling3 of items, 𝑝(˜𝑟= 1) is the probability to
+sample an item that is ranked after 𝑟, i.e., is 𝑛−𝑟
+𝑛−1. Now,
+𝐸[𝑀(˜𝑟)] = 𝑛−𝑟
+𝑛−1 (𝑀(1) −𝑀(2)) + 𝑀(2)
+= 𝑟𝑀(2) −𝑀(1)
+𝑛−1
++ 𝑛𝑀(1) −𝑀(2)
+𝑛−1
+= 𝑟const1 + const2,
+which is a linear function of the true rank 𝑟, regardless of the metric.
+If we only care about the ordering produced by two different met-
+rics on a set of rankings (eq. 14), we can ignore const2. Similarly, for
+const1, only the sign matters when comparing two sets of ranking.
+This sign of 𝑀(2) −𝑀(1) depends on how much ranking a relevant
+item at position 1 is preferred over ranking it at position 2. For met-
+rics that cannot distinguish between the first and second position,
+such as precision and recall at 𝑘≥2, the sampled metric is always
+constant and not useful at all. For any reasonable metric, const1
+should be negative, i.e., ranking at position 1 gives a higher metric
+than position 2. To summarize, for 𝑚= 1 all metrics give the same
+qualitative result in expectation. There is no reason to choose one
+metric over the other if we are only interested in relative statements
+such as “metric of 𝐴is higher than metric of 𝐵". Furthermore, the
+qualitative result with 𝑚= 1 coincides with exhaustive AUC since
+(i) all sampled metrics, including sampled AUC, are indistinguish-
+able for 𝑚= 1 as shown in this section, and (ii) sampled AUC is
+consistent with exhaustive AUC as shown in Section 4.4.1.
+The discussion above shows that it does not make sense to choose
+different metrics for 𝑚= 1; any sensible metric gives the same
+qualitative statement. A similar observation can be found in Figure 3
+and 2 where all metrics behave similarly for small samples sizes.
+5
+CORRECTED METRICS
+So far, we have shown that sampled metrics have different charac-
+teristics than the same metric on the full set of items. This section
+investigates whether we can design a sampled metric ˆ𝑀, a function
+3Here 𝑚= 1, so it does not matter whether sampling is with or without replacement.
+from {1, . . . ,𝑚+ 1} to R, such that ˆ𝑀(˜𝑟) provides a good estimate
+of 𝑀(𝑟). We will consider different definitions of what a "good"
+estimate is.
+5.1
+Unbiased Estimator of the Rank
+Our first approach is motivated by a simple observation. The sam-
+pled metrics that are commonly used are obtained by applying the
+exact metric 𝑀to the observed rank ˜𝑟, i.e. ˆ𝑀(˜𝑟) = 𝑀(˜𝑟). But ˜𝑟is a
+poor estimate of the true rank 𝑟, in fact it always under-estimates
+it. Instead, one can measure the metric not on the observed rank ˜𝑟,
+but on an unbiased estimator of 𝑟. Recall from Section 4.3 that
+˜𝑟|𝑟∼𝐵
+
+𝑚, 𝑟−1
+𝑛−1
+
++ 1. If we let 𝑝:= 𝑟−1
+𝑛−1, then an unbiased estimator
+of 𝑝is given by ˜𝑟−1
+𝑚. Thus an unbiased estimator of 𝑟= 1 + (𝑛−1)𝑝
+is given by ˆ𝑟:= 1 + (𝑛−1) ( ˜𝑟−1)
+𝑚
+. This motivates using the following
+corrected metric:
+ˆ𝑀(˜𝑟) = 𝑀
+
+1 + (𝑛−1)(˜𝑟−1)
+𝑚
+
+.
+(20)
+Since the rank estimate is a real number in [1,𝑛], and the original
+metric 𝑀is only defined on natural numbers, we can either round
+the rank estimate or extend 𝑀using e.g. linear interpolation. In
+our experiments, we round using floor ⌊·⌋.
+5.2
+Minimal Bias Estimator
+The first correction used an unbiased estimator of the rank. How-
+ever, whenever 𝑀is nonlinear, ˆ𝑀(˜𝑟) = 𝑀(ˆ𝑟) is biased in general. A
+criterion one may seek to optimize is the average bias of ˆ𝑀(˜𝑟), that
+is, Í
+𝑟𝑝(𝑟)(𝐸[ ˆ𝑀(˜𝑟)|𝑟] −𝑀(𝑟))2, where 𝑝(𝑟) is a prior on the distri-
+bution of ranks, if available4, or the uniform distribution otherwise.
+Since ˆ𝑀is a function from {1, . . . ,𝑚+ 1} to R, ˆ𝑀can equivalently
+be viewed as a vector in R𝑚+1. Thus we seek to find a vector ˆ𝑀
+that minimizes the following problem:
+argmin
+ˆ𝑀∈R𝑚+1
+𝑛
+Õ
+𝑟=1
+𝑝(𝑟)(𝐸[ ˆ𝑀˜𝑟|𝑟] −𝑀(𝑟))2
+(21)
+= argmin
+ˆ𝑀∈R𝑚+1
+𝑛
+Õ
+𝑟=1
+𝑝(𝑟)
+ Õ
+˜𝑟
+𝑝(˜𝑟|𝑟) ˆ𝑀˜𝑟−𝑀(𝑟)
+!2
+.
+This is a least squares problem, and its solution is given by
+ˆ𝑀=
+
+𝐴𝑇𝐴
+−1
+𝐴𝑇b,
+(22)
+where
+𝐴∈R𝑛×𝑚+1,
+𝐴𝑟,˜𝑟=
+p
+𝑝(𝑟)𝑝(˜𝑟|𝑟),
+b ∈R𝑛,
+𝑏𝑟=
+p
+𝑝(𝑟)𝑀(𝑟).
+(23)
+Note that the problem is under-determined when 𝑚+ 1 < 𝑛, i.e. in
+general, one cannot obtain an unbiased estimator for all 𝑟. This is
+consistent with the observation made in Section 4.4.4, that for the
+limit case𝑚= 1, any metric coincides with (an affine transformation
+of) AUC.
+It may also be desirable for the solution ˆ𝑀to be monotone non-
+increasing, so that on any given evaluation point, a higher rank ˜𝑟
+results in a lower estimated metric ˆ𝑀˜𝑟, although this constraint is
+4Note that the true distribution of ranks 𝑝(𝑟) is algorithm dependent and typically
+unknown. We use a uniform prior in our experiments.
+not essential when averaging over a large number of evaluation
+points. The monotonic constraint corresponds to the linear inequal-
+ities ˆ𝑀˜𝑟+1 ≥
+ˆ𝑀˜𝑟for all ˜𝑟. In this case, problem (21) becomes an
+isotonic regression problem [2]. We will refer to this as Constrained
+Least Squares in the experiments.
+5.3
+Bias-Variance Trade-off
+One potential issue with the minimal bias estimator is that it could
+have high variance, which we observe numerically in Section 6. In
+order to alleviate this problem, we can regularize problem (21) by
+introducing a variance term:
+argmin
+ˆ𝑀∈R𝑚+1
+𝑛
+Õ
+𝑟=1
+𝑝(𝑟)
+
+(𝐸[ ˆ𝑀˜𝑟|𝑟] −𝑀(𝑟))2 + 𝛾Var[ ˆ𝑀˜𝑟|𝑟]
+
+,
+(24)
+where 𝛾is a positive constant. This is a regularized least squares
+problem and its solution is given by:
+ˆ𝑀=
+
+(1.0 −𝛾)𝐴𝑇𝐴+ 𝛾diag(c)
+−1
+𝐴𝑇b,
+(25)
+with 𝐴and b from eq. (23) and 𝑐˜𝑟= Í𝑛
+𝑟=1 𝑝(𝑟)𝑝(˜𝑟|𝑟). When 𝛾= 0,
+this reduces to problem (21). When 𝛾= 1, this reduces to the least
+squares estimator and the solution is
+ˆ𝑀˜𝑟=
+Í𝑛
+𝑟=1 𝑝(˜𝑟|𝑟)𝑝(𝑟)𝑀(𝑟)
+Í𝑛
+𝑟=1 𝑝(˜𝑟|𝑟)𝑝(𝑟)
+=
+Õ
+𝑟=1
+𝑝(𝑟|˜𝑟)𝑀(𝑟).
+(26)
+In a real study, measurements are aggregated over many evaluation
+points, which reduces the overall variance, so a lower value 𝛾< 1
+is preferable.
+5.4
+Example
+Figure 4 shows an example of a corrected average precision met-
+ric ˆAP, for several choices of the parameter 𝛾, and for a uniform
+prior 𝑝(𝑟). The sample size is 𝑚= 100 and the full item set is
+𝑛= 10000, i.e., a sampling rate of 1%. As can be seen, when no order
+constraint is applied, lower values of 𝛾give oscillating solutions on
+the sample (left figure). This is not a problem in aggregate over the
+full evaluation set (right figure). All corrected sampled metrics are
+closer, in expectation, to the true metric.
+5.5
+Effect of the Sample Size and Data Set Size
+Increasing the sample size𝑚reduces the bias of the sampled metrics,
+as seen in Figure 3, as well as the corrected metrics: for example, the
+solution in (21) has a lower value when optimizing over a higher
+dimensional vector ˆ𝑀∈R𝑚+1. Increasing the size of the item set,
+𝑛, has the opposite effect. Increasing the number of evaluation
+points, |𝐷|, decreases the variance of the average estimates. This
+mostly benefits the corrected metrics introduced in this section;
+the uncorrected metrics are high-bias estimators which will have a
+large error even in the limit of zero variance.
+6
+EXPERIMENTS
+In this section, we study sampled metrics on real recommender
+algorithms and a real dataset. We investigate: (1) Do recommender
+algorithms create different ranking distributions, e.g., some are bet-
+ter in the top, some are better overall? (2) Are results from sampled
+metrics and exact metrics inconsistent, e.g., a given recommender is
+0
+20
+40
+60
+80
+100
+Rank ̃r
+−0.2
+0.0
+0.2
+0.4
+0.6
+0.8
+1.0
+Metric 
+̂
+AP
+Corrected Metric on Samples
+sampled (uncorrected)
+Rank Estimate
+Constr. LS
+Bias+Var
+Bias+0.1*Var
+Bias+0.01*Var
+0
+200
+400
+600
+800
+1000
+Rank r
+0.0
+0.2
+0.4
+0.6
+0.8
+1.0
+Expected Average Precision
+Sampled Average Precision
+sampled (uncorrected)
+Rank Estimate
+Constr. LS
+Bias+Var
+Bias+0.1*Var
+Bias+0.01*Var
+exact
+Figure 4: Evaluating the corrected metric ˆ
+AP on a sample of 𝑚= 100 items (left)
+is equivalent to measuring the metric on the full item set of 𝑚= 10, 000 (right).
+Different choices of correction algorithms are plotted.
+100
+101
+102
+103
+Rank r of relevant item (log scale)
+0
+200
+400
+600
+800
+1000
+1200
+1400
+1600
+Frequency
+Exact Ranks on Movielens
+Recommender X
+Recommender Y
+Recommender Z
+Figure 5: Distribution of predicted ranks
+for three recommender algorithms on
+the Movielens 1M dataset.
+better on the sampled metric but worse on the true metric? (3) Can
+corrections help to get more reliable results?
+We use an identical experimental setup as [9] – in particular
+the same dataset (binarized Movielens 1M [8]), split (holdout last
+event), sampling size (𝑚= 100) and metrics (Recall@10=HR@10
+and NDCG@10). In addition, we report AP and AUC. We study the
+behavior of sampled metrics on three popular recommender system
+algorithms: matrix factorization and two variations of item-based
+collaborative filtering (see Section 9 in the appendix for details).
+We want to emphasize that the purpose of our study is not to judge
+if a particular recommender algorithm is good. The purpose is
+rather to assess the behavior of metrics and correction methods.
+To de-emphasize the particular recommender method and hyper-
+parameter choice, we will refer to matrix factorization as ‘recom-
+mender X’, to the two item-based collaborative filtering variations
+as ‘recommender Y’ and ‘recommender Z’.
+6.1
+Rank Distributions
+For each of the 6040 test users, we rank all items (leaving out the
+user’s training items) and record at which position the withheld
+relevant item appears. In total we get 6040 ranks. Figure 5 shows
+the distribution of these ranks. The plot indicates the different
+characteristics of the three recommenders. Z is the best in the top
+10 but has very poor performance at higher ranks as it puts the
+relevant items of over 1600 users in the worst bucket. X is more
+balanced and puts only few items at poor ranks; 2310 items are in
+the top 100 and less than 300 are in the bottom half. Y is in the
+middle, with a better top 10 performance than X, but tends to put
+the relevant item at a worse rank overall.
+6.2
+Sampled Metrics
+The leftmost block in Table 3 reports the exact metric and the
+sampled metric with standard deviation5. As expected from the
+rank distributions, for Recall, NDCG and AP, recommender Z is
+better than Y better than X on the exact metric. However, on the
+sampled metric this does not hold. For sampled Recall, the order
+is reversed and recommender X is much better than Y which is
+better than Z. All the measures have low standard deviation, so the
+issue is not that of variance, but is due to the bias in the sampled
+5We repeated the sampling experiment 100 times to measure the variance.
+metrics. Also for NDCG and AP, the worst recommender on the
+exact metric (X) appears to be the best according to sampled metrics.
+The relative ordering of the two better recommenders is correct.
+For AUC, all sampled results are consistent with the exact metrics.
+These results indicate that sampled metrics can be inconsistent
+in real experiments. In particular, if a study would have compared
+the recommenders only on the sampled metrics, the study would
+have drawn the wrong conclusion about the performance of the
+recommender with respect to top heavy metrics such as Recall,
+NDCG and AP. The worst recommender (X) would have been found
+to be the best one.
+6.3
+Corrected Metrics
+We finally investigate if correction methods can help. We consider
+the three correction strategies proposed in Section 5: rank esti-
+mate (eq. 20), constrained least squares (CLS) (eq. 21) with the con-
+straint ˆ𝑀˜𝑟≥
+ˆ𝑀˜𝑟+1, and bias-variance trade-off (BV 𝛾) with 𝛾∈
+{1.0, 0.1, 0.01, 0.001} and a uniform rank distribution 𝑝(𝑟) = 1/𝑛.
+The right block of Table 3 shows the expected metrics under
+correction. All methods are closer to the exact results than sampling
+without correction. In particular, CLS and BV with low 𝛾have
+values close to the exact metric – which indicates a low bias. All
+identify the order better, e.g., all of them place recommender Z
+as the best performing method for Recall, NDCG and AP. Some
+of them (BV with low 𝛾) also get the order of recommenders X
+and Y right. Figure 6 shows the expected Recall@10 for different
+choices of the sampling size 𝑚. As we can see, the uncorrected
+metric performs poorly and needs more than 𝑚= 1000 samples
+(equivalent to 1/3rd sampling rate) to correctly order recommenders
+X and Y. The corrected metric using a bias-variance trade-off with
+𝛾= 0.1 already has the correct ordering with less than 𝑚= 60
+samples.
+While the corrections seem to be effective in expectation, one
+also needs to consider the variance of these measurements. Table 4
+investigates the bias and variance in more detail. For each sampled
+metric and each pair of recommenders, we compare the order of
+the pair over the 100 runs, and count how often the order is correct,
+i.e. agrees with that of the exact metric. For example, for Recall
+and "X vs Y" we count in how many of the 100 runs, the metric of
+recommender X is worse than Y. Table 4 shows that the correction
+methods are able to resolve most of the mistakes of the uncorrected
+Sampled
+Sampled with Correction
+Recommender
+Exact
+(uncorrected)
+Rank Estimate
+CLS
+BV 1
+BV 0.1
+BV 0.01
+BV 0.001
+Recall
+X
+7.60
+66.19±0.25
+17.46±0.32
+8.52±0.16
+4.71±0.07
+6.49±0.25
+7.18±0.59
+7.32±1.17
+Y
+8.84
+56.51±0.22
+17.26±0.28
+8.42±0.14
+4.60±0.07
+6.95±0.21
+8.18±0.51
+8.54±1.07
+Z
+9.42
+54.20±0.22
+18.67±0.32
+9.10±0.15
+4.97±0.07
+7.44±0.24
+8.63±0.59
+9.08±1.20
+NDCG
+X
+3.76
+39.21±0.20
+17.46±0.32
+3.99±0.07
+2.16±0.04
+3.00±0.12
+3.34±0.32
+3.41±0.71
+Y
+4.59
+34.82±0.16
+17.26±0.28
+3.94±0.06
+2.12±0.03
+3.24±0.10
+3.85±0.28
+4.03±0.66
+Z
+4.79
+35.34±0.16
+18.67±0.32
+4.27±0.07
+2.29±0.04
+3.46±0.12
+4.05±0.32
+4.31±0.74
+AP
+X
+3.75
+32.55±0.21
+18.12±0.31
+3.58±0.06
+2.44±0.03
+3.13±0.09
+3.37±0.21
+3.42±0.49
+Y
+4.32
+30.01±0.20
+17.81±0.28
+3.54±0.06
+2.32±0.03
+3.19±0.07
+3.62±0.18
+3.73±0.45
+Z
+4.44
+30.71±0.21
+19.20±0.31
+3.82±0.06
+2.45±0.03
+3.38±0.08
+3.79±0.21
+3.97±0.51
+AUC
+X
+89.13
+89.12±0.04
+89.24±0.04
+89.12±0.04
+88.36±0.04
+89.04±0.04
+89.11±0.04
+89.12±0.04
+Y
+85.33
+85.33±0.04
+85.48±0.04
+85.32±0.04
+84.63±0.04
+85.26±0.04
+85.32±0.04
+85.32±0.04
+Z
+74.73
+75.04±0.23
+75.24±0.20
+75.04±0.21
+74.51±0.23
+75.02±0.20
+75.02±0.24
+75.02±0.23
+Table 3: Evaluation of three recommenders (X, Y and Z) on the Movielens dataset. Sampled metrics are inconsistent with the
+exact metrics. Corrected metrics, especially Bias2+𝛾∗Variance with𝛾≤0.1 produce the correct relative ordering in expectation.
+0
+200
+400
+600
+800
+1000
+Number of Samples (m)
+0.2
+0.3
+0.4
+0.5
+0.6
+0.7
+0.8
+0.9
+1.0
+Expected Recall at 10
+Movielens: Sampled (uncorrected)
+Recommender X
+Recommender Y
+Recommender Z
+0
+20
+40
+60
+80
+100
+Number of Samples (m)
+0.01
+0.02
+0.03
+0.04
+0.05
+0.06
+0.07
+Expected Recall at 10
+Movielens: Bias 0.1*Variance Correction
+Recommender X
+Recommender Y
+Recommender Z
+Figure 6: Evaluating recommenders with a varying sample size 𝑚. Plots show expected Recall@10 for the uncorrected metric
+and the metric corrected by Bias2 + 0.1 ∗Variance. The uncorrected metric needs 𝑚= 1000 samples to order X and Y correctly
+in expectation, while for the corrected metric requires only 𝑚= 60.
+Sampled
+Sampled with Correction
+Measure
+(uncorrected)
+Rank Estimate
+CLS
+BV 1
+BV 0.1
+BV 0.01
+BV 0.001
+X vs Y
+Recall
+0
+31
+31
+11
+93
+91
+78
+NDCG
+0
+31
+31
+15
+93
+88
+76
+AP
+0
+24
+31
+0
+68
+79
+66
+AUC
+100
+100
+100
+100
+100
+100
+100
+X vs Z
+Recall
+0
+100
+100
+100
+100
+95
+86
+NDCG
+0
+100
+100
+100
+100
+95
+82
+AP
+0
+100
+100
+61
+99
+92
+81
+AUC
+100
+100
+100
+100
+100
+100
+100
+Y vs Z
+Recall
+0
+100
+100
+100
+95
+72
+68
+NDCG
+100
+100
+100
+100
+94
+70
+67
+AP
+100
+100
+100
+100
+98
+75
+68
+AUC
+100
+100
+100
+100
+100
+100
+100
+Table 4: For the 100 repetitions of the experiment in Table 3, how many times the metric for a pair of recommenders show
+the correct ordering. For example: for Recall and "X vs Y", how often the sampled metric of X was smaller than the sampled
+metric of Y. In any of the comparisons, a value of 100 indicates the evaluation was always correct, 0 indicates it was always
+wrong. The exact metric would always score 100.
+metrics. For this particular experiment, BV 0.1 seems to be the
+most effective one, getting the correct order on all but one com-
+parison with >90% chance. The simple ‘rank estimate’ correction
+is surprisingly effective and is strictly better than the uncorrected
+metric in all comparisons of Table 4. It is worth mentioning that
+under the ‘rank estimate’ correction, Recall@10 and NDCG@10
+are identical. However, it still represents an improvement over the
+uncorrected metrics which are much more biased and lead to the
+wrong conclusion. Rank estimate method is trivial to implement
+(i.e., upscaling the rank before applying the metric). In a study with
+sampled evaluation, this should be preferred over uncorrected met-
+rics. More complex corrections such as the adjusted bias-variance
+can get higher gains but are more difficult to implement.
+7
+SUGGESTIONS
+Our results have shown that a sampled metric can be a poor indica-
+tor of the true performance of recommender algorithms under this
+metric. For uncorrected metrics this is mostly due to the large bias
+introduced by sampling. Using correction methods, this bias can
+be reduced but at the cost of higher variance. If a study needs to
+use sampled metrics and is still interested in the true performance
+of the metrics, we suggest to use a correction method as proposed
+in this work. In this case it is important to rerun the experiment
+with different samples (e.g., different random seeds). It is already
+common, in most evaluations, to repeat an experiment 𝑁times –
+usually by varying the dataset (e.g., 𝑁-fold cross validation). In this
+case, variance is introduced by the differences in the dataset split
+and potentially by the initialization of the recommender algorithm.
+In a sampled evaluation, adding a different seed for negative sam-
+pling will add another source of variance. That means it may be
+harder to find “statistically significant" differences between two
+recommenders. If even under the increased variance a difference
+is found, then this is a stronger indication that the recommender
+is truly better under the exact metric. The lower the bias in the
+corrected metric (e.g., the lower 𝛾), the stronger the indication.
+While this evaluation is preferable over uncorrected metrics, it is
+still prone to either not identifying differences (due to variance) or
+drawing false conclusions because of the bias. This bias can only
+be eliminated by avoiding sampling altogether.
+8
+CONCLUSION
+This work seeks to bring attention to some issues with sampling
+of evaluation metrics. It has shown that most metrics are inconsis-
+tent under sampling and can lead to false discoveries. Moreover,
+metrics are usually motivated by applications, e.g., does the top
+10 list contain a relevant item? Sampled metrics do not measure
+the intended quantities – not even in expectation. For this reason,
+sampling should be avoided as much as possible during evaluation.
+If an experimental study needs to sample, we propose correction
+methods that give a better estimate of the true metric, however at
+the cost of increased variance. Our analysis focused on the case of
+a single relevant item. The general case may be treated by making
+the approximation that observed ranks are independent, in which
+case similar correction methods can be applied. Deriving correction
+methods without independence is an interesting direction for future
+research.
+ACKNOWLEDGEMENTS
+We would like to thank Nicolas Mayoraz and Li Zhang for their
+helpful comments and suggestions.
+REFERENCES
+[1] Fabio Aiolli. 2013. Efficient Top-n Recommendation for Very Large Scale Binary
+Rated Datasets. In Proceedings of the 7th ACM Conference on Recommender Systems
+(Hong Kong, China) (RecSys ’13). Association for Computing Machinery, New
+York, NY, USA, 273–280. https://doi.org/10.1145/2507157.2507189
+[2] R.E. Barlow, D.J. Bartholomew, J. M. Bremner, and Brunk H. D. 1972. Statistical In-
+ference Under Order Restrictions: The Theory and Application of Isotonic Regression.
+J. Wiley.
+[3] Immanuel Bayer, Xiangnan He, Bhargav Kanagal, and Steffen Rendle. 2017. A
+Generic Coordinate Descent Framework for Learning from Implicit Feedback.
+In Proceedings of the 26th International Conference on World Wide Web (Perth,
+Australia) (WWW ’17). 1341–1350. https://doi.org/10.1145/3038912.3052694
+[4] Yoshua Bengio and Jean-Sébastien Senecal. 2003. Quick Training of Probabilistic
+Neural Nets by Importance Sampling. In Proceedings of the Ninth International
+Workshop on Artificial Intelligence and Statistics, AISTATS 2003, Key West, Florida,
+USA, January 3-6, 2003.
+[5] Yoshua Bengio and Jean-Sébastien Senecal. 2008. Adaptive Importance Sampling
+to Accelerate Training of a Neural Probabilistic Language Model. IEEE Trans.
+Neural Networks 19, 4 (2008), 713–722.
+[6] Guy Blanc and Steffen Rendle. 2018. Adaptive Sampled Softmax with Kernel
+Based Sampling. In Proceedings of the 35th International Conference on Machine
+Learning (Proceedings of Machine Learning Research, Vol. 80), Jennifer Dy and
+Andreas Krause (Eds.). PMLR, Stockholmsmässan, Stockholm Sweden, 590–599.
+[7] Travis Ebesu, Bin Shen, and Yi Fang. 2018. Collaborative Memory Network for
+Recommendation Systems. In The 41st International ACM SIGIR Conference on
+Research & Development in Information Retrieval (Ann Arbor, MI, USA) (SIGIR ’18).
+ACM, New York, NY, USA, 515–524. https://doi.org/10.1145/3209978.3209991
+[8] F. Maxwell Harper and Joseph A. Konstan. 2015. The MovieLens Datasets: History
+and Context. ACM Trans. Interact. Intell. Syst. 5, 4, Article 19 (Dec. 2015), 19 pages.
+https://doi.org/10.1145/2827872
+[9] Xiangnan He, Lizi Liao, Hanwang Zhang, Liqiang Nie, Xia Hu, and Tat-Seng
+Chua. 2017. Neural Collaborative Filtering. In Proceedings of the 26th International
+Conference on World Wide Web (Perth, Australia) (WWW ’17). International World
+Wide Web Conferences Steering Committee, Republic and Canton of Geneva,
+Switzerland, 173–182. https://doi.org/10.1145/3038912.3052569
+[10] Binbin Hu, Chuan Shi, Wayne Xin Zhao, and Philip S. Yu. 2018. Leveraging Meta-
+path Based Context for Top- N Recommendation with A Neural Co-Attention
+Model. In Proceedings of the 24th ACM SIGKDD International Conference on Knowl-
+edge Discovery & Data Mining (London, United Kingdom) (KDD ’18). ACM, New
+York, NY, USA, 1531–1540. https://doi.org/10.1145/3219819.3219965
+[11] Yifan Hu, Yehuda Koren, and Chris Volinsky. 2008. Collaborative Filtering for
+Implicit Feedback Datasets. In Proceedings of the 2008 Eighth IEEE International
+Conference on Data Mining (ICDM ’08). 263–272.
+[12] Walid Krichene, Nicolas Mayoraz, Steffen Rendle, Li Zhang, Xinyang Yi, Lichan
+Hong, Ed Chi, and John Anderson. 2019. Efficient Training on Very Large Corpora
+via Gramian Estimation. In International Conference on Learning Representations.
+[13] Tomas Mikolov, Kai Chen, Greg Corrado, and Jeffrey Dean. 2013. Efficient
+Estimation of Word Representations in Vector Space. CoRR abs/1301.3781 (2013).
+[14] Badrul Sarwar, George Karypis, Joseph Konstan, and John Riedl. 2001. Item-
+Based Collaborative Filtering Recommendation Algorithms. In Proceedings of
+the 10th International Conference on World Wide Web (Hong Kong, Hong Kong)
+(WWW ’01). Association for Computing Machinery, New York, NY, USA, 285–295.
+https://doi.org/10.1145/371920.372071
+[15] Xiang Wang, Dingxian Wang, Canran Xu, Xiangnan He, Yixin Cao, and Tat-Seng
+Chua. 2019. Explainable Reasoning over Knowledge Graphs for Recommendation.
+In Proceedings of the 33rd AAAI Conference on Artificial Intelligence (AAAI) (AAAI
+’19). 5329–5336.
+[16] Longqi Yang, Eugene Bagdasaryan, Joshua Gruenstein, Cheng-Kang Hsieh, and
+Deborah Estrin. 2018. OpenRec: A Modular Framework for Extensible and
+Adaptable Recommendation Algorithms. In Proceedings of the Eleventh ACM
+International Conference on Web Search and Data Mining (Marina Del Rey, CA,
+USA) (WSDM ’18). ACM, New York, NY, USA, 664–672. https://doi.org/10.1145/
+3159652.3159681
+[17] Longqi Yang, Yin Cui, Yuan Xuan, Chenyang Wang, Serge Belongie, and Deborah
+Estrin. 2018. Unbiased Offline Recommender Evaluation for Missing-not-at-
+random Implicit Feedback. In Proceedings of the 12th ACM Conference on Recom-
+mender Systems (Vancouver, British Columbia, Canada) (RecSys ’18). ACM, New
+York, NY, USA, 279–287. https://doi.org/10.1145/3240323.3240355
+[18] Hsiang-Fu Yu, Mikhail Bilenko, and Chih-Jen Lin. 2017. Selection of Negative
+Samples for One-class Matrix Factorization. In Proceedings of the 2017 SIAM
+International Conference on Data Mining. 363–371.
+9
+REPRODUCIBILITY
+We provide further details about the evaluation in Section 6 to facil-
+itate reproducibility. There are many different variations of matrix
+factorization and item-based collaborative filtering. In this section,
+we clarify the exact model, loss function, and hyper-parameters
+that we used.
+Let 𝑈be the set of users, 𝐼be the set of items, and 𝐻⊆𝑈× 𝐼be
+the training set of items that the user has rated in the past.
+Recommender X is a matrix factorization model, for which the
+output for a pair (𝑢,𝑖) ∈𝑈× 𝐼is given by
+ˆ𝑦(𝑢,𝑖) =
+𝑑
+Õ
+𝑓=1
+𝑣𝑢,𝑓𝑣𝑖,𝑓,
+where 𝑣𝑢,𝑓, 𝑣𝑖,𝑓are the parameters of the model. We use the param-
+eterization of the loss as proposed in [3]:
+argmin
+𝑉
+Õ
+(𝑢,𝑖) ∈𝐻
+( ˆ𝑦(𝑢,𝑖) −1)2 + 𝛼
+Õ
+𝑢∈𝑈
+Õ
+𝑖∈𝐼
+ˆ𝑦(𝑢,𝑖)2 + 𝜆||𝑉||2
+𝐹,
+optimized with implicit alternating least squares [11]. The hyper-
+parameters are 𝑑= 16, 𝜆= 10, 𝛼= 0.2.
+Recommenders Y and Z are item based collaborative filtering
+algorithms [14]. There are many different variations of this algo-
+rithm, in particular how to generate the similarity matrix. We use
+the following definition. The basic similarity is cosine and we fol-
+low the suggestion by [1] to apply an exponent 𝑞to sharpen the
+similarity:
+𝑠𝑖,𝑗=
+ 
+|{𝑢: (𝑢,𝑖) ∈𝐻} ∩{𝑢: (𝑢, 𝑗) ∈𝐻}|
+p
+|{𝑢: (𝑢,𝑖) ∈𝐻}|
+p
+|{𝑢: (𝑢, 𝑗) ∈𝐻}|
+!𝑞
+(27)
+Then we add the option to sparsify based on k-nearest neighbors:
+𝑠′
+𝑖,𝑗= 𝑠𝑖,𝑗𝛿(𝑖∈𝑁𝑘(𝑗)) 𝛿(𝑗∈𝑁𝑘′(𝑖)),
+(28)
+where 𝑁𝑘(𝑖) are the 𝑘closest items to 𝑖based on 𝑠. We allow both
+selecting for row or column neighbors. Then we apply row normal-
+ization:
+𝑠′′
+𝑖,𝑗=
+𝑠′
+𝑖,𝑗
+||s′
+𝑖|| .
+(29)
+Finally the prediction is:
+ˆ𝑦(𝑢,𝑖) =
+Í
+𝑗:(𝑢,𝑗) ∈𝐻𝑠′′
+𝑖,𝑗
+Í
+𝑗∈𝐼𝑠′′
+𝑖,𝑗
+.
+(30)
+Recommender Y uses the following hyperparameters: 𝑞= 3,𝑘=
+∞,𝑘′ = ∞. Recommender Z uses the following hyperparameters:
+𝑞= 1,𝑘= ∞,𝑘′ = 10.

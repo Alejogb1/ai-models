@@ -1,0 +1,99 @@
+{
+  "source": "Estimating Training Data Influence by Tracing Gradient Descent.pdf",
+  "source_group": "Awesome-ML-Papers/Other",
+  "processed_at": "2026-06-08",
+  "agent": "agent5_final",
+  "concepts": [
+    {
+      "finding": "Estimating Training Data Inﬂuence\nby Tracing Gradient Descent\nGarima∗\nGoogle\npruthi@google.com\nFrederick Liu*\nGoogle\nfrederickliu@google.com\nSatyen Kale\nGoogle\nsatyenkale@google.com\nMukund Sundararajan †\nGoogle\nmukunds@google.com\nAbstract\nWe introduce a method called TracIn that computes the inﬂuenc",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Controlling the training\ndata input to the model is one of the main quality knobs to improve the quality of the deep learning\nmodel.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Our main motivation is to identify practical techniques to improve\nthe analysis of the training data.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "However, idealized TracIn requires\nthe test/inference point to be known at training time and is therefore impractical, making the trick less\nrelevant to the problem we study.",
+      "category": "FailureRisk",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "How to address the limitation described: However, idealized TracIn requires\nthe test/inference point to be known at training time and is therefore impractical, making the trick less\nrelevant to the problem we study.",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "The ﬁrst-order approximation remains valid,\nhowever, as long as a small step-size is used in the update.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "How to address the limitation described: The ﬁrst-order approximation remains valid,\nhowever, as long as a small step-size is used in the update.",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Therefore, when we sort training examples by decreasing\nself-inﬂuence, an effective inﬂuence computation method would tend to rank mislabelled examples\nin the beginning of the ranking.",
+      "category": "LabelValidation",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "(In our evaluation, we know which\nexamples are mislabelled because we introduced them.",
+      "category": "LabelValidation",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Furthermore, we show that ﬁxing the mislabelled data found within\na certain fraction of the training data, results in a larger improvement in test accuracy for TracIn\ncompared to the other methods (see the plot on the left hand side of Figure 1a).",
+      "category": "LabelValidation",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Figure 2\nshows TracInCP with just one checkpoint from middle correlates more than the last checkpoint with\n10After 140 epochs, it achieves accuracy of 89.94% on mislabelled train set, and 89.95% on test set.",
+      "category": "LabelValidation",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "The inﬂuence technique\nrequires the the inversion of a Hessian matrix that has a size that is quadratic in the number of model\nparameters, and the representer point method requires a complex, memory-intensive line search or\nthe use of a second order solver such as LBFGS.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "5\nApplications\nWe apply TracIn to a regression problem (Section 5.1) a text problem (Section 5.2) and an computer\nvision problem (Section 5.3) to demonstrate its ability to generate insights.",
+      "category": "FailureRisk",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "We train a Simple Word-Embedding Model\n(SWEM) [20] for 60 epochs and use the default parameters of sentencepeice library as tokenizer\n[21] and achieve 95.5% on both training and test.",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "A.2\nRepresenter Point Selection\nThe second method is proposed in [3] and is based on the representer point theorem [26].",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    }
+  ]
+}

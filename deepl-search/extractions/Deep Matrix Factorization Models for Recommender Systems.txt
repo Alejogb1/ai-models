@@ -1,0 +1,994 @@
+Deep Matrix Factorization Models for Recommender Systems∗
+Hong-Jian Xue, Xin-Yu Dai, Jianbing Zhang, Shujian Huang, Jiajun Chen
+National Key Laboratory for Novel Software Technology; Nanjing University, Nanjing 210023, China
+Collaborative Innovation Center of Novel Software Technology and Industrialization, Nanjing 210023, China
+xuehj@nlp.nju.edu.cn, {daixinyu,zjb,huangsj,chenjj}@nju.edu.cn
+Abstract
+Recommender systems usually make personalized
+recommendation with user-item interaction ratings,
+implicit feedback and auxiliary information. Ma-
+trix factorization is the basic idea to predict a per-
+sonalized ranking over a set of items for an indi-
+vidual user with the similarities among users and
+items. In this paper, we propose a novel matrix
+factorization model with neural network architec-
+ture. Firstly, we construct a user-item matrix with
+explicit ratings and non-preference implicit feed-
+back. With this matrix as the input, we present a
+deep structure learning architecture to learn a com-
+mon low dimensional space for the representations
+of users and items. Secondly, we design a new loss
+function based on binary cross entropy, in which
+we consider both explicit ratings and implicit feed-
+back for a better optimization. The experimental
+results show the effectiveness of both our proposed
+model and the loss function.
+On several bench-
+mark datasets, our model outperformed other state-
+of-the-art methods. We also conduct extensive ex-
+periments to evaluate the performance within dif-
+ferent experimental settings.
+1
+Introduction
+In the era of information explosion, information overload is
+one of the dilemmas we are confronted with. Recommender
+systems (RSs) are instrumental to address this problem as
+they help determine which information to offer to individual
+consumers and allow online users to quickly ﬁnd the person-
+alized information that ﬁts their needs [Sarwar et al., 2001;
+Linden et al., 2003].
+RSs are nowadays ubiquitous in e-
+commerce platforms, such as recommendation of books at
+Amazon, music at Last.com, movie at Netﬂix and reference
+at CiteULike.
+Collaborative ﬁltering (CF) recommender approaches are
+extensively investigated in research community and widely
+used in industry. They are based on the simple intuition that
+∗Xin-Yu Dai is the corresponding author.
+This work was
+supported by the 863 program(2015AA015406) and the NSFC
+(61472183,61672277).
+if users rate items similarly in the past, they are likely to rate
+other items similarly in the future [Sarwar et al., 2001; Linden
+et al., 2003]. As the most popular approach among various
+collaborative ﬁltering techniques, matrix factorization (MF)
+which learns a latent space to represent a user or an item be-
+comes a standard model for recommendation due to its scal-
+ability, simplicity, and ﬂexibility [Billsus and Pazzani, 1998;
+Koren et al., 2009]. In the latent space, the recommender
+system predicts a personalized ranking over a set of items for
+each individual user with the similarities among the users and
+items.
+Ratings in the user-item interaction matrix are explicit
+knowledge which have been deeply exploited in early rec-
+ommendation methods. Because of the variation in rating
+values associated with users on items, biased matrix factor-
+ization
+[Koren et al., 2009] are used to enhance the rat-
+ing prediction. To overcome the sparseness of the ratings,
+additional extra data are integrated into MF, such as social
+matrix factorization with social relations [Ma et al., 2008;
+Tang et al., 2013], topic matrix factorization with item
+contents or reviews text
+[McAuley and Leskovec, 2013;
+Bao et al., 2014], and so on.
+However, modeling only observed ratings is insufﬁcient to
+make good top-N recommendations [Hu et al., 2008]. Im-
+plicit feedback, such as purchase history and unobserved rat-
+ings, is applied in recommender systems [Oard et al., 1998].
+The SVD++ [Koren, 2008] model ﬁrstly factorizes the rating
+matrix with the implicit feedback, and is followed by many
+techniques for recommender systems [Rendle et al., 2009;
+Mnih and Teh, 2012; He and McAuley, 2015].
+Recently, due to the powerful representation learning abil-
+ities, deep learning methods have been successfully applied
+including various areas of Computer Vision, Audio Recogni-
+tion and Natural Language Processing. A few efforts have
+also been made to apply deep learning models in recom-
+mender systems. Restricted Boltzmann Machines [Salakhut-
+dinov et al., 2007] was ﬁrstly proposed to model users’ ex-
+plicit ratings on items. Autoencoders and the denoising au-
+toencoders have also been applied for recommendation [Li et
+al., 2015; Sedhain et al., 2015; Strub and Mary, 2015]. The
+key idea of these methods is to reconstruct the users’ ratings
+through learning hidden structures with the explicit historical
+ratings. Implicit feedback is also applied in this research line
+of deep learning for recommendation. An extended work pre-
+Proceedings of the Twenty-Sixth International Joint Conference on Artiﬁcial Intelligence (IJCAI-17)
+3203
+sented a collaborative denoising autoencoder (CDAE) [Wu et
+al., 2016] to model user’s preference with implicit feedback.
+Another work of neural collaborative ﬁltering (NCF) [He et
+al., 2017] was proposed to model the user-item interactions
+with a multi-layer feedforward neural network. Two recent
+works above exploit only implicit feedback for item recom-
+mendations instead of explicit rating feedback.
+In this paper, to make use of both explicit ratings and
+implicit feedback, we propose a new neural matrix factor-
+ization model for top-N recommendation. We ﬁrstly con-
+struct a user-item matrix with both explicit ratings and non-
+preference implicit feedback, which is different from other
+related methods using either only explicit ratings or only im-
+plicit ratings. With this full matrix (explicit ratings and zero
+of implicit feedback) as input, a neural network architecture is
+proposed to learn a common latent low dimensional space to
+represent the users and items. This architecture is inspired by
+the deep structured semantic models which have been proved
+to be useful for web search [Huang et al., 2013], where it can
+map the query and document in a latent space through multi-
+ple layers of non-linear projections. In addition, we design a
+new loss function based on cross entropy, which includes the
+considerations of both explicit ratings and implicit feedback.
+In sum, our main contributions are outlined as follows.
+• We propose novel deep matrix factorization models with
+a neural network that map the users and items into a
+common low-dimensional space with non-linear projec-
+tions. We use a matrix including both explicit ratings
+and non-preference implicit feedback as the input of our
+models.
+• We design a new loss function to consider both explicit
+ratings and implicit feedback for better optimization.
+• The experimental results show the effectiveness of our
+proposed models which outperform other state-of-the-
+art methods in top-N recommendation.
+The organization of this paper is as follows. Problem state-
+ment is introduced in Section 2. In Section 3, we present the
+architecture and details of the proposed models. In Section
+4, we give empirical results on several benchmark datasets.
+Concluding remarks with a discussion of some future work
+are in the ﬁnal section.
+2
+Problem Statement
+Suppose there are M users U = {u1, ..., uM}, N items
+V = {v1, ..., vN}. Let R ∈RM×N denote the rating ma-
+trix, where Rij is the rating of user i on item j, and we mark
+unk if it is unknown. There are two ways to construct the
+user-item interaction matrix Y ∈RM×N from R with im-
+plicit feedback as,
+Yij =
+0,
+if
+Rij = unk
+1,
+otherwise
+(1)
+Yij =
+0,
+if
+Rij = unk
+Rij,
+otherwise
+(2)
+Most of the existing solutions for recommendation apply
+Equation 1 to construct the interaction matrix of Y [Wu et
+al., 2016; He et al., 2017]. They consider all observed rat-
+ings the same as 1. In this paper, we construct the matrix of
+Y with the Equation 2. The rating Rij of user ui on item
+vj is still reserved in Y . We think that the explicit ratings in
+Equation 2 is non-trivial for recommendation because they in-
+dicate the preference degree of a user on an item. Meanwhile,
+we mark a zero if the rating is unknown, which is named as
+non-preference implicit feedback in this paper.
+The recommender systems are commonly formulated as
+the problem of estimating the rating of each unobserved en-
+try in Y , which are used for ranking the items. Model-based
+approaches [Koren, 2008; Salakhutdinov and Mnih, 2007] as-
+sume that there is an underlying model which can generate all
+ratings as follows.
+ˆYij = F(ui, vj|Θ)
+(3)
+where ˆYij denotes the predicted score of interaction Yij
+between user ui and item vj, Θ denotes the model parameters,
+and F denotes the function that maps the model parameters to
+the predicted scores. Based on this function, we can achieve
+our goal of recommending a set of items for an individual
+user to maximize the user’s satisfaction.
+Now, the next question is how to deﬁne such a function F.
+Latent Factor Model (LFM) simply applied the dot product
+of pi, qj to predict the ˆYij as follows [Koren et al., 2009].
+Here, pi and qj denote the latent representations of ui and vj,
+respectively.
+ˆYij = F LF M(ui, vj|Θ) = pT
+i qj
+(4)
+Recently, neural collaborative ﬁltering (NCF) [He et al.,
+2017] presented an approach with a multi-layer perceptron to
+automatically learn the function of F. The motivation of this
+method is to learn the non-linear interactions between users
+and items.
+In this paper, we follow the Latent Factor Model which
+uses the inner product to calculate the interactions between
+users and items. We do not follow the neural collaborative
+ﬁltering because we try to get the non-linear connection be-
+tween users and items through a deep representation learning
+architecture.
+We give the notations used in the following section. u in-
+dicates a user and v indicates an item. i and j index u and v,
+respectively. Y denote the user-item interaction matrix trans-
+formed by Equation 2, Y + denotes the observed interactions,
+Y −means all zero elements in Y and Y −
+sampled denotes the
+set of negative instances, which can be all (or sampled from)
+Y −. Then Y + ∪Y −
+sampled means all training interactions. We
+denote the i-th row of matrix Y by Yi∗, j-th column by Y∗j
+and its (i, j) −th element by Yij .
+3
+Our Proposed Model
+In this section, we ﬁrstly brieﬂy introduce the deep structure
+semantic model which inspires us to propose our method.
+Then, we present our proposed architecture to represent the
+users and items in a latent low-dimensional space. Lastly, we
+give our designed loss function for optimization, followed by
+the model training algorithm.
+Proceedings of the Twenty-Sixth International Joint Conference on Artiﬁcial Intelligence (IJCAI-17)
+3204
+3.1
+Deep Structure Semantic Model
+Deep Structured Semantic Models (DSSM) were proposed in
+[Huang et al., 2013] for web search. It uses a deep neural
+network to rank a set of documents for a given query. DSSM
+ﬁrstly maps the query and the documents to a common lower
+semantic space with a non-linear multi-layer projection. And
+then for web search ranking, the relevance of query to each
+document is calculated by cosine similarity between the low
+dimensional vectors of query and document. The deep neural
+network are discriminatively trained to maximize the condi-
+tional likelihood of the query and matched documents.
+DSSM has been applied for users modeling [Elkahky et
+al., 2015]. Different from our work, it focused on modeling
+the user with rich extra features, such as the web browsing
+history and search queries. We only use the observed ratings
+and observed feedback since we focus on the traditional top-
+N recommendation problem.
+3.2
+Deep Matrix Factorization Models (DMF)
+As mentioned in Section 2, we form a matrix Y according to
+the Equation 2. With this matrix Y as the input, we propose
+an architecture of deep neural network to project users and
+items into a latent structured space. Figure 1 illustrates our
+proposed architecture.
+Figure 1: The architecture of Deep Matrix Factorization Models
+From the matrix Y , each user ui is represented as a high-
+dimensional vector of Yi∗, which represents the ith user’s rat-
+ings across all items. Each item vj is represented as a high-
+dimensional vector of Y∗j, which represent the jth item’s
+ratings across all users. In each layer, each input vector is
+mapped into another vector in a new space. Formally, if we
+denote the input vector by x , the output vector by y , the
+intermediate hidden layers by li, i = 1, ..., N −1, the ith
+weight matrix by Wi, the ith bias term by bi, and the ﬁnal
+output latent representation by h. We have
+l1 = W1x
+li = f(Wi−1li−1 + bi), i = 2, ..., N −1
+h = f(WNlN−1 + bN)
+(5)
+where we use the ReLU as the activation function at the
+output layer and the hidden layers li, i = 2, ..., N −1:
+f(x) = max(0, x)
+(6)
+In our architecture, we have two multi-layer networks
+to transform the representations of u and v respectively.
+Through the neural network, the user ui and item vj are ﬁ-
+nally mapped to a low-dimensional vector in a latent space as
+shown in Equation 7. The similarity between the user ui and
+item vj is then measured according to the Equation 8.
+pi = fθU
+N (...fθU
+3 (WU2fθU
+2 (Yi∗WU1))...)
+qj = fθI
+N (...fθI
+3(WV 2fθI
+2(Y T
+∗jWV 1))...)
+(7)
+Here WU1 and WV 1 are the ﬁrst layer weighting matrix
+for U and V , respectively, and WU2 and WV 2 for the second
+layer, and so on.
+ˆYij = F DMF (ui, vj|Θ) = cosine(pi, qj) =
+pT
+i qj
+∥pi∥∥qj∥(8)
+In our architecture, besides the multi-layers representation
+learning, we want to emphasize again that, to our best knowl-
+edge, it is the ﬁrst time to use the interaction matrix directly
+as the input for representation learning. As we mentioned be-
+fore, Yi∗represents a user’s ratings across all items. It can
+to some extent indicate a user’s global preference. And Y∗j
+represents an item’s ratings by all users. It can to some ex-
+tent indicate an item’s proﬁle. We believe that these repre-
+sentations of users and items are very useful for their ﬁnal
+low-dimensional representations.
+3.3
+Loss Function
+Another key component for recommendation models is to de-
+ﬁne a proper objective function for model optimization ac-
+cording to the observed data and unobserved feedback.
+A general objective function is as follows.
+L =
+X
+y∈Y +∪Y −
+l(y, ˆy) + λΩ(Θ)
+(9)
+Where l(·) denotes a loss function and Ω(Θ) is the regular-
+izer.
+For recommender systems, two types of objective func-
+tions are commonly used, point-wise and pair-wise, respec-
+tively. For simply, we use point-wise objective function in
+this paper, and leave the pair-wise version to our future work.
+Loss function is the most important part in the objective
+function. Squared loss is largely performed in many existing
+models [Salakhutdinov and Mnih, 2007; Koren et al., 2009;
+Ning and Karypis, 2011; Hu et al., 2008].
+Lsqr =
+X
+(i,j)∈Y +∪Y −
+wij(Yij −ˆYij)2
+(10)
+where wij denotes the weight of training instance (i, j). The
+use of the squared loss is based on the assumption that obser-
+vations are generated from a Gaussian distribution [Salakhut-
+dinov and Mnih, 2007]. However, the square loss can not be
+Proceedings of the Twenty-Sixth International Joint Conference on Artiﬁcial Intelligence (IJCAI-17)
+3205
+used well with implicit feedback, because for implicit data,
+the target value Yij is a binarized 1 or 0 denoting whether i
+has interacted with j or not. In what follows, a loss function
+which pays special attention to the binary property of implicit
+data was proposed by [He et al., 2017] as follows.
+(11)
+L = −
+X
+(i,j)∈Y +∪Y −
+Yijlog ˆ
+Yij + (1 −Yij)log(1 −ˆ
+Yij)
+This loss is actually the binary cross-entropy loss (brieﬂy
+as ce), addressing the recommendation with implicit feedback
+as a binary classiﬁcation problem.
+In sum, square loss pays attention to explicit ratings, while
+cross entropy loss pays attention to implicit ratings. In this
+paper, we design a new loss function to incorporate the ex-
+plicit ratings into cross entropy loss, so that explicit and im-
+plicit information can be used together for optimization. We
+name our new loss as normalized cross entropy loss (brieﬂy
+as nce), which is presented in Equation 12.
+(12)
+L = −
+X
+(i,j)∈Y +∪Y −
+(
+Yij
+max(R)log ˆYij
++ (1 −
+Yij
+max(R))log(1 −ˆYij))
+We use the max(R) (5 in a 5-star system) for normaliza-
+tion which is the max score in all ratings, so that different
+values of Yij have different inﬂuences to the loss.
+Algorithm 1 DMF Training Algorithm With Normalized
+Cross Entropy
+Input: Iter: # of training iterations,
+neg ratio: Negative sampling ratio,
+R: original rating matrix,
+Output: WUi(i=1..N-1): weight matrix for user,
+WV i(i=1..N-1): weight matrix for item,
+1: Initialisation :
+2:
+randomly initialize WU and WV ;
+3:
+set Y ←use Equation 2 with R;
+4:
+set Y + ←all none zero interactions in Y ;
+5:
+set Y −←all zero interactions in Y ;
+6:
+set Y −
+sampled ←sample neg ratio∗∥Y +∥interactions
+from Y −;
+7:
+set T ←Y + ∪Y −
+sampled;
+8: for it from 1 to Iter do
+9:
+for each interaction of User i and Item j in T do
+10:
+set pi, qj ←use Equation 7 with input of Yi∗, Y∗j;
+11:
+set ˆY o
+ij ←use Equation 8,13 with input of pi, qj;
+12:
+set L ←use Equation 11 with input of ˆY o
+ij, Yij;
+13:
+use back propagation to optimize model parameters
+14:
+end for
+15: end for
+3.4
+Training Algorithm
+For cross entropy loss, because the predicted score of Yij can
+be negative, we need to use Equation 13 to transform the orig-
+inal predictions. Let µ be a very small number, and we set
+1.0e−6 in our experiments.
+(13)
+ˆY o
+ij = max(µ, ˆYij)
+We describe the detailed training method in Algorithm 1.
+In Algorithm 1, we present the high-level training process
+of DMF model. For training the parameters of weight matrix
+WU and WV on each layer, we use back propagation to up-
+date the model parameters with batches. The complexity of
+our algorithm is linear to the size of matrix and the layers of
+network.
+4
+Experiments
+In this section, we conduct experiments to demonstrate the
+effectiveness of both our proposed architecture and the re-
+ﬁned loss function. We also do some extensive experiments
+to compare the performance with different experimental set-
+tings, such as the negative sampling ratio, number of layers
+in network, and so on.
+4.1
+Experimental Settings
+Datasets
+We evaluate our models on four widely used datasets
+in recommender systems:
+MovieLens 100K(ML100k),
+MovieLens 10M(ML1m), Amazon music(Amusic), Amazon
+movies(Amovie). They are publicly accessible on the web-
+sites 1 2. For MovieLens dataset we do not process it be-
+cause it was already ﬁltered, and for Amazon dataset we
+ﬁltered the dataset, so that similar to the MovieLens data,
+only those users with at least 20 interactions and items
+with at least 5 interactions are retained [Wu et al., 2016;
+He et al., 2017]. The statistics of the four datasets are given
+in Table 1.
+Statistics
+ML100k ML1m
+Amusic
+Amovie
+# of Users
+944
+6,040
+844
+9,582
+# of Items
+1,683
+3,706
+18,813
+92,221
+# of Ratings
+100,000
+1,000,209 46,468
+766,759
+Rating Density
+0.06294
+0.04468
+0.00292
+0.00087
+Table 1: Statistics of the Four Datasets
+Evaluation for Recommendation
+To evaluate the performance of item recommendation, we
+adopted the leave-one-out evaluation, which has been widely
+used in the literatures [He et al., 2016; Kingma and Ba, 2014;
+He et al., 2017].
+We held-out the latest interaction as a
+test item for every user and utilize the remaining dataset for
+training. Since it is too time-consuming to rank all items
+for every user during evaluation, following [Koren, 2008;
+He et al., 2017], we randomly sample 100 items that are not
+interacted by the users. Among the 100 items together with
+the test item, we get the ranking according to the prediction.
+We also use Hit Ratio (HR) and Normalized Discounted Cu-
+mulative Gain (NDCG) [He et al., 2015] to evaluate the rank-
+ing performance. In our experiments, we truncated the ranked
+1https://grouplens.org/datasets/movielens/
+2http://jmcauley.ucsd.edu/data/amazon/
+Proceedings of the Twenty-Sixth International Joint Conference on Artiﬁcial Intelligence (IJCAI-17)
+3206
+Datasets
+Metrics
+Methods
+DMF
+Improvement of
+ItemPop
+ItemKNN
+eALS
+NeuMF-p
+DMF-2-ce
+DMF-2-nce
+DMF-2-nce vs. NeuMF-p
+ML100k
+NDCG
+0.231
+0.334
+0.356
+0.395
+0.405
+0.409
+3.5%
+HR
+0.406
+0.600
+0.621
+0.670
+0.679
+0.687
+2.5%
+ML1m
+NDCG
+0.263
+0.372
+0.425
+0.440
+0.442
+0.451
+2.5%
+HR
+0.472
+0.637
+0.709
+0.722
+0.720
+0.732
+1.4%
+Amusic
+NDCG
+0.242
+0.345
+0.374
+0.371
+0.403
+0.397
+7.0%
+HR
+0.423
+0.493
+0.521
+0.527
+0.570
+0.563
+6.8%
+Amovie
+NDCG
+0.386
+0.403
+0.455
+0.512
+0.533
+0.550
+7.4%
+HR
+0.620
+0.652
+0.693
+0.739
+0.765
+0.773
+4.6%
+Table 2: NDCG@10 and HR@10 Comparisons of Different Methods
+list at 10 for both metrics. As such, the HR intuitively mea-
+sures whether the test item is present on the top-10 list, and
+the NDCG measures the ranking quality which assigns higher
+scores to hits at top position ranks.
+Detailed Implementation
+We implemented our proposed methods based on Tensor-
+ﬂow3, which will be released publicly upon acceptance. To
+determine hyper-parameters of DMF methods, we randomly
+sampled one interaction for each user as the validation data
+and tuned hyper-parameters on it. When training our models,
+we sampled seven negative instances per positive instance.
+For neural network, we randomly initialized model parame-
+ters with a Gaussian distribution (with a mean of 0 and stan-
+dard deviation of 0.01), optimizing the model with mini-batch
+Adam [Kingma and Ba, 2014]. We set the batch size to 256,
+and set the learning rate to 0.0001.
+4.2
+Performance Comparison
+In this subsection, we compare the proposed DMF with the
+following methods. As our proposed methods aim to model
+the relationship between users and items, we mainly compare
+with user-item models. We leave out the comparison with
+item-item models, such as SLIM [Ning and Karypis, 2011] ,
+CDAE [Wu et al., 2016] because the performance difference
+may be caused by the user models for personalization. We
+also leave out the comparison with MV-DSSM [Elkahky et
+al., 2015] because it uses a lot of auxiliary extra data and
+evaluates on its own datasets.
+ItemPop
+It ranked the items by their popularity judged
+by the number of interactions.
+It is a non-personalized
+method whose performance is usually used as the baseline
+for personalized methods.
+ItemKNN
+This is a standard item-based collaborative
+ﬁltering method used by Amazon commercially [Sarwar et
+al., 2001; Linden et al., 2003].
+eALS
+It is a state-of-the-art MF method for recommen-
+dation with square loss. It used all unobserved interactions as
+negative instances and weighted them non-uniformly by the
+item popularity. We tuned its hyper-parameters in the same
+way as [He et al., 2016].
+NeuMF-p
+This is a state-of-the-art MF method for item
+recommendation with cross entropy loss. It is the most re-
+lated work to us. Different from our models, it only used the
+3https://www.tensorflow.org
+implicit feedback and initialized the representation of users
+and items randomly. After that, it leverages a multi-layer per-
+ceptron to learn the user-item interaction function. We name
+the neural matrix factorization with pretraining as NeuMF-
+p which showed the best performance among their proposal
+models. We tuned its hyper-parameters in the same way as
+[He et al., 2017].
+DMF-2-ce
+This is our proposed deep matrix factoriza-
+tion model, with 2 layers in the network and cross entropy
+as loss function. We use the matrix including the explicit rat-
+ings and implicit feedback as the input of DMF. We name this
+model as DMF-2-ce.
+DMF-2-nce
+DMF-2-nce has the same depth of 2 layers
+in the network as that in DMF-2-ce except that it uses the
+normalized cross entropy loss.
+The results of the comparison are summarized in Table 2.
+It demonstrate the effectiveness of both our proposed archi-
+tecture and the loss function. As for the proposed architec-
+ture, on almost all datasets, both of our two models achieve
+the best performance in both metics of NDCG and HR, com-
+pared to other methods. Even compared to the state-of-the-art
+method of NeuMF-p, DMF-2-nce obtain 2.5-7.4% (5.1% av-
+erage) and 1.4-6.8% (3.8% average) relative improvements in
+NDCG and HR metrics, respectively. As for the loss function,
+we compared the performances of our two models. DMF-
+2-nce achieves better results than DMF-2-ce, except on the
+dataset of Amusic.
+4.3
+Impact of the Input Matrix for DMF
+LFM-nce
+DMF-1-nce
+ML100k
+NDCG
+0.369
+0.386
+HR
+0.634
+0.670
+ML1m
+NDCG
+0.376
+0.383
+HR
+0.641
+0.660
+Amusic
+NDCG
+0.311
+0.389
+HR
+0.491
+0.572
+Amovie
+NDCG
+0.468
+0.520
+HR
+0.714
+0.764
+Table 3: Results for different input matrix. LFM-nce initialize the
+input matrix randomly. DMF-1-nce use the matrix of Y as input.
+They both perform 1-layer projection.
+In DMF, we use the interaction matrix Y as the input. If we
+Proceedings of the Twenty-Sixth International Joint Conference on Artiﬁcial Intelligence (IJCAI-17)
+3207
+randomly initialize the representation vector of each user and
+each item as the input to a one layer DMF model, the model
+would be a standard Latent Factorization Model (LFM). To
+test the usefulness of the input matrix of Y , we conduct ex-
+periments on two models of LFM-nce and DMF-1-nce. They
+both have one layer in network and use the same loss func-
+tion.
+From Table 3, we can observe that, with the input
+matrix, DMF-1-nce obtains a signiﬁcant improvement over
+LFM-nce.
+4.4
+Sensitivity to Hyper-Parameters
+neg-1
+neg-2
+neg-5
+neg-9
+neg-10
+ML100k
+NDCG 0.393
+0.403
+0.406
+0.401
+0.400
+HR
+0.677
+0.687
+0.684
+0.675
+0.667
+ML1m
+NDCG 0.408
+0.432
+0.434
+0.443
+0.438
+HR
+0.689
+0.721
+0.723
+0.726
+0.725
+Amusic
+NDCG 0.384
+0.387
+0.386
+0.391
+0.384
+HR
+0.569
+0.562
+0.556
+0.567
+0.554
+Amovie
+NDCG 0.521
+0.541
+0.549
+0.548
+0.544
+HR
+0.767
+0.778
+0.781
+0.774
+0.776
+Table 4: Results for Models with different negative sampling ratio.
+Negative Sampling Ratio
+In algorithm 1 as shown in Section 3.4, we need to sample
+negative instances from unobserved data for training. In this
+experiment, we apply different negative sampling ratio to ob-
+serve the performance variance (e.g. neg-5 means we set the
+negative sampling ratio as 5). From the results in Table 4, we
+can ﬁnd that more negative instances seem useful to improve
+performance. For these four datasets, the optimal negative
+sampling ratio is around 5 which is consistent with the results
+by previous work [He et al., 2017].
+Depth of Layers in Network
+In our proposed model, we map the users and items to
+low-dimensional representations through neural network with
+multiple hidden layers.
+We conduct an extensive experi-
+ment on the Ml datasets to investigate our model with dif-
+ferent number of hidden layers.
+For detailed comparison,
+Figure 2 shows the performance of each iteration by differ-
+ent layers. For space limitation, we just present the results
+on ML datasets. As shown in Figure 2, on the large ML1m
+dataset, our model with 2-layers illustrates the best perfor-
+mance. While on the relative small ML100k dataset, 2-layers
+almost gets the best performance, but not stably and signif-
+icantly. Deeper layers seem not useful, and 3-layers model
+even decreases the performance.
+Factors of the Final Latent Space
+Besides the number of the hidden layers, the factors in each
+layer is possibly another sensitive parameter in our model.
+For simplicity, we just compare the performance with dif-
+ferent number of factors on the top ﬁnal latent space. We
+conduct the experiments to a two-layers model, and set the
+number of factors on the top layer from 8 to 128. As shown
+in Table 5, the ﬁnal layer with 64 factors gets the best per-
+formance except on the dataset of Amusic. On the Amusic
+Figure 2: Results for models with different deep layers.
+Left:
+ML100k; Right: ML1m.
+8
+16
+32
+64
+128
+ML100k
+NDCG 0.369
+0.389
+0.386
+0.394
+0.393
+HR
+0.660
+0.672
+0.675
+0.682
+0.677
+ML1m
+NDCG 0.361
+0.398
+0.406
+0.411
+0.408
+HR
+0.637
+0.681
+0.688
+0.690
+0.689
+Amusic
+NDCG 0.357
+0.371
+0.377
+0.374
+0.384
+HR
+0.547
+0.560
+0.568
+0.559
+0.569
+Amovie
+NDCG 0.485
+0.514
+0.522
+0.524
+0.521
+HR
+0.740
+0.763
+0.767
+0.768
+0.767
+Table 5: Results for models with different factors of the ﬁnal latent
+space.
+dataset, the best performance appears with 128 factors. The
+ﬁnal representations with more factors might be more useful
+when the dataset is very sparse and small.
+5
+Conclusion and Future Work
+In this paper, we propose a novel matrix factorization model
+with a neural network architecture. Through the neural net-
+work architecture, users and items are projected into low-
+dimensional vectors in a latent space. In our proposed model,
+we make full use of both explicit ratings and implicit feed-
+back in two ways. The input matrix to our proposed model in-
+cludes both explicit ratings and non-preference feedback. In
+another way, we also design a new loss function for training
+our models in which both explicit and implicit feedback are
+considered. The experiments on several benchmark datasets
+demonstrate the effectiveness of our proposed model.
+In the future, there are two directions to extend our work.
+Pairwise objective function is another optional way for rec-
+ommender system. We will verify our model with pairwise
+objective function. Because of the sparseness and large miss-
+ing unobserved data, many works try to incorporate auxiliary
+extra data into recommender systems, such as social relation,
+review text, browsing history, and so on. This give us another
+interesting direction to extend our model with extra data.
+References
+[Bao et al., 2014] Yang Bao, Hui Fang, and Jie Zhang. Top-
+icmf: Simultaneously exploiting ratings and reviews for
+recommendation. In AAAI, 2014.
+Proceedings of the Twenty-Sixth International Joint Conference on Artiﬁcial Intelligence (IJCAI-17)
+3208
+[Billsus and Pazzani, 1998] Daniel Billsus and Michael J
+Pazzani.
+Learning collaborative information ﬁlters.
+In
+ICML, 1998.
+[Elkahky et al., 2015] Ali Mamdouh Elkahky, Yang Song,
+and Xiaodong He. A multi-view deep learning approach
+for cross domain user modeling in recommendation sys-
+tems. In Proceedings of the 24th International Conference
+on World Wide Web, pages 278–288. ACM, 2015.
+[He and McAuley, 2015] Ruining He and Julian McAuley.
+Vbpr: visual bayesian personalized ranking from implicit
+feedback. arXiv preprint arXiv:1510.01784, 2015.
+[He et al., 2015] Xiangnan He, Tao Chen, Min-Yen Kan, and
+Xiao Chen.
+Trirank: Review-aware explainable recom-
+mendation by modeling aspects.
+In Proceedings of the
+24th ACM International on Conference on Information
+and Knowledge Management, pages 1661–1670. ACM,
+2015.
+[He et al., 2016] Xiangnan He, Hanwang Zhang, Min-Yen
+Kan, and Tat-Seng Chua.
+Fast matrix factorization for
+online recommendation with implicit feedback. In Pro-
+ceedings of the 39th International ACM SIGIR conference
+on Research and Development in Information Retrieval,
+pages 549–558. ACM, 2016.
+[He et al., 2017] Xiangnan He, Lizi Liao, Hanwang Zhang,
+Liqiang Nie, Xia Hu, and Tat-Seng Chua. Neural collab-
+orative ﬁltering. In Proceedings of the 26th International
+World Wide Web Conference, 2017.
+[Hu et al., 2008] Yifan Hu, Yehuda Koren, and Chris Volin-
+sky. Collaborative ﬁltering for implicit feedback datasets.
+In Data Mining, 2008. ICDM’08. Eighth IEEE Interna-
+tional Conference on, pages 263–272. Ieee, 2008.
+[Huang et al., 2013] Po-Sen Huang, Xiaodong He, Jianfeng
+Gao, et al. Learning deep structured semantic models for
+web search using clickthrough data. In Proceedings of the
+22nd ACM international conference on Conference on in-
+formation & knowledge management, pages 2333–2338.
+ACM, 2013.
+[Kingma and Ba, 2014] Diederik Kingma and Jimmy Ba.
+Adam: A method for stochastic optimization. In ICLR,
+pages 1–15, 2014.
+[Koren et al., 2009] Yehuda Koren, Robert Bell, and Chris
+Volinsky.
+Matrix factorization techniques for recom-
+mender systems. Computer, IEEE, 42(8):30–37, 2009.
+[Koren, 2008] Yehuda Koren. Factorization meets the neigh-
+borhood: a multifaceted collaborative ﬁltering model. In
+Proceedings of the 14th ACM SIGKDD international con-
+ference on Knowledge discovery and data mining, pages
+426–434. ACM, 2008.
+[Li et al., 2015] Sheng Li, Jaya Kawale, and Yun Fu. Deep
+collaborative ﬁltering via marginalized denoising auto-
+encoder. In Proceedings of the 24th ACM International on
+Conference on Information and Knowledge Management,
+pages 811–820. ACM, 2015.
+[Linden et al., 2003] Greg Linden, Brent Smith, and Jeremy
+York. Amazon.com recommendations: Item-to-item col-
+laborative ﬁltering. Internet Computing, IEEE, 2003.
+[Ma et al., 2008] Hao Ma, Haixuan Yang, Michael R Lyu,
+and Irwin King.
+Sorec: Social recommendation using
+probabilistic matrix factorization. In CIKM, 2008.
+[McAuley and Leskovec, 2013] Julian McAuley and Jure
+Leskovec. Hidden factors and hidden topics: understand-
+ing rating dimensions with review text. In RecSys, 2013.
+[Mnih and Teh, 2012] Andriy Mnih and Yee W Teh. Learn-
+ing label trees for probabilistic modelling of implicit feed-
+back. In Advances in Neural Information Processing Sys-
+tems, pages 2816–2824, 2012.
+[Ning and Karypis, 2011] Xia Ning and George Karypis.
+Slim: Sparse linear methods for top-n recommender sys-
+tems. In Data Mining (ICDM), 2011 IEEE 11th Interna-
+tional Conference on, pages 497–506. IEEE, 2011.
+[Oard et al., 1998] Douglas W Oard, Jinmook Kim, et al.
+Implicit feedback for recommender systems.
+In Pro-
+ceedings of the AAAI workshop on recommender systems,
+pages 81–83, 1998.
+[Rendle et al., 2009] Steffen Rendle, Christoph Freuden-
+thaler, et al. Bpr: Bayesian personalized ranking from im-
+plicit feedback. In Proceedings of the twenty-ﬁfth confer-
+ence on uncertainty in artiﬁcial intelligence, pages 452–
+461. AUAI Press, 2009.
+[Salakhutdinov and Mnih, 2007] Ruslan Salakhutdinov and
+Andriy Mnih. Probabilistic matrix factorization. In Nips,
+volume 1, pages 2–1, 2007.
+[Salakhutdinov et al., 2007] Ruslan Salakhutdinov, Andriy
+Mnih, and Geoffrey Hinton.
+Restricted boltzmann ma-
+chines for collaborative ﬁltering. In Proceedings of the
+24th international conference on Machine learning, pages
+791–798. ACM, 2007.
+[Sarwar et al., 2001] Badrul Sarwar, George Karypis, et al.
+Item-based collaborative ﬁltering recommendation algo-
+rithms. In WWW, 2001.
+[Sedhain et al., 2015] Suvash Sedhain, Menon, et al.
+Au-
+torec: Autoencoders meet collaborative ﬁltering. In Pro-
+ceedings of the 24th International Conference on World
+Wide Web, pages 111–112. ACM, 2015.
+[Strub and Mary, 2015] Florian Strub and Jeremie Mary.
+Collaborative ﬁltering with stacked denoising autoen-
+coders and sparse inputs. In NIPS Workshop on Machine
+Learning for eCommerce, 2015.
+[Tang et al., 2013] Jiliang Tang, Xia Hu, Huiji Gao, and
+Huan Liu. Exploiting local and global social context for
+recommendation. In IJCAI, 2013.
+[Wu et al., 2016] Yao Wu, Christopher DuBois, et al. Col-
+laborative denoising auto-encoders for top-n recommender
+systems. In Proceedings of the Ninth ACM International
+Conference on Web Search and Data Mining, pages 153–
+162. ACM, 2016.
+Proceedings of the Twenty-Sixth International Joint Conference on Artiﬁcial Intelligence (IJCAI-17)
+3209

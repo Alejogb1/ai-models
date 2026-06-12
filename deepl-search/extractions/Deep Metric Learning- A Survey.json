@@ -1,0 +1,22 @@
+{
+  "source": "Deep Metric Learning- A Survey.pdf",
+  "source_group": "Awesome-ML-Papers/Surveys",
+  "processed_at": "2026-06-08",
+  "agent": "agent6_remaining",
+  "concepts": [
+    {
+      "finding": "Deep metric learning comprehensively covers Siamese networks, triplet networks, contrastive/triplet/N-pair/angular losses, and sampling strategies (hard mining, semi-hard mining, distance-weighted sampling).",
+      "category": "Data",
+      "implication": "Metric learning techniques are directly applicable to learning query and document embeddings where semantically similar items should be close and dissimilar items far apart.",
+      "open_question": "Which metric learning loss and sampling strategy is optimal for query-document embedding training?",
+      "testable_hypothesis": "Multi-similarity loss with distance-weighted sampling will outperform triplet loss with semi-hard mining by 5%+ recall@10 for query-document embedding learning."
+    },
+    {
+      "finding": "Sampling strategy (how negative examples are selected) is as important as the loss function for metric learning performance; hard negative mining is crucial but must be balanced.",
+      "category": "Experiment",
+      "implication": "For query embedding training, careful selection of hard negatives (similar but irrelevant queries/documents) is critical and often more impactful than model architecture choices.",
+      "open_question": "What is the optimal ratio of easy/hard/random negatives for query-document contrastive learning?",
+      "testable_hypothesis": "A 1:1:1 ratio of hard:semi-hard:random negatives will outperform pure hard negative mining by 3%+ recall@10 for query-document embedding training."
+    }
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "source": "Graph-RISE- Graph-Regularized Image Semantic Embedding ",
+  "source_group": "Awesome-ML-Papers/Embeddings",
+  "processed_at": "2026-06-08T12:00:00Z",
+  "agent": "agent_batch_generation",
+  "concepts": [
+    {
+      "finding": "Graph-regularized image embedding: combines visual features (CNN) with semantic graph structure. Graph Laplacian regularization preserves semantic relationships between images. Outperforms purely visual embeddings on image retrieval and classification tasks.",
+      "category": "ModelCandidate",
+      "implication": "Graph-regularized keyword embeddings combine keyword text features with graph structure (co-occurrence). Laplacian regularization enforces that keywords connected in the co-occurrence graph have similar embeddings.",
+      "open_question": "What is the optimal balance between keyword text content and graph structure in regularized keyword embeddings?",
+      "testable_hypothesis": "Graph-regularized keyword embeddings (combining BERT text features with co-occurrence graph regularization) outperform both text-only and graph-only embeddings for intent clustering."
+    }
+  ]
+}

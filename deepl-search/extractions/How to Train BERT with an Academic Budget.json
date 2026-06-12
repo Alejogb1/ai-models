@@ -1,0 +1,64 @@
+{
+  "source": "How to Train BERT with an Academic Budget.pdf",
+  "source_group": "Awesome-ML-Papers/Other",
+  "processed_at": "2026-06-08",
+  "agent": "agent5_final",
+  "concepts": [
+    {
+      "finding": "Overall, our ﬁndings demonstrate\nthat, with the right recipe, large language models\ncan indeed be trained in an academic setting.1\n2\nProblem Setup\nWe investigate the task of pretraining a large lan-\nguage model under computational constraints.",
+      "category": "FailureRisk",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "However, their pretraining phase can be\nprohibitively expensive for startups and academic\nresearch groups, limiting the research and devel-\nopment of model pretraining to only a few well-\nfunded industry labs.",
+      "category": "FailureRisk",
+      "implication": "Applicable to user/item clustering for personalization",
+      "open_question": "How to address the limitation described: However, their pretraining phase can be\nprohibitively expensive for startups and academic\nresearch groups, limiting the research and devel-\nopment of model pretraining to only a few well-\nfunded indus",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Moreover,\nwe conduct an extensive hyperparmeter search tai-\nlored to our resource budget, and ﬁnd that synchro-\nnizing the learning rate warmup and decay schedule\nwith our 24 hour budget greatly improves model\nperformance.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "4https://github.com/tensorflow/models/\ntree/master/official/nlp/bert\n\n4\nHyperparameter Search\nCalibrating hyperparameters is key to increasing\nmodel performance in deep learning and NLP\n(Levy et al., 2015; Liu et al., 2019).",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Finally, there appears to be a prefer-\nence towards longer warmup proportions; however,\na closer look at those cases reveals that when the\nnumber of total days is larger (3 or 9), it is better to\nuse a smaller warmup proportion (2%), otherwise\nthe warmup phase might take up a signiﬁcantly\nlarger por",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "How to address the limitation described: Finally, there appears to be a prefer-\nence towards longer warmup proportions; however,\na closer look at those cases reveals that when the\nnumber of total days is larger (3 or 9), it is better to\nuse ",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "The second pascal\nrecognising textual entailment challenge.",
+      "category": "FailureRisk",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "How to address the limitation described: The second pascal\nrecognising textual entailment challenge.",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Proceed-\nings of the Second PASCAL Challenges Workshop\non Recognising Textual Entailment.",
+      "category": "FailureRisk",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "How to address the limitation described: Proceed-\nings of the Second PASCAL Challenges Workshop\non Recognising Textual Entailment.",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Im-\nproving distributional similarity with lessons learned\nfrom word embeddings.",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    }
+  ]
+}

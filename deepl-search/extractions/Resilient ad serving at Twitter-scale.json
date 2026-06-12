@@ -1,0 +1,29 @@
+{
+  "source": "Resilient ad serving at Twitter-scale.pdf",
+  "source_group": "Awesome-ML-Papers/Other",
+  "processed_at": "2026-06-08",
+  "agent": "agent5_final",
+  "concepts": [
+    {
+      "finding": "We can conclude from the above observation\nthat it is very important to maintain a high success rate.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "To do this, we should pick a metric to\ncenter the system around that’s both fundamentally important to the system as well as\ninﬂuenced directly by this knob, k.",
+      "category": "Experiment",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Ideally, we would like for our utilization to always be close to our\nprovisioning, while still being able to absorb load spikes (as shown in the green line in the\ncurve below):\nQuality factor helps us understand and maintain optimal provisioning levels.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    }
+  ]
+}

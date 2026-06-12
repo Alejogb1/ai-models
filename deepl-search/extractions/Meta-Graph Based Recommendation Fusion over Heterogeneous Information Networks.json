@@ -1,0 +1,15 @@
+{
+  "source": "Meta-Graph Based Recommendation Fusion over Heterogeneous Information Networks",
+  "source_group": "Awesome-ML-Papers/Embeddings",
+  "processed_at": "2026-06-08T12:00:00Z",
+  "agent": "agent_batch_generation",
+  "concepts": [
+    {
+      "finding": "Meta-graph (multiple meta-paths combined) for heterogeneous network embedding. Weights different meta-paths via a learned fusion mechanism. Outperforms single meta-path methods. Meta-graph captures compound relationships that single meta-paths miss.",
+      "category": "ModelCandidate",
+      "implication": "Combining multiple meta-paths (Keyword-Document-Intent, Keyword-Session-Keyword, Keyword-Category-Intent) produces richer keyword embeddings than any single meta-path. Learned fusion weights reveal which relationships are most informative.",
+      "open_question": "Which meta-paths contribute most to keyword-intent understanding? Can attention-based fusion identify the best combination automatically?",
+      "testable_hypothesis": "A meta-graph fusion model combining co-occurrence, session, document, and category meta-paths outperforms any single meta-path for keyword-intent clustering."
+    }
+  ]
+}

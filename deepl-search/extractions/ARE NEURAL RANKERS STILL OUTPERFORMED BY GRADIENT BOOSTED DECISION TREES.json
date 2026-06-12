@@ -1,0 +1,15 @@
+{
+  "source": "ARE NEURAL RANKERS STILL OUTPERFORMED BY GRADIENT BOOSTED DECISION TREES",
+  "source_group": "Awesome-ML-Papers/Ranking",
+  "processed_at": "2026-06-08T12:00:00Z",
+  "agent": "agent03_embeddings_mf_ranking_search_compiled",
+  "concepts": [
+    {
+      "finding": "LambdaMART (GBDT implementation LightGBM) substantially outperforms recent neural LTR models on benchmark datasets with numerical features. Neural models need: (1) log1p feature transformation, (2) data augmentation (Gaussian noise) for high-capacity networks, (3) self-attention for listwise context, (4) latent cross interactions. After these fixes, neural equals GBDT.",
+      "category": "Model Candidate",
+      "implication": "For keyword-intent ranking with numerical features (frequency, tf-idf scores, etc.), LambdaMART/GBDT is a strong baseline that neural models may not beat without careful architecture. If the problem reduces to ranking keywords by intent relevance, tree-based methods remain state-of-the-art for tabular features.",
+      "open_question": "For keyword clustering features (frequency, co-occurrence stats, n-gram overlaps), are tree-based or embedding-based models more effective?",
+      "testable_hypothesis": "LambdaMART on engineered keyword features (co-occurrence statistics, entity type, length, etc.) will match or exceed neural embedding models for keyword-to-intent classification accuracy."
+    }
+  ]
+}

@@ -1,0 +1,148 @@
+{
+  "source": "2410.13957v2.pdf",
+  "source_group": "Web-Sources",
+  "processed_at": "2026-06-08",
+  "agent": "agent5_final",
+  "concepts": [
+    {
+      "finding": "For the Robot Domain experiments as shown in Figure\n8, both the LLM evaluations and Human evaluations do not show significant improvement of our\nmethod over the No Goals baseline, but do outperform the No Inference Baseline.",
+      "category": "Baseline",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Our results show that the inference module improves\nthe performance of the goal editing module as both the LLM and Human evaluations show that our\npipeline outperforms the No Inference Baseline significantly.",
+      "category": "Baseline",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Online methods are data efficient, however are very domain specific.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "How to address the limitation described: Online methods are data efficient, however are very domain specific.",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "To accommodate\nhuman preferences from conversations, our method uses the best of both worlds and is data efficient\nand is generalizable for a broad set of tasks and domains.",
+      "category": "ModelCandidate",
+      "implication": "Can inform intent modeling for recommendation systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Our method combines both\naspects of being data efficient, can be generalized across many domains and tasks, and is online.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "A key challenge for this module is determining when to propose new goals or remove unlikely ones.",
+      "category": "TargetConstruct",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "How to address the limitation described: A key challenge for this module is determining when to propose new goals or remove unlikely ones.",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "The “search inventory” function uses the NLTK\npackage [37] and a Kaggle Grocery Store inventory dataset [47] to implement a simple embedding\nsearch by similarity, and retrieves a single most similar item.",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "There can be\nmore flexibility with creating blocks of conversation about particular details associated with human\nprofile or the task at hand, allowing inference calls to be made more efficiently, and we can see if\nthere can be clear improvements of our pipeline over being provided the full conversa",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "We demonstrated that our pipeline can efficiently propose and add new goals based\non conversations with the human, and remove goals that are deemed unlikely, undesirable, or unsafe.",
+      "category": "TargetConstruct",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "While offline methods like RLHF can represent various goals but require\nlarge datasets, our approach achieves similar flexibility with online efficiency.",
+      "category": "Experiment",
+      "implication": "Relevant for similarity-based retrieval and lookalike targeting",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "First, I want to thank my advisor,\nProfessor Dylan Hadfield-Menell, for being a great mentor and for providing amazing advice for how\nto be a good researcher.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "I also thank my undergraduate research advisors, Professors Stefanie Tellex and George Konidaris,\nfor their support during the time I was active in their labs at Brown University as an undergrad and\nfirst starting to do robotics research.",
+      "category": "ModelCandidate",
+      "implication": "Inform search ranking and retrieval optimization",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "I thank those from H2R and IRL labs for inspiring me to work\nin HRI and with language (Ifrah Idrees, Thao Nguyen, Ben Spiegel), for using AI2Thor (Eric Rosen),\nfor showing that robots are fun but take a while to work with (Ben Abbatematteo, Max Merlin), and\nfor helping me submit my first paper (Davi",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "However, applying traditional Bayesian inference to natural language goals present two significant\nchallenges.",
+      "category": "TargetConstruct",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "How to address the limitation described: However, applying traditional Bayesian inference to natural language goals present two significant\nchallenges.",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "We demonstrate that this approach can track a wide range of user goals in a grocery shopping\nassistant and a home robot assistant domain.",
+      "category": "TargetConstruct",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Chapter 3 covers our method: our proposed Bayesian update equation, and the\nfour modules: Conversation Module, Inference Module, Goal Management Module, and the Action\nModule.",
+      "category": "TargetConstruct",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "2\nBackground and Relevant Work\nFor robots/embodied agents that can achieve difficult tasks while interacting with humans (ie:\nhousehold tasks), language grounding for robots is important – that robots can understand language\nand make connections between language and its physical environment.",
+      "category": "FailureRisk",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "However, learning\nbased methods are often domain or task specific.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "How to address the limitation described: However, learning\nbased methods are often domain or task specific.",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Previous works such as [43, 44, 24, 50] show that LLM agents can have different\nroles to achieve tasks.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "[43] also show that LLMs can be used to simulate human behaviors, something we take\nadvantage of for our experiments in our work.",
+      "category": "Experiment",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    }
+  ]
+}

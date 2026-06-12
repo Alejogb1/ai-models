@@ -1,0 +1,503 @@
+Multitask Mixture Embeddings for Large Scale
+Recommendations
+Erik Brinkman
+erk@fb.com
+Facebook AI Applied Research
+Dario Garcia-Garcia
+dariogg@fb.com
+Facebook AI Applied Research
+Henry Ehrenberg
+TBD
+TBD
+Yang Liu
+yangliuyl@fb.com
+Instagram
+Ivan Medvedev
+ivanm@fb.com
+Instagram
+Lin Su
+linsucai@fb.com
+Facebook AI Applied Research
+Chandler Zuo
+chandlerzuo@fb.com
+Facebook AI Applied Research
+ABSTRACT
+Embedding-based retrieval is a fundamental piece of many real-
+world, massive-scale recommendation systems. Embedding both
+users and items in a common space and then applying nearest-
+neighbors to collect potentially relevant items for a given user is
+intuitive, flexible and efficient. We propose an extension of this
+approach in which users are embedded as sets of points, yielding
+mixture embedding-based retrieval. We describe this method to-
+gether with some other key ingredients used as a retrieval source
+in Instagram Explore, one of the largest and most successful uncon-
+nected content recommendation surfaces in the world.
+ACM Reference Format:
+Erik Brinkman, Dario Garcia-Garcia, Henry Ehrenberg, Yang Liu, Ivan
+Medvedev, Lin Su, and Chandler Zuo. 2020. Multitask Mixture Embeddings
+for Large Scale Recommendations. In ,. ACM, New York, NY, USA, 5 pages.
+https://doi.org/10.1145/nnnnnnn.nnnnnnn
+1
+INTRODUCTION
+The abundance of content in today’s digital platforms has made
+recommendation systems an important piece to connect creators
+and consumers in an efficient manner. This prominent role comes
+with significant responsibilities and challenges. The decisions made
+by recommendation systems will to a large extent define the user
+experience and have ecosystem-level implications because of e.g.
+the incentives that they impose on content creators or providers. At
+the same time, these systems have to overcome a series of complex
+challenges such as how to alleviate the effect of biased data collec-
+tion (feedback loops) or how to make sure that recommendations
+are simultaneously relevant and diverse. This last aspect, diversity,
+is particularly important and complicated, especially when working
+with unconnected content recommender systems with a huge (in
+Permission to make digital or hard copies of all or part of this work for personal or
+classroom use is granted without fee provided that copies are not made or distributed
+for profit or commercial advantage and that copies bear this notice and the full citation
+on the first page. Copyrights for components of this work owned by others than ACM
+must be honored. Abstracting with credit is permitted. To copy otherwise, or republish,
+to post on servers or to redistribute to lists, requires prior specific permission and/or a
+fee. Request permissions from permissions@acm.org.
+IRS 2020, Workshop on Industrial Recommendation Systems
+© 2020 Association for Computing Machinery.
+ACM ISBN 978-x-xxxx-xxxx-x/YY/MM...$15.00
+https://doi.org/10.1145/nnnnnnn.nnnnnnn
+terms of both size and range) inventory. If the system designers
+are not very careful it is likely that the recommendations will end
+up focusing on a relatively narrow subset of items, since there are
+several forces at play that could encourage this behavior, including
+feedback loops and limited model capacity.
+Many large-scale recommendation systems use a two-step ar-
+chitecture. Starting with a very large pool (potentially billions or
+even more) of candidates to be recommended for a given user, the
+first step, called retrieval or candidate generation, trims down that
+pool into a manageable set, typically in the order of a few thou-
+sands. The second step performs the final ranking of the surviving
+candidates. The retrieval stage must thus be very computationally
+efficient to be able to handle the potentially extremely large can-
+didate pool. Typical alternatives include rule-based retrieval and
+embedding methods followed by nearest-neighbor (NN) lookups.
+Modern approximate NN method [3] are extremely efficient, pro-
+viding both sub-linear complexity and fine-tuned implementations,
+including GPU-optimized and distributed versions. Together with
+the flexibility that embeddings provide (they can be constructed
+from features or "explicitly" from a co-occurrence matrix to op-
+timize a wide range of losses depending on the specifics of the
+application), this makes embedding based retrieval a key tool when
+building practical recommendation systems.
+The diversity and recall of the final system is heavily determined
+by the retrieval phase. Items that are dropped during retrieval will
+not be visible to the ranker and thus won’t be presented to the user,
+while irrelevant items that pass the retrieval stage can be culled
+by the ranker. One of the main motivations of this work is how to
+extend embedding-based retrieval methods to improve the diversity
+of the candidates while maintaining computational efficiency and
+not requiring too drastic changes to the overall system. To that
+end we introduce mixture-of-embeddings based retrieval. The idea
+here is to represent each user as a set of 𝐾mixture components
+in a space R𝐷and then retrieve items for that user by performing
+𝐾nearest neighbor lookups, one around each one of the compo-
+nents. Intuitively, this partially decouples the different interests of
+a user: in a single embedding model, all of the items that can be
+retrieved for a user must be close to the user embedding, and thus
+by virtue of the triangle inequality also not too far from each other.
+In a mixture model, each mixture component can capture items in
+IRS 2020, Workshop on Industrial Recommendation Systems
+F. LastName et al.
+arbitrarily distant parts of the embedding space, dropping the afore-
+mentioned constraint on retrieved item similarity. Of course these
+effects are not that clear cut in very high dimensional spaces and
+one might argue that increasing the dimension of the embedding
+space gives a more direct solution to increase the expressiveness of
+the models. We’ll also discuss how moving from a single embedding
+to a 𝐾-mixture is different to just increasing the dimension of the
+embedding space to 𝐾𝐷(spoiler: the non-linearity in the total loss
+function that combines the distances from an item to each one of
+the embeddings) and why this approach might be preferable in
+many scenarios.
+Another challenge when building recommendation systems is
+defining a proper objective function. Many different aspects con-
+tribute to this challenge:
+• Many times the user experience can’t be accurately measured
+by a single observable magnitude: should we care about
+clicks, time spent, other types of engagement signals, ...
+• Even if there’s a gold "business metric", that metric might
+not be amenable to direct optimization (e.g. daily users)
+• Sometimes the best metrics don’t have great coverage (e.g.
+explicit surveys)
+• Feedback loops make optimization of any single metric po-
+tentially dangerous unless a lot of care is put into thinking
+through side effects
+As a consequence, many times there will not be a single objec-
+tive but a set of proxy metrics which are correlated with the final
+goal. For this reason we focus also on multi-task models that can
+learn simultaneously from all these signals, contributing to alleviate
+the feedback loop issues and enabling flexible trade-offs between
+coverage and signal quality.
+In this paper we bring together all the aforementioned ideas
+to develop a multitask, mixture embedding based retrieval system
+that can achieve both the scale and performance necessary to help
+Instagram Explore, one of the largest and most popular unconnected
+content recommendation surfaces in the world.
+2
+MIXTURE EMBEDDINGS FOR GRAPHS
+Let’s consider a bipartite graph 𝐺= (𝑆, 𝐷, 𝐸) where 𝑆is the set
+of source nodes, 𝐷is the set of destination nodes and 𝐸is a set
+of edges between 𝑆and 𝐷.1 In a general embedding model, each
+entity 𝑖∈𝑆∪𝐷is represented through an embedding 𝑈𝑖, while
+a scoring function 𝑠𝑐𝑜𝑟𝑒(𝑈𝑠,𝑈𝑑) computes a similarity score for
+each pair of entities 𝑠𝑖𝑛𝑆, 𝑑∈𝐷with the goal of maximizing
+the score for (𝑠,𝑑) ∈𝐸and minimizing it for (𝑠,𝑑) ∉𝐸. In the
+mixture embedding model, 𝑈𝑠∈R𝐶𝑠×𝑛, 𝑈𝑑∈R𝐶𝑑×𝑛, where each
+row represents a different mixture component with dimension 𝑛,
+and 𝐶𝑠, 𝐶𝑑are the number of mixture embeddings on each side.
+Each component embedding is then defined with a standard
+embedding model. Let 𝑈𝑠𝑐,𝑈𝑑𝑙∈R𝑛denote the 𝑐th and the 𝑙th
+embedding component for node 𝑠and 𝑑respectively. In this paper
+we use standard cosine similarity
+𝑠𝑖𝑚(𝑈𝑠𝑐,𝑈𝑑𝑙) =
+𝑈𝑇𝑠𝑐𝑈𝑑𝑙
+||𝑈𝑠𝑐||||𝑈𝑑𝑙|| .
+1We abuse the naming source and destination even if the graph is not directed
+With our component embedding model defined, the mixture
+scoring function is simply the composition of two functions
+𝑠𝑐𝑜𝑟𝑒(𝑈𝑠,𝑈𝑑) = 𝑝𝑜𝑜𝑙(𝑝𝑟𝑜𝑑𝑢𝑐𝑡(𝑈𝑠,𝑈𝑑)).
+𝑝𝑟𝑜𝑑𝑢𝑐𝑡computes a similarity kernel matrix 𝑀∈R𝐶𝑠×𝐶𝑑where
+𝑀𝑐,𝑙= 𝑠𝑖𝑚(𝑈𝑠𝑐,𝑈𝑑𝑙). 𝑝𝑜𝑜𝑙pools the similarity matrix into a final
+score, and is one of the main design considerations of the overall
+loss function as it defines the semantic meaning of mixtures in the
+model. The mixture embedding model is simply a restriction on
+the class of scoring functions, providing an inductive bias over the
+explanations for an interaction between two entities.
+2.0.1
+Pooling Functions. The most obvious pooling function is
+simply the max pool. This function says: two entities need to have
+one similar component to be scored highly. While seeming fairly
+natural at first, the highly nonlinear cost surface makes this hard
+to optimize. A second order approach would be to instead use the
+smooth maximum function with temperature 𝛾
+smoothmax(𝑀;𝛾) =
+Í
+𝑐,𝑙𝑀𝑐,𝑙𝑒
+𝑀𝑐,𝑙/𝛾
+Í
+𝑐′,𝑙′ 𝑒
+𝑀𝑐′,𝑙′/𝛾.
+(1)
+When 𝛾→0, Eqn. (1) approaches the maximum cosine similarity
+between all pairs of components of the node pair.
+2.0.2
+Regularized Smoothmax. We further define a regularized
+smoothmax
+regsmoothmax(𝑀;𝜃,𝛾) =
+Õ
+𝑐,𝑙
+𝑀𝑐,𝑙
+ 
+𝜃+ (1 −𝜃)
+𝑒
+𝑀𝑐,𝑙/𝛾
+Í
+𝑐′,𝑙′ 𝑒
+𝑀𝑐′,𝑙′/𝛾
+!
+.
+(2)
+where 𝜃is the regularization hyperparameter. 𝜃= 0 yields the
+standard smooth max function. Larger values of 𝛾and 𝜃push such
+the smooth max similarity towards the average cosine similarity
+among all pairs of components. Section 3.1 discusses more details
+on how these parameters are chosen in training.
+2.1
+Nonlinear Similarity Function
+The idea of using multiple embeddings to represent nodes in a graph
+is not new. [1] refers to this as the "personal decomposition" prob-
+lem in the context of representing people’s social network, while
+[5] refers to this as representing "node polysemy". In addition to the
+advantages of mixture embeddings mentioned in these papers, our
+motivation behind this framework is mainly to improve diversity.
+In a large-scale recommendation system with a huge pool of re-
+trieval candidates, it is typical for a user to be interested in different
+candidates with very different semantic meaning. In an embedding
+space with Euclidean distance, items close to a single user have
+to be close to each other as dictated by the triangular inequality.
+The distance metric in Eqn. (2) breaks free of such structure. By
+introducing nonlinearity in the distance metric, the underlying
+embedding space allows multiple items to be close to a single user
+while still be distant towards each other.
+The nonlinearity in distance construction of Eqn. (2) is essential
+in this framework. Using a variety of datasets we have compared
+our mixture embedding model against a benchmark model that
+embeds each node with a single vector with the dimensionality
+Multitask Mixture Embeddings for Large Scale Recommendations
+IRS 2020, Workshop on Industrial Recommendation Systems
+R𝐶𝑠/𝑑𝑛, using various link retrieval and node label prediction tasks.
+We have found our framework to significantly outperform the
+benchmark setting, even though the two models have the same
+degrees of freedom.
+We want to highlight one important difference between our
+framework and the standard finite mixture modeling framework.
+Standard finite mixture models include mixture weight parameters
+that determine the distribution across mixture components. The hi-
+erarchical probabilistic formulation in turn determines the distance
+metric, the loss function and the training algorithm. Such a "gen-
+erative modeling" framework is followed by [5]. Our framework’s
+distance metric, Eqn. (2), is independent of such mixture weight
+parameters. Training algorithm in Section 3.1 is also only contigent
+on the distance metric. The framework itself still accepts the no-
+tion of mixture weight parameters, as we will see in Section 3.4,
+but those weights are calculated in a separate post processing step
+to facilitate nearest neighbor retrieval. From this angle, we argue
+that our framework is a "discriminative model" that doesn’t yield
+a coherent probabilistic story. Nevertheless, our framework offers
+significant computational advantage. Compared to the hierarchical
+model in [5], our training algorithm doesn’t require expensive con-
+ditional sampling through nested loops, which is a typical artifact
+in hierarchical modeling. Such computational efficiency makes this
+framework directly applicable to graphs with billions edges. More
+details of the algorithm are discussed in the next section.
+3
+MIXTURE EMBEDDING BASED RETRIEVAL
+Because the main motivation of this work is to improve the candi-
+date generation step in large-scale recommendation systems, we
+designed the model to focus on the retrieval performance from
+every aspect.
+3.1
+Loss Function
+The model is trained using a margin ranking loss (MRL) function,
+which has been proved superior in many of our retrieval tasks.
+Given a positive edge 𝑒= (𝑠,𝑑) ∈𝐸, we construct a set of negative
+edges {𝑒′ = (𝑠,𝑑′) : 𝑑′ ∈𝑁(𝑠)}, where 𝑁(𝑠) is the negative sam-
+pling function that encompasses the negative sample size and the
+pool of potential negative examples. Note that 𝑁(𝑠) is a function of
+the source node 𝑠, and we will discuss the reason in Section 3.2. For
+each pair of positive and negative edges, the corresponding loss is:
+𝑙(𝑒,𝑒′) = max(smoothmax(𝑝𝑟𝑜𝑑𝑢𝑐𝑡(𝑈𝑠,𝑈𝑑′);𝛾) + 𝜆
+−regsmoothmax(𝑝𝑟𝑜𝑑𝑢𝑐𝑡(𝑈𝑠,𝑈𝑑);𝜃,𝛾), 0),
+(3)
+where 𝜆is the margin hyperparameter. Eqn. (3) applies different
+pooling functions for the positive and negative examples in order
+for regularization. By the definition of regsmoothmax, scores of
+positive examples are pooled more towards the average cosine sim-
+ilarity among mixture components compared to scores of negative
+examples. In back-propagation, positive examples influence more
+on all mixture component pairs, while negative examples influence
+mostly on the closest mixture component pair. Our intuition is that
+mixture embeddings of the same entity are similar to each other
+because they represent different aspect of the same entity. Regular-
+ization encourages such similarity structure. Because our training
+randomly initializes all embeddings, such regularization helps the
+training algorithm to converge to a favorable local optimum. Our
+experiments have shown such regularization significantly improves
+retrieval.
+3.2
+Multi-task Model
+We have compressed the notations of tasks for simplicity in the
+discussions above. In order to leverage collective information from
+multiple proxy objectives, we actually focus on multi-task models.
+In multi-task training, the edge set 𝐸consists of the union of edges
+for individual tasks 𝐸= ∪𝑇∈T 𝐸𝑇, and 𝐸𝑇is composed by source
+node type 𝑆𝑇and destination node type 𝐷𝑇, where 𝑆𝑇and 𝐷𝑇can
+be the same, and different tasks should share the same set of node
+types. In this setting, nodes from all types are embedded in the
+same space, which enables us to conduct retrieval between any two
+of them.
+We train this multi-task model by implementing an additive loss
+from all tasks. In addition, our framework allows for the loss of
+each training edge to be associated with a weight 𝜔(𝑒,𝑒′). The form
+of this weight function is user defined. In multi-task training, we
+apply pre-defined weights for all edges belonging to the same task.
+Such weight function can be extended. For example, one may use a
+function of task weight, source and destination node degree that
+can adjust the importance of high-degree or low-degree nodes in
+the training. Given this, our model minimizes the following loss
+function:
+L =
+Õ
+𝑇∈T
+Õ
+(𝑠,𝑑) ∈𝐸𝑇
+Õ
+𝑑′∈𝑁(𝑠)
+𝜔(𝑒,𝑒′)𝑙(𝑒,𝑒′).
+(4)
+In the negative smapling function 𝑁(𝑠), in order to make the neg-
+ative sample hard enough for the loss to learn, we ensure that 𝑑′
+come from the same node type as 𝑑, so that (𝑠,𝑑′) is a potential
+edge within the same task. For destination nodes of different types
+from another task, they are potentially embedded into different
+subspaces far away from the subspace of 𝑠. Therefore, for 𝑑′ of the
+same type as 𝑑and 𝑑′′ of different type, distances between (𝑠,𝑑′′)
+are usually further than (𝑠,𝑑′) naturally.
+In Eqn. (4), each component in this loss function is computed
+based on one positive edge and one negative edge, and the final loss
+is simply additive. Therefore, our model is highly scalable utilizing
+a distributed training system. We can partition the entire bi-partite
+graph from both the source side and the destination side in the
+same way as in [4].
+3.3
+One-sided Negative Sampling
+In our training data, the end users of the recommendation system
+usually correspond to a node type on one side in the bi-partite
+graph, while the content candidates appear on the other side. In
+most cases, we only care about directionally retrieving one type of
+node from another but not the opposite direction. For example, we
+are mostly interested in recommending unconnected contents to
+users instead of sourcing potential users to a content. We enforce
+such focus on directional retrieval by one-sided negative sampling
+during training. We prepare our input graph so that the users in
+downstream retrieval tasks always appears as the source node. In
+IRS 2020, Workshop on Industrial Recommendation Systems
+F. LastName et al.
+Eqn. (3), we always sample from the destination side, and con-
+nect the sampled destination node 𝑑′ with original source 𝑠of the
+positive edge to form a negative edge.
+3.4
+Mixture Weights
+Through computing mixture distance using smooth-max in (2),
+mixture embeddings of one node forms a set without certain or-
+der. Therefore, training step does not explicitly estimate mixture
+component weights. In order to enable sub-linear retrieval, a post
+processing step is implemented to compute mixture weights after
+training is done. Mixture weights are adaptively calculated based
+on a set of tasks T ′ defined on all or a subset of all training tasks
+T. Typically, T ′ is the whole set of training tasks, but in certain
+applications we also let T ′ include only one training task in order
+to compute task specific mixture weights. Denote mixture weights
+of source node 𝑠by {𝑤𝑠𝑐, 1 ≤𝑐≤𝐶𝑠}. These weights are computed
+by
+𝑤𝑠𝑐∝
+Õ
+{𝑇∈T′}
+Õ
+(𝑠,𝑑) ∈𝐸𝑇
+or (𝑑,𝑠) ∈𝐸𝑇
+𝐶𝑑
+Õ
+𝑙=1
+𝑒𝑀𝑐,𝑙/𝛾𝑇,
+(5)
+and normalized by Í𝐶𝑠
+𝑐=1 𝑤𝑠𝑐= 1. Comparing to (2), (5) does not
+include the regularization 𝜃hyperparameter, and the smooth-max
+temperature𝛾𝑇can be chosen to be different from𝛾used in training.
+The mixture weights of destinaton nodes are defined in the same
+way.
+3.5
+Round-robin KNN
+Once we have mixture embeddings trained and their corresponding
+weights computed, we are empowered to conduct nearest-neighbor
+search to obtain a diverse candidate pool per node. For node 𝑠
+with 𝐶𝑠mixture embeddings, if we are interested in retrieving
+the top 𝐾nearest neighbors from the set of destination nodes 𝐷𝑡
+with 𝐶𝑑mixture embeddings, we assign each candidate node 𝑑
+a score through an aggregation in the following way. First, for
+each component in the source mixture embedding we obtain the
+top 𝐾∗𝐶𝑑nearest embeddings from the overall set of destination
+mixture embeddings {𝑈𝑐𝑙: 𝑑∈𝐷𝑡,𝑙= 1, . . . ,𝐶𝑑}. We choose the
+top 𝐾∗𝐶𝑑nearest neighbors in order to guarantee we have at
+least 𝐾nearest neighbors after aggregation and deduplication. We
+obtain the corresponding pairwise scores 𝛼𝑠,𝑑(𝑐,𝑙) between the 𝑐th
+embedding of 𝑠and the 𝑙th embedding of 𝑑. If the 𝑙th embedding
+of 𝑑does not appear in the top 𝐾∗𝐶𝑑nearest embeddings in this
+step, then it is scored as 0. Leveraging modern approximate NN
+techniques (e.g. [3]), this step can be done very efficiently. Assuming
+the larger𝛼is, the closer the two individual embeddings are, then for
+each source embedding we aggregate the score of each destination
+node by summing the product of destination mixture weight and
+NN score, which is 𝛼𝑠,𝑑(𝑐) = Í𝐶𝑑
+𝑙=1 𝑤𝑑𝑙𝛼𝑠,𝑑(𝑐,𝑙). We assign the
+rank of destination node 𝑑for the 𝑐th embedding of node 𝑠by
+ordering 𝛼𝑠,𝑑(𝑐) in descending order, and denote it by 𝑟𝑠,𝑑(𝑐). We
+finally aggregate the scores of retrieved destination nodes for each
+source embedding up to each source node by computing 𝛼𝑠,𝑑=
+max𝐶𝑠
+𝑐=1 𝑤𝑠𝑐/𝑟𝑠,𝑑(𝑐). The nodes with highest 𝛼𝑠,𝑑are the nearest
+neighbors for 𝑠. We do two rounds of aggregations in this process:
+aggregate the scores of destination mixture embeddings first, then
+aggregate the scores of source mixture embeddings. In practice we
+choose to use summation and maximum respectively as aggregation
+functions in each step.
+4
+REAL-WORLD APPLICATION
+4.1
+Implementation
+We implement the techniques described in the previous sections
+on top of Pytorch-BigGraph (PBG) [4], a state-of-the-art library
+for massive multi-relation embeddings 2. Three specific changes
+need to be made to the default options supported by PBG to sup-
+port milti-task mixture embedding training. First, we implement a
+custom comparator that returns our mixture 𝑠𝑐𝑜𝑟𝑒function instead
+of the built in score functions to PBG. Second, we enable support
+of heterogeneous embedding dimension for each entity. Mixture
+embeddings can be represented as a single large embedding formed
+by each component concatenated together, and while it’s possible
+to define PBG’s dimension as the largest such dimension, in practice
+we found this considerably slower even if there were only a small
+portion of entities with “truncated” embeddings. Finally, we enable
+single sided negative sampling as described in Section 3.3.3
+4.2
+Instagram Explore
+Instagram’s Explore tab [2] presents users with unconnected con-
+tent, i.e. content from creators that the user doesn’t already follow.
+Over half of the Instagram community visits Explore every month
+to discover new photos, videos, and Stories relevant to their inter-
+ests out of billions of high quality pieces of media on that eligible
+inventory.
+Multitask mixture embedding-based retrieval is actively used in
+Instagram Explore as a source of candidates for the ranking stage,
+co-existing with several other sources mostly based on account
+similarity [2]. We explode each account into two logical entities: a
+"consumer" and a "creator" persona. Each consumer persona is mod-
+eled as a 5 component mixture, while each creator is represented
+by a single component (we are currently experimenting with hav-
+ing mixtures on both sides). We consider different types of "edges"
+between consumers and creators corresponding to different types
+of engagement (e.g. clicks, likes) to construct a bi-partite graph
+(i.e. consumer personas are only connected to creator personas).
+To perform the actual candidate generation we apply the retrieval
+techniques mentioned in Section 3 to each consumer persona to
+collect relevant accounts from which to source content that is then
+passed on to the ranking stage.
+5
+CONCLUSIONS
+We have presented a type of mixture embedding models that can
+extend the expressive power of standard embedding models while
+being able to scale to extremely large datasets, together with the in-
+gredients necessary to make good use of these mixture embeddings
+in the context of candidate generation for large scale recommen-
+dation systems based on our experience with Instagram’s Explore
+recommender.
+2https://github.com/facebookresearch/PyTorch-BigGraph
+3The second and third changes have already been upstreamed to PBG.
+Multitask Mixture Embeddings for Large Scale Recommendations
+IRS 2020, Workshop on Industrial Recommendation Systems
+Future research includes ways of making the most efficient possi-
+ble use of the expressive capacity provided by the multiple mixture
+components per user while adapting to the wide range of data vol-
+umes across users typical in recommender systems. For example,
+this could include dynamic adjustment of the number of compo-
+nents for each user so that e.g. power users or users with very
+diverse interests have a larger number of components than more
+occasional or "focused" users. Another interesting line is quanti-
+fying the uncertainty of the components and the density of the
+embedding space to properly allocate the total candidate quota
+across the components.
+REFERENCES
+[1] Alessandro Epasto and Bryan Perozzi. Is a single embedding enough? learning
+node representations that capture multiple social contexts. In The World Wide
+Web Conference, pages 394–404, 2019.
+[2] Facebook.
+Powered by AI: Instagram’s Explore recommender system.
+https://ai.facebook.com/blog/powered-by-ai-instagrams-explore-recommender-
+system, 2019.
+[3] Jeff Johnson, Matthijs Douze, and Hervé Jégou. Billion-scale similarity search
+with gpus. IEEE Transactions on Big Data, 2019.
+[4] Adam Lerer, Ledell Wu, Jiajun Shen, Timothee Lacroix, Luca Wehrstedt, Abhijit
+Bose, and Alex Peysakhovich. Pytorch-biggraph: A large-scale graph embedding
+system. arXiv preprint arXiv:1903.12287, 2019.
+[5] Ninghao Liu, Qiaoyu Tan, Yuening Li, Hongxia Yang, Jingren Zhou, and Xia Hu.
+Is a single vector enough? exploring node polysemy for network embedding.
+In Proceedings of the 25th ACM SIGKDD International Conference on Knowledge
+Discovery & Data Mining, pages 932–940, 2019.

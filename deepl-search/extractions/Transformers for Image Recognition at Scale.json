@@ -1,0 +1,148 @@
+{
+  "source": "Transformers for Image Recognition at Scale.pdf",
+  "source_group": "Awesome-ML-Papers/Other",
+  "processed_at": "2026-06-08",
+  "agent": "agent5_final",
+  "concepts": [
+    {
+      "finding": "Decreasing the patch size and thus increasing the\neffective sequence length shows surprisingly robust improvements without introducing parameters.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "RGB embedding filters\n(first 28 principal components)\n1\n2\n3\n4\n5\n6\n7\nInput patch column\n1\n2\n3\n4\n5\n6\n7\nInput patch row\nPosition embedding similarity\n1\n1\nCosine similarity\n0\n5\n10\n15\n20\nNetwork depth (layer)\n0\n20\n40\n60\n80\n100\n120\nMean attention distance (pixels)\nViT-L/16\nHead 1\nHead 2\nHead 3\n...",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Tiles show the cosine similarity between the position\nembedding of the patch with the indicated row and column and the position embeddings of all other\npatches.",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "In computer vision, however, convolutional architectures remain dominant (LeCun et al., 1989;\nKrizhevsky et al., 2012; He et al., 2016).",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "How to address the limitation described: In computer vision, however, convolutional architectures remain dominant (LeCun et al., 1989;\nKrizhevsky et al., 2012; He et al., 2016).",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "The Vision Transformer can handle arbitrary sequence lengths (up to memory constraints),\nhowever, the pre-trained position embeddings may no longer be meaningful.",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "How to address the limitation described: The Vision Transformer can handle arbitrary sequence lengths (up to memory constraints),\nhowever, the pre-trained position embeddings may no longer be meaningful.",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "The BiT CNNs outperform ViT on ImageNet (despite regularization optimization),\nbut with the larger datasets, ViT overtakes.",
+      "category": "Baseline",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "We do, however, use early-stopping, and report the best validation accuracy\nachieved during training.",
+      "category": "Experiment",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "How to address the limitation described: We do, however, use early-stopping, and report the best validation accuracy\nachieved during training.",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Second, hybrids slightly outperform ViT at small compu-\ntational budgets, but the difference vanishes for larger models.",
+      "category": "Baseline",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Figure 7 (left) shows the top principal components of the the\nlearned embedding ﬁlters.",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Figure 7 (center) shows that the model learns\nto encode distance within the image in the similarity of position em-\nbeddings, i.e.",
+      "category": "ModelCandidate",
+      "implication": "Relevant for similarity-based retrieval and lookalike targeting",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "That\nthe position embeddings learn to represent 2D image topology ex-\nplains why hand-crafted 2D-aware embedding variants do not yield\nimprovements (Appendix D.3).",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "With\nself-supervised pre-training, our smaller ViT-B/16 model achieves 79.9% accuracy on ImageNet, a\nsigniﬁcant improvement of 2% to training from scratch, but still 4% behind supervised pre-training.",
+      "category": "LabelValidation",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "While these initial results are encouraging, many challenges remain.",
+      "category": "FailureRisk",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "How to address the limitation described: While these initial results are encouraging, many challenges remain.",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Our initial experiments show improvement from self-supervised\npre-training, but there is still large gap between self-supervised and large-scale supervised pre-\ntraining.",
+      "category": "LabelValidation",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Finally, further scaling of ViT would likely lead to improved performance.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "The attention weights Aij are based on the pairwise similarity between\ntwo elements of the sequence and their respective query qi and key kj representations.",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Overall, we ﬁnd that scaling\nall dimensions proportionally results in robust improvements.",
+      "category": "ModelCandidate",
+      "implication": "General ML methodology applicable to content recommendation",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Thus, for every given pair (one as query, and the other as key/value in the at-\ntention mechanism), we have an offset pq −pk, where each offset is associated with an\nembedding.",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Then, we simply run extra attention, where we use the original query (the\ncontent of query), but use relative positional embeddings as keys.",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    },
+    {
+      "finding": "Even so,\nthe speciﬁc pattern of position embedding similarity learned by the network depends on the training\nhyperparameters (Figure 9).",
+      "category": "Data",
+      "implication": "Useful for building item/user embeddings in retrieval systems",
+      "open_question": "",
+      "testable_hypothesis": ""
+    }
+  ]
+}

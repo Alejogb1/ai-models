@@ -1,0 +1,11 @@
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# Large binary files — PDFs are too heavy for git
+*.pdf
+
+# IDE files
+.vscode/
+.idea/

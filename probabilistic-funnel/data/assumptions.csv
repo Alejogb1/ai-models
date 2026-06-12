@@ -1,0 +1,18 @@
+variable,descripcion,valor_conservador,valor_moderado,valor_fuerte,fuente,confianza
+p_escanea_QR,Tasa de escaneo de QR impreso en factura fisica,0.01,0.03,0.05,"Ramin Zamani Direct Mail QR; How Advertising Matters OOH 2026; supuesto del equipo",baja
+p_completa_formulario,"Tasa de finalización de formulario en móvil",0.25,0.40,0.60,"Tinyform Mobile Form Stats 2025; hasta 63% con formularios simplificados",media
+p_valida_email,Tasa de validación de email via OTP o link,0.40,0.60,0.80,"Startup Stash; Medium Case Study",media
+p_consentimiento,Tasa de consentimiento expreso para factura digital,0.50,0.70,0.85,"Questline Opt-Out Case; ENARGAS Res 17/2025 requiere opt-in expreso",media
+p_primer_acceso,Tasa de apertura de primera factura digital,0.20,0.35,0.50,"Questline Energy Benchmarks; 19.2% open rate; hasta 31.9% con campañas dirigidas",media
+p_retencion,"Tasa de permanencia sin revertir a papel (3+ ciclos)",0.70,0.85,0.95,"Fiserv; estimación propia sin dato local",baja
+p_aporte_FonoGas,Porcentaje del universo que entra via FonoGas asistido,0.01,0.03,0.05,"Sun King Marketing; supuesto del equipo",baja
+p_aporte_NaturgyPIC,Porcentaje del universo que entra via app NaturgyPIC,0.01,0.03,0.05,"Play Store Camuzzi Gas App; supuesto del equipo sin dato MAU/DAU Naturgy",baja
+p_aporte_marketing,"Porcentaje del universo que entra via campaña redes/pantallas/TV",0.01,0.03,0.05,"Shopify Facebook Costs baoliba; Gitnux Direct Mail; supuesto del equipo",baja
+p_aporte_incentivo,Porcentaje del universo motivado por incentivo economico,0.01,0.02,0.04,"Questline Digital; campañas con incentivo convierten 34% vs 23% sin incentivo",media
+p_pago_digital,"Porcentaje del universo que entra via pago con QR interoperable",0.01,0.02,0.03,"ENARGAS Res 293/2021 QR interoperable; Mercado Pago reintegros perfil",baja
+factor_no_solapamiento,"Penalización por solapamiento entre canales",0.65,0.80,0.90,"supuesto del equipo; metodología de atribución multicanal básica",baja
+costo_factura_fisica_ARS,"Costo de impresión y distribución por factura física",1013,1500,2000,"Servicios Publicos marzo 2026; Paylode: hasta $6 USD",media
+ciclos_por_anio,"Cantidad de ciclos de facturación por año",6,6,6,Bimestral gas natural,alta
+costo_incentivo_por_usuario_ARS,"Costo de incentivo por usuario adherido",2000,4000,6000,"EPAS Neuquén: $4000 descuento; Camuzzi premio sorteo; supuesto del equipo",media
+costo_campana_total_ARS,"Costo total de campaña multicanal (redes, TV, pantallas)",2000000,5000000,10000000,"Facebook CPM $3.74 USD; WhatsApp Business; alcance regional estimado",baja
+costo_asistencia_total_ARS,"Costo total operación FonoGas asistida",1000000,3000000,6000000,"supuesto del equipo; Contact Center Benchmarks; volumen estimado 3% del universo",baja

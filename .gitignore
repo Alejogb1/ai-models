@@ -3,6 +3,12 @@ __pycache__/
 *.pyc
 *.pyo
 
+# Trained model files (can be regenerated from scripts)
+deepl-search/models/
+
+# Generated data
+deepl-search/data/
+
 # Large binary files — PDFs are too heavy for git
 *.pdf
 

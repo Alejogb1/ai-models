@@ -1,0 +1,1112 @@
+Pages: 9
+--- Page 1 ---
+Pre-trained Language Model based Ranking in Baidu Search
+Lixin Zou, Shengqiang Zhang†, Hengyi Cai, Dehong Ma,
+Suqi Cheng, Daiting Shi, Zhifan Zhu, Weiyue Su, Shuaiqiang Wang, Zhicong Cheng, Dawei Yin⇤
+Baidu Inc., Beijing, China
+{zoulixin15,hengyi1995,chengsuqi,shqiang.wang}@gmail.com,sq.zhang@pku.edu.cn
+{madehong,shidaiting01,zhuzhifan,suweiyue,chengzhicong01}@baidu.com,yindawei@acm.org
+ABSTRACT
+As the heart of a search engine, the ranking system plays a crucial
+role in satisfying users’ information demands. More recently, neu-
+ral rankers ￿ne-tuned from pre-trained language models (PLMs)
+establish state-of-the-art ranking e￿ectiveness. However, it is non-
+trivial to directly apply these PLM-based rankers to the large-scale
+web search system due to the following challenging issues: (1)
+the prohibitively expensive computations of massive neural PLMs,
+especially for long texts in the web-document, prohibit their de-
+ployments in an online ranking system that demands extremely
+low latency; (2) the discrepancy between existing ranking-agnostic
+pre-training objectives and the ad-hoc retrieval scenarios that de-
+mand comprehensive relevance modeling is another main barrier
+for improving the online ranking system; (3) a real-world search
+engine typically involves a committee of ranking components, and
+thus the compatibility of the individually ￿ne-tuned ranking model
+is critical for a cooperative ranking system.
+In this work, we contribute a series of successfully applied tech-
+niques in tackling these exposed issues when deploying the state-
+of-the-art Chinese pre-trained language model, i.e., ERNIE, in the
+online search engine system. We ￿rst articulate a novel practice
+to cost-e￿ciently summarize the web document and contextualize
+the resultant summary content with the query using a cheap yet
+powerful Pyramid-ERNIE architecture. Then we endow an inno-
+vative paradigm to ￿nely exploit the large-scale noisy and biased
+post-click behavioral data for relevance-oriented pre-training. We
+also propose a human-anchored ￿ne-tuning strategy tailored for
+the online ranking system, aiming to stabilize the ranking signals
+across various online components. Extensive o￿ine and online ex-
+perimental results show that the proposed techniques signi￿cantly
+boost the search engine’s performance.
+CCS CONCEPTS
+• Information systems →Language models; Learning to rank;
+⇤Corresponding author. † Co-￿rst author.
+Permission to make digital or hard copies of all or part of this work for personal or
+classroom use is granted without fee provided that copies are not made or distributed
+for pro￿t or commercial advantage and that copies bear this notice and the full citation
+on the ￿rst page. Copyrights for components of this work owned by others than ACM
+must be honored. Abstracting with credit is permitted. To copy otherwise, or republish,
+to post on servers or to redistribute to lists, requires prior speci￿c permission and/or a
+fee. Request permissions from permissions@acm.org.
+KDD ’21, August 14–18, 2021, Virtual Event, Singapore.
+© 2021 Association for Computing Machinery.
+ACM ISBN 978-1-4503-8332-5/21/08...$15.00
+https://doi.org/10.1145/3447548.3467147
+KEYWORDS
+Pre-trained Language Model; Learning to Rank
+ACM Reference Format: Lixin Zou, Shengqiang Zhang, Hengyi Cai, De-
+hong Ma, Suqi Cheng, Daiting Shi, Shuaiqiang Wang, Zhicong Cheng, Dawei
+Yin. 2021. Pre-tarined Language Model based Ranking in Baidu Search. In
+Proceedings of the 27th ACM SIGKDD Conference on Knowledge Discovery and
+Data Mining (KDD ’21), August 14-18, 2021, Virtual Event, Singapore. ACM,
+New York, NY, USA, 9 pages. https://doi.org/10.1145/3447548.3467147
+1
+INTRODUCTION
+As essential tools for accessing information in today’s world, search
+engines like Google and Baidu satisfy millions of users’ information
+needs every day. In large-scale industrial search engines, ranking
+typically serves as the central stage. It aims at accurately ordering
+the shortlisted candidate documents retrieved from previous stages,
+which plays a critical role in satisfying user information needs and
+improving user experience.
+Traditional approaches, including learning to rank [34], are typi-
+cally based on hand-crafted, manually-engineered features. How-
+ever, they may easily fail to capture the search intent from the
+query text and infer the latent semantics of documents. With the
+recent signi￿cant progress of pre-training language models (PLMs)
+like BERT [13] and ERNIE [44] in many language understanding
+tasks, large-scale pre-trained models also demonstrate increasingly
+promising text ranking results [33]. For example, neural rankers
+￿ne-tuned from pre-trained models establish state-of-the-art rank-
+ing e￿ectiveness [39, 40], attributing to its ability to perform full
+self-attention over a given query and candidate document, in which
+deeply-contextualized representations of all possible input token
+pairs bridge the semantic gap between query and document terms.
+However, it is nontrivial to directly apply the recent advance-
+ments in PLMs to web-scale search engine systems with trillions
+of documents and stringent e￿ciency requirements. First, signi￿-
+cant improvements brought by these PLMs come at a high cost of
+prohibitively expensive computations. Common wisdom [45, 49]
+suggests that the BERT-based ranking model is ine￿cient in pro-
+cessing long text due to its quadratically increasing memory and
+computation consumption, which is further exacerbated when in-
+volving the full content of a document (typically with length >
+4000) into the ranking stage. It thus poses a challenging trade-o￿
+to reconcile the e￿ciency and contextualization in a real-world
+ranking system. Second, explicitly capturing the comprehensive
+relevance between query and documents is crucial to the ranking
+task. Existing pre-training objectives, either sequence-based tasks
+(e.g., masked token prediction) or sentence pair-based tasks (e.g.,
+arXiv:2105.11108v3  [cs.IR]  25 Jun 2021
+
+--- Page 2 ---
+permuted language modeling), learn contextual representations
+based on the intra/inter-sentence coherence relationship, which
+cannot be straightforwardly adapted to model the query-document
+relevance relations. Although user behavioral information can be
+leveraged to mitigate this defect, elaborately designing relevance-
+oriented pre-training strategies to fully exploit the power of PLMs
+for industrial ranking remains elusive, especially in noisy clicks and
+exposure bias induced by the search engine. Third, to well deploy
+the ￿ne-tuned PLM in a real ranking system with various modules,
+the ￿nal ranking score should be compatible with other compo-
+nents, such as the ranking modules of freshness, quality, authority.
+Therefore, in addition to pursuing the individual performance, care-
+fully designing the ￿ne-tuning procedure to seamlessly interwoven
+the resultant PLM and other components into a cooperative ranking
+system is the crux of a well-behaved deployment.
+This work concentrates on endowing our experiences in tack-
+ling these issues that emerged in PLM-based online ranking and
+introducing a series of instrumental techniques that have been suc-
+cessfully implemented and deployed to power the Baidu search en-
+gine. In order to improve both the e￿ectiveness and e￿ciency axes
+for PLM-based full-content-aware ranking, we propose a two-step
+framework to achieve this goal: (1) extract the query-dependent
+summary on the ￿y with an e￿cient extraction algorithm; (2) decou-
+ple the text representation and interaction with a modularized PLM.
+Speci￿cally, we provide a QUery-WeIghted Summary ExTraction
+(QUITE) algorithm with linear time complexity to cost-e￿ciently
+summarize the full content of the web document. Given a sum-
+mary, a Pyramid-ERNIE, built upon the state-of-the-art Chinese
+PLM ERNIE [44], ￿rst decouples the text representation into two
+parts: the query-title part and summary part. Then, the Pyramid-
+ERNIE captures the comprehensive query-document relevance us-
+ing contextualized interactions over the previously generated rep-
+resentations for the sake of balancing the e￿ciency-e￿ectiveness
+trade-o￿in online ranking. To explicitly incentivize the query-
+document relevance modeling in pre-training Pyramid-ERNIE with
+large-scale raw clicking data, we ￿rst manage the noisy and bi-
+ased user clicks through human-guided calibration by aligning
+the post-click behaviors with human-preferred annotations, and
+then conduct relevance-oriented pre-training using the calibrated
+clicks with a ranking-based objective. Regarding the discrepancy of
+ranking signals between the ￿ne-tuned Pyramid-ERNIE and other
+online ranking components that emerged in the naive ￿ne-tuning
+paradigm, we alleviate such defects with a novel ￿ne-tuning strat-
+egy in which the Pyramid-ERNIE is incentivized to be globally
+stabled through anchoring the ￿ne-tuning objective with human-
+preferred relevance feedback, leading to better cooperation with
+other ranking components.
+We conduct extensive o￿ine and online experiments in a large-
+scale web search engine. Extensively experimental results demon-
+strate the e￿ectiveness of the proposed techniques and present
+our contributions to the relevance improvement in Baidu Search.
+We expect to provide practical experiences and new insights for
+building a large-scale ranking system. Our main contributions can
+be summarized as follows:
+• Content-aware Pyramid-ERNIE. We articulate a novel prac-
+tice to e￿ciently contextualize the web-document content with
+a fast query-dependent summary extraction algorithm and a
+Pyramid-ERNIE architecture, striking a good balance between
+the e￿ciency and e￿ectiveness of PLM-based ranking schema in
+the real-world search engine system.
+• Relevance-oriented Pre-training. We design an innovative
+relevance-oriented pre-training paradigm to ￿nely exploit the
+large-scale post-click behavioral data, in which the noisy and
+biased user clicks are calibrated to align the relevance signals
+annotated by the human experts.
+• Human-anchored Fine-tuning. We propose a human-anchored
+￿ne-tuning strategy tailored for the online ranking system, aim-
+ing to stabilize the ranking signals across various online compo-
+nents and further mitigate the misalignment between the naive
+￿ne-tuning objective and human-cared intrinsic relevance mea-
+surements.
+• Extensive O￿line and Online Evaluations. We conduct ex-
+tensive o￿ine and online experiments to validate the e￿ective-
+ness of the designed ranking approach. The results show that
+the proposed techniques signi￿cantly boost the search engine’s
+performance.
+2
+METHODOLOGY
+In this section, we describe the technical details of our proposed
+approaches. We ￿rst formulate the ranking task as a utility optimiza-
+tion problem. Then, we provide the linear time complexity query-
+dependent summary extraction algorithm and propose Pyramid-
+ERNIE architecture to reconcile the content-aware ranking’s ef-
+￿ciency and e￿ectiveness. To e￿ectively incentivize a relevance-
+oriented contextual representation, we present a novel pre-training
+strategy in which large-scale post-click behavioral information can
+be distilled into the proposed Pyramid-ERNIE. We further design
+a human-anchored ￿nd-tuning schema to pertinently anchor the
+resulting ￿ne-tuned model with other online ranking components.
+2.1
+Problem Formulation
+The task of ranking is to measure the relative order among a set
+of documents ⇡= {38}#
+8=1 under the constraint of a query @ 2 Q,
+where ⇡⇢D is the set of @-related documents retrieved from all
+indexed documents D [35], and Q is the set of all possible queries.
+We are required to ￿nd a scoring function 5 (·, ·) : Q ⇥D ! R,
+which can maximize some utility as
+5 ⇤= max
+5
+E{@,⇡,. }o(., 퐹(@, ⇡)).
+(1)
+Here, o is an evaluation metric, such as DCG [23], PNR and ACC.
+퐹(@, ⇡) = {5 (@,38)}#
+8=1 is the set of document scores, and 5 ⇤is
+the optimal scoring function. . = {~8}#
+8=1 is a set of scale with ~8
+representing the relevance label corresponds to 38. Usually, ~8 is
+the graded relevance in 0-4 ratings, which means the relevance of
+38 as {bad, fair, good, excellent, perfect} respectively.
+In learning to rank, a ranking model is trained with a set of
+labeled query-document pairs denoted as Φ = {q@}, where q@ =
+{@, ⇡= {38},. = {~8}|1 8 # } is the set of labeled query-
+document given a speci￿c query @. Under this formulation, the
+ranking model is learned by minimizing the empirical loss over the
+
+--- Page 3 ---
+training data as
+L(5 ) =
+1
+|Z|
+’
+{@,⇡,. }2Φ
+✓(., 퐹(@, ⇡)),
+(2)
+where ✓is the loss function. ✓is an intermediate proxy for optimiz-
+ing the none-di￿erential ranking metric o. Z is the normalizing
+factor. Most of the ranking models are optimized with pointwise
+loss (e.g., mean square error), pairwise loss (e.g., hinge loss [42]),
+or listwise approach (e.g., LambdaMART [5]).
+2.2
+Content-aware Pre-trained Language Model
+In a large-scale search system, the scoring function 5 (@,3) is typ-
+ically implemented to measure the semantic relevance between
+the query and the document title while the document’s content
+is ignored due to the high computational cost. However, merely
+considering the title for a query is risky since the short title usu-
+ally cannot describe the document faithfully and sometimes even
+deviates from the content of a document, e.g., the clickbait, which
+presents insurmountable obstacles to the ranking e￿ectiveness. To
+incorporate the content of a document into the ranking process
+while allowing for fast real-time inference in a production setup
+simultaneously, we propose a two-step framework to achieve this
+goal: (1) we ￿rst pre-extract the query-dependent summary on the
+￿y, which can be operated e￿ciently; (2) then, we employ a highly-
+modularized model—Pyramid-ERNIE, to measure the relevance of
+query, title, and concise summary.
+2.2.1
+￿ery-Dependent Summary Extraction. A document con-
+tains many contents, and correspondingly di￿erent parts may ￿t
+di￿erent queries’ demand. It is more reasonable to retain the coarse-
+grained relevant contents and discard the rest before measuring
+the ￿ne-grained semantic relevance between the query and the
+document. Therefore, we propose a simple yet e￿ective method
+named QUery-WeIghted Summary ExTraction (QUITE) to extract
+summary B from document3 with respect to a given query@ (shown
+in Algorithm 1). The QUITE ￿rst pre-processes query and docu-
+ments, including word tokenization for the query, calculating the
+word importance, sentence segmentation for the document, and
+word tokenization for each sentence, respectively (line 1-4 in Algo-
+rithm 1). Precisely, the word importance is calculated by looking
+up a pre-computed importance dictionary. Then, each sentence
+candidate’s score B8 is measured by summing the word importance
+of all words that appeared in both query and the sentence candidate
+(line 7-9 in Algorithm 1). The candidate with the highest score will
+be chosen as the most related summary at the current time (line
+10 in Algorithm 1). To cover di￿erent words in the summary, the
+importance of words that appeared in both query and the current
+summary will be decayed by a factor U (0 < U < 1) (line 13 in
+Algorithm 1). The above steps will be repeated until the number
+of sentences meets the predetermined threshold :. In this way, we
+can adaptively select the number of summaries to balance ERNIE’s
+performance and e￿ciency.
+2.2.2
+Pyramid-ERNIE. We introduce the Pyramid-ERNIE to con-
+duct semantic matching between the query @, title C, and summary
+B. It comprises three major components: a query and title encoder
+⇢{@,C } = TRM!;>F (@,C) which produces the query-title embedding,
+Algorithm 1 QUIET: Query-Weighted Summary Extraction
+Input:
+The query @, the document 3, the decay factor: U;
+The number of generated query-dependent summaries: :.
+Output:
+The generated query-dependent summaries: B;
+1: ,@ = Word-Tokenize(@);
+2: lF = Word-Importance(F) for F 2 ,@;
+3: ( = Sentence-Tokenize(3);
+4: ,B8 = Word-Tokenize(B8) for B8 2 (;
+5: B,2  {}, 1;
+6: while 2 : do
+7:
+for all B8 2 ( do
+8:
+(2>A4B8 = Õ
+F2,> lF with ,> = ,B8 \,@;
+9:
+end for
+10:
+B⇤= arg maxB {(2>A4B8 |B8 2 ( };
+11:
+B  B⇤+ B;
+12:
+(  ( −B⇤;
+13:
+lF  U · lF for F 2 ,B⇤\,@
+14:
+2  2 + 1;
+15: end while
+16: return B;
+a summary encoder ⇢B = TRM!;>F (B) which produces a summary
+embedding, a uni￿ed encoder ⇢{@,C,B } = TRM!⌘86⌘(⇢{@,C }, ⇢B) which
+encodes the concatenation of the outputs of ⇢{@,C } and ⇢B, and pro-
+duces a relevance score between the query, title and summary.
+The encoder is a =-layer self-attentive building block, denoted as
+TRM= (short for TRansforMer [46]). !;>F and !⌘86⌘are the number
+of representation layers and interaction layers respectively. Figure 1
+depicts the proposed neural architecture.
+2.2.3
+Complexity Analysis. We conduct the time complexity
+analysis to inspect the e￿ciency of the proposed approach. For
+summary extraction, the time complexity is O(#2) where #2 is
+the length of the whole content. Since the algorithm can be op-
+erated in linear time, the cost is rather cheap in online ranking.
+For semantic matching with Pyramid-ERNIE, the time complex-
+ity of a original ERNIE is O(!⌘(#@ + #C + #B)2), where ! and ⌘
+are the number of layers and hidden dimension size of ERNIE,
+and #@, #C and #B are the length of the query, title and sum-
+maries respectively. In Pyramid-ERNIE, the time complexity of
+⇢{@,C }, ⇢B and ⇢{@,C,B } are O(!;>F⌘(#@ + #C)2), O(!;>F⌘(#B)2)
+and O(!⌘86⌘⌘(#@ + #C + #B)2) respectively, where ! = !;>F +
+!⌘86⌘. Therefore, the total time complexity of Pyramid-ERNIE is
+O(!;>F⌘(#@ +#3)2) +!;>F⌘(#B)2 +!⌘86⌘⌘(#@ +#C +#B)2) which
+can be simpli￿ed as O(!⌘(#@ + #C + #B)2 −2!;>F⌘(#@ + #C)#B).
+Coupled with the evidence, the time complexity of Pyramid-ERNIE
+is obviously lower than the original ERNIE. This is a￿rmed by the
+empirical results, in which Pyramid-ERNIE reduces about 30% time
+cost compared with the original ERNIE model.
+2.3
+Relevance-Oriented Pre-training with
+Calibrated Large-Scale User Clicks
+To enhance the pre-training towards relevance ranking, one straight-
+forward approach is to leverage the large-scale post-click behav-
+ioral information for continual domain-adaptive pre-training. The
+
+--- Page 4 ---
+Figure 1: Illustration of the Pyramid-ERNIE model.
+Figure 2: Human preference learning with tree-based struc-
+ture.
+conventional training task for ranking is to predict whether the doc-
+ument will be clicked or not [9]. However, such a trivial approach
+has the following issues:
+(1) The clicking data contains many false-positive samples, which
+are caused by the noisy clicks such as clickbait and accident
+clicks, impairing the accurate modeling of the document rele-
+vance;
+(2) The exposure bias caused by the ranking system [10] —the
+displayed documents usually acquire much more clicks. It is
+problematic since blindly ￿tting the data without considering
+the inherent biases will result in the discrepancy between o￿ine
+evaluation and online metrics, and even lead to the vicious circle
+of bias and rebiasing.
+(3) The inherent inconsistency between clicking and query-documents
+relevance further presents obstacles to the schema of pre-training
+directly with the user clicking behavioral data since the docu-
+ments being clicked are not necessarily relevant results.
+Fortunately, a series of informative features exhibit the ￿ne-
+grained quality of user clicking, including the average dwelling time,
+average scroll speed, number of user-issued query rewriting and
+number of long-click, as well as the carefully-designed features such
+as #click
+#skip ,
+#click
+#click in the query and #long click
+#click
+. These important features
+can be leveraged to calibrate the noisy clicks and exposure bias in
+the raw post-click behavioral data. For instance, the dwelling time
+or long-click can be used to e￿ectively ￿lter out the low-quality
+documents caused by the clickbait or accident click (issue 1); the
+click skip ratio #click
+#skip can be employed to identify the clicks owing
+to exposure bias (issue 2). To this end, we manually annotate 70
+thousand query-document pairs with rich user behavioral features
+into 0-4 ratings and align the "-dimension post-click based features
+(denoted as x 2 R") to query-document relevance by training a
+tree-based model as the calibrator to predict the human label ~
+(issue 3). The trained tree-based calibration model can be adapted to
+calibrate the large-scale post-click behavioral data, and the resultant
+re￿ned clicking data is ￿nally applied to pre-train the Pyramid-
+ERNIE (the e￿ectiveness of the tree-based calibration model is
+veri￿ed in Section 3.7.2). With human preference learning using a
+small amount of annotated data, we are able to substantially exploit
+the massive unsupervised data to pre-train a large ranking model
+and reduce the notoriously defects mentioned above.
+More concretely, a classi￿cation tree [37] ⌘: R" ! R5 is
+constructed to calibrate the post-click behaviors to ground-truth
+relevance, as depicted in Figure 2. Furthermore, the tree-based
+model is optimized using gradient boosting methods [15]. Note that
+other sophisticated classi￿cation models can also be applied, e.g.,
+neural network-based classi￿er [17].
+For a given set of the query, documents, and post-click behaviors
+{@, ⇡= {38},- = {xi}|1 8 # }, we pre-train the Pyramid-
+ERNIE with a triplet loss de￿ned as:
+✓(⌧, 퐹(@, ⇡)) =
+’
+6(x8)<6(x9)
+max(0, 5 (@,38) −5 (@,39) + g),
+(3)
+where g is the margin enforced between positive and negative pairs,
+6(x) = arg max<{⌘(x)}< is the most possible label generated
+by the tree model ⌘(x), ⌧is the set of predicted human labels
+{6(G8)}#
+8=1.
+2.4
+Human-anchored Fine-Tuning
+Provided with a pre-trained Pyramid-ERNIE, a common practice to
+leverage it for online ranking tasks is to ￿ne-tune the pre-trained
+Pyramid-ERNIE with the human-labeled task-speci￿c data, using
+a ranking objective, e.g., pairwise loss. However, merely pursu-
+ing the individual ranking performance leads to the ranking score
+discrepancy between the ￿ne-tuned Pyramid-ERNIE model and
+other online ranking components. This discrepancy is undesirable
+
+--- Page 5 ---
+since a well-behaved online ranking system demands compara-
+ble ranking signals to ful￿ll the multi-modality and multi-source
+presentations of search results (e.g., freshness, authority, and qual-
+ity). Besides, optimizing the ranking model solely with pairwise
+loss generally su￿ers from the high variance of query distribu-
+tions. High-relevance documents are usually overwhelmed for hot
+queries but extremely scarce for tail ones, posing challenges for the
+ranking model to perceive such cross-query relevance gap between
+documents. Moreover, disregarding the query documents’ intrinsic
+relevance also hurts the predicted scores’ interpretability due to
+the discrepancy between the corresponding unanchored ranking
+scores and well-reasoned human-de￿ned relevance grades.
+Therefore, the pre-trained Pyramid-ERNIE model’s ￿nal ranking
+score is incentivized to be globally stable across di￿erent queries
+and online modules by anchoring the ￿ne-tuning objective with
+a human-preferred relevance judgment. Speci￿cally, we manually
+label 10 million query-document pairs into 0-4 ratings and train the
+Pyramid-ERNIE with a mixture of pairwise and pointwise loss as
+✓(., 퐹(@, ⇡)) =
+’
+~8<~9
+max(0, 5 (@,38) −5 (@,39) + g)
++ _(X(5 (@,38),~8) + X(5 (@,39),~9)),
+(4)
+whereX(5 (@,3),~) = max
+n⇥
+5 (@,3) −( ~
+5 + 0.1)
+⇤2 −n, 0
+o
+is the point-
+wise loss. It endeavors to anchor the ranking score to a meaningful
+range, and n = 0.01, _ = 0.7 are the hyper-parameters. With the
+pointwise loss, the ranking score 5 (@,3) is encouraged to be con-
+sistent with the human-labeled relevance grade and can be easily
+blended with ranking signals from other modules in a real-world
+ranking system.
+3
+EXPERIMENTS
+To assure the e￿ectiveness of the proposed solutions, we conducted
+extensive o￿ine and online experiments on a large-scale real-
+world search system. This section details the experimental setup
+and presents several insights demonstrating that the proposed ap-
+proaches are crucial to PLM-based ranking in a commercial search
+engine system.
+3.1
+Dataset
+We train and evaluate our proposed method with both logged user
+behavioral data (log) and manually-labeled (manual) data. The
+logged data is used for the pre-training stage and the manually-
+labeled query-document pairs are used for the ￿ne-tuning stage.
+Speci￿cally, we collect three months of users’ accessing logs from
+Aug. 2020 to Oct. 2020, which contains 538, 314, 000 queries and
+2, 986, 664, 000 query-document pairs. Regarding the ￿ne-tuning
+data, we manually annotate the train/evaluate/test dataset with
+Baidu’s crowd-sourcing platform, resulting in 9, 697, 087/160, 999/
+279, 128 query-document pairs. In the manually-labeled training
+data, 73, 530 query-document pairs are used for constructing the
+tree-based calibrator to re￿ne the raw user behavioral data during
+relevance-oriented pre-training. Table 1 o￿ers the dataset statistics.
+Table 1: Data statistics.
+Data
+#Query
+#Query-Document Pairs
+log data
+538,314,000
+2,986,664,000
+manual train
+469,115
+9,697,087
+manual evaluate
+8,901
+160,999
+manual test
+11,437
+279,128
+3.2
+Evaluation Methodology
+We employ the following evaluation metrics to assess the perfor-
+mance of the ranking system.
+The Positive-Negative Ratio (PNR) is a pairwise metric for
+evaluating the search relevance performance. It has been exten-
+sively used in the industry due to its simplicity. For a ranked list
+of # documents, the PNR is de￿ned as the number of concordant
+pairs versus the number of discordant pairs:
+%#' =
+Õ
+8,9 2[1,# ]
+{~8 > ~9 } ·
+{5 (@,38) > 5 (@,39)}
+Õ
+<,=2[1,# ]
+{~< > ~=} ·
+{5 (@,3<) < 5 (@,3=)},
+(5)
+where the indicator function
+{G > ~} takes the value 1 if G > ~
+and 0 otherwise. We use the symbol %#' to indicate this value’s
+average over a set of test queries in our experiments.
+The Discounted Cumulative Gain (DCG) [23] is a standard
+listwise accuracy metric for evaluating the ranking model perfor-
+mance and is widely adopted in the context of ad-hoc retrieval. For
+a ranked list of # documents, we use the following implementation
+of DCG
+⇡⇠⌧# =
+#
+’
+8=1
+⌧8
+log2(8 + 1) ,
+(6)
+where ⌧8 represents the weight assigned to the document’s label
+at position 8. Higher degree of relevance corresponds to the higher
+weight. We use the symbol ⇡⇠⌧to indicate the average value of
+this metric over the test queries. ⇡⇠⌧will be reported only when
+absolute relevance judgments are available. In the following sec-
+tions, we will report ⇡⇠⌧2, ⇡⇠⌧4 with # 2 {2, 4}, respectively. In
+online experiments, we extract 6, 000 queries and manually label the
+top-4 ranking results generated by the search engine for calculating
+⇡⇠⌧.
+The Interleaving [8] is a metric used to quantify the degree
+of user preference and summarize the outcome of an experiment.
+When conducting comparisons with this metric, two systems’ re-
+sults are interleaved and exposed together to the end-users, whose
+clicks will be credited to the system that provides the corresponding
+user-clicked results. The gain of the new system A over the base
+system B can be quanti￿ed with Δ퐴⌫, which is de￿ned as
+Δ퐴⌫=
+F8=B(퐴) + 0.5 ⇤C84B(퐴, ⌫)
+F8=B(퐴) + F8=B(⌫) + C84B(퐴, ⌫) −0.5,
+(7)
+where F8=B(A) counts the number of times when the results pro-
+duced by system A is more preferred than system B for a given
+query. Thus, Δ퐴⌫> 0 implies that system A is better than system
+B and vice versa. We conduct balanced interleaving experiments
+for comparing the proposed method with the base model.
+The Good vs. Same vs. Bad (GSB) [53] is a metric measured
+by the professional annotators’ judgment. For a user-issued query,
+the annotators are provided with a pair (result1, result2) whereby
+
+--- Page 6 ---
+one result is returned by system A, and the other is generated by
+a competitor system B. The annotators, who do not know which
+system the result is from, are then required to independently rate
+among Good (result1 is better), Bad (result2 is better), and Same
+(they are equally good or bad), considering the relevance between
+the returned document and the given query. In order to quantify the
+human evaluation, we aggregate these three indicators mentioned
+above as a uni￿ed metric, denoted as ΔGSB:
+ΔGSB =
+#Good −#Bad
+#Good + #Same + #Bad.
+(8)
+3.3
+Competitor System
+Due to the high cost of deploying inferior models, we only compare
+the proposed method with the state-of-the-art ERNIE-based ranking
+model as well as di￿erent variants of the proposed approach.
+• Base: The base model is a 12-layer ERNIE-based ranking pol-
+icy, ￿ne-tuned with a pairwise loss using human-labeled query-
+document pairs.
+• Content-aware Pyramid-ERNIE (CAP): This model replaces the
+ERNIE-based ranking model with a Pyramid-ERNIE architecture,
+which incorporates the query-dependent document summary
+into the deep contextualization to better capture the relevance
+between the query and document.
+• Relevance-oriented Pre-training (REP): This variant pre-trains
+the Pyramid-ERNIE model with re￿ned large-scale user-behavioral
+data before ￿ne-tuning it on the task data.
+• Human-anchored Fine-tuning (HINT): In the ￿ne-tuning stage,
+HINT anchors the ranking model with human-preferred rele-
+vance scores using the objective function as in Equation (4).
+3.4
+Experimental Setting
+For the tree-based calibration model, we build a single tree of 6-
+depth with scikit- learn 1. Regarding Pyramid-ERNIE, we use
+a 12-layer transformer architecture with 9-layers for text repre-
+sentation and 3-layers for the query-title-summary interaction. It
+is warm-initialized with a 12-layer ERNIE 2.0 provided by Baidu
+Wenxin 2. The U is set as 0.5 for query-dependent extraction. The
+same hyper-parameters are used for various comparison models,
+i.e., vocabulary size of 32, 000, hidden size of 768, and feed-forward
+layers with dimension 1024, batch size of 128. We use the Adam [27]
+optimizer with a dynamic learning rate following Vaswani et al.
+[46]. Expressly, we set the warmup steps as 4000 and the maximum
+learning rate as 2 ⇥10−6 both in the pre-training and ￿ne-tuning
+stage. All the models are trained on the distributed platform with
+28 Intel(R) 5117 CPU, 32⌧Memory, 8 NVIDIA V100 GPU, and 12T
+Disk.
+3.5
+O￿line Experimental Results
+Table 2 shows the PNR results when incrementally applying the
+proposed techniques, i.e., CAP, REP and HINT, to the base model.
+The experimental result is quite consistent with our intuition. After
+adding the query-dependent summary and employing the Pyramid-
+ERNIE, the PNR reaches 3.017, advancing the base by 4.72%. It
+1https://scikit-learn.org/stable/
+2https://wenxin.baidu.com/
+Table 2: O￿line comparison of the proposed methods.
+Model
+PNR
+Improvement
+Base
+2.881
+-
++CAP
+3.017
+4.72%
++CAP+REP
+3.068
+6.49%
++CAP+REP+HINT
+3.065
+6.39%
+Table 3: Performance improvements of online A/B testing.
+Model
+Δ⇡⇠⌧
+Δ퐴⌫
+ΔGSB
+Δ⇡⇠⌧2 Δ⇡⇠⌧4 Random Long-Tail Random Long-Tail
+Base
+-
+-
+-
+-
+-
+-
++CAP
+0.65%⇤
+0.76%⇤
+0.15%
+0.35%⇤
+3.50%⇤
+6.00%⇤
++CAP+REP
+2.78%⇤
+1.37%⇤
+0.58%⇤
+0.41%⇤
+5.50%⇤
+7.00%⇤
++CAP+REP+HINT 2.85%⇤1.58%⇤
+0.14%⇤
+0.45%⇤
+6.00%⇤
+7.50%⇤
+“ ⇤” indicates the statistically signi￿cant improvement
+(C-test with ? < 0.05 over the baseline).
+indicates that the query-dependent summary bene￿ts the rele-
+vance modeling, and the introduced Pyramid-ERNIE is capable
+of capturing the semantics of query, title, and summary. With the
+relevance-oriented pre-training, our method outperforms the base
+by 6.49% and reaches the highest PNR of 3.068, which reveals that
+pre-training with large-scale post-click behavioral data substan-
+tially improves the performance of the ranking model. Finally, with
+the human-anchored ￿ne-tuning strategy, although sacri￿cing a
+little bit of performance, this approach improves the stability of the
+Pyramid-ERNIE (referred to Section 3.7.3).
+3.6
+Online Experimental Results
+To investigate the e￿ectiveness of the introduced techniques in
+the real-world commercial search engine, we deploy the proposed
+model to the online search system and compare it with the base
+model in the real production environment.
+Table 3 reports the performance comparison between di￿er-
+ent models regarding Δ⇡⇠⌧, Δ퐴⌫, and Δ⌧(⌫. First, we observe
+that the proposed mechanisms bring substantial improvements to
+the online search system. In particular, we note that the perfor-
+mance of CAP, CAP+REP, CAP+REP+HINT increases gradually on
+Δ⇡⇠⌧2, Δ⇡⇠⌧4 and Δ퐴⌫respectively, which demonstrates that
+the designed techniques are practical skills for improving the per-
+formance of the online ranking system. Moreover, we also observe
+that our proposed schema outperforms the online base system by a
+large margin for long-tail queries (i.e., the search frequency of the
+query is lower than 10 per week). Particularly, the improvements of
+long-tail queries in the interleaving are 0.35%, 0.41% and 0.45% for
+CAP, CAP+REP, CAP+REP+HINT, respectively. Furthermore, the
+advantage of GSB for the long-tail queries is 6.00%, 7.00%, and 7.50%.
+We also observe that the proposed approach beats the online base
+system by a large margin regarding ⇡⇠⌧2 with 2.85% relatively
+improvement. This reveals that the proposed schema retrieves not
+only relevant documents but also prefers high-quality results judged
+by professional annotators. Finally, compared with the o￿ine ex-
+periments, we notice that the human-anchored ￿ne-tuning strategy
+further boosts the online performance but slightly hurts the of-
+￿ine metric PNR. This is reasonable since the human-preferred
+
+--- Page 7 ---
+Table 4: Performance of Pyramid-ERNIE with di￿erent
+numbers of interaction layers. @C|B denotes that the left bot-
+tom is the concatenation of @, C and the right bottom is B.
+Similarly, @|CB means that the left bottom is @ and the right
+bottom is the concatenation of C, B.
+# Interaction Layers
+@|CB PNR
+@C |B PNR
+1
+2.31
+3.02
+2
+2.77
+3.02
+3
+2.92
+3.07
+4
+2.94
+3.07
+relevance annotations used in the human-anchored ￿ne-tuning are
+intentionally designed to be aligned with the online users’ judg-
+ments and introduced to help the ranking model cooperate with
+the other components, which may not well-coordinate with the
+o￿ine evaluations.
+3.7
+Ablation Study
+To better understand the source of the designed schema’s e￿ec-
+tiveness, we examine a series of critical strategies by analytically
+ablating speci￿c parts of the proposed approach.
+3.7.1
+Analysis of Content-Aware Pyramid-ERNIE. We study dif-
+ferent options of designing the inputs and architecture of Pyramid-
+ERNIE to present our motivation of setting the hyper-parameters.
+In Table 4, we report the Pyramid-ERNIE with di￿erent settings
+in the interaction layers and input layers. As shown in Table 4, we
+￿nd that concentrating the query and title on one side and putting
+the summary on the other side (denoted as @C|B) achieves the best
+results. Such performance boosts can be attributed to both the early
+interaction between the query and title, which coarsely re￿ects
+the query and document’s semantic relations and the deep interac-
+tions between the query/title and content summary, which further
+enrich the resulting contextualization. In contrast, coupling the
+title and summary on one side enables title-summary early inter-
+actions but hinders query consolidation (denoted as @|CB), which
+is crucial to the query-document relevance modeling. As a result,
+the PNR consistently drops for @|CB compared to @C|B. Furthermore,
+the experiments show three layers of interaction module performs
+best, achieving almost equivalent performance while reducing the
+inference time by 25% compared with the full self-attention-based
+ERNIE model. As expected, the performance drops when reducing
+the interaction module layers since insu￿cient interactions be-
+tween query and document content make it di￿cult to capture the
+semantic relations between query and document comprehensively.
+We explore the impact of using di￿erent summary lengths in
+Pyramid-ERNIE, as shown in Table 5. Without exception, increas-
+ing the number of sentences in summary leads to continuous im-
+provement on the PNR metric. However, a longer summary brings
+growing computational cost. Thus we select to adopt the top-1
+summary as the input for Pyramid-ERNIE to balance the trade-
+o￿between e￿ciency and e￿ectiveness in the large-scale online
+ranking system.
+3.7.2
+Influence of the Data Calibration in Relevance-Oriented Pre-
+training. As depicted in Table 2 and Table 3, the relevance-oriented
+pre-training strategy e￿ectively boosts the ranking performance.
+Table 5: Performance of Pyramid-ERNIE with di￿erent
+length of summary. ¯|B| is the average length of summary.
+w/o
+summary
+1
+sentence
+2
+sentences
+3
+sentences
+4
+sentences
+PNR
+3.01
+3.07
+3.06
+3.06
+3.11
+¯|B |
+38
+54
+70
+84
+95
+Table 6: Performance of raw user clicks and tree-based cali-
+brator on the test set.
+Raw user clicks
+Calibrator
+PNR
+1.86
+3.35
+Table 7: O￿line performance of di￿erent pre-training strate-
+gies: (a) Pre-training w/o data calibration and (b) Pre-
+training w/ calibrated clicking data.
+PNR (w/o ￿ne-tuning)
+PNR (w/ ￿ne-tuning)
+(a)
+1.81
+2.83
+(b)
+2.76
+3.07
+The question then is: how do the performance improvements bene-
+￿t from the tree-based calibration model? To answer this question,
+we ￿rst investigate the e￿ectiveness of the proposed tree-based
+calibrator. As shown in Table 6, compared with the metric PNR
+estimated using raw user clicks, the proposed calibrator obtains a
+much higher score, indicating that the tree-based calibrator pro-
+vides high-quality guidance regarding the query-document ranking
+relevance. Bene￿ting from the re￿ned user clicking data calibrated
+by this strong guidance, we further observe that pre-training with
+data calibration outperforms the naive pre-training strategy by a
+large margin, in terms of both the ￿ne-tuning stage and the pre-
+training stage, as presents in Table 7. Speci￿cally, the improvements
+of pre-training with calibration are 52.5% and 23.5% over the naive
+strategy. It is worth noting that the PNR of the naive pre-training
+(2.83) even underperforms the base system (2.876 in Table 2), af-
+￿rming our intuition that the noisy and biased clicks prevalent in
+the user behavioral data hurt the ranking model remarkably.
+3.7.3
+E￿ects of Human-Anchored Fine-Tuning. In the o￿ine and
+online experimental results, we show that human-anchored ￿ne-
+tuning signi￿cantly improves the ranking performance at a small
+PNR drop cost. We further conduct analytical experiments to under-
+stand the source of e￿ectiveness of this strategy. Figure 3 scatters
+the relevance scores predicted by the ranking model ￿ne-tuned with
+di￿erent strategies. We notice that the human-anchored ￿ne-tuning
+induces concentrated clusters around labels and lower variance of
+the predicted ranking scores, suggesting a more human-aligned
+relevance approximation in the online ranking system, which is
+desirable for stable and interpretable relevance estimation and on-
+line cooperation among various ranking components. It also helps
+to combat the problematic cross-query relevance gap in which the
+query-document ranking scores are biased by the extremely long-
+tailed query distributions, aligning with the performance improve-
+ments of this human-anchored ￿ne-tuning strategy in Long-Tail
+scenarios in online experiments (see the last line in Table 3).
+
+--- Page 8 ---
+Figure 3: Scatters of prediction scores regarding the naive
+￿ne-tuning (the red dots) and human-anchored ￿ne-tuning
+(the green dots) on the test set.
+4
+RELATED WORK
+4.1
+Conventional Machine Learned Ranking
+Learning-to-rank (LTR) techniques can be categorized into three
+types based on the loss function: pointwise approach [12, 32],
+pairwise approach [14, 25, 42, 50, 55], and listwise approach ap-
+proach [5, 6]. The pointwise approach, e.g., SLR [12], McRank [32],
+assumes that each query-document pair has a relevance label, and
+formalizes it as a regression task. The pairwise approach, e.g.,
+RankSVM [25], RankBoost [14], and GBRank [55], treats the rank-
+ing problem as a binary classi￿cation problem and aims to learn
+a binary classi￿er discriminating which document is better in the
+pairwise manner. The listwise methods directly optimize ranking
+metrics, e.g., mean average precision, DCG/NDCG. As expected,
+it is better than pointwise/pairwise methods in practice. However,
+it is more time-consuming and di￿cult to be optimized. A series
+of listwise methods have achieved amazing results in LTR, such as
+LambdaRank [5], ListNet [6].
+4.2
+E￿cient BERT-style Ranking
+Deep learning approaches have been widely adopted in the ranking,
+e.g., representation-based models [21, 43], interaction-based mod-
+els [18, 38, 48, 54, 58–60]. Currently, PLM-based ranking models
+achieve the state-of-the-art ranking e￿ectiveness [39, 40]. However,
+the performance improvement comes at the cost of e￿ciency since
+the computation cost scales quadratically to the text length. How
+to reconcile PLM-based ranking’s e￿ciency and e￿ectiveness is a
+seminal problem in a real-world ranking system. There are several
+research directions aiming to maintain high performance while
+keeping e￿cient computations for PLMs, including knowledge
+distillation [20], weight sharing [30], pruning [41], and quantiza-
+tion [22, 29]. Besides, many works attempt to model long-text with
+more e￿cient PLMs, such as Longformer [4], Linformer [47], Re-
+former [28], and Performer [11]. As to the ranking area, MORES [16]
+attempts to modularize the Transformer ranker into separate mod-
+ules for text representation and interaction. ColBERT [26] intro-
+duces a late interaction architecture that independently encodes
+the query and the document using BERT and employs a cheap yet
+powerful interaction step that models their ￿ne-grained similarity.
+Our work provides a content-aware Pyramid-ERNIE architecture
+that balances e￿ciency and e￿ectiveness in a real-world ranking
+system.
+4.3
+Task-tailored Pre-training
+As standard PLMs usually do not explicitly model task-speci￿c
+knowledge, a series of works have investigated encoding the do-
+main knowledge into pre-trained language models. Gururangan
+et al. [19] shows that the second phase of pre-training in-domain
+data leads to performance gains under both high- and low-resource
+settings [2, 3, 31, 52]. To name a few, Ma et al. [36] proposes to
+pre-train the Transformer model to predict the pairwise prefer-
+ence between the two sets of words given a document; Chang et al.
+[7] investigates various pre-training tasks in the large-scale dense
+retrieval problem; Zhang et al. [51] designs a gap-sentences genera-
+tion task as a pre-training objective tailored for abstractive text sum-
+marization; Zhou et al. [56] introduces two self-supervised strate-
+gies, i.e., concept-to-sentence generation and concept order recov-
+ering, to inject the concept-centric knowledge into pre-trained lan-
+guage models. In this work, we instead perform relevance-oriented
+pre-training using large-scale user behavioral data and design a
+tree-based calibration model to re￿ne the noisy and biased clicking
+data.
+4.4
+E￿ective Fine-tuning
+Although widely adopted, existing approaches for ￿ne-tuning pre-
+trained language models are confronted with issues like unstable
+predictions [1], poor generalization [24], or misalignment between
+the ￿ne-tuning objective and designer’s preferences [57]. Blindly
+￿ne-tuning the pre-trained model without considering intrinsic
+human-preferred task properties risks deviating the resultant ￿ne-
+tuned model from human-cared ultimate goals. This paper aims
+to mitigate such risks by exploring a human-anchored ￿ne-tuning
+strategy tailored for the online ranking system, which brings a
+substantial performance boost to a commercial search engine.
+5
+CONCLUSION
+In this work, we give an overview of practical solutions to employ
+the state-of-the-art Chinese pre-trained language model—ERNIE—
+in the large-scale online ranking system. The proposed solutions are
+successfully implemented and deployed to power the Baidu search
+engine. To mitigate the de￿ciency of existing PLMs when ranking
+the long web-document, we propose a novel practice to summa-
+rize the lengthy document and then capture the query-document
+relevance e￿ciently through a Pyramid-ERNIE architecture. To
+manage the discrepancy between the existing pre-training objec-
+tive and the urgent demands of relevance modeling in the ranking,
+we ￿rst provide a tree-based calibration model to align the user
+clicks with human preferences and then conduct the large-scale
+￿ne-tuning with re￿ned user behavioral data. We also articulate
+a human-anchored ￿ne-tuning strategy to deal with the inconsis-
+tency of ranking signals between the Pyramid-ERNIE and other
+online ranking components, which further improves the online
+ranking performance. The conducted extensive o￿ine and online
+experiments verify the e￿ectiveness of our proposed solutions.
+
+--- Page 9 ---
+REFERENCES
+[1] Armen Aghajanyan, Akshat Shrivastava, Anchit Gupta, Naman Goyal, Luke
+Zettlemoyer, and Sonal Gupta. 2020. Better ￿ne-tuning by reducing representa-
+tional collapse. arXiv:2008.03156 (2020).
+[2] Kristjan Arumae, Qing Sun, and Parminder Bhatia. 2020. An Empirical Investiga-
+tion towards E￿cient Multi-Domain Language Model Pre-training. In EMNLP’20.
+[3] Alexei Baevski, Sergey Edunov, Yinhan Liu, Luke Zettlemoyer, and M. Auli. 2019.
+Cloze-driven Pretraining of Self-attention Networks. In EMNLP’19.
+[4] Iz Beltagy, Matthew E Peters, and Arman Cohan. 2020. Longformer: The long-
+document transformer. arXiv:2004.05150 (2020).
+[5] Christopher JC Burges. 2010. From ranknet to lambdarank to lambdamart: An
+overview. Learning (2010).
+[6] Zhe Cao, Tao Qin, T. Liu, Ming-Feng Tsai, and H. Li. 2007. Learning to rank: from
+pairwise approach to listwise approach. In ICML’07.
+[7] Wei-Cheng Chang, X Yu Felix, Yin-Wen Chang, Yiming Yang, and Sanjiv Kumar.
+2019. Pre-training Tasks for Embedding-based Large-scale Retrieval. In ICLR’19.
+[8] Olivier Chapelle, Thorsten Joachims, Filip Radlinski, and Yisong Yue. 2012. Large-
+scale validation and analysis of interleaved search evaluation. TOIS (2012).
+[9] O. Chapelle and Y. Zhang. 2009. A dynamic bayesian network click model for
+web search ranking. In WWW’09.
+[10] J. Chen, Hande Dong, Xiao lei Wang, Fuli Feng, Ming-Chieh Wang, and X. He.
+2020. Bias and Debias in Recommender System: A Survey and Future Directions.
+arXiv:2010.03240 (2020).
+[11] Krzysztof Choromanski, Valerii Likhosherstov, David Dohan, Xingyou Song,
+Andreea Gane, Tamas Sarlos, Peter Hawkins, Jared Davis, Afroz Mohiuddin,
+Lukasz Kaiser, et al. 2020. Rethinking attention with performers. arXiv:2009.14794
+(2020).
+[12] William S Cooper, Fredric C Gey, and Daniel P Dabney. 1992. Probabilistic
+retrieval based on staged logistic regression. In SIGIR’92.
+[13] J. Devlin, Ming-Wei Chang, Kenton Lee, and Kristina Toutanova. 2019. BERT:
+Pre-training of Deep Bidirectional Transformers for Language Understanding. In
+NAACL-HLT’19.
+[14] Yoav Freund, Raj Iyer, Robert E Schapire, and Yoram Singer. 2003. An E￿cient
+Boosting Algorithm for Combining Preferences. JMLR (2003).
+[15] Yoav Freund and Robert E Schapire. 1997. A decision-theoretic generalization of
+on-line learning and an application to boosting. JCSS (1997).
+[16] Luyu Gao, Zhuyun Dai, and J. Callan. 2020. Modularized Transfomer-based
+Ranking Framework. In EMNLP’20.
+[17] Ian Goodfellow, Yoshua Bengio, Aaron Courville, and Yoshua Bengio. 2016. Deep
+learning. Vol. 1. MIT press Cambridge.
+[18] Jiafeng Guo, Yixing Fan, Qingyao Ai, and W Bruce Croft. 2016. A deep relevance
+matching model for ad-hoc retrieval. In CIKM’16.
+[19] Suchin Gururangan, Ana Marasović, Swabha Swayamdipta, Kyle Lo, Iz Beltagy,
+Doug Downey, and Noah A. Smith. 2020. Don’t Stop Pretraining: Adapt Language
+Models to Domains and Tasks. arXiv:2004.10964 (2020).
+[20] Geo￿rey Hinton, Oriol Vinyals, and Je￿Dean. 2015. Distilling the knowledge in
+a neural network. arXiv:1503.02531 (2015).
+[21] Po-Sen Huang, Xiaodong He, Jianfeng Gao, Li Deng, Alex Acero, and Larry
+Heck. 2013. Learning deep structured semantic models for web search using
+clickthrough data. In CIKM’13.
+[22] Benoit Jacob, Skirmantas Kligys, Bo Chen, Menglong Zhu, Matthew Tang, Andrew
+Howard, Hartwig Adam, and Dmitry Kalenichenko. 2018. Quantization and
+training of neural networks for e￿cient integer-arithmetic-only inference. In
+CVPR’18.
+[23] K. Järvelin and Jaana Kekäläinen. 2017. IR evaluation methods for retrieving
+highly relevant documents. In SIGIR’17.
+[24] Haoming Jiang, Pengcheng He, Weizhu Chen, Xiaodong Liu, Jianfeng Gao, and
+Tuo Zhao. 2019. Smart: Robust and e￿cient ￿ne-tuning for pre-trained natural
+language models through principled regularized optimization. arXiv:1911.03437
+(2019).
+[25] Thorsten Joachims. 2002. Optimizing search engines using clickthrough data. In
+SIGKDD’02.
+[26] Omar Khattab and Matei Zaharia. 2020. Colbert: E￿cient and e￿ective passage
+search via contextualized late interaction over bert. In SIGIR’20.
+[27] Diederik P. Kingma and Jimmy Ba. 2015. Adam: A Method for Stochastic Opti-
+mization. CoRR abs/1412.6980 (2015).
+[28] Nikita Kitaev, Łukasz Kaiser, and Anselm Levskaya. 2020. Reformer: The e￿cient
+transformer. arXiv:2001.04451 (2020).
+[29] Raghuraman Krishnamoorthi. 2018. Quantizing deep convolutional networks
+for e￿cient inference: A whitepaper. arXiv:1806.08342 (2018).
+[30] Zhenzhong Lan, Mingda Chen, Sebastian Goodman, Kevin Gimpel, Piyush
+Sharma, and Radu Soricut. 2019. Albert: A lite bert for self-supervised learning
+of language representations. arXiv:1909.11942 (2019).
+[31] Jinhyuk Lee, Wonjin Yoon, Sungdong Kim, D. Kim, Sunkyu Kim, Chan Ho So, and
+Jaewoo Kang. 2020. BioBERT: a pre-trained biomedical language representation
+model for biomedical text mining. Bioinformatics (2020).
+[32] Ping Li, Qiang Wu, and Christopher Burges. 2007. McRank: Learning to Rank
+Using Multiple Classi￿cation and Gradient Boosting. NIPS’07 (2007).
+[33] Jimmy Lin, Rodrigo Nogueira, and A. Yates. 2020. Pretrained Transformers for
+Text Ranking: BERT and Beyond. arXiv:2010.06467 (2020).
+[34] Tie-Yan Liu. 2009. Learning to Rank for Information Retrieval. Foundations and
+Trends in Information Retrieval (2009).
+[35] Yiding Liu, Weixue Lu, Suqi Cheng, Daiting Shi, Shuaiqiang Wang, Zhicong
+Cheng, and Dawei Yin. 2021. Pre-trained Language Model for Web-scale Retrieval
+in Baidu Search. In SIGKDD’21.
+[36] Xinyu Ma, Jiafeng Guo, Ruqing Zhang, Yixing Fan, Xiang Ji, and Xueqi Cheng.
+2020. PROP: Pre-training with Representative Words Prediction for Ad-hoc
+Retrieval. arXiv:2010.10137 (2020).
+[37] Oded Z Maimon and Lior Rokach. 2014. Data mining with decision trees: theory
+and applications. World scienti￿c.
+[38] Ryan McDonald, George Brokos, and Ion Androutsopoulos. 2018. Deep Relevance
+Ranking Using Enhanced Document-Query Interactions. In EMNLP’18.
+[39] Rodrigo Nogueira and Kyunghyun Cho. 2019. Passage Re-ranking with BERT.
+arXiv:1901.04085 (2019).
+[40] Rodrigo Nogueira, W. Yang, Kyunghyun Cho, and Jimmy Lin. 2019. Multi-Stage
+Document Ranking with BERT. arXiv:1910.14424 (2019).
+[41] Morteza Mousa Pasandi, Mohsen Hajabdollahi, Nader Karimi, and Shadrokh
+Samavi. 2020. Modeling of Pruning Techniques for Deep Neural Networks
+Simpli￿cation. arXiv:2001.04062 (2020).
+[42] Lorenzo Rosasco, Ernesto De Vito, Andrea Caponnetto, Michele Piana, and
+Alessandro Verri. 2004. Are loss functions all the same? Neural computation
+(2004).
+[43] Yelong Shen, Xiaodong He, Jianfeng Gao, Li Deng, and Grégoire Mesnil. 2014.
+A latent semantic model with convolutional-pooling structure for information
+retrieval. In CIKM’14.
+[44] Yu Sun, Shuohuan Wang, Yukun Li, Shikun Feng, Xuyi Chen, Han Zhang, Xin
+Tian, Danxiang Zhu, Hao Tian, and Hua Wu. 2019. ERNIE: Enhanced Represen-
+tation through Knowledge Integration. arXiv preprint arXiv:1904.09223 (2019).
+[45] Yi Tay, Mostafa Dehghani, Dara Bahri, and Donald Metzler. 2020. E￿cient
+transformers: A survey. arXiv:2009.06732 (2020).
+[46] Ashish Vaswani, Noam Shazeer, Niki Parmar, Jakob Uszkoreit, Llion Jones,
+Aidan N. Gomez, L. Kaiser, and Illia Polosukhin. 2017. Attention is All you
+Need. In NIPS’17.
+[47] Sinong Wang, Belinda Li, Madian Khabsa, Han Fang, and Hao Ma. 2020. Linformer:
+Self-attention with linear complexity. arXiv:2006.04768 (2020).
+[48] Chenyan Xiong, Zhuyun Dai, Jamie Callan, Zhiyuan Liu, and Russell Power. 2017.
+End-to-end neural ad-hoc ranking with kernel pooling. In SIGIR’17.
+[49] Z. Yang, Zihang Dai, Yiming Yang, J. Carbonell, R. Salakhutdinov, and Quoc V.
+Le. 2019. XLNet: Generalized Autoregressive Pretraining for Language Under-
+standing. NeurIPS’19 (2019).
+[50] Dawei Yin, Yuening Hu, Jiliang Tang, Tim Daly, Mianwei Zhou, Hua Ouyang,
+Jianhui Chen, Changsung Kang, Hongbo Deng, Chikashi Nobata, et al. 2016.
+Ranking relevance in yahoo search. In SIGKDD’16.
+[51] Jingqing Zhang, Yao Zhao, Mohammad Saleh, and Peter Liu. 2020. Pegasus:
+Pre-training with extracted gap-sentences for abstractive summarization. In
+ICML’20.
+[52] R. Zhang, Revanth Reddy Gangi Reddy, Md Arafat Sultan, V. Castelli, Anthony
+Ferritto, Radu Florian, Efsun Sarioglu Kayi, S. Roukos, A. Sil, and T. Ward. 2020.
+Multi-Stage Pre-training for Low-Resource Domain Adaptation. arXiv:2010.05904
+(2020).
+[53] Shiqi Zhao, H. Wang, Chao Li, T. Liu, and Y. Guan. 2011. Automatically Gen-
+erating Questions from Queries for Community-based Question Answering. In
+IJCNLP’11.
+[54] Xiangyu Zhao, Long Xia, Lixin Zou, Hui Liu, Dawei Yin, and Jiliang Tang. 2020.
+Whole-Chain Recommendations. In CIKM’20.
+[55] Zhaohui Zheng, Keke Chen, Gordon Sun, and Hongyuan Zha. 2007. A regression
+framework for learning ranking functions using relative relevance judgments. In
+SIGIR’07.
+[56] Wangchunshu Zhou, Dong-Ho Lee, Ravi Kiran Selvam, Seyeon Lee, Bill Yuchen
+Lin, and Xiang Ren. 2020. Pre-training text-to-text transformers for concept-
+centric common sense. arXiv:2011.07956 (2020).
+[57] Daniel M Ziegler, Nisan Stiennon, Je￿rey Wu, Tom B Brown, Alec Radford, Dario
+Amodei, Paul Christiano, and Geo￿rey Irving. 2019. Fine-tuning language models
+from human preferences. arXiv:1909.08593 (2019).
+[58] Lixin Zou, Long Xia, Zhuoye Ding, Jiaxing Song, Weidong Liu, and Dawei Yin.
+2019. Reinforcement learning to optimize long-term user engagement in recom-
+mender systems. In SIGKDD’19.
+[59] Lixin Zou, Long Xia, Pan Du, Zhuo Zhang, Ting Bai, Weidong Liu, Jian-Yun Nie,
+and Dawei Yin. 2020. Pseudo Dyna-Q: A reinforcement learning framework for
+interactive recommendation. In WSDM’20.
+[60] Lixin Zou, Long Xia, Yulong Gu, Xiangyu Zhao, Weidong Liu, Jimmy Xiangji
+Huang, and Dawei Yin. 2020. Neural Interactive Collaborative Filtering. In
+SIGIR’20.
+

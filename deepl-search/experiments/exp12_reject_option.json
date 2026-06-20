@@ -1,0 +1,149 @@
+{
+  "n_queries": 2000,
+  "confidence_mean": 0.1231,
+  "confidence_median": 0.1131,
+  "confidence_std": 0.0767,
+  "percentiles": {
+    "p10": 0.0308,
+    "p25": 0.0679,
+    "p50": 0.1131,
+    "p75": 0.1696,
+    "p90": 0.2258
+  },
+  "coverage_curve": [
+    {
+      "threshold": 0.0,
+      "n_accepted": 2000,
+      "coverage_pct": 100.0,
+      "mean_confidence": 0.1231
+    },
+    {
+      "threshold": 0.05,
+      "n_accepted": 1660,
+      "coverage_pct": 83.0,
+      "mean_confidence": 0.1436
+    },
+    {
+      "threshold": 0.1,
+      "n_accepted": 1148,
+      "coverage_pct": 57.4,
+      "mean_confidence": 0.1735
+    },
+    {
+      "threshold": 0.15,
+      "n_accepted": 646,
+      "coverage_pct": 32.3,
+      "mean_confidence": 0.2121
+    },
+    {
+      "threshold": 0.2,
+      "n_accepted": 314,
+      "coverage_pct": 15.7,
+      "mean_confidence": 0.2537
+    },
+    {
+      "threshold": 0.25,
+      "n_accepted": 133,
+      "coverage_pct": 6.7,
+      "mean_confidence": 0.298
+    },
+    {
+      "threshold": 0.3,
+      "n_accepted": 48,
+      "coverage_pct": 2.4,
+      "mean_confidence": 0.345
+    },
+    {
+      "threshold": 0.35,
+      "n_accepted": 18,
+      "coverage_pct": 0.9,
+      "mean_confidence": 0.3811
+    },
+    {
+      "threshold": 0.4,
+      "n_accepted": 3,
+      "coverage_pct": 0.1,
+      "mean_confidence": 0.4485
+    },
+    {
+      "threshold": 0.45,
+      "n_accepted": 1,
+      "coverage_pct": 0.1,
+      "mean_confidence": 0.4977
+    },
+    {
+      "threshold": 0.5,
+      "n_accepted": 0,
+      "coverage_pct": 0.0,
+      "mean_confidence": 0.0
+    },
+    {
+      "threshold": 0.55,
+      "n_accepted": 0,
+      "coverage_pct": 0.0,
+      "mean_confidence": 0.0
+    },
+    {
+      "threshold": 0.6,
+      "n_accepted": 0,
+      "coverage_pct": 0.0,
+      "mean_confidence": 0.0
+    },
+    {
+      "threshold": 0.65,
+      "n_accepted": 0,
+      "coverage_pct": 0.0,
+      "mean_confidence": 0.0
+    },
+    {
+      "threshold": 0.7,
+      "n_accepted": 0,
+      "coverage_pct": 0.0,
+      "mean_confidence": 0.0
+    },
+    {
+      "threshold": 0.75,
+      "n_accepted": 0,
+      "coverage_pct": 0.0,
+      "mean_confidence": 0.0
+    },
+    {
+      "threshold": 0.8,
+      "n_accepted": 0,
+      "coverage_pct": 0.0,
+      "mean_confidence": 0.0
+    },
+    {
+      "threshold": 0.85,
+      "n_accepted": 0,
+      "coverage_pct": 0.0,
+      "mean_confidence": 0.0
+    },
+    {
+      "threshold": 0.9,
+      "n_accepted": 0,
+      "coverage_pct": 0.0,
+      "mean_confidence": 0.0
+    },
+    {
+      "threshold": 0.95,
+      "n_accepted": 0,
+      "coverage_pct": 0.0,
+      "mean_confidence": 0.0
+    }
+  ],
+  "low_confidence_at_05_pct": 100.0,
+  "elbow_90": {
+    "threshold": 0.0,
+    "n_accepted": 2000,
+    "coverage_pct": 100.0,
+    "mean_confidence": 0.1231
+  },
+  "elbow_80": {
+    "threshold": 0.05,
+    "n_accepted": 1660,
+    "coverage_pct": 83.0,
+    "mean_confidence": 0.1436
+  },
+  "decision": "FALSIFIED: Cannot reach 80% coverage at reasonable threshold. Reject option essential."
+}

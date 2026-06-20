@@ -1,0 +1,522 @@
+{
+  "L1": {
+    "curve": [
+      {
+        "threshold": 0.0,
+        "coverage": 0.91,
+        "n_accepted": 1820,
+        "n_rejected": 180
+      },
+      {
+        "threshold": 0.025,
+        "coverage": 0.7845,
+        "n_accepted": 1569,
+        "n_rejected": 431
+      },
+      {
+        "threshold": 0.05,
+        "coverage": 0.64,
+        "n_accepted": 1280,
+        "n_rejected": 720
+      },
+      {
+        "threshold": 0.075,
+        "coverage": 0.4855,
+        "n_accepted": 971,
+        "n_rejected": 1029
+      },
+      {
+        "threshold": 0.1,
+        "coverage": 0.3655,
+        "n_accepted": 731,
+        "n_rejected": 1269
+      },
+      {
+        "threshold": 0.125,
+        "coverage": 0.2605,
+        "n_accepted": 521,
+        "n_rejected": 1479
+      },
+      {
+        "threshold": 0.15,
+        "coverage": 0.1825,
+        "n_accepted": 365,
+        "n_rejected": 1635
+      },
+      {
+        "threshold": 0.175,
+        "coverage": 0.1255,
+        "n_accepted": 251,
+        "n_rejected": 1749
+      },
+      {
+        "threshold": 0.2,
+        "coverage": 0.0805,
+        "n_accepted": 161,
+        "n_rejected": 1839
+      },
+      {
+        "threshold": 0.225,
+        "coverage": 0.0555,
+        "n_accepted": 111,
+        "n_rejected": 1889
+      },
+      {
+        "threshold": 0.25,
+        "coverage": 0.03,
+        "n_accepted": 60,
+        "n_rejected": 1940
+      },
+      {
+        "threshold": 0.275,
+        "coverage": 0.019,
+        "n_accepted": 38,
+        "n_rejected": 1962
+      },
+      {
+        "threshold": 0.3,
+        "coverage": 0.012,
+        "n_accepted": 24,
+        "n_rejected": 1976
+      },
+      {
+        "threshold": 0.325,
+        "coverage": 0.006,
+        "n_accepted": 12,
+        "n_rejected": 1988
+      },
+      {
+        "threshold": 0.35,
+        "coverage": 0.003,
+        "n_accepted": 6,
+        "n_rejected": 1994
+      },
+      {
+        "threshold": 0.375,
+        "coverage": 0.002,
+        "n_accepted": 4,
+        "n_rejected": 1996
+      },
+      {
+        "threshold": 0.4,
+        "coverage": 0.001,
+        "n_accepted": 2,
+        "n_rejected": 1998
+      },
+      {
+        "threshold": 0.425,
+        "coverage": 0.0005,
+        "n_accepted": 1,
+        "n_rejected": 1999
+      },
+      {
+        "threshold": 0.45,
+        "coverage": 0.0005,
+        "n_accepted": 1,
+        "n_rejected": 1999
+      },
+      {
+        "threshold": 0.475,
+        "coverage": 0.0,
+        "n_accepted": 0,
+        "n_rejected": 2000
+      },
+      {
+        "threshold": 0.5,
+        "coverage": 0.0,
+        "n_accepted": 0,
+        "n_rejected": 2000
+      },
+      {
+        "threshold": 0.525,
+        "coverage": 0.0,
+        "n_accepted": 0,
+        "n_rejected": 2000
+      },
+      {
+        "threshold": 0.55,
+        "coverage": 0.0,
+        "n_accepted": 0,
+        "n_rejected": 2000
+      },
+      {
+        "threshold": 0.575,
+        "coverage": 0.0,
+        "n_accepted": 0,
+        "n_rejected": 2000
+      },
+      {
+        "threshold": 0.6,
+        "coverage": 0.0,
+        "n_accepted": 0,
+        "n_rejected": 2000
+      },
+      {
+        "threshold": 0.625,
+        "coverage": 0.0,
+        "n_accepted": 0,
+        "n_rejected": 2000
+      },
+      {
+        "threshold": 0.65,
+        "coverage": 0.0,
+        "n_accepted": 0,
+        "n_rejected": 2000
+      },
+      {
+        "threshold": 0.675,
+        "coverage": 0.0,
+        "n_accepted": 0,
+        "n_rejected": 2000
+      },
+      {
+        "threshold": 0.7,
+        "coverage": 0.0,
+        "n_accepted": 0,
+        "n_rejected": 2000
+      },
+      {
+        "threshold": 0.725,
+        "coverage": 0.0,
+        "n_accepted": 0,
+        "n_rejected": 2000
+      },
+      {
+        "threshold": 0.75,
+        "coverage": 0.0,
+        "n_accepted": 0,
+        "n_rejected": 2000
+      },
+      {
+        "threshold": 0.775,
+        "coverage": 0.0,
+        "n_accepted": 0,
+        "n_rejected": 2000
+      },
+      {
+        "threshold": 0.8,
+        "coverage": 0.0,
+        "n_accepted": 0,
+        "n_rejected": 2000
+      },
+      {
+        "threshold": 0.825,
+        "coverage": 0.0,
+        "n_accepted": 0,
+        "n_rejected": 2000
+      },
+      {
+        "threshold": 0.85,
+        "coverage": 0.0,
+        "n_accepted": 0,
+        "n_rejected": 2000
+      },
+      {
+        "threshold": 0.875,
+        "coverage": 0.0,
+        "n_accepted": 0,
+        "n_rejected": 2000
+      },
+      {
+        "threshold": 0.9,
+        "coverage": 0.0,
+        "n_accepted": 0,
+        "n_rejected": 2000
+      },
+      {
+        "threshold": 0.925,
+        "coverage": 0.0,
+        "n_accepted": 0,
+        "n_rejected": 2000
+      }
+    ],
+    "n_classes": 8,
+    "n_queries": 2000,
+    "overall_mean_confidence": 0.0856,
+    "overall_std_confidence": 0.0749,
+    "max_tau_for_1pct_coverage": {
+      "threshold": 0.025,
+      "coverage": 0.7845
+    },
+    "max_tau_for_0pct_coverage": {
+      "threshold": 0.05,
+      "coverage": 0.64
+    }
+  },
+  "L2": {
+    "curve": [
+      {
+        "threshold": 0.0,
+        "coverage": 1.0,
+        "n_accepted": 2000,
+        "n_rejected": 0
+      },
+      {
+        "threshold": 0.025,
+        "coverage": 1.0,
+        "n_accepted": 2000,
+        "n_rejected": 0
+      },
+      {
+        "threshold": 0.05,
+        "coverage": 0.9895,
+        "n_accepted": 1979,
+        "n_rejected": 21
+      },
+      {
+        "threshold": 0.075,
+        "coverage": 0.9485,
+        "n_accepted": 1897,
+        "n_rejected": 103
+      },
+      {
+        "threshold": 0.1,
+        "coverage": 0.869,
+        "n_accepted": 1738,
+        "n_rejected": 262
+      },
+      {
+        "threshold": 0.125,
+        "coverage": 0.741,
+        "n_accepted": 1482,
+        "n_rejected": 518
+      },
+      {
+        "threshold": 0.15,
+        "coverage": 0.6025,
+        "n_accepted": 1205,
+        "n_rejected": 795
+      },
+      {
+        "threshold": 0.175,
+        "coverage": 0.4785,
+        "n_accepted": 957,
+        "n_rejected": 1043
+      },
+      {
+        "threshold": 0.2,
+        "coverage": 0.3775,
+        "n_accepted": 755,
+        "n_rejected": 1245
+      },
+      {
+        "threshold": 0.225,
+        "coverage": 0.2915,
+        "n_accepted": 583,
+        "n_rejected": 1417
+      },
+      {
+        "threshold": 0.25,
+        "coverage": 0.2085,
+        "n_accepted": 417,
+        "n_rejected": 1583
+      },
+      {
+        "threshold": 0.275,
+        "coverage": 0.15,
+        "n_accepted": 300,
+        "n_rejected": 1700
+      },
+      {
+        "threshold": 0.3,
+        "coverage": 0.1075,
+        "n_accepted": 215,
+        "n_rejected": 1785
+      },
+      {
+        "threshold": 0.325,
+        "coverage": 0.0775,
+        "n_accepted": 155,
+        "n_rejected": 1845
+      },
+      {
+        "threshold": 0.35,
+        "coverage": 0.052,
+        "n_accepted": 104,
+        "n_rejected": 1896
+      },
+      {
+        "threshold": 0.375,
+        "coverage": 0.036,
+        "n_accepted": 72,
+        "n_rejected": 1928
+      },
+      {
+        "threshold": 0.4,
+        "coverage": 0.024,
+        "n_accepted": 48,
+        "n_rejected": 1952
+      },
+      {
+        "threshold": 0.425,
+        "coverage": 0.0155,
+        "n_accepted": 31,
+        "n_rejected": 1969
+      },
+      {
+        "threshold": 0.45,
+        "coverage": 0.01,
+        "n_accepted": 20,
+        "n_rejected": 1980
+      },
+      {
+        "threshold": 0.475,
+        "coverage": 0.0045,
+        "n_accepted": 9,
+        "n_rejected": 1991
+      },
+      {
+        "threshold": 0.5,
+        "coverage": 0.0025,
+        "n_accepted": 5,
+        "n_rejected": 1995
+      },
+      {
+        "threshold": 0.525,
+        "coverage": 0.002,
+        "n_accepted": 4,
+        "n_rejected": 1996
+      },
+      {
+        "threshold": 0.55,
+        "coverage": 0.001,
+        "n_accepted": 2,
+        "n_rejected": 1998
+      },
+      {
+        "threshold": 0.575,
+        "coverage": 0.0,
+        "n_accepted": 0,
+        "n_rejected": 2000
+      },
+      {
+        "threshold": 0.6,
+        "coverage": 0.0,
+        "n_accepted": 0,
+        "n_rejected": 2000
+      },
+      {
+        "threshold": 0.625,
+        "coverage": 0.0,
+        "n_accepted": 0,
+        "n_rejected": 2000
+      },
+      {
+        "threshold": 0.65,
+        "coverage": 0.0,
+        "n_accepted": 0,
+        "n_rejected": 2000
+      },
+      {
+        "threshold": 0.675,
+        "coverage": 0.0,
+        "n_accepted": 0,
+        "n_rejected": 2000
+      },
+      {
+        "threshold": 0.7,
+        "coverage": 0.0,
+        "n_accepted": 0,
+        "n_rejected": 2000
+      },
+      {
+        "threshold": 0.725,
+        "coverage": 0.0,
+        "n_accepted": 0,
+        "n_rejected": 2000
+      },
+      {
+        "threshold": 0.75,
+        "coverage": 0.0,
+        "n_accepted": 0,
+        "n_rejected": 2000
+      },
+      {
+        "threshold": 0.775,
+        "coverage": 0.0,
+        "n_accepted": 0,
+        "n_rejected": 2000
+      },
+      {
+        "threshold": 0.8,
+        "coverage": 0.0,
+        "n_accepted": 0,
+        "n_rejected": 2000
+      },
+      {
+        "threshold": 0.825,
+        "coverage": 0.0,
+        "n_accepted": 0,
+        "n_rejected": 2000
+      },
+      {
+        "threshold": 0.85,
+        "coverage": 0.0,
+        "n_accepted": 0,
+        "n_rejected": 2000
+      },
+      {
+        "threshold": 0.875,
+        "coverage": 0.0,
+        "n_accepted": 0,
+        "n_rejected": 2000
+      },
+      {
+        "threshold": 0.9,
+        "coverage": 0.0,
+        "n_accepted": 0,
+        "n_rejected": 2000
+      },
+      {
+        "threshold": 0.925,
+        "coverage": 0.0,
+        "n_accepted": 0,
+        "n_rejected": 2000
+      }
+    ],
+    "n_classes": 64,
+    "n_queries": 2000,
+    "overall_mean_confidence": 0.1869,
+    "overall_std_confidence": 0.0866,
+    "max_tau_for_1pct_coverage": {
+      "threshold": 0.125,
+      "coverage": 0.741
+    },
+    "max_tau_for_0pct_coverage": {
+      "threshold": 0.15,
+      "coverage": 0.6025
+    }
+  },
+  "granularity_ladder": {
+    "tau_0.05": {
+      "l2_direct_pct": 99.0,
+      "l1_fallback_pct": 0.0,
+      "rejected_pct": 1.1
+    },
+    "tau_0.10": {
+      "l2_direct_pct": 86.9,
+      "l1_fallback_pct": 0.1,
+      "rejected_pct": 13.0
+    },
+    "tau_0.15": {
+      "l2_direct_pct": 60.2,
+      "l1_fallback_pct": 0.2,
+      "rejected_pct": 39.5
+    },
+    "tau_0.20": {
+      "l2_direct_pct": 37.8,
+      "l1_fallback_pct": 0.2,
+      "rejected_pct": 62.0
+    },
+    "tau_0.30": {
+      "l2_direct_pct": 10.8,
+      "l1_fallback_pct": 0.3,
+      "rejected_pct": 88.9
+    },
+    "tau_0.50": {
+      "l2_direct_pct": 0.2,
+      "l1_fallback_pct": 0.0,
+      "rejected_pct": 99.8
+    }
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "n_single": 500,
+  "n_sessions": 500,
+  "single_mean_conf": 0.123,
+  "session_mean_conf": 0.1396,
+  "conf_gain": 0.0166,
+  "prediction_changes": 438,
+  "change_rate_pct": 87.6,
+  "decision": "FALSIFIED: Session context changes >30% of predictions. Query alone is insufficient."
+}

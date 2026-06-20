@@ -1,0 +1,8 @@
+{
+  "n_queries": 500,
+  "total_misspelled_variants": 727,
+  "changed_by_misspelling": 600,
+  "change_rate_pct": 82.5,
+  "has_symspell": false,
+  "decision": "FALSIFIED: 82.5% change rate from misspellings. Preprocessing more important than architecture."
+}

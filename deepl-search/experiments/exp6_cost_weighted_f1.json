@@ -1,0 +1,45 @@
+{
+  "n_samples": 1000,
+  "n_classes": 100,
+  "models": [
+    {
+      "name": "Model A: High F1, some cross-L1",
+      "error_rate": 0.15,
+      "cross_l1_pct": 0.3,
+      "accuracy": 0.85,
+      "f1": 0.85,
+      "avg_cost": 0.0786,
+      "cost_weighted_f1": 0.7832
+    },
+    {
+      "name": "Model B: Lower F1, all within-L1",
+      "error_rate": 0.2,
+      "cross_l1_pct": 0.05,
+      "accuracy": 0.805,
+      "f1": 0.805,
+      "avg_cost": 0.062,
+      "cost_weighted_f1": 0.7551
+    },
+    {
+      "name": "Model C: Moderate F1, moderate cross-L1",
+      "error_rate": 0.18,
+      "cross_l1_pct": 0.15,
+      "accuracy": 0.834,
+      "f1": 0.834,
+      "avg_cost": 0.0708,
+      "cost_weighted_f1": 0.775
+    }
+  ],
+  "rank_by_f1": [
+    "Model A: High F1, some cross-L1",
+    "Model C: Moderate F1, moderate cross-L1",
+    "Model B: Lower F1, all within-L1"
+  ],
+  "rank_by_cost_weighted": [
+    "Model A: High F1, some cross-L1",
+    "Model C: Moderate F1, moderate cross-L1",
+    "Model B: Lower F1, all within-L1"
+  ],
+  "ranks_differ": false,
+  "decision": "PREMISE HOLDS: Same ranking by both metrics. F1 is sufficient proxy."
+}

@@ -1,0 +1,20 @@
+{
+  "n_queries_trained": 20000,
+  "n_session_pairs_eval": 200,
+  "vanilla_all_minilm": {
+    "mean_similarity": 0.3215445578098297,
+    "std_similarity": 0.19538447260856628,
+    "pct_above_0_5": 0.17,
+    "pct_above_0_3": 0.525
+  },
+  "simcse_trained": {
+    "mean_similarity": 0.3644134998321533,
+    "std_similarity": 0.22724366188049316,
+    "pct_above_0_5": 0.29,
+    "pct_above_0_3": 0.565
+  },
+  "delta": {
+    "mean_similarity": 0.04286894202232361,
+    "std_similarity": 0.03185918927192688
+  }
+}

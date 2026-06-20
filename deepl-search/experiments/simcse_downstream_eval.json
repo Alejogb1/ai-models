@@ -1,0 +1,35 @@
+{
+  "n_queries": 500,
+  "L1": {
+    "vanilla": {
+      "mean_confidence": 0.0939912423491478,
+      "std_confidence": 0.07654279470443726,
+      "max_confidence": 0.35071611404418945,
+      "median_confidence": 0.08033454418182373
+    },
+    "simcse": {
+      "mean_confidence": 0.14959242939949036,
+      "std_confidence": 0.1294967532157898,
+      "max_confidence": 0.5361227989196777,
+      "median_confidence": 0.12868762016296387
+    }
+  },
+  "L2": {
+    "vanilla": {
+      "mean_confidence": 0.18950647115707397,
+      "std_confidence": 0.0881701186299324,
+      "max_confidence": 0.5246933102607727,
+      "median_confidence": 0.1771617829799652
+    },
+    "simcse": {
+      "mean_confidence": 0.28578948974609375,
+      "std_confidence": 0.13819043338298798,
+      "max_confidence": 0.7227425575256348,
+      "median_confidence": 0.2732424736022949
+    }
+  },
+  "L2_effective_K": {
+    "vanilla": 42,
+    "simcse": 35
+  }
+}

@@ -1,0 +1,194 @@
+{
+  "vanilla": {
+    "l2_accuracy": 0.244,
+    "l1_accuracy": 0.446,
+    "correct": 122,
+    "total": 500,
+    "mean_confidence": 0.1906554405912757,
+    "std_confidence": 0.09190816225169729,
+    "max_confidence": 0.599045991897583,
+    "min_confidence": 0.03149117901921272,
+    "effective_K": 39,
+    "confidence_bins": {
+      "0_0.05": 3,
+      "0.05_0.10": 65,
+      "0.10_0.15": 129,
+      "0.15_0.20": 117,
+      "0.20_0.30": 125,
+      "0.30_0.50": 58,
+      "0.50_1.00": 3
+    },
+    "per_l1_accuracy": {
+      "Arts & Entertainment": {
+        "accuracy": 0.5277777777777778,
+        "total": 36
+      },
+      "Business & Finance": {
+        "accuracy": 0.39344262295081966,
+        "total": 61
+      },
+      "Computers & Technology": {
+        "accuracy": 0.12903225806451613,
+        "total": 31
+      },
+      "Education & Reference": {
+        "accuracy": 0.08284023668639054,
+        "total": 169
+      },
+      "Food & Dining": {
+        "accuracy": 0.28,
+        "total": 25
+      },
+      "Health & Fitness": {
+        "accuracy": 0.3595505617977528,
+        "total": 89
+      },
+      "Shopping & Commerce": {
+        "accuracy": 0.16216216216216217,
+        "total": 37
+      },
+      "Travel & Local": {
+        "accuracy": 0.36363636363636365,
+        "total": 44
+      }
+    },
+    "per_l1_mean_confidence": {
+      "Arts & Entertainment": 0.20270700131853422,
+      "Business & Finance": 0.22165547677727995,
+      "Computers & Technology": 0.17843969094176446,
+      "Education & Reference": 0.17200087403228298,
+      "Food & Dining": 0.26386354595422745,
+      "Health & Fitness": 0.19934383859292845,
+      "Shopping & Commerce": 0.14187539872285482,
+      "Travel & Local": 0.20560045675797897
+    }
+  },
+  "simcse": {
+    "l2_accuracy": 0.282,
+    "l1_accuracy": 0.458,
+    "correct": 141,
+    "total": 500,
+    "mean_confidence": 0.2935223607495427,
+    "std_confidence": 0.1512318595299527,
+    "max_confidence": 0.7209933996200562,
+    "min_confidence": 0.0038533564656972885,
+    "effective_K": 38,
+    "confidence_bins": {
+      "0_0.05": 4,
+      "0.05_0.10": 32,
+      "0.10_0.15": 50,
+      "0.15_0.20": 65,
+      "0.20_0.30": 141,
+      "0.30_0.50": 147,
+      "0.50_1.00": 61
+    },
+    "per_l1_accuracy": {
+      "Arts & Entertainment": {
+        "accuracy": 0.6388888888888888,
+        "total": 36
+      },
+      "Business & Finance": {
+        "accuracy": 0.3442622950819672,
+        "total": 61
+      },
+      "Computers & Technology": {
+        "accuracy": 0.1935483870967742,
+        "total": 31
+      },
+      "Education & Reference": {
+        "accuracy": 0.17159763313609466,
+        "total": 169
+      },
+      "Food & Dining": {
+        "accuracy": 0.2,
+        "total": 25
+      },
+      "Health & Fitness": {
+        "accuracy": 0.3707865168539326,
+        "total": 89
+      },
+      "Shopping & Commerce": {
+        "accuracy": 0.1891891891891892,
+        "total": 37
+      },
+      "Travel & Local": {
+        "accuracy": 0.38636363636363635,
+        "total": 44
+      }
+    },
+    "per_l1_mean_confidence": {
+      "Arts & Entertainment": 0.3172832193473975,
+      "Business & Finance": 0.3532508353962273,
+      "Computers & Technology": 0.2272015728296772,
+      "Education & Reference": 0.2546307007457025,
+      "Food & Dining": 0.3805223134160042,
+      "Health & Fitness": 0.30465336240242036,
+      "Shopping & Commerce": 0.2415451182908303,
+      "Travel & Local": 0.36511110785332596
+    }
+  },
+  "bi_encoder_labeled": {
+    "l2_accuracy": 0.748,
+    "l1_accuracy": 0.848,
+    "correct": 374,
+    "total": 500,
+    "mean_confidence": 0.42788848125934603,
+    "std_confidence": 0.11961567229131198,
+    "max_confidence": 0.7801316976547241,
+    "min_confidence": 0.1305997669696808,
+    "effective_K": 25,
+    "confidence_bins": {
+      "0_0.05": 0,
+      "0.05_0.10": 0,
+      "0.10_0.15": 3,
+      "0.15_0.20": 7,
+      "0.20_0.30": 62,
+      "0.30_0.50": 299,
+      "0.50_1.00": 129
+    },
+    "per_l1_accuracy": {
+      "Arts & Entertainment": {
+        "accuracy": 0.9444444444444444,
+        "total": 36
+      },
+      "Business & Finance": {
+        "accuracy": 0.819672131147541,
+        "total": 61
+      },
+      "Computers & Technology": {
+        "accuracy": 0.6129032258064516,
+        "total": 31
+      },
+      "Education & Reference": {
+        "accuracy": 0.7514792899408284,
+        "total": 169
+      },
+      "Food & Dining": {
+        "accuracy": 0.48,
+        "total": 25
+      },
+      "Health & Fitness": {
+        "accuracy": 0.7191011235955056,
+        "total": 89
+      },
+      "Shopping & Commerce": {
+        "accuracy": 0.8108108108108109,
+        "total": 37
+      },
+      "Travel & Local": {
+        "accuracy": 0.8636363636363636,
+        "total": 44
+      }
+    },
+    "per_l1_mean_confidence": {
+      "Arts & Entertainment": 0.4967234830061595,
+      "Business & Finance": 0.4581601209327823,
+      "Computers & Technology": 0.3902200090308343,
+      "Education & Reference": 0.3896336987526459,
+      "Food & Dining": 0.528445497751236,
+      "Health & Fitness": 0.4340451170554322,
+      "Shopping & Commerce": 0.3816406674481727,
+      "Travel & Local": 0.48076224530285055
+    }
+  }
+}

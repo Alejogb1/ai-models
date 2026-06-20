@@ -1,0 +1,17 @@
+{
+  "n_queries": 2000,
+  "l1_mean_conf": 0.06669999659061432,
+  "l2_mean_conf": 0.10859999805688858,
+  "l3_mean_conf": 0.11550000309944153,
+  "l4_mean_conf": 0.12219999730587006,
+  "l1_to_l2_drop": -0.04190000146627426,
+  "l2_to_l3_drop": -0.006899999920278788,
+  "l3_to_l4_drop": -0.0066999997943639755,
+  "total_drop": -0.05559999868273735,
+  "l1_self_consistency_pct": 72.8,
+  "l1_above_07_pct": 0.0,
+  "l4_above_07_pct": 0.0,
+  "l3_effective_used": 423,
+  "l4_effective_used": 1069,
+  "decision": "WEAKENED: L1 self-consistency only 72.8%. L4 predictions inconsistent with L1."
+}

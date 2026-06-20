@@ -1,0 +1,60 @@
+{
+  "n_train": 400,
+  "n_val": 100,
+  "n_epochs": 10,
+  "batch_size": 32,
+  "lr": 2e-05,
+  "temperature": 0.05,
+  "model_path": "C:\\Users\\ALEJOO\\Documents\\Gym IG Content Landing Page\\ai-models\\deepl-search\\models\\bi_encoder_labeled",
+  "before_training": {
+    "accuracy": 0.25,
+    "correct": 25,
+    "total": 100,
+    "mean_confidence": 0.28272914681583644,
+    "std_confidence": 0.13511788686183618,
+    "max_confidence": 0.6224544048309326,
+    "min_confidence": 0.03624230995774269,
+    "effective_K": 24,
+    "top10_classes_share": {
+      "Celebrities": 0.06,
+      "Small Business": 0.05,
+      "Real Estate": 0.04,
+      "Medical Conditions": 0.04,
+      "Weather": 0.04,
+      "Food Science": 0.04,
+      "Dictionaries & Thesauri": 0.04,
+      "Groceries": 0.04,
+      "Economy": 0.03,
+      "Cuisine Types": 0.03
+    }
+  },
+  "after_training": {
+    "accuracy": 0.53,
+    "correct": 53,
+    "total": 100,
+    "mean_confidence": 0.40363605186343193,
+    "std_confidence": 0.11659649555590886,
+    "max_confidence": 0.6380683183670044,
+    "min_confidence": 0.13068437576293945,
+    "effective_K": 21,
+    "top10_classes_share": {
+      "Research": 0.08,
+      "Academic Subjects": 0.08,
+      "Medical Conditions": 0.07,
+      "Food Science": 0.07,
+      "Home & Garden": 0.06,
+      "Software": 0.06,
+      "Dictionaries & Thesauri": 0.05,
+      "Celebrities": 0.04,
+      "Maps & Navigation": 0.04,
+      "Small Business": 0.04
+    }
+  },
+  "delta": {
+    "accuracy": 0.28,
+    "mean_confidence": 0.12090690504759549,
+    "max_confidence": 0.015613913536071777,
+    "effective_K": -3
+  },
+  "best_val_accuracy": 0.53
+}
